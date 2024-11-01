@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'DatDot';
+    font-style: normal;
+    font-weight: 400;
+    src: local('DatDot'), url('https://sos.emiia.ai/Datdot-K7prl.woff') format('woff');
+}
+@font-face {
+    font-family: 'DatDot';
+    font-style: normal;
+    font-weight: 300;
+    src: local('DatDot'), url('https://sos.emiia.ai/DatdotLight-MVEKn.woff') format('woff');
+}
+@font-face {
+    font-family: 'DatDot';
+    font-style: normal;
+    font-weight: 700;
+    src: local('DatDot'), url('https://sos.emiia.ai/DatdotBold-BWOJ8.woff') format('woff');
+}
