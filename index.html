@@ -1,10 +1,94 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>CSS Rubik's Cube</title>
+		<title>Cube</title>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+
+
+
+
+
+
+
+ <style>  
+   
+  
+
+
+body {
+
+
+
+
+.container {
+  color: #333;
+  margin: 0 auto;
+  text-align: left;
+}
+
+h1 {
+  font-weight: normal;
+  letter-spacing: .125rem;
+  text-transform: uppercase;
+}
+
+li {
+  display: ;
+  font-size: 1.0em;
+  list-style-type: none;
+  padding: 1em;
+  text-transform: uppercase;
+}
+
+li span {
+  display: block;
+  font-size: 5.5rem;
+}
+
+.emoji {
+  display: none;
+  padding: 1rem;
+}
+
+.emoji span {
+  font-size: 4rem;
+  padding: 0 .5rem;
+}
+
+@media all and (max-width: 768px) {
+  h1 {
+    font-size: calc(1.5rem * var(--smaller));
+  }
+  
+  li {
+    font-size: calc(1.125rem * var(--smaller));
+  }
+  
+  li span {
+    font-size: calc(3.375rem * var(--smaller));
+  }
+}
+   
+   </style>
+   
+        
+        
+
+
+
+
+
+
+
+
+		
 		<link rel="stylesheet" type="text/css" href="cube.css">
 		<link rel="stylesheet" type="text/css" href="cuberotation.css">
 		
@@ -325,7 +409,44 @@
 				</div>
 
 			</div>
-		</div>		
+		</div>	
+
+
+
+
+
+
+
+
+
+
+
+ <!-- partial:index.partial.html -->
+<div class="container">
+  <h1 id="headline"></h1>
+  <div id="countdown">
+    <ul>
+      <li><span id="days"></span>days</li>
+      <li><span id="hours"></span>Hours</li>
+      <li><span id="minutes"></span>Minutes</li>
+      <li><span id="seconds"></span>Seconds</li>
+    </ul>
+  </div>
+  <div id="content" class="emoji">
+    <span>🥳</span>
+    <span>🎉</span>
+    <span>🎂</span>
+  </div>
+</div>
+<!-- partial -->
+        
+
+
+
+
+
+
+		
 	</body>
 
 
