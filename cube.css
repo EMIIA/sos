@@ -67,14 +67,22 @@
 .cubie-middle-u  { transform: translate3d(0px, -100px, 0px); }
 .cubie-middle-d  { transform: translate3d(0px, 100px, 0px); }
 
+
+
+
+
 .cubie-face {
 	position: absolute;
 	width: 100px;
 	height: 100px;
-	background-color: rgba(0,30,60,0.2);
-	/*border-radius: 16px;*/
+	background-color: rgba(255,255,255,1);
+	border-radius: 16px;
 	transform-style: preserve-3d;
 }
+
+
+
+
 .face-u { transform: rotateX(90deg)  translateZ(50px); }
 .face-f { transform:                 translateZ(50px); }
 .face-r { transform: rotateY(90deg)  translateZ(50px); }
