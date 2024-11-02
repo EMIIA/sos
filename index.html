@@ -101,9 +101,26 @@ body {
 
 
 .container {
-  color: #d9d9d9;
-  margin: 0 auto;
-  text-align: center;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* div position */
+  position: fixed;
+  margin: auto;
+
+  
+  
+  padding-top: 10em;
+  
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  /* visual styling */
+
+  background: transparent;
+ 
 
 }
 
@@ -509,20 +526,21 @@ li span {
   
         
  <!-- partial:index.partial.html -->
-<div class="container"  style="text-align: center">
-  <h1 id="headline" style="text-align: center"></h1>
-  <div id="countdown" style="position: fixed; bottom: 1.9em; right: 1.3em; z-index: +20000;" style="text-align: center">
+<div class="container" >
+  <h1 id="headline"></h1>
+
     <ul>
-      <li><span id="days" style="font-family: datdot; font-size: 2.3rem; color:  #fad57a;"></span></li>
-      <li><span id="hours" style="font-family: datdot; font-size: 2.3rem; color:  #eb5b57;"></span></li>
-      <li><span id="minutes" style="font-family: datdot; font-size: 2.3rem; color:  #517eb9;"></span></li>
-      <li><span id="seconds" style="font-family: datdot; font-size: 2.3rem; color:  #748c6a"></span></li>
+      <li><span id="days" style="font-family: datdot; font-size: 2.3rem;"></span></li>
+      <li><span id="hours" style="font-family: datdot; font-size: 2.3rem;"></span></li>
+      <li><span id="minutes" style="font-family: datdot; font-size: 2.3rem;"></span></li>
+      <li><span id="seconds" style="font-family: datdot; font-size: 2.3rem;"></span></li>
     </ul>
   </div>
 
-</div>
+
 <!-- partial -->
-   
+        
+        
         
  
         
