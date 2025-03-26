@@ -123,7 +123,7 @@ display: flex;
   margin: auto;
   
   
- 
+
   
   left: 0;
   right: 0;
@@ -131,7 +131,7 @@ display: flex;
 
   /* visual styling */
 
-  background: transparent;
+background-color: transparent;
  
 
 }
@@ -194,9 +194,11 @@ li span {
 .header {
     padding: 0rem;
     position: fixed;
-    top: 50px;
+    top: 65px;
     z-index: 20000;
     right: 2%;
+
+
 }
 
 
@@ -204,8 +206,8 @@ li span {
 
 @media (max-width: 768px) {
  .header {
-    top: 90px; /* Новое значение для мобильных */
-    right: 2%;
+    top: 95px; /* Новое значение для мобильных */
+    right: 3.5%;
   }
 }
 </style>
@@ -662,6 +664,54 @@ li span {
 
 
 	  
+
+
+
+
+
+<script type="text/javascript">
+ 
+ 
+
+
+
+const data = JSON.stringify({
+  eventType: 'web_app_setup_back_button',
+  eventData: { is_visible: false },
+});
+
+window.external.notify(data);
+ 
+ 
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+      tele.BackButton.show();
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
+
+
+          
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+
+
+
+
+
+
+
 
 
 	
