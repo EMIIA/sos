@@ -194,7 +194,7 @@ li span {
 .header {
     padding: 0rem;
     position: fixed;
-    top: 65px;
+    top: 70px;
     z-index: 20000;
     right: 2%;
 
@@ -207,7 +207,7 @@ li span {
 @media (max-width: 768px) {
  .header {
     top: 95px; /* Новое значение для мобильных */
-    right: 3.5%;
+    right: 4.5%;
   }
 }
 </style>
@@ -215,7 +215,22 @@ li span {
 
 
 
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+
+<script type="text/javascript">
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+     
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
 
 
 		
