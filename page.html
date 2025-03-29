@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF как HTML-страницы</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+    }
+    #pdf-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0px;
+    }
+    .pdf-page {
+      margin-bottom: 0px;
+      
+      background: white;
+      overflow: hidden;
+      border-radius: 5px;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+    }
+    #loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div id="pdf-container">
+    <div id="loading">Загрузка PDF...</div>
+  </div>
+
+  <script>
+    // Укажите путь к PDF
+    const pdfUrl = 'https://www.emiia.ru/emiia_ai_ru_sos.pdf'; // Замените на свой PDF
+    
+    // Инициализация PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+    
+    let pdfDoc = null;
+    const container = document.getElementById('pdf-container');
+    
+    // Загрузка PDF и рендеринг всех страниц
+    pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+      pdfDoc = pdf;
+      document.getElementById('loading').remove();
+      
+      // Рендерим все страницы
+      for (let i = 1; i <= pdf.numPages; i++) {
+        renderPage(i);
+      }
+    });
+    
+    // Отрисовка одной страницы
+    function renderPage(pageNumber) {
+      pdfDoc.getPage(pageNumber).then(function(page) {
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Настройка canvas
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        
+        // Создаем контейнер для страницы
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'pdf-page';
+        pageDiv.appendChild(canvas);
+        container.appendChild(pageDiv);
+        
+        // Рендерим страницу
+        page.render({
+          canvasContext: ctx,
+          viewport: viewport
+        });
+      });
+    }
+  </script>
+</body>
+</html>
