@@ -13,8 +13,8 @@
             width: 100%;
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
-            overflow: hidden; /* Убираем двойную прокрутку */
-            font-size: 16px; /* Базовый размер шрифта увеличен */
+            overflow: hidden;
+            font-size: 16px;
         }
 
         /* Основной контейнер */
@@ -27,7 +27,7 @@
         h1 {
             margin: 20px 15px 15px 15px;
             color: #333;
-            font-size: 1.8rem; /* Увеличенный размер */
+            font-size: 1.8rem;
         }
 
         /* Статус бар */
@@ -48,7 +48,7 @@
             border: 1px solid #ddd;
             background: white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Стилизация скроллбара */
@@ -76,9 +76,8 @@
         table {
             border-collapse: collapse;
             width: 100%;
-            min-width: 600px; /* Минимальная ширина для таблицы */
-            table-layout: fixed; /* Фиксированная ширина столбцов */
-            word-wrap: break-word; /* Перенос длинных слов */
+            min-width: 600px;
+            table-layout: fixed;
         }
 
         thead th {
@@ -91,7 +90,8 @@
             font-weight: bold;
             z-index: 10;
             font-size: 1.1rem;
-            white-space: normal; /* Разрешаем перенос текста */
+            white-space: normal;
+            word-break: break-word;
         }
 
         td {
@@ -99,8 +99,8 @@
             border-bottom: 1px solid #eee;
             vertical-align: top;
             font-size: 1rem;
-            white-space: normal; /* Разрешаем перенос текста */
-            word-break: break-word; /* Перенос длинных слов */
+            white-space: pre-wrap; /* Сохраняем переносы как в оригинале */
+            word-break: normal; /* Отключаем принудительный перенос слов */
         }
 
         tr:hover td {
@@ -112,7 +112,7 @@
             text-decoration: none;
             cursor: pointer;
             font-size: 1rem;
-            word-break: break-all; /* Перенос длинных URL */
+            white-space: pre-wrap; /* Для ссылок тоже сохраняем переносы */
         }
 
         a:hover {
@@ -122,7 +122,7 @@
         /* Адаптивные стили для мобильных устройств */
         @media screen and (max-width: 768px) {
             html, body {
-                font-size: 18px; /* Еще больше на маленьких экранах */
+                font-size: 18px;
             }
             
             h1 {
@@ -150,7 +150,6 @@
             }
         }
 
-        /* Для очень маленьких экранов */
         @media screen and (max-width: 480px) {
             html, body {
                 font-size: 16px;
@@ -160,7 +159,6 @@
                 font-size: 1.8rem;
             }
             
-            /* Уменьшаем отступы для очень маленьких экранов */
             .status, .table-wrapper {
                 margin-left: 5px;
                 margin-right: 5px;
@@ -180,13 +178,11 @@
 </div>
 
 <script>
-    // Конфигурация
     const CONFIG = {
         csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTMEg8_wienbwIqTvkudtMjty2a9JnUWb8g-J6kwqcAYs9kH5v-S-xt6vMRMR3zFbRFjPH4keJMFnv9/pub?output=csv',
-        reloadInterval: 60000 // 1 минута
+        reloadInterval: 60000
     };
 
-    // Основная функция загрузки
     async function loadCSVData() {
         try {
             document.getElementById('status').textContent = 'Загрузка данных...';
@@ -213,7 +209,6 @@
         }
     }
 
-    // Парсинг CSV
     function parseCSV(text) {
         const rows = [];
         let currentRow = [];
@@ -246,7 +241,6 @@
         return rows;
     }
 
-    // Отображение таблицы
     function renderTable(rows) {
         const table = document.getElementById('data-table');
         table.innerHTML = '';
@@ -294,20 +288,32 @@
         
         table.appendChild(tbody);
         
-        // Установка ширины столбцов на основе первого ряда данных
+        // Автоматическая ширина столбцов на основе содержимого
         if (rows.length > 1) {
-            const firstRow = table.querySelector('tbody tr:first-child');
-            if (firstRow) {
-                const cells = firstRow.cells;
-                for (let i = 0; i < cells.length; i++) {
-                    const contentWidth = Math.min(Math.max(cells[i].textContent.length * 8, 100), 300); // Минимальная 100px, максимальная 300px
-                    table.rows[0].cells[i].style.width = `${contentWidth}px`;
+            const cols = rows[0].length;
+            const colWidths = new Array(cols).fill(0);
+            
+            // Находим максимальную ширину для каждого столбца
+            for (let i = 0; i < rows.length; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (rows[i][j]) {
+                        const cellLength = rows[i][j].length;
+                        if (cellLength > colWidths[j]) {
+                            colWidths[j] = cellLength;
+                        }
+                    }
                 }
+            }
+            
+            // Устанавливаем ширину столбцов
+            const headerCells = table.rows[0].cells;
+            for (let i = 0; i < cols; i++) {
+                const width = Math.min(Math.max(colWidths[i] * 8, 80), 400); // Минимум 80px, максимум 400px
+                headerCells[i].style.width = `${width}px`;
             }
         }
     }
 
-    // Извлечение URL
     function extractUrl(text) {
         const urlRegex = /(?:(?:https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*/gi;
         const match = text.match(urlRegex);
@@ -322,14 +328,12 @@
         return url;
     }
 
-    // Автоперезагрузка
     function setupAutoReload() {
         setInterval(() => {
             loadCSVData();
         }, CONFIG.reloadInterval);
     }
 
-    // Инициализация
     document.addEventListener('DOMContentLoaded', () => {
         loadCSVData();
         setupAutoReload();
