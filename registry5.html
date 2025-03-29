@@ -279,7 +279,52 @@ border-radius: 4px;
 
 
 
+    <style>
+        /* ОБЩИЕ СТИЛИ */
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            color: #333;
+            font-size: 14px; /* Базовый размер шрифта */
+        }
 
+        /* КОНТЕЙНЕР */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+
+        /* Адаптивные стили для мобильных устройств */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 14px !important; /* Фиксированный размер */
+            }
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.4em !important;
+            }
+            th, td {
+                padding: 8px 10px !important;
+                font-size: 14px !important; /* Единый размер */
+            }
+            #status {
+                font-size: 14px !important;
+                padding: 8px 10px !important;
+            }
+        }
+
+        /* Остальные стили без изменений */
+        /* ... */
+    </style>
 
 
 
@@ -430,6 +475,16 @@ border-radius: 4px;
         loadData();
         setInterval(loadData, RELOAD_INTERVAL);
     });
+
+
+
+
+document.body.style.fontSize = '14px';
+Array.from(document.querySelectorAll('th, td')).forEach(el => {
+    el.style.fontSize = '14px';
+});
+
+
 </script>
 </body>
 </html>
