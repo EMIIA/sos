@@ -3,31 +3,75 @@
 <head>
     <title>Данные из Google Таблицы</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Убираем все отступы по умолчанию */
+        html, body {
             margin: 0;
-            padding: 20px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: Arial, sans-serif;
             background-color: #f9f9f9;
             overflow: hidden; /* Убираем двойную прокрутку */
         }
+
+        /* Основной контейнер */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Заголовок */
         h1 {
-            margin: 0 0 15px 0;
+            margin: 15px 15px 10px 15px;
             color: #333;
         }
+
+        /* Статус бар */
+        .status {
+            padding: 10px 15px;
+            margin: 0 15px 15px 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            color: #0d47a1;
+        }
+
+        /* Контейнер таблицы */
         .table-wrapper {
             flex: 1;
             overflow: auto;
+            margin: 0 15px 15px 15px;
             border: 1px solid #ddd;
             background: white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+
+        /* Стилизация скроллбара */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 6px;
+            border: 3px solid #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Стили таблицы */
         table {
             border-collapse: collapse;
             width: 100%;
         }
+
         thead th {
             position: sticky;
             top: 0;
@@ -38,28 +82,25 @@
             font-weight: bold;
             z-index: 10;
         }
+
         td {
             padding: 8px 15px;
             border-bottom: 1px solid #eee;
             vertical-align: top;
         }
+
         tr:hover td {
             background-color: #f5f5f5;
         }
+
         a {
             color: #0066cc;
             text-decoration: none;
             cursor: pointer;
         }
+
         a:hover {
             text-decoration: underline;
-        }
-        .status {
-            padding: 10px;
-            margin-bottom: 15px;
-            background: #e3f2fd;
-            border-radius: 4px;
-            color: #0d47a1;
         }
     </style>
 </head>
