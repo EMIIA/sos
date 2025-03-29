@@ -2,242 +2,316 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Данные из Google Таблицы</title>
+    <title>Реестр "Безопасная среда"</title>
     <style>
-        /* Убираем все отступы по умолчанию */
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            overflow: hidden;
-            font-size: 16px;
-        }
-
-        /* Основной контейнер */
+        /* ОБЩИЕ СТИЛИ */
         body {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Заголовок */
-        h1 {
-            margin: 20px 15px 15px 15px;
+            font-family: monospace;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
             color: #333;
-            font-size: 1.8rem;
         }
 
-        /* Статус бар */
-        .status {
-            padding: 15px;
-            margin: 0 15px 15px 15px;
-            background: #e3f2fd;
-            border-radius: 6px;
-            color: #0d47a1;
-            font-size: 1.1rem;
-        }
-
-        /* Контейнер таблицы */
-        .table-wrapper {
-            flex: 1;
-            overflow: auto;
-            margin: 0 15px 15px 15px;
-            border: 1px solid #ddd;
+        /* КОНТЕЙНЕР */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
             background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
         }
 
-        /* Стилизация скроллбара */
-        ::-webkit-scrollbar {
-            width: 12px;
-            height: 12px;
+        /* ЗАГОЛОВОК */
+        h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f2f2f2;
         }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 6px;
+        /* СТАТУС */
+        #status {
+            margin: 15px 0;
+            padding: 12px 15px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 0.95em;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 6px;
-            border: 3px solid #f1f1f1;
+        .time-separator {
+            color: #bdc3c7;
+            margin: 0 8px;
+            font-weight: normal;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        /* ТАБЛИЦА */
+        .table-container {
+            overflow: auto; /* Изменено на auto для вертикальной прокрутки */
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            background: white;
+            max-height: 70vh; /* Ограничение высоты для вертикальной прокрутки */
         }
 
-        /* Стили таблицы */
         table {
-            border-collapse: collapse;
             width: 100%;
-            min-width: 600px;
+            border-collapse: separate;
+            border-spacing: 0;
             table-layout: fixed;
         }
 
-        thead th {
-            position: sticky;
-            top: 0;
-            background: #f2f2f2;
-            padding: 15px;
-            text-align: left;
-            border-bottom: 2px solid #ddd;
-            font-weight: bold;
-            z-index: 10;
-            font-size: 1.1rem;
-            white-space: normal;
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+            white-space: pre-wrap;
             word-break: break-word;
         }
 
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: top;
-            font-size: 1rem;
-            white-space: pre-wrap; /* Сохраняем переносы как в оригинале */
-            word-break: normal; /* Отключаем принудительный перенос слов */
+        th {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: bold;
+            color: #2c3e50;
         }
 
-        tr:hover td {
-            background-color: #f5f5f5;
+        tr:last-child td {
+            border-bottom: none;
         }
 
+        /* Закругленные углы */
+        tr:first-child th:first-child {
+            border-top-left-radius: 10px;
+        }
+        tr:first-child th:last-child {
+            border-top-right-radius: 10px;
+        }
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
+        }
+
+        /* ССЫЛКИ */
         a {
-            color: #0066cc;
+            color: #3498db;
             text-decoration: none;
-            cursor: pointer;
-            font-size: 1rem;
-            white-space: pre-wrap; /* Для ссылок тоже сохраняем переносы */
+            transition: color 0.2s;
         }
-
         a:hover {
+            color: #2980b9;
             text-decoration: underline;
         }
 
-        /* Адаптивные стили для мобильных устройств */
-        @media screen and (max-width: 768px) {
-            html, body {
-                font-size: 18px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-                margin: 15px 10px 10px 10px;
-            }
-            
-            .status {
-                padding: 12px;
-                margin: 0 10px 10px 10px;
-                font-size: 1rem;
-            }
-            
-            .table-wrapper {
-                margin: 0 10px 10px 10px;
-            }
-            
-            thead th {
-                padding: 12px;
-                font-size: 1rem;
-            }
-            
-            td {
-                padding: 10px 12px;
-            }
+        /* ПОЛОСА ПРОКРУТКИ */
+        .table-container::-webkit-scrollbar {
+            width: 8px;  /* Вертикальная полоса */
+            height: 8px; /* Горизонтальная полоса */
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #95a5a6; /* Серый цвет */
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #7f8c8d; /* Темнее при наведении */
+        }
+        .table-container::-webkit-scrollbar-button {
+            display: none; /* Убираем стрелки */
         }
 
-        @media screen and (max-width: 480px) {
-            html, body {
-                font-size: 16px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .status, .table-wrapper {
-                margin-left: 5px;
-                margin-right: 5px;
-            }
-        }
+
+
+        
+
+
+
     </style>
+
+
+
+
+
+    <style>
+        /* 1. Основной скролл страницы - убираем ТОЛЬКО стрелки */
+        ::-webkit-scrollbar {
+            width: 8px;  /* Сохраняем ширину полосы */
+border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Сохраняем фон дорожки */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #95a5a6; /* Сохраняем цвет ползунка */
+        }
+        ::-webkit-scrollbar-button {
+            display: none !important; /* Убираем ВСЕ стрелки */
+            height: 0;
+            width: 0;
+border-radius: 4px;
+        }
+
+        /* 2. Оригинальные стили без изменений */
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+border-radius: 4px;
+        }
+        
+        /* 3. Стили скролла таблицы (оставляем как есть) */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #95a5a6;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-button {
+            display: none;
+        }
+
+
+
+
+
+
+
+
+        /* 1. Основной скролл страницы - полное отключение стрелок */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-button {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+        ::-webkit-scrollbar-thumb {
+            background:#95a5a6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+
+
+
+
+
+
+
+    </style>
+
+
+
+    
+
+
+
+
+
+
+
+
+
 </head>
 <body>
-
-<h1>Реестр "Безопасная среда"</h1>
-<div id="status" class="status">Загрузка данных...</div>
-
-<div class="table-wrapper">
-    <table id="data-table">
-        <!-- Данные будут вставлены сюда -->
-    </table>
+<div class="container">
+    <h1>Реестр "Безопасная среда"</h1>
+    <div id="status">Загрузка данных...</div>
+    <div class="table-container">
+        <table id="data-table"></table>
+    </div>
 </div>
 
 <script>
-    const CONFIG = {
-        csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTMEg8_wienbwIqTvkudtMjty2a9JnUWb8g-J6kwqcAYs9kH5v-S-xt6vMRMR3zFbRFjPH4keJMFnv9/pub?output=csv',
-        reloadInterval: 60000
-    };
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTMEg8_wienbwIqTvkudtMjty2a9JnUWb8g-J6kwqcAYs9kH5v-S-xt6vMRMR3zFbRFjPH4keJMFnv9/pub?output=csv';
+    const RELOAD_INTERVAL = 60000;
 
-    async function loadCSVData() {
+    function findUrls(text) {
+        const urlRegex = /(https?:\/\/[^\s]+)/gi;
+        return text.match(urlRegex) || [];
+    }
+
+    async function loadData() {
         try {
-            document.getElementById('status').textContent = 'Загрузка данных...';
-            
-            const response = await fetch(CONFIG.csvUrl + '&t=' + Date.now());
-            if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
-            
+            document.getElementById('status').textContent = 'Загрузка...';
+            const response = await fetch(CSV_URL + '&t=' + Date.now());
             const csvData = await response.text();
             const rows = parseCSV(csvData);
-            if (!rows.length) throw new Error('Таблица пуста');
-            
             renderTable(rows);
+            
             const now = new Date();
-            document.getElementById('status').textContent = `Данные обновлены: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+            const formattedDate = now.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            const formattedTime = now.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            document.getElementById('status').innerHTML = `
+                Данные обновлены: <strong>${formattedDate}</strong>
+                <span class="time-separator">|</span>
+                <strong>${formattedTime}</strong>
+            `;
             
         } catch (error) {
-            console.error('Ошибка:', error);
-            document.getElementById('status').textContent = `Ошибка: ${error.message}`;
-            document.getElementById('data-table').innerHTML = `
-                <tr><td colspan="100%" style="color: #d32f2f; padding: 20px; text-align: center;">
-                    Не удалось загрузить данные. Проверьте URL и доступ к таблице.
-                </td></tr>
-            `;
+            document.getElementById('status').textContent = 'Ошибка загрузки';
+            console.error(error);
         }
     }
 
     function parseCSV(text) {
         const rows = [];
-        let currentRow = [];
+        let row = [""];
         let inQuotes = false;
-        let currentCell = '';
-        
+        let currentChar;
+
         for (let i = 0; i < text.length; i++) {
-            const char = text[i];
+            currentChar = text[i];
             
-            if (char === '"') {
+            if (currentChar === '"') {
                 inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                currentRow.push(currentCell.trim());
-                currentCell = '';
-            } else if (char === '\n' && !inQuotes) {
-                currentRow.push(currentCell.trim());
-                rows.push(currentRow);
-                currentRow = [];
-                currentCell = '';
+            } else if (currentChar === ',' && !inQuotes) {
+                row.push("");
+            } else if (currentChar === '\n' && !inQuotes) {
+                rows.push(row);
+                row = [""];
             } else {
-                currentCell += char;
+                row[row.length-1] += currentChar;
             }
         }
-        
-        if (currentCell.trim() || currentRow.length) {
-            currentRow.push(currentCell.trim());
-            rows.push(currentRow);
-        }
-        
+        rows.push(row);
         return rows;
     }
 
@@ -245,10 +319,10 @@
         const table = document.getElementById('data-table');
         table.innerHTML = '';
         
-        // Создаем заголовок
+        if (rows.length === 0) return;
+        
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        
         rows[0].forEach(cell => {
             const th = document.createElement('th');
             th.textContent = cell;
@@ -257,86 +331,57 @@
         thead.appendChild(headerRow);
         table.appendChild(thead);
         
-        // Создаем тело таблицы
         const tbody = document.createElement('tbody');
-        
         for (let i = 1; i < rows.length; i++) {
-            if (!rows[i].join('').trim()) continue;
-            
             const tr = document.createElement('tr');
-            
             rows[i].forEach(cell => {
                 const td = document.createElement('td');
-                const url = extractUrl(cell);
+                const urls = findUrls(cell);
                 
-                if (url) {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.textContent = cell;
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    td.appendChild(a);
+                if (urls.length > 0) {
+                    let content = cell;
+                    urls.forEach(url => {
+                        content = content.replace(url, 
+                            `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+                    });
+                    td.innerHTML = content;
                 } else {
                     td.textContent = cell;
                 }
                 
                 tr.appendChild(td);
             });
-            
             tbody.appendChild(tr);
         }
-        
         table.appendChild(tbody);
         
-        // Автоматическая ширина столбцов на основе содержимого
-        if (rows.length > 1) {
-            const cols = rows[0].length;
-            const colWidths = new Array(cols).fill(0);
-            
-            // Находим максимальную ширину для каждого столбца
-            for (let i = 0; i < rows.length; i++) {
-                for (let j = 0; j < cols; j++) {
-                    if (rows[i][j]) {
-                        const cellLength = rows[i][j].length;
-                        if (cellLength > colWidths[j]) {
-                            colWidths[j] = cellLength;
-                        }
-                    }
-                }
+        adjustColumnWidths(table);
+    }
+
+    function adjustColumnWidths(table) {
+        const colCount = table.rows[0].cells.length;
+        const colWidths = new Array(colCount).fill(100);
+        
+        for (let i = 0; i < table.rows.length; i++) {
+            for (let j = 0; j < colCount; j++) {
+                const cell = table.rows[i].cells[j];
+                const text = cell.textContent || cell.innerText;
+                const lines = text.split('\n');
+                const maxLength = Math.max(...lines.map(l => l.length));
+                colWidths[j] = Math.max(colWidths[j], maxLength * 8 + 20);
             }
-            
-            // Устанавливаем ширину столбцов
-            const headerCells = table.rows[0].cells;
-            for (let i = 0; i < cols; i++) {
-                const width = Math.min(Math.max(colWidths[i] * 8, 80), 400); // Минимум 80px, максимум 400px
-                headerCells[i].style.width = `${width}px`;
+        }
+        
+        for (let j = 0; j < colCount; j++) {
+            for (let i = 0; i < table.rows.length; i++) {
+                table.rows[i].cells[j].style.width = `${Math.min(colWidths[j], 500)}px`;
             }
         }
     }
 
-    function extractUrl(text) {
-        const urlRegex = /(?:(?:https?|ftp):\/\/|www\.)[^\s/$.?#].[^\s]*/gi;
-        const match = text.match(urlRegex);
-        
-        if (!match) return null;
-        
-        let url = match[0];
-        if (!url.startsWith('http')) {
-            url = 'http://' + url;
-        }
-        
-        return url;
-    }
-
-    function setupAutoReload() {
-        setInterval(() => {
-            loadCSVData();
-        }, CONFIG.reloadInterval);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        loadCSVData();
-        setupAutoReload();
+    document.addEventListener('DOMContentLoaded', function() {
+        loadData();
+        setInterval(loadData, RELOAD_INTERVAL);
     });
 </script>
 </body>
