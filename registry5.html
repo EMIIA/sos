@@ -280,53 +280,36 @@ border-radius: 4px;
 
 
     <style>
-        /* ОБЩИЕ СТИЛИ */
+        /* Базовые стили */
         body {
             font-family: monospace;
             margin: 0;
             padding: 15px;
             background-color: #f8f9fa;
             color: #333;
-            font-size: 14px; /* Базовый размер шрифта */
+            -webkit-text-size-adjust: 100%; /* Фиксируем размер шрифта */
         }
-
-        /* КОНТЕЙНЕР */
+        
+        /* Фиксированные размеры для всей таблицы */
+        table {
+            font-size: 14px !important;
+        }
+        th, td {
+            font-size: 14px !important;
+        }
+        
+        /* Остальные ваши стили без изменений */
         .container {
             max-width: 100%;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            padding: 15px;
+            padding: 20px;
         }
-
-        /* Адаптивные стили для мобильных устройств */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                font-size: 14px !important; /* Фиксированный размер */
-            }
-            .container {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 1.4em !important;
-            }
-            th, td {
-                padding: 8px 10px !important;
-                font-size: 14px !important; /* Единый размер */
-            }
-            #status {
-                font-size: 14px !important;
-                padding: 8px 10px !important;
-            }
-        }
-
-        /* Остальные стили без изменений */
-        /* ... */
+        
+        /* ... другие ваши стили ... */
     </style>
-
-
 
 
 
@@ -341,7 +324,39 @@ border-radius: 4px;
     </div>
 </div>
 
+
+
+
+
+
+
+
 <script>
+    // Принудительная установка размеров после загрузки
+    document.addEventListener('DOMContentLoaded', function() {
+        // Фиксируем размеры шрифтов в таблице
+        const table = document.getElementById('data-table');
+        if (table) {
+            table.style.fontSize = '14px';
+            const cells = table.querySelectorAll('th, td');
+            cells.forEach(cell => {
+                cell.style.fontSize = '14px';
+            });
+        }
+        
+        // Ваш существующий код загрузки данных
+        // ...
+    });
+</script>
+
+
+
+
+
+
+<script>
+
+
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTMEg8_wienbwIqTvkudtMjty2a9JnUWb8g-J6kwqcAYs9kH5v-S-xt6vMRMR3zFbRFjPH4keJMFnv9/pub?output=csv';
     const RELOAD_INTERVAL = 60000;
 
@@ -479,10 +494,7 @@ border-radius: 4px;
 
 
 
-document.body.style.fontSize = '14px';
-Array.from(document.querySelectorAll('th, td')).forEach(el => {
-    el.style.fontSize = '14px';
-});
+
 
 
 </script>
