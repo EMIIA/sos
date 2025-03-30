@@ -450,26 +450,7 @@ border-radius: 4px;
 
 
 
-<style>
-  /* Только фиксация плавания в мобильной версии */
-  @media (max-width: 768px) {
-    .table-container {
-      -webkit-overflow-scrolling: touch;
-      overflow-anchor: none; /* Отключаем автоматическое смещение */
-    }
-    
-    table {
-      transform: translateZ(0); /* Аппаратное ускорение */
-      will-change: transform; /* Оптимизация рендеринга */
-    }
-    
-    th {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-  }
-</style>
+
 
 
 
