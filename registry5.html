@@ -7,13 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 
-    <title>Реестр "Безопасная среда"</title>
+    <title>Реестр: Безопасная среда</title>
     <style>
         /* ОБЩИЕ СТИЛИ */
         body {
             font-family: monospace;
             margin: 0;
-            padding: 5px;
+            padding: -10px;
             background-color: #f8f9fa;
             color: #333;
         }
@@ -41,7 +41,7 @@
         /* СТАТУС */
         #status {
             margin: 15px 0;
-            padding: 12px 15px;
+            padding: 2px 5px;
             background: #f5f7fa;
             border-radius: 8px;
             display: inline-block;
@@ -314,11 +314,143 @@ border-radius: 4px;
 
 
 
+
+
+
+
+
+
+<style>
+        /* ОБЩИЕ СТИЛИ */
+        body {
+            font-family: monospace;
+            margin: 0;
+            padding: 5px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* КОНТЕЙНЕР */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 5px;
+        }
+
+        /* ЗАГОЛОВОК */
+        h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f2f2f2;
+        }
+
+        /* СТАТУС */
+        #status {
+            margin: 15px 0;
+            padding: 12px 15px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 0.95em;
+        }
+
+        .time-separator {
+            color: #bdc3c7;
+            margin: 0 8px;
+            font-weight: normal;
+        }
+
+        /* ТАБЛИЦА */
+        .table-container {
+            overflow: auto;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            background: white;
+            max-height: 70vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Изменено с separate на collapse */
+            border-spacing: 0;
+            table-layout: fixed;
+            border: 1px solid #e0e0e0; /* Добавлена граница для таблицы */
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0; /* Добавлены вертикальные линии */
+            vertical-align: top;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Убираем правую границу у последней ячейки в строке */
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        /* Остальные стили без изменений */
+        /* ... */
+    </style>
+
+
+
+
+
+
+
+
+
+<style>
+        /* Только стиль для фиксации шапки таблицы в мобильной версии */
+        @media (max-width: 768px) {
+            th {
+                position: -webkit-sticky; /* Для Safari */
+                position: sticky;
+                top: 0;
+                z-index: 10; /* Увеличиваем z-index для надежности */
+            }
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
 </head>
 <body>
 <div class="container">
-    <h1>Реестр "Безопасная среда"</h1>
-    <div id="status">Загрузка данных...</div>
+    <h1>Реестр: Безопасная среда</h1>
+    <div id="status">EMIIA.AI ERP...</div>
     <div class="table-container">
         <table id="data-table"></table>
     </div>
@@ -498,5 +630,55 @@ border-radius: 4px;
 
 
 </script>
+
+
+
+
+
+
+
+<script>
+    // ... весь предыдущий JavaScript код ...
+
+    async function loadData() {
+        try {
+            document.getElementById('status').textContent = 'ОБНОВЛЕНИЕ: EMIIA.AI ERP';  // Изменено здесь
+            const response = await fetch(CSV_URL + '&t=' + Date.now());
+            const csvData = await response.text();
+            const rows = parseCSV(csvData);
+            renderTable(rows);
+            
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            const formattedTime = now.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            document.getElementById('status').innerHTML = `
+                EMIIA.AI ERP: <strong>${formattedDate}</strong>  <!-- Изменено здесь -->
+                <span class="time-separator">|</span>
+                <strong>${formattedTime}</strong>
+            `;
+            
+        } catch (error) {
+            document.getElementById('status').textContent = 'EMIIA.AI ERP';  // Изменено здесь
+            console.error(error);
+        }
+    }
+
+    // ... остальной JavaScript код без изменений ...
+</script>
+
+
+
+
+
 </body>
 </html>
