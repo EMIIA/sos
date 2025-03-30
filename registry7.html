@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Данные из Google Таблицы</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px 0;
+      font-family: Arial, sans-serif;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+    .loading {
+      color: #666;
+      font-style: italic;
+    }
+    .error {
+      color: red;
+      padding: 20px;
+      border: 1px solid red;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div id="data-container">
+  <p class="loading">Загрузка данных...</p>
+</div>
+
+<script>
+// Функция для создания кликабельных ссылок
+function makeLinksClickable(text, rowData) {
+  if (!text) return text;
+
+  // Если текущий текст уже ссылка или email — обрабатываем стандартно
+  if (text.includes('http') || text.includes('@') || text.includes('www.')) {
+    if (text.includes('@')) {
+      return `<a href="mailto:${text}">${text}</a>`;
+    } else {
+      const fullUrl = text.startsWith('http') ? text : `http://${text}`;
+      return `<a href="${fullUrl}" target="_blank">${text}</a>`;
+    }
+  }
+
+  // Ищем первую ссылку в строке (из других колонок)
+  const firstLinkInRow = rowData.find(cell => 
+    typeof cell === 'string' && 
+    (cell.includes('http') || cell.includes('@') || cell.includes('www.'))
+  );
+
+  // Если нашли ссылку — делаем текущий текст кликабельным
+  if (firstLinkInRow) {
+    if (firstLinkInRow.includes('@')) {
+      return `<a href="mailto:${firstLinkInRow}">${text}</a>`;
+    } else {
+      const fullUrl = firstLinkInRow.startsWith('http') ? firstLinkInRow : `http://${firstLinkInRow}`;
+      return `<a href="${fullUrl}" target="_blank">${text}</a>`;
+    }
+  }
+
+  // Если ссылок в строке нет — возвращаем обычный текст
+  return text;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('data-container');
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbyfbSUEAWWDI6-vSqHP2tqmqtq-7qgn3HGeTdtlxkPt417D6PPg6hP0NBhGfOXqRhhxCA/exec';
+  
+  // Добавляем случайный параметр для избежания кэширования
+  const url = apiUrl + '?cache=' + Math.random().toString(36).substring(2);
+  
+  fetch(url)
+    .then(response => {
+      // Проверяем Content-Type
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        return response.text().then(text => {
+          throw new Error(`Ожидался JSON, но получен: ${text.substring(0, 100)}...`);
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (!data.success) {
+        throw new Error(data.error || 'Неизвестная ошибка сервера');
+      }
+      
+      // Создаем таблицу
+      let html = '<table><thead><tr>';
+      
+      // Заголовки
+      data.headers.forEach(header => {
+        html += `<th>${header}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+      
+      // Данные
+      data.rows.forEach(row => {
+        html += '<tr>';
+        row.forEach(cell => {
+          // Передаём всю строку (row) в makeLinksClickable
+          html += `<td>${makeLinksClickable(cell, row)}</td>`;
+        });
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+      container.innerHTML = `
+        <div class="error">
+          <strong>Ошибка загрузки данных:</strong><br>
+          ${error.message}<br><br>
+          <button onclick="window.location.reload()">Обновить страницу</button>
+        </div>
+      `;
+    });
+});
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
