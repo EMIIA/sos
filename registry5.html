@@ -425,17 +425,27 @@ border-radius: 4px;
 
 
 <style>
-        /* Только стиль для фиксации шапки таблицы в мобильной версии */
-        @media (max-width: 768px) {
-            th {
-                position: -webkit-sticky; /* Для Safari */
-                position: sticky;
-                top: 0;
-                z-index: 10; /* Увеличиваем z-index для надежности */
-            }
+    /* Фиксация таблицы для мобильных устройств */
+    @media (max-width: 768px) {
+        .table-container {
+            -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
+            overflow: auto;
+            overscroll-behavior: contain; /* Предотвращает "подпрыгивание" */
         }
-    </style>
-
+        
+        table {
+            transform: translateZ(0); /* Фикс для аппаратного ускорения */
+            backface-visibility: hidden; /* Предотвращает артефакты */
+        }
+        
+        th {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    }
+</style>
 
 
 
@@ -462,43 +472,6 @@ border-radius: 4px;
         }
     </style>
 
-
-
-
-
-
-
-
-
-
-<style>
-        /* Фиксация шапки ТОЛЬКО для мобильных */
-        @media (max-width: 768px) {
-            .table-container {
-                padding-top: 45px; /* Место под фиксированную шапку */
-            }
-            
-            table thead tr:first-child th {
-                position: fixed;
-                top: 5px; /* Отступ от верха экрана */
-                left: 5px;
-                right: 5px;
-                z-index: 1000;
-                background-color: #f8f9fa;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                margin: 0;
-                width: calc(100% - 10px); /* Ширина с учетом отступов */
-            }
-            
-            /* Восстановление скругленных углов */
-            table thead tr:first-child th:first-child {
-                border-top-left-radius: 10px !important;
-            }
-            table thead tr:first-child th:last-child {
-                border-top-right-radius: 10px !important;
-            }
-        }
-    </style>
 
 
 
