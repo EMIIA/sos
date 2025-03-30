@@ -279,38 +279,7 @@ border-radius: 4px;
 
 
 
-    <style>
-        /* Базовые стили */
-        body {
-            font-family: monospace;
-            margin: 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            color: #333;
-            -webkit-text-size-adjust: 100%; /* Фиксируем размер шрифта */
-        }
-        
-        /* Фиксированные размеры для всей таблицы */
-        table {
-            font-size: 14px !important;
-        }
-        th, td {
-            font-size: 14px !important;
-        }
-        
-        /* Остальные ваши стили без изменений */
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-        
-        /* ... другие ваши стили ... */
-    </style>
-
+    
 
 
 
@@ -471,6 +440,43 @@ border-radius: 4px;
             }
         }
     </style>
+
+
+
+
+
+
+
+
+
+
+<style>
+  /* Только фиксация плавания в мобильной версии */
+  @media (max-width: 768px) {
+    .table-container {
+      -webkit-overflow-scrolling: touch;
+      overflow-anchor: none; /* Отключаем автоматическое смещение */
+    }
+    
+    table {
+      transform: translateZ(0); /* Аппаратное ускорение */
+      will-change: transform; /* Оптимизация рендеринга */
+    }
+    
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+  }
+</style>
+
+
+
+
+
+
+
 
 
 
