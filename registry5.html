@@ -276,19 +276,6 @@ border-radius: 4px;
 
 
 
-
-
-
-    
-
-
-
-
-
-
-
-
-
 <style>
         /* ОБЩИЕ СТИЛИ */
         body {
@@ -393,69 +380,7 @@ border-radius: 4px;
 
 
 
-<style>
-    /* Фиксация таблицы для мобильных устройств */
-    @media (max-width: 768px) {
-        .table-container {
-            -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
-            overflow: auto;
-            overscroll-behavior: contain; /* Предотвращает "подпрыгивание" */
-        }
-        
-        table {
-            transform: translateZ(0); /* Фикс для аппаратного ускорения */
-            backface-visibility: hidden; /* Предотвращает артефакты */
-        }
-        
-        th {
-            position: -webkit-sticky;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-    }
-</style>
-
-
-
-
-
-
-
-
-<style>
-        /* Только исправление для фиксированной шапки в мобильной версии */
-        @media (max-width: 768px) {
-            .table-container {
-                margin-top: 0; /* Убираем отступ сверху */
-                border-top: none; /* Убираем верхнюю границу если есть */
-            }
-            
-            th {
-                position: -webkit-sticky;
-                position: sticky;
-                top: -1px; /* Компенсируем возможную границу */
-                z-index: 100;
-                margin-top: 0 !important;
-            }
-        }
-    </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 
 
 
@@ -667,7 +592,7 @@ border-radius: 4px;
 
     async function loadData() {
         try {
-            document.getElementById('status').textContent = 'ОБНОВЛЕНИЕ: EMIIA.AI ERP';  // Изменено здесь
+            document.getElementById('status').textContent = 'ОБНОВЛЕНИЕ: EMIIA.AI ERP...';  // Изменено здесь
             const response = await fetch(CSV_URL + '&t=' + Date.now());
             const csvData = await response.text();
             const rows = parseCSV(csvData);
