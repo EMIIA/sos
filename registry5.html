@@ -382,7 +382,19 @@ border-radius: 4px;
 
     
 
-
+<style>
+  /* Добавьте это в head, остальные стили не трогаем */
+  @media (max-width: 768px) {
+    table {
+      -webkit-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+      font-size: 14px !important;
+    }
+    th, td {
+      font-size: inherit !important;
+    }
+  }
+</style>
 
 
 
