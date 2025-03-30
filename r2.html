@@ -1,19 +1,8 @@
 <!DOCTYPE html>
 <html>
-
-
-
-
 <head>
-
-
-
-
-
-<meta charset="UTF-8">
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <title>Расписание</title>
     <style>
@@ -27,6 +16,7 @@
             text-align: center;
             color: #2c3e50;
             margin-bottom: 10px;
+font-size: 20px;
         }
         #update-info {
             text-align: right;
@@ -40,7 +30,7 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 15px;
+            padding: 0px;
         }
         table { 
             border-collapse: collapse; 
@@ -48,7 +38,7 @@
         }
         td, th { 
             border: 1px solid #ddd; 
-            padding: 8px; 
+            padding: 8px; /* Оригинальная высота от padding */
         }
         th {
             position: sticky;
@@ -66,14 +56,17 @@
     </style>
 </head>
 <body>
-    <h1>Расписание занятий</h1>
+    <h1>Реестр: Безопасная среда</h1>
     <div id="update-info"></div>
     <div id="table-container">
         <div id="table-content"></div>
     </div>
 
 <script>
-// ... (весь JavaScript остается без изменений)
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = 'https://script.google.com/macros/s/AKfycbyfbSUEAWWDI6-vSqHP2tqmqtq-7qgn3HGeTdtlxkPt417D6PPg6hP0NBhGfOXqRhhxCA/exec';
     const container = document.getElementById('table-content');
@@ -130,5 +123,78 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateTable, 60000);
 });
 </script>
+
+
+
+
+
+
+<script>
+    // ... весь предыдущий JavaScript код ...
+
+    async function loadData() {
+        try {
+            document.getElementById('status').textContent = 'Обновление: EMIIA.AI API...';  // Изменено здесь
+            const response = await fetch(CSV_URL + '&t=' + Date.now());
+            const csvData = await response.text();
+            const rows = parseCSV(csvData);
+            renderTable(rows);
+            
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            const formattedTime = now.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            document.getElementById('status').innerHTML = `
+                EMIIA.AI ERP: <strong>${formattedDate}</strong>  <!-- Изменено здесь -->
+                <span class="time-separator">|</span>
+                <strong>${formattedTime}</strong>
+            `;
+            
+        } catch (error) {
+            document.getElementById('status').textContent = 'EMIIA.AI ERP';  // Изменено здесь
+            console.error(error);
+        }
+    }
+
+    // ... остальной JavaScript код без изменений ...
+</script>
+
+
+
+
+
+<script>
+    // Принудительная установка размеров после загрузки
+    document.addEventListener('DOMContentLoaded', function() {
+        // Фиксируем размеры шрифтов в таблице
+        const table = document.getElementById('data-table');
+        if (table) {
+            table.style.fontSize = '14px';
+            const cells = table.querySelectorAll('th, td');
+            cells.forEach(cell => {
+                cell.style.fontSize = '14px';
+            });
+        }
+        
+        // Ваш существующий код загрузки данных
+        // ...
+    });
+</script>
+
+
+
+
+
+
+
 </body>
 </html>
