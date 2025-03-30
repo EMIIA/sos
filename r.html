@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Извлечение ссылок</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        td, th { border: 1px solid #ddd; padding: 8px; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div id="table-container"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyfbSUEAWWDI6-vSqHP2tqmqtq-7qgn3HGeTdtlxkPt417D6PPg6hP0NBhGfOXqRhhxCA/exec';
+    const container = document.getElementById('table-container');
+
+    const formatUrl = (url) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        if (url.includes('@')) return `mailto:${url}`;
+        return `https://${url}`;
+    };
+
+    const processCell = (cell) => {
+        if (cell.url) {
+            const url = formatUrl(cell.url);
+            return url ? `<a href="${url}" target="_blank">${cell.text}</a>` : cell.text;
+        }
+        
+        if (typeof cell === 'string') {
+            const urlMatch = cell.match(/(https?:\/\/[^\s]+|www\.[^\s]+|[^\s]+@[^\s]+\.[^\s]+)/i);
+            if (urlMatch) {
+                const url = formatUrl(urlMatch[0]);
+                return cell.replace(urlMatch[0], `<a href="${url}" target="_blank">${urlMatch[0]}</a>`);
+            }
+        }
+        
+        return cell;
+    };
+
+    const renderTable = (headers, rows) => {
+        let html = `<table><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        
+        rows.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                html += `<td>${processCell(cell)}</td>`;
+            });
+            html += '</tr>';
+        });
+        
+        return html + '</table>';
+    };
+
+    try {
+        const response = await fetch(API_URL);
+        const { success, headers, rows, error } = await response.json();
+        
+        if (!success) throw new Error(error);
+        container.innerHTML = renderTable(headers, rows);
+        
+    } catch (error) {
+        container.innerHTML = `<div style="color:red">Error: ${error.message}</div>`;
+    }
+});
+</script>
+</body>
+</html>
