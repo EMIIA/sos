@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Расписание</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        #update-info {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        #table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+        }
+        td, th { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #f5f5f5;
+            z-index: 1;
+        }
+        a { 
+            color: #0066cc; 
+            text-decoration: none; 
+        }
+        a:hover { 
+            text-decoration: underline; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Расписание занятий</h1>
+    <div id="update-info"></div>
+    <div id="table-container">
+        <div id="table-content"></div>
+    </div>
+
+<script>
+// ... (весь JavaScript остается без изменений)
+document.addEventListener('DOMContentLoaded', () => {
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyfbSUEAWWDI6-vSqHP2tqmqtq-7qgn3HGeTdtlxkPt417D6PPg6hP0NBhGfOXqRhhxCA/exec';
+    const container = document.getElementById('table-content');
+    const updateInfo = document.getElementById('update-info');
+
+    const formatUrl = (url) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        if (url.includes('@')) return `mailto:${url}`;
+        return `https://${url}`;
+    };
+
+    const processCell = (cell) => {
+        if (cell?.url) {
+            const url = formatUrl(cell.url);
+            return url ? `<a href="${url}" target="_blank">${cell.text}</a>` : cell.text;
+        }
+        if (typeof cell === 'string') {
+            const urlMatch = cell.match(/(https?:\/\/[^\s]+|www\.[^\s]+|[^\s]+@[^\s]+\.[^\s]+)/i);
+            if (urlMatch) {
+                const url = formatUrl(urlMatch[0]);
+                return cell.replace(urlMatch[0], `<a href="${url}" target="_blank">${urlMatch[0]}</a>`);
+            }
+        }
+        return cell;
+    };
+
+    const renderTable = (headers, rows) => {
+        let html = `<table><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        rows.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                html += `<td>${processCell(cell)}</td>`;
+            });
+            html += '</tr>';
+        });
+        return html + '</table>';
+    };
+
+    const updateTable = async () => {
+        try {
+            const response = await fetch(API_URL);
+            const { success, headers, rows, error } = await response.json();
+            if (!success) throw new Error(error);
+            container.innerHTML = renderTable(headers, rows);
+            const now = new Date().toLocaleString('ru-RU');
+            updateInfo.textContent = `Обновлено: ${now}`;
+        } catch (error) {
+            container.innerHTML = `<div style="color:red">Error: ${error.message}</div>`;
+        }
+    };
+
+    updateTable();
+    setInterval(updateTable, 300000);
+});
+</script>
+</body>
+</html>
