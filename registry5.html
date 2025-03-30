@@ -443,6 +443,36 @@ border-radius: 4px;
 
 
 
+<style>
+        /* Только исправление для фиксированной шапки в мобильной версии */
+        @media (max-width: 768px) {
+            .table-container {
+                margin-top: 0; /* Убираем отступ сверху */
+                border-top: none; /* Убираем верхнюю границу если есть */
+            }
+            
+            th {
+                position: -webkit-sticky;
+                position: sticky;
+                top: -1px; /* Компенсируем возможную границу */
+                z-index: 100;
+                margin-top: 0 !important;
+            }
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
