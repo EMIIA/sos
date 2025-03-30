@@ -638,7 +638,7 @@ border-radius: 4px;
 
     async function loadData() {
         try {
-            document.getElementById('status').textContent = 'ОБНОВЛЕНИЕ: EMIIA.AI ERP...';  // Изменено здесь
+            document.getElementById('status').textContent = 'Обновление: EMIIA.AI ERP...';  // Изменено здесь
             const response = await fetch(CSV_URL + '&t=' + Date.now());
             const csvData = await response.text();
             const rows = parseCSV(csvData);
