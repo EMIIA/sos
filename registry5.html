@@ -400,6 +400,29 @@ border-radius: 4px;
 
 
 
+<style>
+  /* Полный сброс мобильных стилей таблицы */
+  @media (max-width: 768px) {
+    table {
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    th, td {
+      white-space: pre-wrap !important;
+      word-break: keep-all !important;
+      overflow: visible !important;
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+    }
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+</style>
+
+
+
 
 
 
