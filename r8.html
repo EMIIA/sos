@@ -176,5 +176,24 @@
             setInterval(updateTable, 60000);
         });
     </script>
+
+
+
+<script>
+// Добавляем обработчик resize
+window.addEventListener('resize', () => {
+    const container = document.getElementById('table-container');
+    container.style.height = `${window.innerHeight - 100}px`;
+});
+
+// Инициализация высоты при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('table-container');
+    container.style.height = `${window.innerHeight - 100}px`;
+});
+</script>
+
+
+
 </body>
 </html>
