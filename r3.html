@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Расписание</title>
+    <style>
+        body {
+           
+
+
+font-family: monospace;
+            margin: 0;
+            margin: 3px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+font-size: 20px;
+        }
+        #update-info {
+            text-align: right;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        #table-container {
+            max-height: 500px;
+
+max-width: 100%;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 0px;
+        }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+        }
+        td, th { 
+            border: 1px solid #ddd; 
+            padding: 8px; /* Оригинальная высота от padding */
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #f5f5f5;
+            z-index: 1;
+        }
+        a { 
+            color: #0066cc; 
+            text-decoration: none; 
+        }
+        a:hover { 
+            text-decoration: underline; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Реестр: Безопасная среда</h1>
+    <div id="update-info"></div>
+    <div id="table-container">
+        <div id="table-content"></div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyfbSUEAWWDI6-vSqHP2tqmqtq-7qgn3HGeTdtlxkPt417D6PPg6hP0NBhGfOXqRhhxCA/exec';
+    const container = document.getElementById('table-content');
+    const updateInfo = document.getElementById('update-info');
+    let currentContent = '';
+
+    const formatUrl = (url) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        if (url.includes('@')) return `mailto:${url}`;
+        return `https://${url}`;
+    };
+
+    const processCell = (cell) => {
+        if (cell?.url) {
+            const url = formatUrl(cell.url);
+            return url ? `<a href="${url}" target="_blank">${cell.text}</a>` : cell.text;
+        }
+        if (typeof cell === 'string') {
+            const urlMatch = cell.match(/(https?:\/\/[^\s]+|www\.[^\s]+|[^\s]+@[^\s]+\.[^\s]+)/i);
+            if (urlMatch) {
+                const url = formatUrl(urlMatch[0]);
+                return cell.replace(urlMatch[0], `<a href="${url}" target="_blank">${urlMatch[0]}</a>`);
+            }
+        }
+        return cell;
+    };
+
+    const renderTable = (headers, rows) => {
+        let html = `<table><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        rows.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                html += `<td>${processCell(cell)}</td>`;
+            });
+            html += '</tr>';
+        });
+        return html + '</table>';
+    };
+
+    const updateTable = async () => {
+        updateInfo.innerHTML = '<span style="font-size:1.1em; font-family:monospace; color:#666">Обновление: EMIIA.AI API...</span>';
+        
+        try {
+            const response = await fetch(API_URL);
+            const { success, headers, rows, error } = await response.json();
+            if (!success) throw new Error(error);
+            currentContent = renderTable(headers, rows);
+            container.innerHTML = currentContent;
+            const now = new Date().toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }).replace(', ', ' | ');
+            updateInfo.innerHTML = `EMIIA.AI ERP: <span style="font-weight:bold; font-size:1em; color:#2c3e50">${now}</span>`;
+        } catch (error) {
+            container.innerHTML = `${currentContent}<div style="color:red">Error: ${error.message}</div>`;
+            updateInfo.innerHTML = 'Ошибка при обновлении';
+        }
+    };
+
+    updateTable();
+    setInterval(updateTable, 60000);
+});
+</script>
+
+
+
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyfbSUEAWWDI6-vSqHP2tqmqtq-7qgn3HGeTdtlxkPt417D6PPg6hP0NBhGfOXqRhhxCA/exec';
+    const container = document.getElementById('table-content');
+    const updateInfo = document.getElementById('update-info');
+    let currentContent = '';
+
+    const formatUrl = (url) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        if (url.includes('@')) return `mailto:${url}`;
+        return `https://${url}`;
+    };
+
+    const processCell = (cell) => {
+        if (cell?.url) {
+            const url = formatUrl(cell.url);
+            return url ? `<a href="${url}" target="_blank">${cell.text}</a>` : cell.text;
+        }
+        if (typeof cell === 'string') {
+            const urlMatch = cell.match(/(https?:\/\/[^\s]+|www\.[^\s]+|[^\s]+@[^\s]+\.[^\s]+)/i);
+            if (urlMatch) {
+                const url = formatUrl(urlMatch[0]);
+                return cell.replace(urlMatch[0], `<a href="${url}" target="_blank">${urlMatch[0]}</a>`);
+            }
+        }
+        return cell;
+    };
+
+    const renderTable = (headers, rows) => {
+        let html = `<table><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        rows.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                html += `<td>${processCell(cell)}</td>`;
+            });
+            html += '</tr>';
+        });
+        return html + '</table>';
+    };
+
+    const updateTable = async () => {
+        updateInfo.innerHTML = '<span style="font-size:1.1em; font-family:monospace; color:#666">Обновление: EMIIA.AI API...</span>';
+        
+        try {
+            const response = await fetch(API_URL);
+            const { success, headers, rows, error } = await response.json();
+            if (!success) throw new Error(error);
+            currentContent = renderTable(headers, rows);
+            container.innerHTML = currentContent;
+            const now = new Date().toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }).replace(', ', ' | ');
+            updateInfo.innerHTML = `<span style="font-size:1.2em">EMIIA.AI ERP:</span> <span style="font-weight:bold; font-size:1em; color:#2c3e50">${now}</span>`;
+        } catch (error) {
+            container.innerHTML = `${currentContent}<div style="color:red">Error: ${error.message}</div>`;
+            updateInfo.innerHTML = 'Ошибка при обновлении';
+        }
+    };
+
+    updateTable();
+    setInterval(updateTable, 60000);
+});
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>
