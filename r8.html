@@ -120,7 +120,36 @@ font-family: monospace;
 
 
 
+<style>
+/* Добавить эти стили в раздел таблицы */
+th {
+    background-color: #f8f9fa !important; /* Новый цвет фона */
+    color: #383838 !important; /* Белый текст */
+    
+   
+}
 
+/* Для мобильной версии */
+@media (max-width: 768px) {
+    th {
+        padding: 10px 8px !important;
+        font-size: 15px !important;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style>
 
 
 
@@ -151,30 +180,37 @@ font-family: monospace;
         color: #333;
     }
     /* ... остальной CSS ... */
+
+
+
+
+
+
+th {
+   
+ height: 40px !important; /* Фиксированная высота */
+    line-height: 1.4 !important; /* Вертикальное выравнивание текста */
+    vertical-align: middle !important; /* Центрирование по вертикали */
+    white-space: nowrap; /* Запрет переноса текста */
+border-top: var(--header-line-height) solid var(--header-line-color) !important;
+    border-bottom: 1px solid #ddd !important;
+    border-left: 1px solid #ddd !important;
+    border-right: 1px solid #ddd !important;
+}
+
+
+
+
+
+
+
+
 </style>
 
 
 
 
 
-<style>
-    /* Добавляем это правило первым */
-    a {
-        color: #3498db !important;
-        text-decoration: none !important;
-    }
-
-    /* Все остальные стили остаются без изменений */
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        font-family: monospace;
-        background-color: #f8f9fa;
-        color: #333;
-    }
-    /* ...остальной CSS без изменений... */
-</style>
 
 
 
