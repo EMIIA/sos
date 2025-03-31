@@ -6,63 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <title>Расписание</title>
-    <style>
-        body {
-           
 
 
-font-family: monospace;
-            margin: 0;
-            margin: 3px;
-            background-color: #f8f9fa;
-            color: #333;
-        }
 
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 10px;
-font-size: 20px;
-        }
-        #update-info {
-            text-align: right;
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        #table-container {
-            max-height: 500px;
 
-max-width: 100%;
-            overflow-y: auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 0px;
-        }
-        table { 
-            border-collapse: collapse; 
-            width: 100%; 
-        }
-        td, th { 
-            border: 1px solid #ddd; 
-            padding: 8px; /* Оригинальная высота от padding */
-        }
-        th {
-            position: sticky;
-            top: 0;
-            background-color: #f5f5f5;
-            z-index: 1;
-        }
-        a { 
-            color: #0066cc; 
-            text-decoration: none; 
-        }
-        a:hover { 
-            text-decoration: underline; 
-        }
-    </style>
 
 
 
@@ -73,14 +21,18 @@ max-width: 100%;
 
 
 <style>
-    body {
+    html, body {
+        height: 100%; / Полная высота окна /
+        margin: 0; / Убираем лишние отступы /
+        padding: 0;
         font-family: monospace;
-        margin: 3px;
         background-color: #f8f9fa;
         color: #333;
-        height: 100vh; /* Высота тела = высота окна */
+    }
+    body {
         display: flex;
         flex-direction: column;
+        margin: 3px;
     }
     h1 {
         text-align: center;
@@ -95,13 +47,14 @@ max-width: 100%;
         margin-bottom: 10px;
     }
     #table-container {
-        flex: 1; /* Контейнер растягивается на доступное пространство */
+        flex: 1; / Занимает всё доступное пространство /
+        height: calc(100% - 50px); / Высота минус примерная высота h1 и update-info /
         max-width: 100%;
-        overflow-y: auto; /* Прокрутка внутри контейнера */
+        overflow-y: auto;
         background-color: #f8f9fa;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        padding: 0px;
+        padding: 0;
     }
     table { 
         border-collapse: collapse; 
@@ -125,10 +78,6 @@ max-width: 100%;
         text-decoration: underline; 
     }
 </style>
-
-
-
-
 
 
 
