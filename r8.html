@@ -124,7 +124,7 @@ font-family: monospace;
 /* Добавить эти стили в раздел таблицы */
 th {
     background-color: #f8f9fa !important; /* Новый цвет фона */
-    color: #383838 !important; /* Белый текст */
+    color: #95a5a6 !important; /* Белый текст */
     
    
 }
@@ -212,7 +212,84 @@ border-top: var(--header-line-height) solid var(--header-line-color) !important;
 
 
 
+<style>
+/* В раздел стилей для th */
+th {
+    font-weight: 600 !important; /* Вместо стандартного bold (700) */
+    letter-spacing: 0.03em; /* Улучшенная читаемость */
+    text-transform: uppercase; /* Все заглавные */
+    font-size: 0.95em !important; /* Относительный размер */
 
+}
+
+/* Для градиентного эффекта текста */
+th span {
+    background: linear-gradient(45deg, #2c3e50, #34495e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* В медиа-запросах для мобильных */
+@media (max-width: 768px) {
+    th {
+        font-weight: 600 !important; /* Чуть насыщеннее на малых экранах */
+        letter-spacing: normal;
+
+    }
+}
+</style>
+
+
+<style>
+  /* Только мобильная прокрутка без изменения стилей */
+  @media (max-width: 768px) {
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table {
+      min-width: 100%;
+    }
+  }
+</style>
+
+
+
+
+
+<style>
+        /* 1. Основной скролл страницы */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-button {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+        
+        
+
+
+::-webkit-scrollbar-thumb {
+            background: #95a5a6;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7f8c8d;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+
+        
+
+    </style>
 
 
 
