@@ -310,6 +310,8 @@ th {
     line-height: 1.4 !important;
     vertical-align: middle !important;
     text-align: center !important; /* Добавлено горизонтальное выравнивание */
+
+
     white-space: nowrap !important;
     border-top: var(--header-line-height) solid var(--header-line-color) !important;
     border-bottom: 1px solid #ddd !important;
@@ -320,6 +322,11 @@ th {
     max-width: 200px !important;
     transition: width 0.3s ease;
 }
+
+
+
+
+
 
 /* Для обычных ячеек */
 td {
@@ -399,6 +406,9 @@ td:nth-child(7) {
         min-width: 120px !important;
         max-width: 120px !important;
     }
+
+
+
 }
 
 
@@ -406,6 +416,69 @@ td:nth-child(7) {
 
 
 
+
+
+
+<style>
+    /* Основные стили таблицы */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    /* Фиксированная высота строк */
+    tr {
+        height: 15px;
+    }
+
+    /* Стили ячеек */
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        vertical-align: middle;
+        text-align: center;
+        height: 15px;
+        max-height: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Заголовки */
+    th {
+        background-color: #f5f5f5;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    /* Адаптив для мобильных */
+    @media (max-width: 768px) {
+        th, td {
+            white-space: normal;
+            padding: 5px;
+        }
+    }
+</style>
+
+<script>
+const renderTable = (headers, rows) => {
+    let html = `<table>`;
+    
+    // Заголовки
+    html += `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+    
+    // Строки
+    rows.forEach(row => {
+        html += `<tr>${row.map(cell => 
+            `<td><div class="cell-content">${processCell(cell)}</div></td>`
+        ).join('')}</tr>`;
+    });
+    
+    return html + '</table>';
+};
+</script>
 
 
 
@@ -583,6 +656,39 @@ const makeResizable = (column) => {
 // Инициализация для нужных столбцов после загрузки таблицы
 document.querySelectorAll('th').forEach(makeResizable);
 </script>
+
+
+
+
+
+
+<script>
+
+let rowHeights = {};
+
+const saveRowHeights = () => {
+    document.querySelectorAll('tr').forEach((tr, index) => {
+        rowHeights[index] = tr.offsetHeight;
+    });
+};
+
+const applySavedHeights = () => {
+    document.querySelectorAll('tr').forEach((tr, index) => {
+        if(rowHeights[index]) {
+            tr.style.height = `${rowHeights[index]}px`;
+        }
+    });
+};
+
+// Вызывать перед обновлением данных
+saveRowHeights();
+
+// Вызывать после рендеринга таблицы
+applySavedHeights();
+
+</script>
+
+
 
 
 </body>
