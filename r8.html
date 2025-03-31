@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -39,7 +40,7 @@
             padding: 8px 15px;
             margin: 0 10px 10px auto;
             background: rgba(255,255,255,0.9);
-            border-radius: 20px;
+            border-radius: 9px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
             display: inline-block;
@@ -143,7 +144,7 @@
             };
 
             const updateTable = async () => {
-                updateInfo.innerHTML = '<span class="loading">🔄 Обновление: EMIIA.AI API...</span>';
+                updateInfo.innerHTML = '<span class="loading">Обновление: EMIIA.AI API...</span>';
                 
                 try {
                     const response = await fetch(API_URL);
@@ -162,12 +163,12 @@
                         second: '2-digit'
                     }).replace(', ', ' | ');
                     
-                    updateInfo.innerHTML = `📅 EMIIA.AI ERP: 
+                    updateInfo.innerHTML = `EMIIA.AI ERP: 
                         <span style="color:#2980b9; font-weight:600">${now}</span> 
-                        <span style="color:#27ae60">✓</span>`;
+                        <span style="color:#27ae60"></span>`;
                 } catch (error) {
                     container.innerHTML = `${currentContent}<div style="color:red">Ошибка: ${error.message}</div>`;
-                    updateInfo.innerHTML = '⚠️ Ошибка обновления';
+                    updateInfo.innerHTML = 'Ошибка обновления';
                 }
             };
 
