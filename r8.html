@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -124,8 +125,8 @@ font-family: monospace;
 <style>
 /* Добавить эти стили в раздел таблицы */
 th {
-    background-color: #3d85c6 !important; /* Новый цвет фона */
-    color: white !important; /* Белый текст */
+    background-color: #f8f9fa !important; /* Новый цвет фона */
+    color: #95a5a6 !important; /* Белый текст */
     
    
 }
@@ -301,6 +302,102 @@ th span {
 
 
 
+ <style>
+
+/* Для заголовков */
+th {
+    height: 40px !important;
+    line-height: 1.4 !important;
+    vertical-align: middle !important;
+    text-align: center !important; /* Добавлено горизонтальное выравнивание */
+    white-space: nowrap !important;
+    border-top: var(--header-line-height) solid var(--header-line-color) !important;
+    border-bottom: 1px solid #ddd !important;
+    border-left: 1px solid #ddd !important;
+    border-right: 1px solid #ddd !important;
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+    transition: width 0.3s ease;
+}
+
+/* Для обычных ячеек */
+td {
+    vertical-align: middle !important;
+    text-align: center !important; /* Центрирование содержимого */
+    padding: 8px !important;
+    border: 1px solid #ddd !important;
+    word-break: break-word;
+}
+
+/* Переопределение ширины */
+th:nth-child(1), 
+td:nth-child(1) { 
+    width: 150px !important; 
+    min-width: 150px !important; 
+    max-width: 150px !important; 
+}
+
+th:nth-child(4),
+td:nth-child(4) { 
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important; 
+}
+
+th:nth-child(7),
+td:nth-child(7) { 
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important; 
+}
+
+/* Адаптивная версия */
+@media (max-width: 768px) {
+    th, td {
+        text-align: center !important; /* Сохраняем центрирование */
+    }
+    
+    th {
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+    
+    th:nth-child(1),
+    td:nth-child(1) { 
+        width: 250px !important;
+        min-width: 250px !important;
+        max-width: 250px !important; 
+    }
+    
+    th:nth-child(4),
+    td:nth-child(4) { 
+        width: 150px !important;
+        min-width: 150px !important;
+        max-width: 150px !important;
+    }
+    
+    th:nth-child(7),
+    td:nth-child(7) { 
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+}
+
+
+ </style>
+
+
+
+
+
+
+
+
+
+
 
 
 </head>
@@ -404,6 +501,73 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+const makeResizable = (column) => {
+    const resizer = document.createElement('div');
+    resizer.style.cssText = `
+        position: absolute;
+        right: -5px;
+        top: 0;
+        width: 10px;
+        height: 40px; /* Фиксированная высота как у th */
+        cursor: col-resize;
+        z-index: 2;
+        background: rgba(52, 152, 219, 0.3);
+        opacity: 0;
+        transition: opacity 0.2s;
+    `;
+
+    column.style.position = 'relative';
+    column.appendChild(resizer);
+    
+    resizer.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        let startX = e.clientX;
+        let startWidth = column.offsetWidth;
+        
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', stopDrag);
+
+        function doDrag(e) {
+            const newWidth = startWidth + (e.clientX - startX);
+            column.style.width = `${newWidth}px`;
+            Array.from(column.parentNode.children)
+                .forEach(td => td.style.width = `${newWidth}px`);
+        }
+
+        function stopDrag() {
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+    });
+
+    column.addEventListener('mouseenter', () => 
+        resizer.style.opacity = '1'
+    );
+    column.addEventListener('mouseleave', () => 
+        resizer.style.opacity = '0'
+    );
+};
+
+// Инициализация для нужных столбцов после загрузки таблицы
+document.querySelectorAll('th').forEach(makeResizable);
+</script>
 
 
 </body>
