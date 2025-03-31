@@ -7,78 +7,85 @@
 
     <title>Расписание</title>
 
-
-
-
-
-
-
-
-
-
+<meta name="theme-color" content="#f8f9fa">
+<meta name="theme-color" content="lab(29.2345% 39.3825 20.0664)">
 
 <style>
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        font-family: monospace;
-        background-color: #f8f9fa;
-        color: #333;
-    }
-    body {
-        display: flex;
-        flex-direction: column;
-    }
-    h1 {
-        text-align: center;
-        color: #2c3e50;
-        margin: 0;
-        padding: 10px 0;
-        font-size: 20px;
-    }
-    #update-info {
-        text-align: right;
-        font-size: 14px;
-        color: #666;
-        padding: 0 10px 10px;
-        margin: 0;
-    }
+
+
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+    background-color: #f8f9fa;
+    color: #333;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin: 0;
+    padding: 10px 0;
+    font-size: 20px;
+}
+#update-info {
+font-family: monospace;
+    text-align: right;
+    font-size: 14px;
+    color: #666;
+    padding: 0 10px 10px;
+    margin: 0;
+}
+#table-container {
+    flex-grow: 1; /* Растягивается на всё доступное пространство */
+    width: 100%;
+font-family: monospace;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    overflow-y: auto;
+    overflow-x: auto; /* Горизонтальный скролл для широких таблиц */
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    font-family: monospace; /* Моноширинный шрифт только для таблицы */
+}
+td, th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+th {
+    position: sticky;
+    top: 0;
+    background-color: #f5f5f5;
+}
+@media (max-width: 768px) {
+
     #table-container {
-        flex-grow: 1; / Растягивается на всё доступное /
-        width: 100%;
+        height: calc(100vh - 60px); /* Учитываем высоту h1 + #update-info */
         margin: 0;
         padding: 0;
-        background-color: #fff;
-        overflow-y: auto;
+font-family: monospace;
     }
     table {
         width: 100%;
-        border-collapse: collapse;
         margin: 0;
-        font-family: monospace; / Явно задаём шрифт /
     }
-    td, th {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-    th {
-        position: sticky;
-        top: 0;
-        background-color: #f5f5f5;
-    }
-    @media (max-width: 768px) {
-        #table-container {
-            height: calc(100vh - 60px); / Учитываем высоту h1 + #update-info /
-            margin: 0;
-            padding: 0;
-        }
-        table {
-            width: 100%;
-            margin: 0;
-        }
-    }
+}
+
 </style>
+
+
+
+
 
 
 
@@ -92,23 +99,6 @@
     <div id="table-container">
         <div id="table-content"></div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -259,10 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateTable, 60000);
 });
 </script>
-
-
-
-
 
 
 
