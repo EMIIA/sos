@@ -100,41 +100,80 @@ font-family: monospace;
 
 
 
+<style>
+    /* Добавить эти правила в раздел стилей таблицы */
+    table {
+        font-size: 15px; /* Было наследование от body (обычно 16px) */
+    }
+    
+    th {
+        font-size: 16px !important; /* Увеличиваем заголовки */
+    }
+
+    @media (max-width: 768px) {
+        td, th {
+            font-size: 15px !important; /* Для мобильной версии */
+        }
+    }
+</style>
+
+
+
+
+
+
+
+
 
 
 
 
 <style>
-
-
+    /* Добавляем эти правила */
+    a {
+        color: #3498db !important;
+        text-decoration: none !important;
+        transition: color 0.2s ease !important;
+    }
     
-
-    th {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0;
-        z-index: 3;
-        background: #f5f5f5 !important;
-        box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+    a:hover {
+        color: #1a5276 !important;
+        text-decoration: none !important;
     }
 
-    
+    /* Все остальные стили остаются без изменений */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: monospace;
+        background-color: #f8f9fa;
+        color: #333;
+    }
+    /* ... остальной CSS ... */
+</style>
 
-    tr {
-        display: table-row !important;
-        page-break-inside: avoid;
+
+
+
+
+<style>
+    /* Добавляем это правило первым */
+    a {
+        color: #3498db !important;
+        text-decoration: none !important;
     }
 
-    /* Фикс для iOS */
-    @supports (-webkit-touch-callout: none) {
-        th {
-            position: -webkit-sticky;
-        }
-        #table-container {
-            padding-right: 1px;
-        }
+    /* Все остальные стили остаются без изменений */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: monospace;
+        background-color: #f8f9fa;
+        color: #333;
     }
-}
+    /* ...остальной CSS без изменений... */
 </style>
 
 
