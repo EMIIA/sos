@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 minute: '2-digit',
                 second: '2-digit'
             }).replace(', ', ' | ');
-            updateInfo.innerHTML = `<span style="font-size:1.2em">EMIIA.AI ERP:</span> <span style="font-weight:bold; font-size:1em; color:#2c3e50">${now}</span>`;
+            updateInfo.innerHTML = `<span style="font-weight:bold; font-size:1.1em; color:#3d85c6;">EMIIA.AI ERP:</span> <span style="font-weight:bold; font-size:1em; color:#2c3e50">${now}</span>`;
         } catch (error) {
             container.innerHTML = `${currentContent}<div style="color:red">Error: ${error.message}</div>`;
             updateInfo.innerHTML = 'Ошибка при обновлении';
