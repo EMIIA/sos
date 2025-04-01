@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMIIA.AI WebDAV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin: 8px 0;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .file-item:hover {
+            background: #f1f3f5;
+            transform: translateX(4px);
+        }
+
+        .file-link {
+            text-decoration: none;
+            color: #1a73e8;
+            font-size: 1.1rem;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .file-link i {
+            margin-right: 12px;
+            color: #5f6368;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white!important;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <ul class="file-list">
+            <li class="file-item">
+                <a href="../" class="file-link">
+                    <i class="fas fa-folder-open"></i>
+                    ..
+                </a>
+            </li>
+            <li class="file-item">
+                <a href="emiia_ai.mp4" class="file-link">
+                    <i class="fas fa-file-video"></i>
+                    emiia_ai.mp4
+                </a>
+                <a href="emiia_ai.mp4" class="download-btn" download>
+                    <i class="fas fa-download"></i>
+                </a>
+            </li>
+            <li class="file-item">
+                <a href="info.zip" class="file-link">
+                    <i class="fas fa-file-archive"></i>
+                    info.zip
+                </a>
+                <a href="info.zip" class="download-btn" download>
+                    <i class="fas fa-download"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        EMIIA.AI SIP server @ emiia.ai
+    </div>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</body>
+</html>
+
