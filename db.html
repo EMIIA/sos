@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            background: #4285f4;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Вход в систему</h2>
+        <div class="form-group">
+            <input type="text" id="login" placeholder="Логин" required>
+        </div>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Пароль" required>
+        </div>
+        <button onclick="handleLogin()">Войти</button>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <script>
+        // Замените на ваш URL веб-приложения GAS
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxpc8C3d3UGPRBnTvtG2-fKQrrJRqafLofchlll5OhVzaCu3v53aBWKCFxrf0Fo5_XJjA/exec';
+
+        function handleLogin() {
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+            
+            fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    login: login,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(error => showError('Ошибка соединения'));
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+</html>
