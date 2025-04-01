@@ -2,72 +2,157 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Авторизация</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация - EMIIA.AI</title>
     <style>
-        .auth-container {max-width: 400px; margin: 50px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
-        .form-group {margin-bottom: 20px;}
-        input {width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px;}
-        button {background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; width: 100%;}
-        .error-message {color: #dc3545; margin-top: 10px;}
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
-        <h2>Вход в систему</h2>
-        <div class="form-group">
-            <input type="text" id="login" placeholder="Логин" required>
-        </div>
-        <div class="form-group">
-            <input type="password" id="password" placeholder="Пароль" required>
-        </div>
-        <button onclick="handleLogin()">Войти</button>
-        <div id="errorMessage" class="error-message"></div>
+        <h2>Авторизация</h2>
+        <form id="authForm">
+            <div class="form-group">
+                <label for="login">Логин:</label>
+                <input type="text" id="login" name="login" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="loader"></div>
+            <div class="message error" id="errorMessage"></div>
+            
+            <button type="submit">Войти</button>
+        </form>
     </div>
 
-    <script>
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxpc8C3d3UGPRBnTvtG2-fKQrrJRqafLofchlll5OhVzaCu3v53aBWKCFxrf0Fo5_XJjA/exec';
+<script>
+// Обновленная функция отправки
+async function handleSubmit(e) {
+  e.preventDefault();
+  
+  const debugInfo = {
+    timestamp: new Date().toISOString(),
+    login: document.getElementById('login').value,
+    password: document.getElementById('password').value
+  };
 
-        async function handleLogin() {
-            const login = document.getElementById('login').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('errorMessage');
-            
-            if (!login || !password) {
-                showError('Введите логин и пароль');
-                return;
-            }
+  try {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxKnugkn5VkRdbrQOKk_GAyDYECn5x6l3-uHmcWYum-8z2UC7uOXY6dEvYvsyB6uMoujg/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Debug-Info': JSON.stringify(debugInfo)
+      },
+      body: JSON.stringify({
+        login: debugInfo.login,
+        password: debugInfo.password
+      })
+    });
 
-            try {
-                const response = await fetch(GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ login, password }),
-                    redirect: 'follow'
-                });
-
-                if (!response.ok) {
-                    throw new Error('Сетевая ошибка: ' + response.status);
-                }
-
-                const data = await response.json();
-                
-                if (data.success && data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
-                } else {
-                    showError(data.message || 'Ошибка авторизации');
-                }
-            } catch (error) {
-                showError('Ошибка соединения: ' + error.message);
-            }
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            setTimeout(() => errorDiv.style.display = 'none', 3000);
-        }
-    </script>
+    console.log('Response status:', response.status);
+    const text = await response.text();
+    console.log('Raw response:', text);
+    
+    try {
+      const data = JSON.parse(text);
+      // ... обработка ответа ...
+    } catch (e) {
+      console.error('JSON parse error:', e);
+    }
+    
+  } catch (error) {
+    console.error('Full error:', error);
+  }
+}
+</script>
 </body>
 </html>
