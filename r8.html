@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -232,7 +233,7 @@ html, body {
 
 @media (min-width: 768px) {
   html, body {
-    margin-top: 0px; /* Для десктопов */
+    margin-top: 5px; /* Для десктопов */
   }
 }
 
@@ -506,6 +507,64 @@ td:nth-child(7) {
     }
 </style>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+#search-container {
+    padding: 0 15px 15px;
+    background: white;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#search-input {
+    width: 100%;
+    max-width: 250px;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    font-family: monospace;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#search-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.15);
+}
+
+@media (max-width: 768px) {
+    #search-container {
+        justify-content: center;
+    }
+    
+    #search-input {
+        max-width: 100%;
+    }
+}
+
+</style>
+
+
+
+
+
 <script>
 const renderTable = (headers, rows) => {
     let html = `<table>`;
@@ -559,9 +618,58 @@ const renderTable = (headers, rows) => {
         <h1>Реестр: Безопасная среда</h1>
         <div id="update-info"></div>
     </div>
+
+<div id="search-container">
+            <input type="text" id="search-input" placeholder="Поиск и фильтрация..." autocomplete="off">
+        </div>
+
+
     <div id="table-container">
         <div id="table-content"></div>
     </div>
+
+
+
+
+
+<script>
+// Добавить в конец скрипта
+const filterTable = (searchText) => {
+    const rows = document.querySelectorAll('#table-content tr');
+    const search = searchText.toLowerCase();
+    
+    rows.forEach((row, index) => {
+        if(index === 0) return; // Пропускаем заголовок
+        
+        let match = false;
+        const cells = row.querySelectorAll('td');
+        
+        cells.forEach(cell => {
+            const text = cell.textContent.toLowerCase();
+            if(text.includes(search)) match = true;
+        });
+        
+        row.style.display = match ? '' : 'none';
+    });
+};
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+    filterTable(e.target.value);
+});
+
+// Обновить функцию updateTable для сохранения фильтра
+const updateTable = async () => {
+    // ... существующий код ...
+    
+    // После обновления таблицы
+    const searchValue = document.getElementById('search-input').value;
+    if(searchValue) filterTable(searchValue);
+};
+</script>
+
+
+
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
