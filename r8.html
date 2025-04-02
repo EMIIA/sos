@@ -901,6 +901,26 @@ window.external.notify(data);
 
           
 
+
+
+  <script>
+
+document.getElementById('search-input').addEventListener('blur', function() {
+    this.blur(); // Снимает фокус с поля
+    window.scrollTo(0, 0); // Опционально: скролл вверх
+});
+
+document.getElementById('search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        this.blur(); // Скрывает клавиатуру при нажатии Enter
+    }
+});
+
+  </script>
+
+
+
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 
