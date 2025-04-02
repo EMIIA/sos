@@ -954,9 +954,25 @@ Telegram.WebApp.MainButton.onClick(function() {
 
 </script>
 
+<script>
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    input.addEventListener('blur', function() {
+        Telegram.WebApp.MainButton.hide(); // Скрываем кнопку, если есть
+        document.activeElement.blur();
+        window.focus();
+    });
 
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            input.blur();
+            Telegram.WebApp.MainButton.hide();
+        }
+    });
+});
 
-
+</script>
 
 </body>
 </html>
