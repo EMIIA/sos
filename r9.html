@@ -1,0 +1,867 @@
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Реестр: Безопасная среда</title>
+    <meta name="theme-color" content="#f8f9fa">
+    <meta name="theme-color" content="lab(29.2345% 39.3825 20.0664)">
+
+
+
+
+
+
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        h1 {
+            text-align: center;
+font-family: monospace;
+            color: #2c3e50;
+            margin: 0;
+            padding: 15px 0;
+            font-size: 24px;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        #update-info {
+            font-family: monospace;
+            text-align: right;
+            font-size: 14px;
+            color: #666;
+            padding: 12px 0px;
+            margin: 0 10px 10px auto;
+            background: rgba(255,255,255,0.9);
+            border-radius: 9px;
+            box-shadow: 0 0px 0px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        #table-container {
+            flex-grow: 1;
+            width: 100%;
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            font-family: monospace;
+        }
+        td, th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #f5f5f5;
+        }
+        @media (max-width: 768px) {
+            #table-container {
+                height: calc(100vh - 60px);
+            }
+        }
+        
+        /* Анимации */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        .loading {
+            animation: pulse 1.5s infinite;
+            color: #3498db !important;
+        }
+        .header-wrapper {
+            background: #ffffff;
+            padding: 0 10px;
+            box-shadow: 0 0px 0px rgba(0,0,0,0.05);
+        }
+    </style>
+
+
+
+
+
+
+
+<style>
+    /* Добавить эти правила в раздел стилей таблицы */
+    table {
+        font-size: 15px; /* Было наследование от body (обычно 16px) */
+    }
+    
+    th {
+        font-size: 16px !important; /* Увеличиваем заголовки */
+    }
+
+    @media (max-width: 768px) {
+        td, th {
+            font-size: 15px !important; /* Для мобильной версии */
+        }
+    }
+</style>
+
+
+
+
+
+
+
+
+
+<style>
+    /* Добавляем эти правила */
+    a {
+        color: #3498db !important;
+        text-decoration: none !important;
+        transition: color 0.2s ease !important;
+    }
+    
+    a:hover {
+        color: #1a5276 !important;
+        text-decoration: none !important;
+    }
+
+    /* Все остальные стили остаются без изменений */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: monospace;
+        background-color: #f8f9fa;
+        color: #333;
+    }
+    /* ... остальной CSS ... */
+
+
+
+
+
+
+
+
+
+
+html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
+            background-color: white;
+            color: #333;
+
+
+  margin-top: 35px; /* Для мобильных */
+}
+
+@media (min-width: 768px) {
+  html, body {
+    margin-top: 5px; /* Для десктопов */
+  }
+}
+
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+        /* 1. Основной скролл страницы */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-button {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+        
+        
+
+
+::-webkit-scrollbar-thumb {
+            background: #95a5a6;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7f8c8d;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+
+        
+
+    </style>
+
+
+
+ <style>
+
+
+/* Для заголовков */
+th {
+    height: 40px !important;
+    line-height: 1.4 !important;
+    vertical-align: middle !important;
+    text-align: center !important; /* Добавлено горизонтальное выравнивание */
+
+
+    white-space: nowrap !important;
+    border-top: var(--header-line-height) solid var(--header-line-color) !important;
+    border-bottom: 1px solid #ddd !important;
+    border-left: 1px solid #ddd !important;
+    border-right: 1px solid #ddd !important;
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+    transition: width 0.3s ease;
+}
+
+/* Для обычных ячеек */
+td {
+    vertical-align: middle !important;
+    text-align: center !important; /* Центрирование содержимого */
+    padding: 8px !important;
+    border: 1px solid #ddd !important;
+    word-break: break-word;
+}
+
+/* Переопределение ширины */
+th:nth-child(1), 
+td:nth-child(1) { 
+    width: 350px !important; 
+    min-width: 350px !important; 
+    max-width: 350px !important; 
+}
+
+/* Переопределение ширины */
+th:nth-child(2), 
+td:nth-child(2) { 
+    width: 200px !important; 
+    min-width: 200px !important; 
+    max-width: 200px !important; 
+}
+
+
+/* Переопределение ширины */
+th:nth-child(3), 
+td:nth-child(3) { 
+    width: 200px !important; 
+    min-width: 200px !important; 
+    max-width: 200px !important; 
+}
+
+
+
+
+
+
+}
+
+
+ </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+
+
+
+
+
+/* Основные стили таблицы */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    
+    /* Стили ячеек */
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        vertical-align: middle;
+        text-align: center;
+        height: 25px;
+        max-height: 25px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+
+
+
+
+
+   
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+#search-container {
+    padding: 0 15px 15px;
+    background: white;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#search-input {
+    width: 100%;
+    max-width: 250px;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    font-family: monospace;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#search-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.15);
+}
+
+@media (max-width: 768px) {
+    #search-container {
+        justify-content: center;
+    }
+    
+    #search-input {
+        max-width: 100%;
+    }
+
+
+input {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+}
+
+</style>
+
+
+
+
+
+<script>
+const renderTable = (headers, rows) => {
+    let html = `<table>`;
+    
+    // Заголовки
+    html += `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+    
+    // Строки
+    rows.forEach(row => {
+        html += `<tr>${row.map(cell => 
+            `<td><div class="cell-content">${processCell(cell)}</div></td>`
+        ).join('')}</tr>`;
+    });
+    
+    return html + '</table>';
+};
+
+
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+</script>
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+
+
+
+
+
+</head>
+
+
+
+
+
+<script type="text/javascript">
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+     
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
+
+
+
+<body>
+    <div class="header-wrapper">
+        <h1>Реестр: Безопасная среда</h1>
+        <div id="update-info"></div>
+    </div>
+
+<div id="search-container">
+            <input type="text" id="search-input" placeholder="Поиск и фильтрация..." autocomplete="off">
+        </div>
+
+
+    <div id="table-container">
+        <div id="table-content"></div>
+    </div>
+
+
+
+
+
+<script>
+// Добавить в конец скрипта
+const filterTable = (searchText) => {
+    const rows = document.querySelectorAll('#table-content tr');
+    const search = searchText.toLowerCase();
+    
+    rows.forEach((row, index) => {
+        if(index === 0) return; // Пропускаем заголовок
+        
+        let match = false;
+        const cells = row.querySelectorAll('td');
+        
+        cells.forEach(cell => {
+            const text = cell.textContent.toLowerCase();
+            if(text.includes(search)) match = true;
+        });
+        
+        row.style.display = match ? '' : 'none';
+    });
+};
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+    filterTable(e.target.value);
+});
+
+// Обновить функцию updateTable для сохранения фильтра
+const updateTable = async () => {
+    // ... существующий код ...
+    
+    // После обновления таблицы
+    const searchValue = document.getElementById('search-input').value;
+    if(searchValue) filterTable(searchValue);
+};
+</script>
+
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const API_URL = 'https://script.google.com/macros/s/AKfycbyfbSUEAWWDI6-vSqHP2tqmqtq-7qgn3HGeTdtlxkPt417D6PPg6hP0NBhGfOXqRhhxCA/exec';
+            const container = document.getElementById('table-content');
+            const updateInfo = document.getElementById('update-info');
+            let currentContent = '';
+
+            const formatUrl = (url) => {
+                if (!url) return null;
+                if (url.startsWith('http')) return url;
+                if (url.includes('@')) return `mailto:${url}`;
+                return `https://${url}`;
+            };
+
+            const processCell = (cell) => {
+                if (cell?.url) {
+                    const url = formatUrl(cell.url);
+                    return url ? `<a href="${url}" target="_blank">${cell.text}</a>` : cell.text;
+                }
+                if (typeof cell === 'string') {
+                    const urlMatch = cell.match(/(https?:\/\/[^\s]+|www\.[^\s]+|[^\s]+@[^\s]+\.[^\s]+)/i);
+                    if (urlMatch) {
+                        const url = formatUrl(urlMatch[0]);
+                        return cell.replace(urlMatch[0], `<a href="${url}" target="_blank">${urlMatch[0]}</a>`);
+                    }
+                }
+                return cell;
+            };
+
+            const renderTable = (headers, rows) => {
+                let html = `<table><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+                rows.forEach(row => {
+                    html += '<tr>';
+                    row.forEach(cell => {
+                        html += `<td>${processCell(cell)}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                return html + '</table>';
+            };
+
+            const updateTable = async () => {
+                updateInfo.innerHTML = '<span class="loading">Обновление: EMIIA.AI API...</span>';
+                
+                try {
+                    const response = await fetch(API_URL);
+                    const { success, headers, rows, error } = await response.json();
+                    if (!success) throw new Error(error);
+                    
+                    currentContent = renderTable(headers, rows);
+                    container.innerHTML = currentContent;
+                    
+                    const now = new Date().toLocaleString('ru-RU', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    }).replace(', ', ' | ');
+                    
+                    updateInfo.innerHTML = `EMIIA.AI SIP/ERP: 
+                        <span style="color:#2980b9; font-weight:600">${now}</span> 
+                        <span style="color:#27ae60"></span>`;
+                } catch (error) {
+                    container.innerHTML = `${currentContent}<div style="color:red">Ошибка: ${error.message}</div>`;
+                    updateInfo.innerHTML = 'Ошибка обновления';
+                }
+            };
+
+            updateTable();
+            setInterval(updateTable, 60000);
+        });
+    </script>
+
+
+
+<script>
+// Добавляем обработчик resize
+window.addEventListener('resize', () => {
+    const container = document.getElementById('table-container');
+    container.style.height = `${window.innerHeight - 100}px`;
+});
+
+// Инициализация высоты при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('table-container');
+    container.style.height = `${window.innerHeight - 100}px`;
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+const makeResizable = (column) => {
+    const resizer = document.createElement('div');
+    resizer.style.cssText = `
+        position: absolute;
+        right: -5px;
+        top: 0;
+        width: 10px;
+        height: 40px; /* Фиксированная высота как у th */
+        cursor: col-resize;
+        z-index: 2;
+        background: rgba(52, 152, 219, 0.3);
+        opacity: 0;
+        transition: opacity 0.2s;
+    `;
+
+    column.style.position = 'relative';
+    column.appendChild(resizer);
+    
+    resizer.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        let startX = e.clientX;
+        let startWidth = column.offsetWidth;
+        
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', stopDrag);
+
+        function doDrag(e) {
+            const newWidth = startWidth + (e.clientX - startX);
+            column.style.width = `${newWidth}px`;
+            Array.from(column.parentNode.children)
+                .forEach(td => td.style.width = `${newWidth}px`);
+        }
+
+        function stopDrag() {
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+    });
+
+    column.addEventListener('mouseenter', () => 
+        resizer.style.opacity = '1'
+    );
+    column.addEventListener('mouseleave', () => 
+        resizer.style.opacity = '0'
+    );
+};
+
+// Инициализация для нужных столбцов после загрузки таблицы
+document.querySelectorAll('th').forEach(makeResizable);
+</script>
+
+
+
+
+
+
+<script>
+
+let rowHeights = {};
+
+const saveRowHeights = () => {
+    document.querySelectorAll('tr').forEach((tr, index) => {
+        rowHeights[index] = tr.offsetHeight;
+    });
+};
+
+const applySavedHeights = () => {
+    document.querySelectorAll('tr').forEach((tr, index) => {
+        if(rowHeights[index]) {
+            tr.style.height = `${rowHeights[index]}px`;
+        }
+    });
+};
+
+// Вызывать перед обновлением данных
+saveRowHeights();
+
+// Вызывать после рендеринга таблицы
+applySavedHeights();
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+ 
+ 
+
+
+
+const data = JSON.stringify({
+  eventType: 'web_app_setup_back_button',
+  eventData: { is_visible: false },
+});
+
+window.external.notify(data);
+ 
+ 
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+      tele.BackButton.show();
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
+
+
+          
+
+
+
+  <script>
+
+document.getElementById('search-input').addEventListener('blur', function() {
+    this.blur(); // Снимает фокус с поля
+    window.scrollTo(0, 0); // Опционально: скролл вверх
+});
+
+document.getElementById('search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        this.blur(); // Скрывает клавиатуру при нажатии Enter
+    }
+});
+
+  </script>
+
+
+
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+<script>
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    input.addEventListener('blur', function() {
+        Telegram.WebApp.MainButton.hide(); // Скрываем кнопку, если есть
+        document.activeElement.blur();
+        window.focus();
+    });
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            input.blur();
+            Telegram.WebApp.MainButton.hide();
+        }
+    });
+});
+
+</script>
+
+
+
+<script>
+
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    function hideKeyboard() {
+        input.blur();
+        document.activeElement.blur();
+        Telegram.WebApp.expand(); // Сворачивает клавиатуру
+        setTimeout(() => window.focus(), 50);
+    }
+
+    input.addEventListener('blur', hideKeyboard);
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            hideKeyboard();
+        }
+    });
+});
+
+
+</script>
+
+
+
+</body>
+</html>
+
+
+
