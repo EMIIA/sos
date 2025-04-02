@@ -1,105 +1,169 @@
-
-        <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Авторизация</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация - Emiia.ai</title>
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --error-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f6fa;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        input[type="password"] {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
         .loader {
+            display: none;
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+            border-top: 4px solid var(--secondary-color);
             border-radius: 50%;
             width: 30px;
             height: 30px;
             animation: spin 1s linear infinite;
-            display: none;
             margin: 20px auto;
         }
+
+        .error-message {
+            color: var(--error-color);
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .error-box {
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ff4444;
-            border-radius: 4px;
-            background: #ffeaea;
-            color: #cc0000;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <form id="authForm">
-            <input type="password" id="password" placeholder="Пароль" required>
+    <div class="auth-container">
+        <form class="auth-form" id="authForm">
+            <input type="password" 
+                   id="password" 
+                   placeholder="Введите пароль"
+                   required
+                   autocomplete="current-password">
             <button type="submit">Войти</button>
         </form>
-        <div class="loader"></div>
-        <div id="message"></div>
+        <div class="loader" id="loader"></div>
+        <div class="error-message" id="errorMessage"></div>
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzJph_SIelaZylWp9lDb5pLDKeHonzmAo6kpjFKvaAsfUFShCqgFRgIM4YZITDsgvMA/exec'; // Замените на реальный URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzJph_SIelaZylWp9lDb5pLDKeHonzmAo6kpjFKvaAsfUFShCqgFRgIM4YZITDsgvMA/exec';
         const MAX_RETRIES = 2;
-        let retryCount = 0;
+        const RETRY_DELAY = 1000;
 
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
+        const form = document.getElementById('authForm');
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const form = e.target;
-            const loader = document.querySelector('.loader');
-            const message = document.getElementById('message');
+            const passwordInput = document.getElementById('password');
             
-            // Сброс предыдущих ошибок
-            message.innerHTML = '';
-            loader.style.display = 'block';
-            form.style.opacity = '0.5';
-            form.querySelector('button').disabled = true;
+            showLoading(true);
+            clearError();
 
             try {
-                const response = await fetchWithRetry(
-                    API_URL,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            password: document.getElementById('password').value,
-                            ip: await getClientIP()
-                        }),
-                        signal: AbortSignal.timeout(8000) // Таймаут 8 секунд
-                    }
-                );
+                const ip = await getClientIP();
+                const response = await fetchWithRetry(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        password: passwordInput.value,
+                        ip: ip
+                    })
+                });
 
-                const result = await response.json();
+                const data = await response.json();
                 
-                if (result.status === 'success') {
-                    window.location.href = result.redirect;
+                if (data.status === 'success') {
+                    window.location.href = data.redirect;
                 } else {
-                    throw new Error(result.message || 'Ошибка сервера');
+                    throw new Error(data.message || 'Ошибка сервера');
                 }
-                
             } catch (error) {
                 showError(error.message);
+                passwordInput.value = '';
             } finally {
-                loader.style.display = 'none';
-                form.style.opacity = '1';
-                form.querySelector('button').disabled = false;
+                showLoading(false);
             }
         });
 
         async function fetchWithRetry(url, options, retries = MAX_RETRIES) {
             try {
-                const response = await fetch(url, options);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка: ${response.status}`);
+                }
+                
                 return response;
             } catch (error) {
                 if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
                     return fetchWithRetry(url, options, retries - 1);
                 }
-                throw new Error(`Сеть недоступна. Попробуйте позже.`);
+                throw new Error('Проблемы с соединением. Попробуйте позже.');
             }
         }
 
@@ -109,18 +173,24 @@
                     signal: AbortSignal.timeout(3000)
                 });
                 return (await response.json()).ip;
-            } catch (error) {
+            } catch {
                 return 'unknown';
             }
         }
 
-        function showError(msg) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.innerHTML = `
-                <div class="error-box">
-                    ${msg}
-                </div>
-            `;
+        function showLoading(show) {
+            loader.style.display = show ? 'block' : 'none';
+            form.style.opacity = show ? '0.5' : '1';
+            form.querySelector('button').disabled = show;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function clearError() {
+            errorMessage.style.display = 'none';
         }
     </script>
 </body>
