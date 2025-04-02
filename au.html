@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Form</title>
+</head>
+<body>
+    <form id="loginForm">
+        <input type="password" id="passcode" required>
+        <button type="submit">Войти</button>
+    </form>
+    <div id="message"></div>
+
+    <script>
+        const FORM_URL = 'https://script.google.com/macros/s/AKfycbzJph_SIelaZylWp9lDb5pLDKeHonzmAo6kpjFKvaAsfUFShCqgFRgIM4YZITDsgvMA/exec'; // Замените на URL вашего скрипта
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch(FORM_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        passcode: document.getElementById('passcode').value
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    window.location.href = result.redirect;
+                } else {
+                    document.getElementById('message').innerHTML = `
+                        <p style="color: red">${result.message}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('message').innerHTML = `
+                    <p style="color: red">Ошибка соединения</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
