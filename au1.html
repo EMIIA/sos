@@ -5,102 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EMIIA.AI ERP</title>
     <style>
-        body {
-            font-family: monospace;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #F8F9FA;
-        }
-        .auth-container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            width: 100%;
-            max-width: 400px;
-            margin: 1rem;
-            font-family: monospace;
-        }
-        h2 {
-            color: #2c3e50;
-            margin: 0 0 2rem 0;
-            text-align: center;
-            font-size: 1.8rem;
-            font-family: monospace;
-        }
-        .input-group {
-            margin-bottom: 1.5rem;
-            font-family: monospace;
-        }
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            box-sizing: border-box;
-            font-family: monospace;
-        }
-        input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
-            font-family: monospace;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #3d85c6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            font-family: monospace;
-        }
-        button:hover {
-            background: #2980b9;
-        }
-        @media (max-width: 480px) {
-            .auth-container {
-                padding: 1.5rem;
-                margin: 0.5rem;
-            }
-            h2 {
-                font-size: 1.5rem;
-            }
-        }
+        body { font-family: monospace; margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background: #F8F9FA; }
+        .auth-container { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); width: 100%; max-width: 400px; margin: 1rem; font-family: monospace; }
+        h2 { color: #2c3e50; margin: 0 0 2rem 0; text-align: center; font-size: 1.8rem; font-family: monospace; }
+        .input-group { margin-bottom: 1.5rem; font-family: monospace; }
+        input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; box-sizing: border-box; font-family: monospace; }
+        input:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.1); }
+        button { width: 100%; padding: 14px; background: #3d85c6; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s ease; font-family: monospace; }
+        button:hover { background: #2980b9; }
+        @media (max-width: 480px) { .auth-container { padding: 1.5rem; margin: 0.5rem; } h2 { font-size: 1.5rem; } }
     </style>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+const renderTable = (headers, rows) => {
+    let html = `<table>`;
+    
+    // Заголовки
+    html += `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+    
+    // Строки
+    rows.forEach(row => {
+        html += `<tr>${row.map(cell => 
+            `<td><div class="cell-content">${processCell(cell)}</div></td>`
+        ).join('')}</tr>`;
+    });
+    
+    return html + '</table>';
+};
+
+
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+</script>
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+
+
+<script type="text/javascript">
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+     
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
+
+
+
+
+
+
 </head>
 <body>
     <div class="auth-container">
         <h2>EMIIA.AI ERP</h2>
         <form id="auth-form" onsubmit="auth(); return false;">
             <div class="input-group">
-                <input 
-                    type="text" 
-                    id="login" 
-                    name="username"
-                    placeholder="Email address"
-                    autocomplete="username"
-                    required
-                >
+                <input type="text" id="login" name="username" placeholder="Email address" autocomplete="username" required>
             </div>
             <div class="input-group">
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password"
-                    placeholder="Password"
-                    autocomplete="current-password"
-                    required
-                >
+                <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" required>
             </div>
             <p class="small"><a class="text-primary" href="mailto:emiia@emiia.ai">Forgot password?</a></p>
             <button type="submit">Login</button>
@@ -109,8 +99,15 @@
         <p>EMIIA.AI SIP — distributed cloud platform for spatial intelligence.</p>
     </div>
 
-   
     <script>
+    // Загрузка сохранённых данных из localStorage
+    window.onload = function() {
+        const savedLogin = localStorage.getItem('savedLogin');
+        const savedPassword = localStorage.getItem('savedPassword');
+        if (savedLogin) document.getElementById('login').value = savedLogin;
+        if (savedPassword) document.getElementById('password').value = savedPassword;
+    };
+
     async function auth() {
         const login = document.getElementById('login').value;
         const password = document.getElementById('password').value;
@@ -121,6 +118,9 @@
         });
         
         if (await response.text() === 'OK') {
+            // Сохранение данных в localStorage после успешной авторизации
+            localStorage.setItem('savedLogin', login);
+            localStorage.setItem('savedPassword', password);
             window.location.href = 'https://sos.emiia.ai/r9';
         } else {
             alert('Неверные учетные данные!');
