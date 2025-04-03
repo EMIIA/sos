@@ -127,5 +127,78 @@ Telegram.WebApp.MainButton.onClick(function() {
         }
     }
     </script>
+
+
+
+
+
+
+
+
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+<script>
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    input.addEventListener('blur', function() {
+        Telegram.WebApp.MainButton.hide(); // Скрываем кнопку, если есть
+        document.activeElement.blur();
+        window.focus();
+    });
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            input.blur();
+            Telegram.WebApp.MainButton.hide();
+        }
+    });
+});
+
+</script>
+
+
+
+<script>
+
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    function hideKeyboard() {
+        input.blur();
+        document.activeElement.blur();
+        Telegram.WebApp.expand(); // Сворачивает клавиатуру
+        setTimeout(() => window.focus(), 50);
+    }
+
+    input.addEventListener('blur', hideKeyboard);
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            hideKeyboard();
+        }
+    });
+});
+
+
+</script>
+
+
+
+
+
 </body>
 </html>
