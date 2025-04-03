@@ -4,10 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EMIIA.AI ERP</title>
+
+
+
+
+
+
+
     <style>
         body { font-family: monospace; margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background: #F8F9FA; }
         .auth-container { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); width: 100%; max-width: 400px; margin: 1rem; font-family: monospace; }
-        h2 { color: #2c3e50; margin: 0 0 2rem 0; text-align: center; font-size: 1.8rem; font-family: monospace; }
+        h2 { color: #3d85c6; margin: 0 0 2rem 0; text-align: center; font-size: 1.8rem; font-family: monospace; }
         .input-group { margin-bottom: 1.5rem; font-family: monospace; }
         input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; box-sizing: border-box; font-family: monospace; }
         input:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.1); }
@@ -21,6 +28,26 @@
 
 
 
+
+
+
+
+
+<style>
+
+/* Базовый стиль для десктопа */
+input {
+  letter-spacing: 1px; 
+}
+
+/* Стили для мобильных устройств */
+@media (max-width: 768px) {
+  input{
+    letter-spacing: 2.5px; /* Уменьшаем интервал на мобильных */
+  }
+}
+
+</style>
 
 
 
@@ -136,8 +163,57 @@ Telegram.WebApp.MainButton.onClick(function() {
 
 
 
+<script type="text/javascript">
+ 
+ 
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+const data = JSON.stringify({
+  eventType: 'web_app_setup_back_button',
+  eventData: { is_visible: false },
+});
+
+window.external.notify(data);
+ 
+ 
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+      tele.BackButton.show();
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
+
+
+          
+
+
+
+  <script>
+
+document.getElementById('search-input').addEventListener('blur', function() {
+    this.blur(); // Снимает фокус с поля
+    window.scrollTo(0, 0); // Опционально: скролл вверх
+});
+
+document.getElementById('search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        this.blur(); // Скрывает клавиатуру при нажатии Enter
+    }
+});
+
+  </script>
+
+
+
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 
 
@@ -195,6 +271,7 @@ Telegram.WebApp.ready(function() {
 
 
 </script>
+
 
 
 
