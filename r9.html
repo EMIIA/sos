@@ -6,6 +6,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -396,12 +397,12 @@ td:nth-child(3) {
     padding: 0 8px 15px;
     background: white;
     display: flex;
-    justify-content: flex-end; /* Схлопывание вправо на десктопе сохранено */
+    justify-content: flex-end;
 }
 
 .input-wrapper {
-    position: relative; /* Для позиционирования точек */
-    display: inline-flex; /* Inline для корректного схлопывания */
+    position: relative;
+    display: inline-flex;
     align-items: center;
     max-width: 350px;
     width: 100%;
@@ -409,7 +410,7 @@ td:nth-child(3) {
 
 #search-input {
     width: 100%;
-    padding: 12px 30px 12px 15px; /* Отступ справа для точек */
+    padding: 12px 30px 12px 15px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-family: monospace;
@@ -417,8 +418,6 @@ td:nth-child(3) {
     outline: none;
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-
-
 }
 
 #search-input:focus {
@@ -429,19 +428,22 @@ td:nth-child(3) {
 .dots {
     position: absolute;
     right: 15px;
+    top: 50%; /* Центрирование по вертикали */
+    transform: translateY(-50%); /* Смещение на половину высоты */
     font-size: 25px;
     color: #3d85c6;
-font-weight: bold;
+    font-weight: bold;
     pointer-events: none;
+    line-height: 1; /* Убирает лишние отступы шрифта */
 }
 
 @media (max-width: 768px) {
     #search-container {
-        justify-content: center; /* Центрирование на мобильных */
+        justify-content: center;
     }
     
     .input-wrapper {
-        max-width: 100%; /* Полная ширина на мобильных */
+        max-width: 100%;
     }
 }
 
@@ -450,8 +452,6 @@ input {
     user-select: none;
 }
 </style>
-
-
 
 
 
