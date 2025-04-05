@@ -208,37 +208,7 @@ html, body {
 
 
 
-<style>
-        /* 1. Основной скролл страницы */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-button {
-            width: 0;
-            height: 0;
-            display: none;
-        }
-        
 
-
-::-webkit-scrollbar-thumb {
-            background: #95a5a6;
-            border-radius: 4px;
-            transition: background 0.2s ease;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #7f8c8d;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-
-        
-
-    </style>
 
 
 
@@ -459,6 +429,83 @@ input {
 .beta {
     font-size: 0.4em; /* Уменьшаем до 70% от размера h1 */
 }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    / 1. Основной скролл страницы /
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-button {
+        width: 0;
+        height: 0;
+        display: none;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #95a5a6;
+        border-radius: 4px;
+        transition: background 0.2s ease;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #7f8c8d;
+    }
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    / 2. Контейнер таблицы /
+    .table-container {
+        max-height: 300px; / Ограничение высоты /
+        overflow-y: auto; / Включаем вертикальный скролл /
+        padding-bottom: 10px; / Место для скроллбара снизу /
+    }
+
+    / Скролл для таблицы с теми же стилями /
+    .table-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    .table-container::-webkit-scrollbar-button {
+        width: 0;
+        height: 0;
+        display: none;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+        background: #95a5a6;
+        border-radius: 4px;
+        transition: background 0.2s ease;
+    }
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: #7f8c8d;
+    }
+    .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+        margin-bottom: 10px; / Отступ снизу для видимости /
+    }
 </style>
 
 
