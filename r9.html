@@ -479,14 +479,17 @@ input {
 
     / 2. Контейнер таблицы /
     .table-container {
-        max-height: 300px; / Ограничение высоты /
-        overflow-y: auto; / Включаем вертикальный скролл /
-        padding-bottom: 10px; / Место для скроллбара снизу /
+        max-height: 300px;
+        overflow-y: auto; / Вертикальный скролл /
+        overflow-x: scroll; / Горизонтальный скролл всегда виден /
+        padding-bottom: 10px;
+        white-space: nowrap; / Предотвращает перенос строк /
     }
 
-    / Скролл для таблицы с теми же стилями /
+    / Стили для скролла таблицы /
     .table-container::-webkit-scrollbar {
         width: 8px;
+        height: 6px; / Высота горизонтального скролла /
     }
     .table-container::-webkit-scrollbar-button {
         width: 0;
@@ -504,10 +507,15 @@ input {
     .table-container::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 4px;
-        margin-bottom: 10px; / Отступ снизу для видимости /
+        margin-bottom: 10px; / Отступ для вертикального /
+    }
+
+    / Убедимся, что таблица шире контейнера /
+    .table-container table {
+        min-width: 100%; / Минимальная ширина /
+        width: max-content; / Ширина по содержимому /
     }
 </style>
-
 
 
 
