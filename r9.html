@@ -440,19 +440,6 @@ input {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 <style>
     / 1. Основной скролл страницы /
     ::-webkit-scrollbar {
@@ -478,44 +465,65 @@ input {
     }
 
     / 2. Контейнер таблицы /
-    .table-container {
+    #table-container {
         max-height: 300px;
         overflow-y: auto; / Вертикальный скролл /
-        overflow-x: scroll; / Горизонтальный скролл всегда виден /
+        overflow-x: scroll; / Горизонтальный скролл /
         padding-bottom: 10px;
-        white-space: nowrap; / Предотвращает перенос строк /
+        position: relative;
+        white-space: nowrap;
+        width: 100%; / Явно задаём ширину контейнера /
+        max-width: 100%; / Ограничиваем ширину /
+        display: block; / Убеждаемся, что контейнер занимает место /
     }
 
-    / Стили для скролла таблицы /
-    .table-container::-webkit-scrollbar {
+    / Стили для скролла контейнера /
+    #table-container::-webkit-scrollbar {
         width: 8px;
-        height: 6px; / Высота горизонтального скролла /
+        height: 6px;
     }
-    .table-container::-webkit-scrollbar-button {
+    #table-container::-webkit-scrollbar-button {
         width: 0;
         height: 0;
         display: none;
     }
-    .table-container::-webkit-scrollbar-thumb {
+    #table-container::-webkit-scrollbar-thumb {
         background: #95a5a6;
         border-radius: 4px;
         transition: background 0.2s ease;
     }
-    .table-container::-webkit-scrollbar-thumb:hover {
+    #table-container::-webkit-scrollbar-thumb:hover {
         background: #7f8c8d;
     }
-    .table-container::-webkit-scrollbar-track {
+    #table-container::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 4px;
-        margin-bottom: 10px; / Отступ для вертикального /
     }
 
-    / Убедимся, что таблица шире контейнера /
-    .table-container table {
-        min-width: 100%; / Минимальная ширина /
-        width: max-content; / Ширина по содержимому /
+    / Фиксация горизонтального скролла /
+    #table-container::-webkit-scrollbar:horizontal {
+        height: 6px;
+        display: block !important; / Всегда виден /
+        position: sticky; / Фиксируем относительно контейнера /
+        bottom: 0; / Привязка к низу /
+    }
+    #table-container::-webkit-scrollbar-track:horizontal {
+        background: #f1f1f1;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    / Внутренний контент /
+    #table-content {
+        min-width: 120%; / Контент шире контейнера для активации скролла /
+        width: max-content;
+        display: inline-block;
     }
 </style>
+
+
+
+
 
 
 
