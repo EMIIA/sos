@@ -5,12 +5,13 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Реестр: Безопасная среда</title>
+    <title>EMIIA.AI SIP</title>
     <meta name="theme-color" content="white">
     
 
@@ -173,17 +174,13 @@ font-family: monospace;
 
 
 
-
-
-
-
 html, body {
             height: 100%;
             margin: 0;
             padding: 0;
             font-family: monospace;
             background-color: white;
-            color: #333;
+            color:  #333;
 
 
   margin-top: 35px; /* Для мобильных */
@@ -222,7 +219,6 @@ html, body {
             display: none;
         }
         
-        
 
 
 ::-webkit-scrollbar-thumb {
@@ -255,7 +251,7 @@ th {
     vertical-align: middle !important;
     text-align: center !important; /* Добавлено горизонтальное выравнивание */
 
-
+color:  #3d85c6;
     white-space: nowrap !important;
     border-top: var(--header-line-height) solid var(--header-line-color) !important;
     border-bottom: 1px solid #ddd !important;
@@ -381,20 +377,36 @@ td:nth-child(3) {
 
 
 
+
+
+
+
+
+
+
+
+
 <style>
 #search-container {
-    padding: 0 15px 15px;
+    padding: 0 8px 15px;
     background: white;
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-end; /* Схлопывание вправо на десктопе сохранено */
+}
+
+.input-wrapper {
+    position: relative; /* Для позиционирования точек */
+    display: inline-flex; /* Inline для корректного схлопывания */
+    align-items: center;
+    max-width: 350px;
+    width: 100%;
 }
 
 #search-input {
     width: 100%;
-    max-width: 250px;
-    padding: 12px 15px;
+    padding: 12px 30px 12px 15px; /* Отступ справа для точек */
     border: 2px solid #e0e0e0;
-    border-radius: 15px;
+    border-radius: 10px;
     font-family: monospace;
     font-size: 16px;
     outline: none;
@@ -407,24 +419,43 @@ td:nth-child(3) {
     box-shadow: 0 2px 8px rgba(52,152,219,0.15);
 }
 
+.dots {
+    position: absolute;
+    right: 15px;
+    font-size: 25px;
+    color: #3d85c6;
+font-weight: bold;
+    pointer-events: none;
+}
+
 @media (max-width: 768px) {
     #search-container {
-        justify-content: center;
+        justify-content: center; /* Центрирование на мобильных */
     }
     
-    #search-input {
-        max-width: 100%;
+    .input-wrapper {
+        max-width: 100%; /* Полная ширина на мобильных */
     }
-
+}
 
 input {
     -webkit-user-select: none;
     user-select: none;
 }
-
-}
-
 </style>
+
+
+
+
+
+<style>
+.beta {
+    font-size: 0.4em; /* Уменьшаем до 70% от размера h1 */
+}
+</style>
+
+
+
 
 
 
@@ -492,14 +523,24 @@ Telegram.WebApp.MainButton.onClick(function() {
 
 
 <body>
-    <div class="header-wrapper">
-        <h1>Реестр: Безопасная среда</h1>
+   
+ <div class="header-wrapper">
+        <h1>EMIIA.AI SIP<span class="beta"> βeta</span></h1>
         <div id="update-info"></div>
     </div>
 
+
+
+
+
+
 <div id="search-container">
-            <input type="text" id="search-input" placeholder="Поиск и фильтрация..." autocomplete="off">
-        </div>
+    <div class="input-wrapper">
+        <input type="text" id="search-input" placeholder="AI agent PILOT" autocomplete="off">
+        <span class="dots">⋮</span>
+    </div>
+</div>
+
 
 
     <div id="table-container">
@@ -610,7 +651,7 @@ const updateTable = async () => {
                         second: '2-digit'
                     }).replace(', ', ' | ');
                     
-                    updateInfo.innerHTML = `EMIIA.AI SIP/ERP: 
+                    updateInfo.innerHTML = `EMIIA.AI ERP: 
                         <span style="color:#2980b9; font-weight:600">${now}</span> 
                         <span style="color:#27ae60"></span>`;
                 } catch (error) {
@@ -862,3 +903,4 @@ Telegram.WebApp.ready(function() {
 
 </body>
 </html>
+
