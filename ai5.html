@@ -150,9 +150,17 @@
             transition: transform 0.2s;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-max-width:2.5em;
-max-height:3em;
+           
+max-width:3.0em;
+max-height:3.5em;
+
+margin-right: clamp(0.5rem, 2%, 2rem); /* Адаптивный отступ */
+    
+    display: flex;
+    gap: 1rem; /* Отступ между дочерними элементами */
+
+
+
         }
         button:active {
             transform: scale(0.95);
