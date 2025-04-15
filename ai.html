@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mistral Chat Mobile</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+        }
+
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin: 8px 0;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 85%;
+            font-size: 16px;
+            line-height: 1.4;
+            position: relative;
+            word-break: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            background: #ffffff;
+            color: #1a1a1a;
+            margin-right: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-bottom-left-radius: 4px;
+        }
+
+        #input-container {
+            padding: 12px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            bottom: 0;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            min-height: 48px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        button {
+            padding: 0 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            min-width: 80px;
+            transition: opacity 0.2s;
+        }
+
+        button:active {
+            opacity: 0.8;
+        }
+
+        .loading {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            top: 50%;
+            left: 50%;
+            margin: -12px 0 0 -12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Мобильная оптимизация скролла */
+        #chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 2px;
+        }
+
+        @media (max-width: 480px) {
+            .message {
+                max-width: 90%;
+                font-size: 15px;
+            }
+            
+            #user-input {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Напишите сообщение..." autocomplete="off">
+            <button onclick="sendMessage()">Отпр</button>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu'; // ⚠️ Только для тестов!
+        const API_URL = 'https://api.mistral.ai/v1/chat/completions';
+        let isGenerating = false;
+
+        async function sendMessage() {
+            if (isGenerating) return;
+            
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            isGenerating = true;
+            addMessage('user', message);
+            
+            const loadingId = addLoading();
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "mistral-tiny",
+                        messages: [{ role: "user", content: message }],
+                        temperature: 0.7
+                    })
+                });
+
+                const data = await response.json();
+                removeLoading(loadingId);
+                
+                if (data.choices?.[0]?.message?.content) {
+                    addMessage('bot', data.choices[0].message.content);
+                } else {
+                    throw new Error('Ошибка получения ответа');
+                }
+            } catch (error) {
+                removeLoading(loadingId);
+                addMessage('bot', `⚠️ Ошибка: ${error.message}`);
+            } finally {
+                isGenerating = false;
+            }
+        }
+
+        function addMessage(role, text) {
+            const container = document.getElementById('chat-messages');
+            const msg = document.createElement('div');
+            msg.className = `message ${role}-message`;
+            msg.textContent = text;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addLoading() {
+            const container = document.getElementById('chat-messages');
+            const loader = document.createElement('div');
+            loader.id = `loading-${Date.now()}`;
+            loader.className = 'message bot-message loading';
+            container.appendChild(loader);
+            return loader.id;
+        }
+
+        function removeLoading(id) {
+            const loader = document.getElementById(id);
+            if (loader) loader.remove();
+        }
+
+        // Обработчики событий
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Адаптация высоты поля ввода
+        const input = document.getElementById('user-input');
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = `${Math.min(input.scrollHeight, 120)}px`;
+        });
+    </script>
+</body>
+</html>
