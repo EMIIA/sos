@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -188,7 +189,7 @@
 .menu-button {
     position: fixed;
     top: 10px;
-    right: 10px;
+    right: 15px;
     font-size: 24px;
     cursor: pointer;
     z-index: 1000;
@@ -277,6 +278,24 @@
     <button onclick="exportChat()">Export JSON</button>
     <button onclick="clearHistory()">Clear History</button>
 </div>
+
+
+
+
+   <script>
+
+document.addEventListener('click', function(e) {
+  const menu = document.querySelector('.menu');
+  const button = document.querySelector('.menu-button');
+  if (menu && menu.style.display === 'block' && !menu.contains(e.target) && !button.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+   </script>
+
+
+
 
 
 
@@ -431,6 +450,35 @@ function clearHistory() {
 }
 
 </script>
+
+
+
+
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+
+
+  // Преобразуем Markdown в HTML
+  document.getElementById('markdown-content').innerHTML = marked.parse(markdown);
+
+  // Подсветка кода
+  document.querySelectorAll('pre code').forEach(block => {
+    hljs.highlightElement(block);
+  });
+</script>
+
+
+
+
+
+
 
 
 
