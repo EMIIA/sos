@@ -1,0 +1,651 @@
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMIIA.AI</title>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <style>
+        :root {
+            --bg: #0F172A;
+            --primary: #818CF8;
+            --text: #E2E8F0;
+            --surface: #1E293B;
+            --success: #34D399;
+            --error: #F87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 1.25rem;
+            border-radius: 1.5rem;
+            line-height: 1.6;
+            animation: slideIn 0.3s ease;
+        }
+
+        .user {
+            background: var(--surface);
+            margin-left: auto;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .assistant {
+            background: linear-gradient(135deg, var(--primary) 0%, #6366F1 100%);
+            margin-right: auto;
+            border-bottom-left-radius: 0.5rem;
+        }
+
+        
+
+.input-area {
+            position: relative;
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        }
+
+
+.chat-container {
+  padding-bottom: 80px; /* высота input-area */
+}
+.input-area {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  
+  margin: 0px auto;
+  right: 0;
+  z-index: 100;
+ 
+
+
+ width: 99%;
+  max-width: 800px;
+  margin: 0 auto;
+
+}
+
+
+
+
+
+
+        input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text);
+            padding: 1rem 3.0rem;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        button {
+            background: #0F172A;
+            color: white;
+            border: none;
+            padding: 0rem 1rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .loading {
+            display: inline-flex;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+            animation: pulse 1.4s infinite;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 640px) {
+            .message {
+                max-width: 90%;
+                padding: 1rem;
+            }
+            
+            button span {
+                display: none;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+.menu-button {
+    position: fixed;
+    bottom: 16px;
+    left: 25px;
+    font-size: 30px;
+font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+    color: white;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: transform 0.3s;
+
+}
+
+.menu-button:hover {
+    transform: scale(1.2);
+}
+
+.menu {
+    position: fixed;
+    bottom: 60px;
+    left: 5px;
+    background-color: #1E293B;;
+    border: 0px solid #dee2e6;
+
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.menu button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #0F172A;
+    color: white;
+    border: none;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: background-color 0.3s, transform 0.3s;
+
+  
+}
+
+.menu button:hover {
+    background-color: #1E293B;
+    transform: scale(1.02);
+}
+
+.menu button:last-child {
+    margin-bottom: 0;
+}
+</style>
+
+
+
+
+
+
+
+<style>
+
+.loader {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+#wave {
+	height: 70px;
+	width: 70px;
+	fill: #fff;
+}
+
+@for $i from 1 through 9 {
+	#Line_#{$i} {
+		animation: pulse 1s infinite;
+		animation-delay: $i * .15s;
+	}
+}
+
+@keyframes pulse {
+	0% {
+		transform: scaleY(1);
+		transform-origin: 50% 50%;
+	}
+	
+	50% {
+		transform: scaleY(.7);
+		transform-origin: 50% 50%;
+	}
+	
+	100% {
+		transform: scaleY(1);
+		transform-origin: 50% 50%;
+	}
+}
+
+</style>
+
+<style>
+textarea#input {
+  width: 100%;
+ min-height: 50px;
+  max-height: 50px; 
+  resize: vertical;
+  padding: 10px 12px;
+  border: 0px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  background: #1E293B;
+  color: #fff; /* белый текст */
+  overflow: hidden;
+  transition: border 0.2s;
+}
+textarea#input:focus {
+  border: 0.0px solid #4a90e2;
+  outline: none;
+  background: #1E293B;
+padding-left: 40px;
+ 
+}
+
+
+
+textarea#input {
+  padding-left: 40px;
+  /* остальные стили */
+}
+}
+
+</style>
+
+</head>
+<body>
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        
+        <div class="input-area">
+
+
+<textarea 
+    id="input" 
+    rows="3" 
+    cols="40" 
+    placeholder="EMIIA.AI PILOT"
+></textarea>
+
+
+
+            <button onclick="sendMessage()">
+                
+
+<span></span>
+              
+
+
+
+
+
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 12L21 12M13 6L21 12L13 18" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg> 
+
+
+
+
+
+
+
+
+
+
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+<div id="menuButton" class="menu-button">⋮</div>
+<div id="menu" class="menu" style="display: none;">
+    <button onclick="exportChat()">JSON</button>
+    <button onclick="clearHistory()">Очистить</button>
+</div>
+
+
+
+
+   <script>
+
+document.addEventListener('click', function(e) {
+  const menu = document.querySelector('.menu');
+  const button = document.querySelector('.menu-button');
+  if (menu && menu.style.display === 'block' && !menu.contains(e.target) && !button.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+   </script>
+
+
+
+
+
+
+    <script>
+        const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu'; // 🔑 Your API key here
+        const API_URL = 'https://api.mistral.ai/v1/chat/completions';
+        let isProcessing = false;
+
+        // Initialize chat history
+        let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+        renderHistory();
+
+        async function sendMessage() {
+            if (isProcessing || !API_KEY) return;
+            
+            const input = document.getElementById('input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            isProcessing = true;
+            
+            // Add user message
+            addMessage('user', message);
+            
+            try {
+                // Show loading state
+                const loader = addLoader();
+                
+                // API request
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "mistral-tiny",
+                        messages: [
+                            ...history,
+                            { role: "user", content: message }
+                        ],
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                const reply = data.choices[0].message.content;
+                
+                // Add AI response
+                addMessage('assistant', reply);
+                
+                // Update history
+                history = [...history, 
+                    { role: "user", content: message },
+                    { role: "assistant", content: reply }
+                ];
+                saveHistory();
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                isProcessing = false;
+                removeLoader();
+            }
+        }
+
+        function addMessage(role, content) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.textContent = content;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function renderHistory() {
+            history.forEach(msg => addMessage(msg.role, msg.content));
+        }
+
+        function saveHistory() {
+            localStorage.setItem('chatHistory', JSON.stringify(history));
+        }
+
+        function addLoader() {
+            const loader = document.createElement('div');
+            loader.className = 'message assistant loading';
+            loader.innerHTML = `
+                <div class="dot"></div>
+                <div class="dot" style="animation-delay: 0.2s"></div>
+                <div class="dot" style="animation-delay: 0.4s"></div>
+            `;
+            document.getElementById('messages').appendChild(loader);
+            return loader;
+        }
+
+        function removeLoader() {
+            document.querySelector('.loading')?.remove();
+        }
+
+        function showError(message) {
+            const error = document.createElement('div');
+            error.className = 'message assistant';
+            error.style.color = 'var(--error)';
+            error.textContent = `Error: ${message}`;
+            document.getElementById('messages').appendChild(error);
+        }
+
+        // Event listeners
+        document.getElementById('input').addEventListener('keypress', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+
+
+
+
+
+
+<script>
+
+document.getElementById('menuButton').addEventListener('click', function() {
+    const menu = document.getElementById('menu');
+    if (menu.style.display === 'none') {
+        menu.style.display = 'block';
+    } else {
+        menu.style.display = 'none';
+    }
+});
+
+function exportChat() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(history));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("download", "chat_history.json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function clearHistory() {
+    if (confirm('Are you sure you want to clear the chat history?')) {
+        history = [];
+        localStorage.removeItem('chatHistory');
+        document.getElementById('messages').innerHTML = '';
+    }
+}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+
+
+  // Преобразуем Markdown в HTML
+  document.getElementById('markdown-content').innerHTML = marked.parse(markdown);
+
+  // Подсветка кода
+  document.querySelectorAll('pre code').forEach(block => {
+    hljs.highlightElement(block);
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
