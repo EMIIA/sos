@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -70,6 +71,7 @@ font-size: 1.1rem;
             gap: 1.5rem;
             scrollbar-width: thin;
             scrollbar-color: var(--primary) transparent;
+
         }
 
         .message {
@@ -78,6 +80,7 @@ font-size: 1.1rem;
             border-radius: 1.5rem;
             line-height: 1.6;
             animation: slideIn 0.3s ease;
+
         }
 
         .user {
@@ -208,7 +211,9 @@ margin-right: clamp(0.1rem, 1%, 1rem); /* Адаптивный отступ */
 
 
 
-
+textarea::placeholder {
+    color: #46d446; /* Пример кастомного цвета */
+}
 
 
 
@@ -445,6 +450,7 @@ padding-left: 55px;
 textarea#input {
   padding-left: 55px;
   /* остальные стили */
+
 }
 }
 
@@ -507,14 +513,15 @@ button:hover .arrow path {
     <div class="chat-container">
         <div class="messages" id="messages"></div>
         
-        <div class="input-area">
-
+        
+<div class="input-area">
 
 <textarea 
     id="input" 
     rows="3" 
     cols="40" 
     placeholder="РЖД В ПУТЬ ❯"
+
 ></textarea>
 
 
@@ -800,3 +807,4 @@ function clearHistory() {
 
 </body>
 </html>
+
