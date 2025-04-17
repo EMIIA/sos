@@ -605,6 +605,54 @@ textarea::placeholder {
 
 
 
+<style>
+
+.input-area::before {
+    content: '';
+    position: absolute;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  viewBox='0 0 45 45'%3E%3Cpath d='M18.4,13.95l-5.65-2.82a.79.79,0,0,0-.7,0L6.4,13.95' style='fill: none;stroke: %2334D399; stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 2.5px'/%3E%3C/svg%3E");
+    width: 55px;
+    height: 55px;
+    top: -45px; /* Расстояние от верхнего края input-area */
+    left: 50%;
+    transform: translate(-50%, 0); /* Центрирование по обеим осям */
+    opacity: 0.8;
+    background-size: contain;
+    animation: float 3s ease-in-out infinite;
+    
+    /* Новые свойства для точного позиционирования */
+    margin-left: auto;
+    margin-right: auto;
+    pointer-events: none; /* Чтобы не мешала кликам */
+}
+
+@keyframes float {
+    0%, 100% { 
+        transform: translate(-50%, 0); /* Сохраняем центрирование */
+    }
+    50% { 
+        transform: translate(-50%, -10px); /* Двигаем только по вертикали */
+    }
+}
+
+@media (max-width: 640px) {
+    .input-area::before {
+        width: 75px;
+        height: 75px;
+        top: -30px; /* Уменьшаем расстояние для мобилок */
+    }
+}
+
+
+</style>
+
+
+
+
+
+
+
+
 </head>
 <body>
     <div class="chat-container">
