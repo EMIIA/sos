@@ -564,38 +564,14 @@ textarea::placeholder {
 
 
 
-<style>
 
-/* Иконка над полем ввода */
-.input-area::before {
-    content: '';
-    position: absolute;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  viewBox='0 0 45 45'%3E%3Cpath d='M18.4,13.95l-5.65-2.82a.79.79,0,0,0-.7,0L6.4,13.95' style='fill: none;stroke: %2334D399; stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 2.24px'/%3E%3C/svg%3E");
-    width: 55px;
-    height: 55px;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0.8;
-    background-size: contain;
-    animation: float 3s ease-in-out infinite;
-}
 
-/* Анимация плавания */
-@keyframes float {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(-10px); }
-}
 
-/* Адаптация для мобильных */
-@media (max-width: 640px) {
-    .input-area::before {
-        width: 78px;
-        height: 78px;
-        top: -30px;
-    }
-}
-</style>
+
+
+
+
+
 
 
 
@@ -607,31 +583,28 @@ textarea::placeholder {
 
 <style>
 
+
 .input-area::before {
     content: '';
     position: absolute;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  viewBox='0 0 45 45'%3E%3Cpath d='M18.4,13.95l-5.65-2.82a.79.79,0,0,0-.7,0L6.4,13.95' style='fill: none;stroke: %2334D399; stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 2.5px'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 45'%3E%3Cpath d='M18.4,13.95l-5.65-2.82a.79.79,0,0,0-.7,0L6.4,13.95' style='fill: none;stroke: %2334D399; stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 2.5px'/%3E%3C/svg%3E");
     width: 55px;
     height: 55px;
-    top: -45px; /* Расстояние от верхнего края input-area */
+    top: -45px;
     left: 50%;
-    transform: translate(-50%, 0); /* Центрирование по обеим осям */
-    opacity: 0.8;
+    transform: translateX(-50%); /* Центрируем только по горизонтали */
     background-size: contain;
+    opacity: 0.8;
     animation: float 3s ease-in-out infinite;
-    
-    /* Новые свойства для точного позиционирования */
-    margin-left: auto;
-    margin-right: auto;
-    pointer-events: none; /* Чтобы не мешала кликам */
+    pointer-events: none; /* Не мешает кликам */
 }
 
 @keyframes float {
-    0%, 100% { 
-        transform: translate(-50%, 0); /* Сохраняем центрирование */
+    0%, 100% {
+        transform: translateX(-50%); /* Центр по горизонтали */
     }
-    50% { 
-        transform: translate(-50%, -10px); /* Двигаем только по вертикали */
+    50% {
+        transform: translateX(-50%) translateY(-10px); /* Двигаем вверх */
     }
 }
 
@@ -639,12 +612,19 @@ textarea::placeholder {
     .input-area::before {
         width: 75px;
         height: 75px;
-        top: -30px; /* Уменьшаем расстояние для мобилок */
+        top: -30px;
+        left: 50%; /* Убеждаемся, что остается */
+        transform: translateX(-50%); /* Центрируем для мобилок */
     }
 }
 
 
+
 </style>
+
+
+
+
 
 
 
