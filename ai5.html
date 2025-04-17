@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -32,6 +33,8 @@
             --surface: #1E293B;
             --success: #34D399;
             --error: #F87171;
+
+--surface: rgba(30, 41, 59, 0.7); /* Вместо оригинального #1E293B */
         }
 
         * {
@@ -48,6 +51,23 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+
+
+
+background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Новые свойства */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+
+
+
+
+
+
         }
 
         .chat-container {
@@ -360,7 +380,7 @@ transform: scale(1.3);
 @media (max-width: 768px) {
     .menu-button {
         font-size: 28px; /* Увеличиваем на мобилках */
-        bottom: 19px;
+        bottom: 21px;
         left: 23px;
         -webkit-text-stroke: 1.5px #46d446; /* Фикс для Safari */
 
@@ -436,7 +456,7 @@ resize: none; /* запретить растяжение */
   font-size: 16px;
   line-height: 2.0;
   box-sizing: border-box;
-  background: #1E293B;
+  background: none;
   color: #fff; /* белый текст */
   overflow: hidden;
   transition: border 0.2s;
@@ -444,7 +464,7 @@ resize: none; /* запретить растяжение */
 textarea#input:focus {
   border: 0.0px solid #4a90e2;
   outline: none;
-  background: #1E293B;
+  background: none;
 padding-left: 55px;
  
 }
@@ -456,6 +476,13 @@ textarea#input {
   /* остальные стили */
 
 }
+
+
+
+
+
+
+
 }
 
 </style>
