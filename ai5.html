@@ -211,9 +211,13 @@ margin-right: clamp(0.1rem, 1%, 1rem); /* Адаптивный отступ */
 
 
 
-textarea::placeholder {
-    color: #46d446; /* Пример кастомного цвета */
-}
+
+
+
+
+
+
+
 
 
 
@@ -501,6 +505,24 @@ button:hover .arrow path {
   50%  { transform: scaleY(0.7);}
   100% { transform: scaleY(1);}
 }
+
+
+
+/* Десктоп по умолчанию */
+textarea::placeholder {
+    color: #46d446 !important;
+}
+
+/* Мобильная версия */
+@media (max-width: 640px) {
+    textarea::placeholder {
+        color: #46d446 !important; /* Пример другого цвета для мобилок */
+    }
+
+
+
+
+
 </style>
 
 
