@@ -172,6 +172,13 @@ font-size: 1.1rem;
         }
 
        
+
+
+
+
+
+
+
  button {
             background: transparent;
             color: white;
@@ -183,17 +190,27 @@ font-size: 1.1rem;
             display: flex;
             align-items: center;
            
+            height:3.5em;
 
-height:3.5em;
-
-
-margin-right: clamp(0.1rem, 1%, 1rem); /* Адаптивный отступ */
-    
-   
-   
-
+            margin-right: clamp(-1rem, 0%, 0rem); /* Адаптивный отступ */
 
         }
+
+
+@media (max-width: 768px) {
+button {
+    
+    right: -20px;
+      
+    z-index: 10000;
+margin-right: clamp(0rem, 0%, 0rem); /* Адаптивный отступ */
+   
+}
+
+
+
+
+
         button:active {
             transform: scale(0.95);
         }
@@ -231,20 +248,6 @@ margin-right: clamp(0.1rem, 1%, 1rem); /* Адаптивный отступ */
             button span {
                 display: none;
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -409,12 +412,7 @@ border-radius: 10px 10px 10px 1px;
 
 
 
-
-
 }
-
-
-
 
 
 
@@ -436,9 +434,6 @@ border-radius: 10px 10px 10px 1px;
 
 bottom: 2px;
 }
-
-
-
 
 
 
@@ -474,20 +469,7 @@ margin-bottom: 10px;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 }
-
-
 
 
 
@@ -539,6 +521,9 @@ margin-bottom: 10px;
 }
 
 </style>
+
+
+
 
 <style>
 textarea#input {
@@ -592,6 +577,8 @@ textarea#input {
 
 
 
+
+
 <style>
 button .arrow path {
   transition: transform 0.3s;
@@ -600,9 +587,7 @@ button:hover .arrow path {
   transform: translateX(4px);
 }
 
-
-
-
+</style>
 
 
 
@@ -615,14 +600,15 @@ button:hover .arrow path {
   height: 100%;
 }
 #wave path {
-  fill: #E2E8F0;
+  fill: #818cf8;
   transform-origin: 50% 50%;
   animation: pulse 1s infinite;
 }
 #wave.stop path {
   animation-play-state: paused;
 }
-#wave #Line_1 { animation-delay: 0s; }
+
+#wave #Line_1 { animation-delay: 0.0s; }
 #wave #Line_2 { animation-delay: 0.15s; }
 #wave #Line_3 { animation-delay: 0.3s; }
 #wave #Line_4 { animation-delay: 0.45s; }
@@ -817,8 +803,11 @@ textarea::placeholder {
 
 
 
-<svg id="wave" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="3.56mm" height="2.92mm" viewBox="-4 0 15.08 4.0">
+<svg id="wave" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="1.56mm" height="1.92mm" viewBox="-7.5 0 18.08 4.0">
   <title>Voice</title>
+
+
+
   <path stroke="#E2E8F0" 
       stroke-width="0.0"
       fill="none"  id="Line_1" data-name="Line 1" d="M1.61,3.27h0a.22.22,0,0,0-.21.22V4.8a.22.22,0,0,0,.43,0h0V3.49a.22.22,0,0,0-.22-.22Z"/>
@@ -834,6 +823,9 @@ textarea::placeholder {
   <path stroke="#E2E8F0" 
       stroke-width="0.0"
       fill="none" id="Line_5" data-name="Line 5" d="M8.52,3.27h0a.22.22,0,0,0-.17.22V4.8a.22.22,0,0,0,.43,0h0V3.49a.22.22,0,0,0-.22-.22Z"/>
+
+
+
 </svg>
 
 
