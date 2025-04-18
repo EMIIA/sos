@@ -22,7 +22,7 @@
 
 
 
-
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 
 
@@ -377,7 +377,7 @@ transform: scale(0.0);
 
     .menu-button {
         font-size: 29px;
-        bottom: 6px;
+        bottom: 12px;
         left: 2px;
         -webkit-text-stroke: 1.6px #E2E8F0;
         
@@ -435,7 +435,7 @@ border-radius: 10px 10px 10px 1px;
             0 0 10px 2px rgba(226, 232, 240, 0.1);
 
 
-bottom: 10px;
+bottom: 12px;
 }
 
 
@@ -711,6 +711,13 @@ textarea::placeholder {
 
 
 
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
 
 
 
@@ -724,6 +731,19 @@ textarea::placeholder {
 <body>
 
 
+<script type="text/javascript">
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+     
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
 
 
 
@@ -1237,6 +1257,73 @@ function clearHistory() {
 
 
 
+
+
+
+
+
+
+
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+<script>
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    input.addEventListener('blur', function() {
+        Telegram.WebApp.MainButton.hide(); // Скрываем кнопку, если есть
+        document.activeElement.blur();
+        window.focus();
+    });
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            input.blur();
+            Telegram.WebApp.MainButton.hide();
+        }
+    });
+});
+
+</script>
+
+
+
+<script>
+
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    function hideKeyboard() {
+        input.blur();
+        document.activeElement.blur();
+        Telegram.WebApp.expand(); // Сворачивает клавиатуру
+        setTimeout(() => window.focus(), 50);
+    }
+
+    input.addEventListener('blur', hideKeyboard);
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            hideKeyboard();
+        }
+    });
+});
+
+
+</script>
 
 
 
