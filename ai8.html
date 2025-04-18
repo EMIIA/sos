@@ -479,6 +479,12 @@ margin-bottom: 10px;
 
 
 
+
+
+
+
+
+
 }
 
 
@@ -727,6 +733,45 @@ textarea::placeholder {
 
 </head>
 <body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="chat-container">
         <div class="messages" id="messages"></div>
         
@@ -879,11 +924,6 @@ textarea::placeholder {
 
 
 
-
-
-
-
-
 <button><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
   <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
 </svg></button>
@@ -891,6 +931,93 @@ textarea::placeholder {
 
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="mobile-logo">
+
+
+<a href="https://example.com" target="_blank" class="logo-link">
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 512 512">
+  <title>logo sip</title>
+  <g>
+    <g>
+      <path d="M202.86,78.6v13.5a7.92,7.92,0,0,1-7.32,7.92,104.31,104.31,0,0,0-96.72,96.71,7.92,7.92,0,0,1-7.92,7.32H77.4a8,8,0,0,1-7.93-8.51A133.68,133.68,0,0,1,194.35,70.66,8,8,0,0,1,202.86,78.6Z" style="fill: #E2E8F0;stroke: #E2E8F0;stroke-miterlimit: 10;stroke-width: 25.53479456118614px"/>
+      <path d="M304.13,78.6v13.5a7.92,7.92,0,0,0,7.32,7.92,104.31,104.31,0,0,1,96.72,96.71,7.92,7.92,0,0,0,7.92,7.32h13.5a8,8,0,0,0,7.93-8.51A133.68,133.68,0,0,0,312.64,70.66,8,8,0,0,0,304.13,78.6Z" style="fill: #E2E8F0;stroke: #E2E8F0;stroke-miterlimit: 10;stroke-width: 25.53479456118614px"/>
+    </g>
+    <path d="M202.86,433.27v-13.5a7.92,7.92,0,0,0-7.32-7.92,104.31,104.31,0,0,1-96.72-96.71,7.92,7.92,0,0,0-7.92-7.32H77.4a8,8,0,0,0-7.93,8.51A133.68,133.68,0,0,0,194.35,441.2,8,8,0,0,0,202.86,433.27Z" style="fill: #E2E8F0;stroke: #E2E8F0;stroke-miterlimit: 10;stroke-width: 20.53479456118614px"/>
+    <path d="M304.13,433.27v-13.5a7.92,7.92,0,0,1,7.32-7.92,104.31,104.31,0,0,0,96.72-96.71,7.92,7.92,0,0,1,7.92-7.32h13.5a8,8,0,0,1,7.93,8.51A133.68,133.68,0,0,1,312.64,441.2,8,8,0,0,1,304.13,433.27Z" style="fill: #E2E8F0;stroke: #E2E8F0;stroke-miterlimit: 10;stroke-width: 25.53479456118614px"/>
+  </g>
+  <circle cx="254.11" cy="257.41" r="59.75" style="fill:#E2E8F0;stroke: #E2E8F0;stroke-miterlimit: 10;stroke-width: 31.7826485372871px"/>
+</svg>
+</div>
+
+<style>
+/* Медиазапрос для мобилок */
+@media (max-width: 768px) {
+  .mobile-logo {
+position: fixed;
+
+
+
+    top: 80px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    z-index: 20000;
+  }
+
+  .mobile-logo svg {
+    width: 100%;
+    height: 100%;
+    fill: #E2E8F0;
+    stroke: #E2E8F0;
+  }
+
+  .logo-part {
+    stroke-width: 3px; /* Уменьшенная толщина линий */
+  }
+
+  .logo-center {
+    stroke-width: 8px; /* Уменьшенная толщина центрального круга */
+  }
+}
+
+/* Скрываем на десктопах */
+@media (min-width: 769px) {
+  .mobile-logo {
+    display: none;
+
+  }
+}
+</style>
+
+
+
+
+
+
+
+
+
+
 
 
 
