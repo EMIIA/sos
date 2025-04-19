@@ -14,6 +14,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -1401,11 +1402,12 @@ document.addEventListener('click', function(e) {
             div.textContent = msg.content;
             messages.appendChild(div);
         });
-        
+
         // Прокрутка вниз при загрузке истории
         messages.scrollTop = messages.scrollHeight;
     }
 
+        
     // Остальные функции без изменений
     function saveHistory() {
         localStorage.setItem('chatHistory', JSON.stringify(history));
@@ -1465,14 +1467,14 @@ function exportChat() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(history));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href",     dataStr);
-    downloadAnchorNode.setAttribute("download", "chat_history.json");
+    downloadAnchorNode.setAttribute("download", "emiia_ai_chat_history.json");
     document.body.appendChild(downloadAnchorNode); // required for firefox
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
 
 function clearHistory() {
-    if (confirm('Are you sure you want to clear the chat history?')) {
+    if (confirm('Вы уверены, что хотите очистить историю чата с EMIIA.AI?')) {
         history = [];
         localStorage.removeItem('chatHistory');
         document.getElementById('messages').innerHTML = '';
