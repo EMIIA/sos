@@ -2,10 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-
- <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Чат с авторастягивающимся полем ввода</title>
 <style>
   :root {
@@ -29,6 +26,11 @@
     margin: 0 auto;
     padding: 20px;
     box-sizing: border-box;
+    transition: transform 0.3s ease;
+  }
+
+  .container.active {
+    transform: translateY(-20%);
   }
 
   #messages {
@@ -38,6 +40,9 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+    min-height: 0;
   }
 
   .message {
@@ -83,17 +88,8 @@
     border-radius: 8px;
     margin-top: 20px;
     box-sizing: border-box;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
   }
-
-
-#messages {
-  /* ... */
-  scroll-behavior: smooth; /* Плавная прокрутка */
-  overscroll-behavior: contain; /* Улучшение поведения скролла */
-}
-
-
 
   @keyframes bounce {
     0%, 100% { transform: translateY(0); }
@@ -102,7 +98,7 @@
 </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="block">
     <div id="messages"></div>
     <textarea 
       id="input" 
@@ -112,38 +108,40 @@
   </div>
 
 <script>
-  const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu'; // 🔑 Ваш API ключ здесь
+  const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu';
   const API_URL = 'https://api.mistral.ai/v1/chat/completions';
   let isProcessing = false;
   let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-  
+  const container = document.getElementById('block');
+  const input = document.getElementById('input');
+
   // Инициализация чата
   renderHistory();
-  adjustTextareaHeight(document.getElementById('input'));
+  adjustTextareaHeight(input);
 
-  // Автоматическое изменение высоты textarea
+  // Поднимаем блок при фокусе
+  input.addEventListener('focus', () => container.classList.add('active'));
+  input.addEventListener('blur', () => container.classList.remove('active'));
+
   function adjustTextareaHeight(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
+    if(document.activeElement === textarea) container.classList.add('active');
   }
 
-  // Отправка сообщения
   async function sendMessage() {
     if (isProcessing || !API_KEY) return;
     
-    const input = document.getElementById('input');
     const message = input.value.trim();
     if (!message) return;
 
     input.value = '';
     isProcessing = true;
     adjustTextareaHeight(input);
-    
     addMessage('user', message);
     
     try {
       const loader = addLoader();
-      
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
@@ -157,7 +155,7 @@
         })
       });
 
-      if (!response.ok) throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
+      if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
       
       const data = await response.json();
       const reply = data.choices[0].message.content;
@@ -177,14 +175,19 @@
     }
   }
 
-  // Вспомогательные функции
   function addMessage(role, content) {
     const messages = document.getElementById('messages');
     const div = document.createElement('div');
     div.className = `message ${role}`;
     div.textContent = content;
     messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
+    
+    requestAnimationFrame(() => {
+      messages.scrollTo({
+        top: messages.scrollHeight,
+        behavior: 'smooth'
+      });
+    });
   }
 
   function renderHistory() {
@@ -219,40 +222,14 @@
     document.getElementById('messages').appendChild(error);
   }
 
-  // Обработчики событий
-  document.getElementById('input').addEventListener('input', function() {
-    adjustTextareaHeight(this);
-  });
-
-  document.getElementById('input').addEventListener('keydown', e => {
+  input.addEventListener('input', () => adjustTextareaHeight(input));
+  input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
 </script>
-
-
-
-
-
-<script>
-function addMessage(role, content) {
-  // ... предыдущий код ...
-  
-  // Оптимальное решение с двойной проверкой
-  requestAnimationFrame(() => {
-    messages.scrollTo({
-      top: messages.scrollHeight,
-      behavior: 'smooth'
-    });
-  });
-}
-
-</script>
-
-
-
-
 </body>
 </html>
+
