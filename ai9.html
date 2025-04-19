@@ -11,6 +11,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -731,33 +732,28 @@ Telegram.WebApp.MainButton.onClick(function() {
 
 
 
+
+
+
+
+
+
+
+
 <style>
 
 #messages {
-    height: 400px;          /* Фиксированная высота */
-    overflow-y: auto;       /* Включить скролл */
+    height: 400px;
+    overflow-y: auto;
     display: flex;
-    flex-direction: column-reverse; /* Новые сообщения сверху */
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
 }
-
 
 </style>
 
-
-
-
-
-
-
-
-
  
-
-
-
-
-
-
 
 
 
@@ -1256,121 +1252,138 @@ document.addEventListener('click', function(e) {
 
 
 
-    <script>
-        const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu'; // 🔑 Your API key here
-        const API_URL = 'https://api.mistral.ai/v1/chat/completions';
-        let isProcessing = false;
+ <script>
+    const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu';
+    const API_URL = 'https://api.mistral.ai/v1/chat/completions';
+    let isProcessing = false;
 
-        // Initialize chat history
-        let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-        renderHistory();
+    let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+    renderHistory();
 
-        async function sendMessage() {
-            if (isProcessing || !API_KEY) return;
+    async function sendMessage() {
+        if (isProcessing || !API_KEY) return;
+        
+        const input = document.getElementById('input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        input.value = '';
+        isProcessing = true;
+        
+        addMessage('user', message);
+        
+        try {
+            const loader = addLoader();
             
-            const input = document.getElementById('input');
-            const message = input.value.trim();
-            if (!message) return;
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "mistral-tiny",
+                    messages: [...history, { role: "user", content: message }],
+                    temperature: 0.7
+                })
+            });
 
-            input.value = '';
-            isProcessing = true;
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
-            // Add user message
-            addMessage('user', message);
+            const data = await response.json();
+            const reply = data.choices[0].message.content;
             
-            try {
-                // Show loading state
-                const loader = addLoader();
-                
-                // API request
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: "mistral-tiny",
-                        messages: [
-                            ...history,
-                            { role: "user", content: message }
-                        ],
-                        temperature: 0.7
-                    })
-                });
+            addMessage('assistant', reply); // Исправлена опечатка в 'assistant'
+            
+            history = [
+                ...history, 
+                { role: "user", content: message },
+                { role: "assistant", content: reply }
+            ];
+            saveHistory();
 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const data = await response.json();
-                const reply = data.choices[0].message.content;
-                
-                // Add AI response
-                addMessage('assistant', reply);
-                
-                // Update history
-                history = [...history, 
-                    { role: "user", content: message },
-                    { role: "assistant", content: reply }
-                ];
-                saveHistory();
-
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                isProcessing = false;
-                removeLoader();
-            }
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            isProcessing = false;
+            removeLoader();
         }
+    }
 
-        function addMessage(role, content) {
-            const messages = document.getElementById('messages');
-            const div = document.createElement('div');
-            div.className = `message ${role}`;
-            div.textContent = content;
-            messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
-        }
-
-        function renderHistory() {
-            history.forEach(msg => addMessage(msg.role, msg.content));
-        }
-
-        function saveHistory() {
-            localStorage.setItem('chatHistory', JSON.stringify(history));
-        }
-
-        function addLoader() {
-            const loader = document.createElement('div');
-            loader.className = 'message assistant loading';
-            loader.innerHTML = `
-                <div class="dot"></div>
-                <div class="dot" style="animation-delay: 0.2s"></div>
-                <div class="dot" style="animation-delay: 0.4s"></div>
-            `;
-            document.getElementById('messages').appendChild(loader);
-            return loader;
-        }
-
-        function removeLoader() {
-            document.querySelector('.loading')?.remove();
-        }
-
-        function showError(message) {
-            const error = document.createElement('div');
-            error.className = 'message assistant';
-            error.style.color = 'var(--error)';
-            error.textContent = `Error: ${message}`;
-            document.getElementById('messages').appendChild(error);
-        }
-
-        // Event listeners
-        document.getElementById('input').addEventListener('keypress', e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+    function addMessage(role, content) {
+        const messages = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = `message ${role}`;
+        div.textContent = content;
+        
+        // Добавляем новое сообщение в начало списка
+        messages.insertBefore(div, messages.firstChild);
+        
+        // Автопрокрутка к новому сообщению
+        div.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
         });
-    </script>
+    }
+
+    function renderHistory() {
+        // Добавляем сообщения в историческом порядке (старые -> новые)
+        history.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = `message ${msg.role}`;
+            div.textContent = msg.content;
+            // Каждое новое сообщение добавляется в начало
+            messages.insertBefore(div, messages.firstChild);
+        });
+        
+        // Прокрутка к самому последнему сообщению (которое теперь вверху)
+        if (history.length > 0) {
+            messages.firstChild?.scrollIntoView();
+        }
+    }
+
+    function saveHistory() {
+        localStorage.setItem('chatHistory', JSON.stringify(history));
+    }
+
+    function addLoader() {
+        const loader = document.createElement('div');
+        loader.className = 'message assistant loading';
+        loader.innerHTML = `
+            <div class="dot"></div>
+            <div class="dot" style="animation-delay: 0.2s"></div>
+            <div class="dot" style="animation-delay: 0.4s"></div>
+        `;
+        messages.insertBefore(loader, messages.firstChild);
+        return loader;
+    }
+
+    function removeLoader() {
+        document.querySelector('.loading')?.remove();
+    }
+
+    function showError(message) {
+        const error = document.createElement('div');
+        error.className = 'message assistant';
+        error.style.color = 'var(--error)';
+        error.textContent = `Error: ${message}`;
+        messages.insertBefore(error, messages.firstChild);
+        error.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('input').addEventListener('keypress', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+</script>
+
+
+
+
+
+
 
 
 
