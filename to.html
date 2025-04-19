@@ -1,0 +1,777 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Чат с авторастягивающимся полем ввода</title>
+
+
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<style>
+  :root {
+    --user-bg: #e3f2fd;
+    --assistant-bg: #f5f5f5;
+    --error: #ff4444;
+  }
+
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .container {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+  }
+
+  .container.active {
+    transform: translateY(-5%);
+  }
+
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+    min-height: 0;
+  }
+
+  .message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 15px;
+    line-height: 1.4;
+  }
+
+  .user {
+    background: var(--user-bg);
+    align-self: flex-end;
+  }
+
+  .assistant {
+    background: var(--assistant-bg);
+    align-self: flex-start;
+  }
+
+  .loading {
+    display: inline-flex;
+    gap: 6px;
+    padding: 12px 16px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: #666;
+    border-radius: 50%;
+    animation: bounce 1s infinite;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 40px;
+    max-height: 200px;
+    padding: 12px;
+    font-size: 16px;
+    resize: none;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+</style>
+
+
+
+
+
+
+<style>
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.chat-menu {
+  width: 250px;
+  background: #f5f5f5;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-button {
+  padding: 10px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.chats-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-item {
+  padding: 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.chat-item:hover {
+  background: #e0e0e0;
+}
+
+.chat-item.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* Остальные ваши существующие стили */
+
+</style>
+
+
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+
+
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+<script type="text/javascript">
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+     
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+  <div class="container" id="block">
+    <div id="messages"></div>
+    <textarea 
+      id="input" 
+      placeholder="Введите сообщение..."
+      rows="1"
+    ></textarea>
+  </div>
+
+  <script>
+  const API_KEY = '5a1cc5e8b937de2f9a0ed631864532f758e251e9ddd6349dd84a907708d7ebad';
+  const API_URL = 'https://api.together.ai/v1/chat/completions';
+  const MODEL = 'meta-llama/Llama-3-70b-chat-hf';
+  
+  let isProcessing = false;
+  let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+  const container = document.getElementById('block');
+  const input = document.getElementById('input');
+  const messages = document.getElementById('messages');
+
+  // Инициализация
+  renderHistory();
+  adjustTextareaHeight(input);
+
+  // Обработчики событий
+  input.addEventListener('focus', () => container.classList.add('active'));
+  input.addEventListener('blur', () => container.classList.remove('active'));
+  input.addEventListener('input', () => adjustTextareaHeight(input));
+  
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  async function sendMessage() {
+    if (isProcessing || !API_KEY) return;
+    
+    const message = input.value.trim();
+    if (!message) return;
+
+    input.value = '';
+    isProcessing = true;
+    adjustTextareaHeight(input);
+    addMessage('user', message);
+    
+    try {
+      const loader = addLoader();
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [...history, { role: "user", content: message }],
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      
+      const data = await response.json();
+      const reply = data.choices[0].message.content;
+      
+      addMessage('assistant', reply);
+      history = [
+        ...history, 
+        { role: "user", content: message },
+        { role: "assistant", content: reply }
+      ];
+      saveHistory();
+
+    } catch (error) {
+      showError(error.message);
+    } finally {
+      isProcessing = false;
+      removeLoader();
+    }
+  }
+
+  function adjustTextareaHeight(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+    if (document.activeElement === textarea) {
+      container.classList.add('active');
+    }
+  }
+
+  function addMessage(role, content) {
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    div.textContent = content;
+    messages.appendChild(div);
+    messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+  }
+
+  function renderHistory() {
+    history.forEach(msg => addMessage(msg.role, msg.content));
+  }
+
+  function saveHistory() {
+    localStorage.setItem('chatHistory', JSON.stringify(history));
+  }
+
+  function addLoader() {
+    const loader = document.createElement('div');
+    loader.className = 'message assistant loading';
+    loader.innerHTML = `
+      <div class="dot"></div>
+      <div class="dot" style="animation-delay: 0.2s"></div>
+      <div class="dot" style="animation-delay: 0.4s"></div>
+    `;
+    messages.appendChild(loader);
+    return loader;
+  }
+
+  function removeLoader() {
+    document.querySelector('.loading')?.remove();
+  }
+
+  function showError(message) {
+    const error = document.createElement('div');
+    error.className = 'message assistant';
+    error.style.color = 'var(--error)';
+    error.textContent = `Ошибка: ${message}`;
+    messages.appendChild(error);
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="module">
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { create } from 'zustand';
+import Markdown from 'react-markdown';
+import './App.css';
+
+// ... (ваши существующие импорты и хранилище zustand остаются без изменений)
+
+function App() {
+  const [inputMessage, setInputMessage] = useState('');
+  const messagesEndRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Состояния для управления чатами
+  const [chats, setChats] = useState(() => {
+    const saved = localStorage.getItem('chats');
+    return saved ? JSON.parse(saved) : [{ 
+      id: 1, 
+      name: "Чат 1", 
+      messages: [], 
+      history: [] 
+    }];
+  });
+  const [activeChatId, setActiveChatId] = useState(() => {
+    const saved = localStorage.getItem('activeChatId');
+    return saved ? Number(saved) : 1;
+  });
+
+  // Получаем активный чат
+  const activeChat = chats.find(c => c.id === activeChatId) || chats[0];
+
+  // Сохранение в localStorage
+  useEffect(() => {
+    localStorage.setItem('chats', JSON.stringify(chats));
+    localStorage.setItem('activeChatId', activeChatId.toString());
+  }, [chats, activeChatId]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const createNewChat = () => {
+    const newChatId = Date.now();
+    const newChat = {
+      id: newChatId,
+      name: `Чат ${chats.length + 1}`,
+      messages: [],
+      history: []
+    };
+    setChats(prev => [...prev, newChat]);
+    setActiveChatId(newChatId);
+  };
+
+  const exportChatToJSON = () => {
+    const dataStr = JSON.stringify(activeChat, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `chat_${activeChatId}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSend = useCallback(async () => {
+    // ... (ваша существующая логика отправки, но с заменой setMessages/setHistory на)
+    
+    setChats(prevChats => prevChats.map(chat => {
+      if (chat.id === activeChatId) {
+        return { 
+          ...chat,
+          messages: [...newMessages],
+          history: [...newHistory]
+        };
+      }
+      return chat;
+    }));
+    
+    // ... (остальная часть вашей логики отправки)
+  }, [activeChatId, chats, inputMessage]);
+
+  const rerunMessage = useCallback(async (index) => {
+    // ... (аналогичные изменения в логике rerunMessage)
+  }, [activeChatId, chats]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [activeChat.messages]);
+
+  return (
+    <div className="app-container">
+      {/* Боковое меню */}
+      <div className="chat-menu">
+        <button className="menu-button" onClick={createNewChat}>
+          + Новый чат
+        </button>
+        
+        <div className="chats-list">
+          {chats.map(chat => (
+            <div
+              key={chat.id}
+              className={`chat-item ${chat.id === activeChatId ? 'active' : ''}`}
+              onClick={() => setActiveChatId(chat.id)}
+            >
+              {chat.name}
+            </div>
+          ))}
+        </div>
+        
+        <button className="menu-button" onClick={exportChatToJSON}>
+          Экспорт чата
+        </button>
+      </div>
+
+      {/* Основная область чата */}
+      <div className="chat-main">
+        <div className="messages-container">
+          {activeChat.messages.map((message, index) => (
+            // ... (ваша существующая разметка сообщений)
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        
+        {/* Ваша существующая форма ввода */}
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand();
+    window.Telegram.WebApp.ready();
+
+    var inputContainer = document.getElementById('input-container');
+    var input = document.getElementById('input');
+
+    input.addEventListener('focus', function() {
+        inputContainer.classList.add('focused');
+        inputContainer.classList.remove('blurred');
+    });
+
+    input.addEventListener('blur', function() {
+        inputContainer.classList.remove('focused');
+        inputContainer.classList.add('blurred');
+    });
+});
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand();
+    
+    var inputContainer = document.getElementById('input-container');
+    var input = document.getElementById('input');
+    
+    input.addEventListener('focus', function() {
+        inputContainer.style.transform = 'translateY(-' + window.innerHeight + 'px)';
+    });
+    
+    input.addEventListener('blur', function() {
+        inputContainer.style.transform = 'translateY(0)';
+    });
+});
+
+
+</script>
+
+<script>
+if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+}
+</script>
+
+<script type="module">
+        import { WebApp } from 'https://unpkg.com/@twa-dev/sdk@0.0.6/dist/web.js';
+
+        class TelegramChat {
+            constructor() {
+                this.chatContainer = document.querySelector('.chat-container');
+                this.messagesContainer = document.querySelector('.messages');
+                this.input = document.querySelector('input');
+                this.sendButton = document.querySelector('button');
+                
+                this.initialize();
+            }
+
+            initialize() {
+                WebApp.ready();
+                WebApp.expand();
+
+                this.setupEventListeners();
+                this.adjustHeight();
+                this.addTestMessages();
+            }
+
+            setupEventListeners() {
+                this.sendButton.addEventListener('click', () => this.handleSend());
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handleSend();
+                });
+
+                window.addEventListener('resize', () => this.adjustHeight());
+                WebApp.onEvent('viewportChanged', (params) => {
+                    document.documentElement.style.setProperty(
+                        '--keyboard-height', 
+                        `${params.height}px`
+                    );
+                    this.adjustHeight();
+                });
+            }
+
+            adjustHeight() {
+                const viewportHeight = WebApp.viewportHeight || window.innerHeight;
+                document.documentElement.style.setProperty(
+                    '--viewport-height', 
+                    `${viewportHeight}px`
+                );
+                
+                requestAnimationFrame(() => {
+                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+                });
+            }
+
+            async handleSend() {
+                const text = this.input.value.trim();
+                if (!text) return;
+
+                this.addMessage(text, 'user');
+                this.input.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    this.addMessage('This is a sample response', 'bot');
+                }, 1000);
+            }
+
+            addMessage(text, type) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${type}-message`;
+                messageEl.textContent = text;
+                this.messagesContainer.appendChild(messageEl);
+                this.adjustHeight();
+            }
+
+            addTestMessages() {
+                this.addMessage('Hello! How can I help you?', 'bot');
+                this.addMessage('Hi! This is a test message.', 'user');
+            }
+        }
+
+        // Initialize chat when WebApp is ready
+        WebApp.onEvent('ready', () => {
+            const chat = new TelegramChat();
+            window.chat = chat; // Expose for debugging
+        });
+
+    </script>
+
+
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand(); // Расширяет окно приложения
+    window.Telegram.WebApp.enableClosingConfirmation(); // Подтверждение перед закрытием
+
+    // Если клавиатура открывается, можно добавить обработчик события для её открытия
+    // Это зависит от того, как вы управляете показом клавиатуры, например, через фокусировку на input
+    var inputElement = document.getElementById('input-area');
+    inputElement.addEventListener('focus', function() {
+        // Здесь можно добавить дополнительную логику, если нужно
+        // Например, скролл до нужной позиции или изменение стилей
+    });
+});
+
+
+</script>
+
+
+
+
+
+
+
+
+
+<script>
+Telegram.WebApp.onEvent('viewportChanged', () => {
+  const viewport = Telegram.WebApp.viewportParams;
+  document.documentElement.style.setProperty('--keyboard-height', `${viewport.height}px`);
+  document.body.style.height = `${viewport.height}px`;
+});
+
+</script>
+
+
+
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+<script>
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    input.addEventListener('blur', function() {
+        Telegram.WebApp.MainButton.hide(); // Скрываем кнопку, если есть
+        document.activeElement.blur();
+        window.focus();
+    });
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            input.blur();
+            Telegram.WebApp.MainButton.hide();
+        }
+    });
+});
+
+</script>
+
+
+
+<script>
+
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    function hideKeyboard() {
+        input.blur();
+        document.activeElement.blur();
+        Telegram.WebApp.expand(); // Сворачивает клавиатуру
+        setTimeout(() => window.focus(), 50);
+    }
+
+    input.addEventListener('blur', hideKeyboard);
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            hideKeyboard();
+        }
+    });
+});
+
+
+</script>
+
+
+
+
+</body>
+</html>
+
