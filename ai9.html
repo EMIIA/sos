@@ -10,6 +10,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -730,7 +731,17 @@ Telegram.WebApp.MainButton.onClick(function() {
 
 
 
+<style>
 
+#messages {
+    height: 400px;          /* Фиксированная высота */
+    overflow-y: auto;       /* Включить скролл */
+    display: flex;
+    flex-direction: column-reverse; /* Новые сообщения сверху */
+}
+
+
+</style>
 
 
 
@@ -1498,5 +1509,7 @@ Telegram.WebApp.ready(function() {
 
 </body>
 </html>
+
+
 
 
