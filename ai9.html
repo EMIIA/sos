@@ -651,11 +651,16 @@ textarea::placeholder {
 
 
 
+<style>
 
+#input-container {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 2000; /* Увеличим z-index, чтобы быть выше клавиатуры */
+}
 
-
-
-
+</style>
 
 
 
@@ -994,14 +999,32 @@ position: fixed;
 
 
 
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand();
+    
+    var inputContainer = document.getElementById('input-container');
+    var input = document.getElementById('input');
+    
+    input.addEventListener('focus', function() {
+        inputContainer.style.transform = 'translateY(-' + window.innerHeight + 'px)';
+    });
+    
+    input.addEventListener('blur', function() {
+        inputContainer.style.transform = 'translateY(0)';
+    });
+});
 
 
+</script>
 
-
-
-
-
-
+<script>
+if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+}
+</script>
 
 <script type="module">
         import { WebApp } from 'https://unpkg.com/@twa-dev/sdk@0.0.6/dist/web.js';
