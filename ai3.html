@@ -2,6 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
+
+ <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Чат с авторастягивающимся полем ввода</title>
 <style>
   :root {
@@ -81,6 +85,15 @@
     box-sizing: border-box;
     transition: transform 0.3s ease;
   }
+
+
+#messages {
+  /* ... */
+  scroll-behavior: smooth; /* Плавная прокрутка */
+  overscroll-behavior: contain; /* Улучшение поведения скролла */
+}
+
+
 
   @keyframes bounce {
     0%, 100% { transform: translateY(0); }
@@ -218,5 +231,28 @@
     }
   });
 </script>
+
+
+
+
+
+<script>
+function addMessage(role, content) {
+  // ... предыдущий код ...
+  
+  // Оптимальное решение с двойной проверкой
+  requestAnimationFrame(() => {
+    messages.scrollTo({
+      top: messages.scrollHeight,
+      behavior: 'smooth'
+    });
+  });
+}
+
+</script>
+
+
+
+
 </body>
 </html>
