@@ -1252,6 +1252,8 @@ document.addEventListener('click', function(e) {
 
 
 
+
+
  <script>
     const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu';
     const API_URL = 'https://api.mistral.ai/v1/chat/completions';
@@ -1293,7 +1295,7 @@ document.addEventListener('click', function(e) {
             const data = await response.json();
             const reply = data.choices[0].message.content;
             
-            addMessage('assistant', reply); // Исправлена опечатка в 'assistant'
+            addMessage('assistant', reply);
             
             history = [
                 ...history, 
@@ -1316,32 +1318,33 @@ document.addEventListener('click', function(e) {
         div.className = `message ${role}`;
         div.textContent = content;
         
-        // Добавляем новое сообщение в начало списка
+        // Добавляем сообщение в начало
         messages.insertBefore(div, messages.firstChild);
         
-        // Автопрокрутка к новому сообщению
-        div.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
+        // Гарантированная прокрутка к новому сообщению
+        requestAnimationFrame(() => {
+            div.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
         });
     }
 
     function renderHistory() {
-        // Добавляем сообщения в историческом порядке (старые -> новые)
-        history.forEach(msg => {
+        // Восстанавливаем в обратном порядке
+        const reversedHistory = [...history].reverse();
+        reversedHistory.forEach(msg => {
             const div = document.createElement('div');
             div.className = `message ${msg.role}`;
             div.textContent = msg.content;
-            // Каждое новое сообщение добавляется в начало
-            messages.insertBefore(div, messages.firstChild);
+            messages.appendChild(div);
         });
         
-        // Прокрутка к самому последнему сообщению (которое теперь вверху)
-        if (history.length > 0) {
-            messages.firstChild?.scrollIntoView();
-        }
+        // Прокрутка вниз при загрузке истории
+        messages.scrollTop = messages.scrollHeight;
     }
 
+    // Остальные функции без изменений
     function saveHistory() {
         localStorage.setItem('chatHistory', JSON.stringify(history));
     }
@@ -1378,11 +1381,6 @@ document.addEventListener('click', function(e) {
         }
     });
 </script>
-
-
-
-
-
 
 
 
