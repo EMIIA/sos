@@ -537,11 +537,13 @@
 
 <script>
 
-const inputBlock = document.querySelector('.input-block'); // Замените на ваш селектор блока
+
+
+const inputBlock = document.querySelector('.input-container'); // Блок с полем ввода
 
 // Поднимаем блок при фокусе на поле ввода
 document.querySelector('input[type="text"]').addEventListener('focus', function() {
-    inputBlock.style.transform = 'translateY(-20px)';
+    inputBlock.style.transform = 'translateY(-50px)';
     inputBlock.style.transition = 'transform 0.3s ease';
 });
 
@@ -549,6 +551,7 @@ document.querySelector('input[type="text"]').addEventListener('focus', function(
 document.querySelector('input[type="text"]').addEventListener('blur', function() {
     inputBlock.style.transform = 'translateY(0)';
 });
+
 
 </script>
 
