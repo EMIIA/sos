@@ -669,97 +669,6 @@ textarea::placeholder {
 
 
 
-
-
-
-<style>
-
-
-.input-area::before {
-    content: '';
-    position: absolute;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-9 0 45 45'%3E%3Cpath d='M18.4,13.95l-5.65-2.82a.79.79,0,0,0-.7,0L6.4,13.95' style='fill: none;stroke: %23E2E8F0; stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 1.5px'/%3E%3C/svg%3E");
-    width: 60px;
-    height: 60px;
-    top: -45px;
-    left: 50%;
-    transform: translateX(-50%); /* Центрируем только по горизонтали */
-    background-size: contain;
-    opacity: 0.8;
-    animation: float 0s ease-in-out infinite;
-    pointer-events: none; /* Не мешает кликам */
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translateX(-50%); /* Центр по горизонтали */
-    }
-    50% {
-        transform: translateX(-50%) translateY(-10px); /* Двигаем вверх */
-    }
-}
-
-@media (max-width: 640px) {
-    .input-area::before {
-        width: 80px;
-        height: 80px;
-        top: -33px;
-        left: 50%; /* Убеждаемся, что остается */
-        transform: translateX(-50%); /* Центрируем для мобилок */
-    }
-}
-
-
-
-</style>
-
-
-
-
-
-
-
-
-
-<style>
-
-body {
-    /* Заменяем height: 100vh */
-    height: var(--viewport-height, 100vh);
-    /* Добавляем временное решение для iOS */
-    padding-bottom: constant(safe-area-inset-bottom);
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-.chat-container {
-    padding-bottom: 120px; /* Увеличьте отступ если нужно */
-}
-
-.input-area {
-    position: fixed;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 5px);
-    transition: bottom 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-/* Для случаев когда клавиатура открыта */
-@media (max-height: 500px) {
-    .input-area {
-        bottom: calc(var(--keyboard-height, 0px) + env(safe-area-inset-bottom, 0px));
-    }
-}
-
-
-</style>
-
-
-
-
-
-
-
-
-
 <script>
 
 Telegram.WebApp.MainButton.onClick(function() {
@@ -1089,11 +998,23 @@ position: fixed;
 
 
 
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand(); // Расширяет окно приложения
+    window.Telegram.WebApp.enableClosingConfirmation(); // Подтверждение перед закрытием
+
+    // Если клавиатура открывается, можно добавить обработчик события для её открытия
+    // Это зависит от того, как вы управляете показом клавиатуры, например, через фокусировку на input
+    var inputElement = document.getElementById('input-area');
+    inputElement.addEventListener('focus', function() {
+        // Здесь можно добавить дополнительную логику, если нужно
+        // Например, скролл до нужной позиции или изменение стилей
+    });
+});
 
 
-
-
-
+</script>
 
 
 
