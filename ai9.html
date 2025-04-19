@@ -657,15 +657,24 @@ textarea::placeholder {
     position: fixed;
     bottom: 0;
     width: 100%;
-    z-index: 2000; /* Увеличим z-index, чтобы быть выше клавиатуры */
+    z-index: 9999; /* Увеличиваем z-index */
+    transition: transform 0.3s ease-out;
 }
+
 
 </style>
 
 
+<style>
+#input-container.focused {
+    transform: translateY(0);
+}
 
+#input-container.blurred {
+    transform: translateY(100%);
+}
 
-
+</style>
 
 
 
@@ -996,6 +1005,55 @@ position: fixed;
   }
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand();
+    window.Telegram.WebApp.ready();
+
+    var inputContainer = document.getElementById('input-container');
+    var input = document.getElementById('input');
+
+    input.addEventListener('focus', function() {
+        inputContainer.classList.add('focused');
+        inputContainer.classList.remove('blurred');
+    });
+
+    input.addEventListener('blur', function() {
+        inputContainer.classList.remove('focused');
+        inputContainer.classList.add('blurred');
+    });
+});
+
+
+</style>
+
+
+
+
+
+
+
 
 
 
