@@ -998,6 +998,113 @@ position: fixed;
 
 
 
+
+
+
+
+
+<script type="module">
+        import { WebApp } from 'https://unpkg.com/@twa-dev/sdk@0.0.6/dist/web.js';
+
+        class TelegramChat {
+            constructor() {
+                this.chatContainer = document.querySelector('.chat-container');
+                this.messagesContainer = document.querySelector('.messages');
+                this.input = document.querySelector('input');
+                this.sendButton = document.querySelector('button');
+                
+                this.initialize();
+            }
+
+            initialize() {
+                WebApp.ready();
+                WebApp.expand();
+
+                this.setupEventListeners();
+                this.adjustHeight();
+                this.addTestMessages();
+            }
+
+            setupEventListeners() {
+                this.sendButton.addEventListener('click', () => this.handleSend());
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handleSend();
+                });
+
+                window.addEventListener('resize', () => this.adjustHeight());
+                WebApp.onEvent('viewportChanged', (params) => {
+                    document.documentElement.style.setProperty(
+                        '--keyboard-height', 
+                        `${params.height}px`
+                    );
+                    this.adjustHeight();
+                });
+            }
+
+            adjustHeight() {
+                const viewportHeight = WebApp.viewportHeight || window.innerHeight;
+                document.documentElement.style.setProperty(
+                    '--viewport-height', 
+                    `${viewportHeight}px`
+                );
+                
+                requestAnimationFrame(() => {
+                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+                });
+            }
+
+            async handleSend() {
+                const text = this.input.value.trim();
+                if (!text) return;
+
+                this.addMessage(text, 'user');
+                this.input.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    this.addMessage('This is a sample response', 'bot');
+                }, 1000);
+            }
+
+            addMessage(text, type) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${type}-message`;
+                messageEl.textContent = text;
+                this.messagesContainer.appendChild(messageEl);
+                this.adjustHeight();
+            }
+
+            addTestMessages() {
+                this.addMessage('Hello! How can I help you?', 'bot');
+                this.addMessage('Hi! This is a test message.', 'user');
+            }
+        }
+
+        // Initialize chat when WebApp is ready
+        WebApp.onEvent('ready', () => {
+            const chat = new TelegramChat();
+            window.chat = chat; // Expose for debugging
+        });
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
 
 document.addEventListener('DOMContentLoaded', function() {
