@@ -393,6 +393,37 @@
   bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
 }
 
+
+
+
+
+
+.chat-container {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.input-area {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); /* +10px для дополнительного смещения */
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-radius: 1.5rem;
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+
+
+
+
 </style>
 
 </head>
@@ -428,7 +459,7 @@
 
 <script>
 window.addEventListener('resize', () => {
-  document.querySelector('.input-area').style.bottom = '10px';
+  document.querySelector('.input-area').style.bottom = '80px';
 });
 </script>
 
