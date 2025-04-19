@@ -243,6 +243,34 @@
 
 
 
+
+
+
+
+
+.chat-container {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+.input-area {
+  position: fixed;
+  bottom: env(safe-area-inset-bottom, 0);
+  left: 0;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-radius: 1.5rem;
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+
+
+
 </style>
 
 
