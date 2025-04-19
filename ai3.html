@@ -388,10 +388,12 @@
 </style>
 
 
+<style>
+.input-area {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+}
 
-
-
-
+</style>
 
 </head>
 <body>
@@ -424,9 +426,11 @@
     <button onclick="clearHistory()">Очистить</button>
 </div>
 
-
-
-
+<script>
+window.addEventListener('resize', () => {
+  document.querySelector('.input-area').style.bottom = '10px';
+});
+</script>
 
 <script>
 
