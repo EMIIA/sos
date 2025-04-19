@@ -704,6 +704,64 @@ Telegram.WebApp.MainButton.onClick(function() {
 
 
 
+
+
+<style>
+
+
+.input-area::before {
+    content: '';
+    position: absolute;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-9 0 45 45'%3E%3Cpath d='M18.4,13.95l-5.65-2.82a.79.79,0,0,0-.7,0L6.4,13.95' style='fill: none;stroke: %23E2E8F0; stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 1.5px'/%3E%3C/svg%3E");
+    width: 60px;
+    height: 60px;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%); /* Центрируем только по горизонтали */
+    background-size: contain;
+    opacity: 0.8;
+    animation: float 0s ease-in-out infinite;
+    pointer-events: none; /* Не мешает кликам */
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateX(-50%); /* Центр по горизонтали */
+    }
+    50% {
+        transform: translateX(-50%) translateY(-10px); /* Двигаем вверх */
+    }
+}
+
+@media (max-width: 640px) {
+    .input-area::before {
+        width: 80px;
+        height: 80px;
+        top: -30px;
+        left: 50%; /* Убеждаемся, что остается */
+        transform: translateX(-50%); /* Центрируем для мобилок */
+    }
+}
+
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </head>
 <body>
 
@@ -750,7 +808,7 @@ Telegram.WebApp.MainButton.onClick(function() {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 70px 0px 0px 0px;
+    padding: 80px 0px 10px 10px;
 
 
 }
