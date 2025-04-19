@@ -678,32 +678,7 @@ textarea::placeholder {
 </style>
 
 
-<style>
-.input-area {
-  position: sticky;
-  bottom: calc(env(safe-area-inset-bottom) + 10px);
-  transition: bottom 0.3s ease;
-}
 
-</style>
-
-
-
-<style>
-.messages {
-  z-index: 1;
-}
-
-.input-area {
-  z-index: 1000;
-}
-
-.menu {
-  z-index: 2000;
-}
-
-
-</style>
 
 
 
@@ -718,60 +693,15 @@ Telegram.WebApp.MainButton.onClick(function() {
 </script>
 
 
-<style>
-
-body {
-  overscroll-behavior: none;
-  touch-action: pan-y;
-}
 
 
-textarea#input {
-  scroll-padding-bottom: 100px;
-}
 
-</style>
+
+
 
 
 </head>
 <body>
-
-
-<script>
-function scrollToBottom() {
-  const messages = document.getElementById('messages');
-  messages.scrollTo({
-    top: messages.scrollHeight,
-    behavior: 'smooth'
-  });
-}
-
-// Вызывать при:
-// - Отправке сообщения
-// - Получении ответа
-// - Изменении viewport
-
-</script>
-
-
-  <script>
-Telegram.WebApp.onEvent('viewportChanged', (params) => {
-  const keyboardHeight = params.isStateStable 
-    ? params.height 
-    : 0;
-  
-  document.documentElement.style.setProperty(
-    '--keyboard-height',
-    `${keyboardHeight}px`
-  );
-  
-  document.querySelector('.chat-container').style.paddingBottom = 
-    `calc(100px + ${keyboardHeight}px)`;
-});
-
-
-  </script>
-
 
 
 <script type="text/javascript">
