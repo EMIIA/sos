@@ -52,7 +52,29 @@ body { margin: 0; padding: 0; }
 
 
 
+<style>
 
+
+.header {
+    padding: 0rem;
+    position: fixed;
+    top: 70px;
+    z-index: 20000;
+    right: 2%;
+
+
+}
+
+
+
+
+@media (max-width: 768px) {
+ .header {
+    top: 95px; /* Новое значение для мобильных */
+    right: 5%;
+  }
+}
+</style>
 
 
 
@@ -162,6 +184,20 @@ map.addControl(new MapboxLanguage({
     
 </script>
 
+
+
+
+<div class="header">
+  
+  
+ 
+<a class="header" href="https://www.emiia.ru"><img src="https://sos.emiia.ai/sos.svg" data-aos="zoom-out" data-aos-duration="2000" width="30" height="35" alt="ЭМИИА ИИ — машинное радиозрение (радиовидение)" title="EMIIA.AI"  class="header"></a>
+
+
+
+
+
+</div>
 
 
 
