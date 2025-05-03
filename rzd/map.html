@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -476,12 +477,6 @@ map.addControl(new MapboxLanguage({
 
 
 
-
-
-
-
-  
-
 </script>
 
 
@@ -526,8 +521,72 @@ map.addControl(new MapboxLanguage({
     });
     
     
- 
-     
+
+ let lng;
+      let lat;
+      const lngDisplay = document.getElementById('lng');
+      const latDisplay = document.getElementById('lat');
+      const eleDisplay = document.getElementById('ele');
+
+      const marker = new mapboxgl.Marker({
+        'color': '#383838ff'
+      });
+      
+      
+      
+  
+
+      
+    map.on('mousemove', (event) => {
+    
+
+        // Use the returned LngLat object to set the marker location
+        // https://docs.mapbox.com/mapbox-gl-js/api/#lnglat
+        marker.setLngLat(event.lngLat).addTo(map);
+
+        lng = event.lngLat.lng;
+        lat = event.lngLat.lat;
+
+        getElevation();
+      });
+      
+
+
+      async function getElevation() {
+        // Construct the API request
+        const query = await fetch(
+          `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${lng},${lat}.json?layers=contour&limit=50&access_token=${mapboxgl.accessToken}`,
+          { method: 'GET' }
+        );
+        if (query.status !== 200) return;
+        const data = await query.json();
+        // Display the longitude and latitude values
+        lngDisplay.textContent = lng.toFixed(14);
+        latDisplay.textContent = lat.toFixed(14);
+        // Get all the returned features
+        const allFeatures = data.features;
+        // For each returned feature, add elevation data to the elevations array
+        const elevations = allFeatures.map((feature) => feature.properties.ele);
+        // In the elevations array, find the largest value
+        const highestElevation = Math.max(...elevations);
+        // Display the largest elevation value
+        eleDisplay.textContent = `${highestElevation} m`;
+      }
+      
+      
+    map.on('crosshair', (e) => {
+document.getElementById('info').innerHTML =
+// `e.point` is the x, y coordinates of the `mousemove` event
+// relative to the top-left corner of the map.
+JSON.stringify(e.point) +
+'<br />' +
+// `e.lngLat` is the longitude, latitude geographical position of the event.
+JSON.stringify(e.lngLat.wrap());  
+      
+});  
+   
+   
+  
 
     </script>
 
