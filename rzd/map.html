@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -225,9 +226,7 @@ body { margin: 0; padding: 0; }
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23000" stroke-width="3"/></svg>') 16 16, crosshair;
         }
         
-        .marker, .marker1 {
-            cursor: inherit;
-        }
+       
     }
 </style>
 
@@ -665,34 +664,43 @@ textarea::placeholder {
 
 
 
+
+
+
+
+
+
 <script>
-// Определение типа устройства
+// Определение сенсорного устройства
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-// Инициализация курсора только для десктопов
+// Функция для установки пользовательского курсора
+function setCustomCursor() {
+    return `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23FF0000" stroke-width="3"/></svg>') 16 16, crosshair`;
+}
+
+// Применение курсора только для десктопов
 if (!isTouchDevice) {
-    // Динамическое изменение курсора
     map.on('mousemove', () => {
-        map.getCanvas().style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23FF0000" stroke-width="3"/></svg>') 16 16, crosshair`;
+        map.getCanvas().style.cursor = setCustomCursor();
     });
-    
+
     map.on('mouseleave', () => {
         map.getCanvas().style.cursor = '';
     });
 }
 
-// Оптимизация для Safari iOS
-if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    document.documentElement.style.cursor = 'pointer';
-    map.touchZoomRotate.disableRotation();
-    map.doubleClickZoom.disable();
+// Оптимизация для iOS Safari
+if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+    // Отключение кастомного курсора (iOS Safari игнорирует пользовательские курсоры)
+    document.documentElement.style.cursor = 'default';
+    
+    // Отключение функций, мешающих сенсорному взаимодействию
+    map.touchZoomRotate.disableRotation(); // Отключение вращения карты
+    map.doubleClickZoom.disable(); // Отключение зума по двойному касанию
+    map.dragRotate.disable(); // Отключение вращения карты при драге
 }
 </script>
-
-
-
-
-
 
 
 
