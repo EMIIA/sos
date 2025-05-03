@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,12 +17,6 @@
 <script src="https://unpkg.com/threebox-plugin/dist/threebox.min.js" type="text/javascript"></script>
 
 <script src="/style/threebox.min.js" type="text/javascript"></script>
-
-
-
-
-
-
 
 
 
@@ -199,43 +192,17 @@ body { margin: 0; padding: 0; }
 
 
 
+
 <div id="map"></div>
-
-
-
 
 <pre id="info"></pre>
 
 
 
 
+<script>
 
 
-
-
-
-
-
-
-
-
-
-<style>
-    /* Только для десктопов с поддержкой мыши */
-    @media (pointer: fine) {
-        #map {
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23000" stroke-width="3"/></svg>') 16 16, crosshair;
-        }
-        
-       
-    }
-</style>
-
-
-
-
-
-  <script>
 
     mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
 
@@ -273,28 +240,6 @@ maxPitch: 60,
     });
 
 
-
-
-
- 
- 
-
- map.on('crosshair', (e) => {
-document.getElementById('info').innerHTML =
-// `e.point` is the x, y coordinates of the `mousemove` event
-// relative to the top-left corner of the map.
-JSON.stringify(e.point) +
-'<br />' +
-// `e.lngLat` is the longitude, latitude geographical position of the event.
-JSON.stringify(e.lngLat.wrap());  
-      
-});  
-   
-   
-
-
-
- 
 
 
 
@@ -475,7 +420,7 @@ map.addControl(new MapboxLanguage({
 }));
         
 
-
+  
 
 </script>
 
@@ -521,72 +466,8 @@ map.addControl(new MapboxLanguage({
     });
     
     
-
- let lng;
-      let lat;
-      const lngDisplay = document.getElementById('lng');
-      const latDisplay = document.getElementById('lat');
-      const eleDisplay = document.getElementById('ele');
-
-      const marker = new mapboxgl.Marker({
-        'color': '#383838ff'
-      });
-      
-      
-      
-  
-
-      
-    map.on('mousemove', (event) => {
-    
-
-        // Use the returned LngLat object to set the marker location
-        // https://docs.mapbox.com/mapbox-gl-js/api/#lnglat
-        marker.setLngLat(event.lngLat).addTo(map);
-
-        lng = event.lngLat.lng;
-        lat = event.lngLat.lat;
-
-        getElevation();
-      });
-      
-
-
-      async function getElevation() {
-        // Construct the API request
-        const query = await fetch(
-          `https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/${lng},${lat}.json?layers=contour&limit=50&access_token=${mapboxgl.accessToken}`,
-          { method: 'GET' }
-        );
-        if (query.status !== 200) return;
-        const data = await query.json();
-        // Display the longitude and latitude values
-        lngDisplay.textContent = lng.toFixed(14);
-        latDisplay.textContent = lat.toFixed(14);
-        // Get all the returned features
-        const allFeatures = data.features;
-        // For each returned feature, add elevation data to the elevations array
-        const elevations = allFeatures.map((feature) => feature.properties.ele);
-        // In the elevations array, find the largest value
-        const highestElevation = Math.max(...elevations);
-        // Display the largest elevation value
-        eleDisplay.textContent = `${highestElevation} m`;
-      }
-      
-      
-    map.on('crosshair', (e) => {
-document.getElementById('info').innerHTML =
-// `e.point` is the x, y coordinates of the `mousemove` event
-// relative to the top-left corner of the map.
-JSON.stringify(e.point) +
-'<br />' +
-// `e.lngLat` is the longitude, latitude geographical position of the event.
-JSON.stringify(e.lngLat.wrap());  
-      
-});  
-   
-   
-  
+ 
+     
 
     </script>
 
@@ -710,75 +591,5 @@ textarea::placeholder {
 
 
 
-
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
-// Определение сенсорного устройства
-const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-// Функция для установки пользовательского курсора
-function setCustomCursor() {
-    return `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23FF0000" stroke-width="3"/></svg>') 16 16, crosshair`;
-}
-
-// Применение курсора только для десктопов
-if (!isTouchDevice) {
-    map.on('mousemove', () => {
-        map.getCanvas().style.cursor = setCustomCursor();
-    });
-
-    map.on('mouseleave', () => {
-        map.getCanvas().style.cursor = '';
-    });
-}
-
-// Оптимизация для iOS Safari
-if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-    // Отключение кастомного курсора (iOS Safari игнорирует пользовательские курсоры)
-    document.documentElement.style.cursor = 'default';
-    
-    // Отключение функций, мешающих сенсорному взаимодействию
-    map.touchZoomRotate.disableRotation(); // Отключение вращения карты
-    map.doubleClickZoom.disable(); // Отключение зума по двойному касанию
-    map.dragRotate.disable(); // Отключение вращения карты при драге
-}
-</script>
-
-
-
-
-
-
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
