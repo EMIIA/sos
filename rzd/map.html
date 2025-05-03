@@ -1,14 +1,8 @@
-
-
-
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>GLB + откорректирован файл 3d-buildings экструдирование, json на сервере  </title>
+<title>РЖД </title>
 
 
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -109,6 +103,35 @@ body { margin: 0; padding: 0; }
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div id="map"></div>
 
 
@@ -134,7 +157,7 @@ minPitch: 0,
 
 maxPitch: 60,
         
-        center: [37.580193, 55.758240],
+        center: [37.17395908840854, 55.9802212103700],
  
          
         hash: true,
@@ -156,12 +179,88 @@ maxPitch: 60,
     
 
 
-    
-   mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js');
+ 
+
+// The 'building' layer in the streets vector source contains building-height
+  // data from OpenStreetMap.
+  map.on('load', () => {
+      // Insert the layer beneath any symbol layer.
+      const layers = map.getStyle().layers;
+
+      let labelLayerId;
+      for (let i = 0; i < layers.length; i++) {
+          if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+              labelLayerId = layers[i].id;
+              break;
+          }
+      }
+      
+      
+      
+      
+      
+      
+
+      map.addSource('openmaptiles', {
+          url: `https://api.maptiler.com/tiles/v3/tiles.json?key=QN6ALYSRnAohNK6Y8BiB`,
+          type: 'vector',
+      });
+
+
+      map.addLayer(
+          {
+              'id': '3d-buildings',
+              'source': 'openmaptiles',
+              'source-layer': 'building',
+              'type': 'fill-extrusion',
+
+              
+              
+              'minzoom': 15,
+'maxzoom': 19,
+              
+              
+              
+              'paint': {
+                  'fill-extrusion-color': [
+                      'interpolate',
+                      ['linear'],
+                      ['get', 'render_height'], 1, 'lightgray', 200, 'royalblue', 400, 'lightblue'
+                  ],
+                  'fill-extrusion-height': [
+                      'interpolate',
+                      ['linear'],
+                      ['zoom'],
+                      15,
+                      0,
+                      16,
+                      ['get', 'render_height']
+                  ],
+                  'fill-extrusion-base': ['case',
+                      ['>=', ['get', 'zoom'], 16],
+                      ['get', 'render_min_height'], 1
+                  ], 'fill-extrusion-opacity': 0.5
+              }
+          },
+          labelLayerId
+      );
+      
+      
+
+      
+  });
+
+
+
+
+
+ mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js');
 map.addControl(new MapboxLanguage({
   defaultLanguage: 'ru'
 }));
         
+
+
 
     
 </script>
@@ -266,13 +365,7 @@ textarea::placeholder {
 
 
 
-
-
 </style>
-
-
-
-
 
 
 
@@ -281,6 +374,8 @@ textarea::placeholder {
 
 </body>
 </html>
+
+
 
 
 
