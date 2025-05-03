@@ -26,6 +26,7 @@ body { margin: 0; padding: 0; }
 </style>
 </head>
 <body>
+
 <style type="text/css">
     #info {
         display: table;
@@ -38,7 +39,7 @@ body { margin: 0; padding: 0; }
         border-radius: 3px;
         font-size: 12px;
         text-align: center;
-        color: #222;
+        color: #818cf8;
         background: transparent;
     }
 </style>
@@ -134,7 +135,7 @@ body { margin: 0; padding: 0; }
 
 <div id="map"></div>
 
-
+<pre id="info"></pre>
 
 
 
@@ -264,6 +265,65 @@ map.addControl(new MapboxLanguage({
 
     
 </script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+    
+
+    
+  map.on('load', () => {
+        map.addSource("terrain", {
+          "type": "raster-dem",
+          "url": `json`
+        });
+        map.setTerrain({
+          source: "terrain",
+          exaggeration: 0.0
+        });
+      });
+      map.on('error', function(err) {
+        throw new Error("To load the map, you must replace YOUR_MAPTILER_API_KEY_HERE first, see README");
+      });
+      
+
+    map.on('mousemove', (e) => {
+        document.getElementById('info').innerHTML =
+            // `e.point` is the x, y coordinates of the `mousemove` event
+            // relative to the top-left corner of the map.
+            JSON.stringify(e.point) +
+            '<br />' +
+            // `e.lngLat` is the longitude, latitude geographical position of the event.
+            JSON.stringify(e.lngLat.wrap());
+    });
+    
+    
+ 
+     
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
