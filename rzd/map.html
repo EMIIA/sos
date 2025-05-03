@@ -20,6 +20,12 @@
 
 
 
+
+
+
+
+
+
 <style>
 body { margin: 0; padding: 0; }
 #map { position: absolute; top: 0; bottom: 0; width: 100%; }
@@ -191,17 +197,42 @@ body { margin: 0; padding: 0; }
 
 
 
-
 <div id="map"></div>
+
+
+
 
 <pre id="info"></pre>
 
 
 
 
-<script>
 
 
+
+<style>
+    /* Кастомный курсор для всей карты */
+    #map {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23000" stroke-width="3"/></svg>') 16 16, crosshair;
+    }
+
+   
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
 
     mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
 
@@ -239,6 +270,28 @@ maxPitch: 60,
     });
 
 
+
+
+
+ 
+ 
+
+ map.on('crosshair', (e) => {
+document.getElementById('info').innerHTML =
+// `e.point` is the x, y coordinates of the `mousemove` event
+// relative to the top-left corner of the map.
+JSON.stringify(e.point) +
+'<br />' +
+// `e.lngLat` is the longitude, latitude geographical position of the event.
+JSON.stringify(e.lngLat.wrap());  
+      
+});  
+   
+   
+
+
+
+ 
 
 
 
@@ -419,6 +472,12 @@ map.addControl(new MapboxLanguage({
 }));
         
 
+
+
+
+
+
+
   
 
 </script>
@@ -586,6 +645,25 @@ textarea::placeholder {
 </style>
 
 
+
+
+
+
+
+
+
+  
+  
+
+
+<script>
+// ... ваш существующий код инициализации карты ...
+
+// Динамическое изменение курсора через JavaScript
+map.on('mousemove', () => {
+    map.getCanvas().style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23FF0000" stroke-width="3"/></svg>') 16 16, crosshair`;
+});
+</script>
 
 
 
