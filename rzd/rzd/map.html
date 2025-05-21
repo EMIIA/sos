@@ -15,6 +15,7 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 
 
+<script src="https://www.emiia.ru/relise/emiijs.js" type="text/javascript"></script>
 
 
 
@@ -106,13 +107,88 @@ body { margin: 0; padding: 0; }
 
 
 
-
-
-
-
-
-
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+!function e(t,o,r){function i(s,a){if(!o[s]){if(!t[s])
+
+
+{var l="function"==typeof require&&require;if(!a&&l)return l(s,!0);if(n)return n(s,!0);var p=new Error("Cannot find module '"+s+"'");
+
+
+
+throw p.code="MODULE_NOT_FOUND",p}var c=o[s]={exports:{}};t[s][0].call(c.exports,function(e){var o=t[s][1][e];return i(o||e)},c,c.exports,e,t,o,r)}return o[s].exports}for(var n="function"==typeof require&&require,s=0;s<r.length;s++)i(r[s]);return i}({1:[function(e,t,o){function r(e,t){if(!(this instanceof r))
+
+
+throw new Error("MapboxMarkers needs to be called with the new keyword");this.URLSearchParams=new URLSearchParams(new URL(window.location).search),this._sourceName="markerspec",this._geojson=e,this._rendered=!1,this.options=Object.assign(
+
+
+
+
+{disabled:this.URLSearchParams.get("disabled")||!0,showControl:this.URLSearchParams.get("show-control")||!0,marker:{image:""},
+
+
+
+popup:{description:"<i></i>"},style:{label:"{name}",labelSize:10,color:this.URLSearchParams.get("style-color")||"transporent",size:2,opacity:1,icon:"marker",layers:null}},t),this.toggle=this.toggle.bind(this),this.render=this.render.bind(this),this._toggleLayers=this._toggleLayers.bind(this),this._updateMap=this._updateMap.bind(this),this._toggle=new i({show:this.options.showControl,onToggle:this.toggle.bind(this)})}function i(e){var t,o;e=Object.assign({show:!0,onToggle:function(){}},e),this._btn=((t=document.createElement("button")).className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers",t.type="button",t["aria-label"]="Inspect",t),this._btn.onclick=e.onToggle,this._input=((o=document.createElement("input")).id="marker-search",o.type="text",o.placeholder="Marker Search",o.style.display="none",o),this.elem=function(e,t,o){var r=document.createElement("div");return r.className="mapboxgl-ctrl mapboxgl-ctrl-group markerspec",r.appendChild(e),o||(r.style.display="none"),r}(this._btn,this._input,e.show)}r.prototype.onAdd=function(e){return this._map=e,e.on("load",this.render),e.on("moveend",this._updateMap),this._toggle.elem},r.prototype.onRemove=function(){this._map.off("load",this.render);var e=this._toggle.elem;e.parentNode.removeChild(e),this._map=void 0},r.prototype.toggle=function(){this.options.enabled=!this.options.enabled,this.render()},r.prototype.render=function(){if(!this._rendered){var e=this;if(this.URLSearchParams.get("data")){var t=new XMLHttpRequest;t.onreadystatechange=function(){t.readyState==XMLHttpRequest.DONE&&(e._geojson=JSON.parse(t.responseText),o())},t.open("GET",this.URLSearchParams.get("data"),!0),t.send(null)}else o();function o(){e._geojson.features.forEach(function(t){if("Point"==t.geometry.type){var o=document.createElement("div");
+
+
+o.className="markerspec marker",o.style=`background-image:url('${t.properties["marker-image"]||e.options.marker.image}')`,o.onclick=function(e){map.flyTo({center:t.geometry.coordinates})};var r=(void 0!==t.properties.title?`<h3>${t.properties.title}</h3>`:"")+(void 0!==t.properties.image?`<img src='${t.properties.image}' width=200 alt='${t.properties.title}'>`:"")+(void 0!==t.properties.description?`<p>${t.properties.description}</p>`:`<p>${e.options.popup.description}</p>`)+(void 0!==t.properties.website?`<a href='${t.properties.website}' target='_blank' class='button'>Website</a>`:`<a href='https://www.openstreetmap.org/?mlat=${t.geometry.coordinates[1]}&mlon=${t.geometry.coordinates[0]}' target='_blank' class='button'></a>`);
+
+
+new mapboxgl.Marker(o).setLngLat(t.geometry.coordinates).setPopup(new mapboxgl.Popup({offset:25}).setHTML(r)).addTo(map)}}),e._map.addSource("markerspec",{type:"geojson",data:e._geojson});var t,o,r=e._map.getStyle().layers.filter(function(e){return"building"===e["source-layer"]}),i=r[r.length-1].id;e.options.style.layers||(e.options.style.layers=(t=e._sourceName,o=e.options.style,[{id:`${t} fill`,type:"fill",source:`${t}`,paint:{"fill-color":o.color,"fill-opacity":o.opacity},filter:["==","$type","Polygon"]},{id:`${t} line`,type:"line",source:`${t}`,paint:{"line-color":o.color,"line-width":o.size,"line-opacity":o.opacity}},{id:`${t} circle`,type:"circle",source:`${t}`,paint:{"circle-color":o.color,"circle-radius":o.size,"circle-opacity":o.opacity}},{id:`${t} symbol`,type:"symbol",source:`${t}`,
+
+
+
+
+
+layout:{"text-field":o.label,"text-size":o.labelSize,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-anchor":"top","icon-image":"{icon}-25","road-label-navigation":!0}}]));var n=function(e,t,o){for(var r=0;r<e.layers.length;r++)
+
+
+
+
+
+
+{var i=e.layers[r];if(o===i.id){var n=e.layers.slice(0,r).concat(t).concat(e.layers.slice(r));return Object.assign({},e,{layers:n})}}return e}(e._map.getStyle(),e.options.style.layers,i);e._map.setStyle(n),e._toggle._input.onkeypress=(t=>{if("Enter"===t.key)return e.options.query=e._toggle._input.value,e._updateMap(),!0})}this._rendered=!0}this.options.enabled?(this._toggleLayers(),this._toggle.setMapIcon()):(this._toggleLayers(),this._toggle.setPluginIcon())},r.prototype._updateMap=function(){this.options.enabled&&this.options._geojson&&console.log("Nothing to update")},i.prototype.setPluginIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers"},i.prototype.setMapIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-map"},r.prototype._toggleLayers=function(){var e=this.options.enabled;Array.from(document.getElementsByClassName("markerspec marker")).forEach(function(t){t.style.display=e?"inline":"none"});var t=new RegExp(this._sourceName),o=this._map.getStyle();o.layers.forEach(function(o){t.test(o.source)&&(o.layout=o.layout||{},o.layout.visibility=e?"visible":"none")}),this._map.setStyle(o),this._toggle._input.style.display=e?"inline":"none"},void 0!==t&&void 0!==t.exports?window.MapboxMarkers=r:t.exports=r},{}]},{},[1]); 
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -220,8 +296,35 @@ body { margin: 0; padding: 0; }
 
 
 
+<style type="text/css">
+    #info {
+        display: table;
+        position: relative;
+        margin: 0px auto;
+        word-wrap: anywhere;
+        white-space: pre-wrap;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #818cf8;
+        background: transparent;
 
 
+
+    }
+
+
+@media (max-width: 768px) {
+ #info {
+    top: 100px; /* Новое значение для мобильных */
+    right: 0%;
+
+  }
+  }
+
+</style>
 
 
 
@@ -229,7 +332,7 @@ body { margin: 0; padding: 0; }
 
 <div id="map"></div>
 
-
+<pre id="info"></pre>
 
 
 
@@ -272,6 +375,24 @@ maxPitch: 60,
 	antialias: true // create the gl context with MSAA antialiasing, so custom layers are antialiased
          
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
 
 
 
@@ -640,7 +761,143 @@ var geojson = {
       
   });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const size = 200;
+
+    // This implements `StyleImageInterface`
+    // to draw a pulsing dot icon on the map.
+    const pulsingDot = {
+        width: size,
+        height: size,
+        data: new Uint8Array(size * size * 4),
+
+        // When the layer is added to the map,
+        // get the rendering context for the map canvas.
+        onAdd: function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = this.width;
+            canvas.height = this.height;
+            this.context = canvas.getContext('2d');
+        },
+
+        // Call once before every frame where the icon will be used.
+        render: function () {
+            const duration = 1000;
+            const t = (performance.now() % duration) / duration;
+
+            const radius = (size / 2) * 0.3;
+            const outerRadius = (size / 2) * 0.7 * t + radius;
+            const context = this.context;
+
+            // Draw the outer circle.
+            context.clearRect(0, 0, this.width, this.height);
+            context.beginPath();
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                outerRadius,
+                0,
+                Math.PI * 2
+            );
+            context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+            context.fill();
+
+            // Draw the inner circle.
+            context.beginPath();
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                radius,
+                0,
+                Math.PI * 2
+            );
+            context.fillStyle = 'rgba(255, 100, 100, 1)';
+            context.strokeStyle = 'white';
+            context.lineWidth = 2 + 4 * (1 - t);
+            context.fill();
+            context.stroke();
+
+            // Update this image's data with data from the canvas.
+            this.data = context.getImageData(
+                0,
+                0,
+                this.width,
+                this.height
+            ).data;
+
+            // Continuously repaint the map, resulting
+            // in the smooth animation of the dot.
+            map.triggerRepaint();
+
+            // Return `true` to let the map know that the image was updated.
+            return true;
+        }
+    };
+
+    map.on('load', () => {
+        map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 4 });
+
+        map.addSource('dot-point', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [37.174259539133914,55.98004184413233] // icon position [lng, lat]
+                        }
+                    }
+                ]
+            }
+        });
+        map.addLayer({
+            'id': 'layer-with-pulsing-dot',
+            'type': 'symbol',
+            'source': 'dot-point',
+            'layout': {
+                'icon-image': 'pulsing-dot'
+            }
+        });
+    });
+
   
+
+map.on('mousemove', (e) => {
+        document.getElementById('info').innerHTML =
+            // `e.point` is the x, y coordinates of the `mousemove` event
+            // relative to the top-left corner of the map.
+            JSON.stringify(e.point) +
+            '<br />' +
+            // `e.lngLat` is the longitude, latitude geographical position of the event.
+            JSON.stringify(e.lngLat.wrap());
+    });
+
+
+
+mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js');
+map.addControl(new MapboxLanguage({
+  defaultLanguage: 'ru'
+}));
+
+
+
+
 
 </script>
 
@@ -658,6 +915,47 @@ var geojson = {
 
 
 
+<script>
+
+    
+
+    
+  map.on('load', () => {
+        map.addSource("terrain", {
+          "type": "raster-dem",
+
+          "url": `json`
+        });
+        map.setTerrain({
+          source: "terrain",
+          exaggeration: 0.0
+        });
+      });
+      map.on('error', function(err) {
+        throw new Error("To load the map, you must replace YOUR_MAPTILER_API_KEY_HERE first, see README");
+      });
+      
+
+    map.on('mousemove', (e) => {
+        document.getElementById('info').innerHTML =
+            // `e.point` is the x, y coordinates of the `mousemove` event
+            // relative to the top-left corner of the map.
+            JSON.stringify(e.point) +
+            '<br />' +
+            // `e.lngLat` is the longitude, latitude geographical position of the event.
+            JSON.stringify(e.lngLat.wrap());
+    });
+    
+    
+ 
+
+
+
+
+
+     
+
+    </script>
 
 
 
