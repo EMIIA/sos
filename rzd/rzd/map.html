@@ -878,15 +878,19 @@ const size = 200;
 
   
 
-map.on('mousemove', (e) => {
-        document.getElementById('info').innerHTML =
-            // `e.point` is the x, y coordinates of the `mousemove` event
-            // relative to the top-left corner of the map.
-            JSON.stringify(e.point) +
-            '<br />' +
-            // `e.lngLat` is the longitude, latitude geographical position of the event.
-            JSON.stringify(e.lngLat.wrap());
-    });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -917,42 +921,26 @@ map.addControl(new MapboxLanguage({
 
 <script>
 
-    
-
-    
-  map.on('load', () => {
-        map.addSource("terrain", {
-          "type": "raster-dem",
-
-          "url": `json`
-        });
-        map.setTerrain({
-          source: "terrain",
-          exaggeration: 0.0
-        });
-      });
-      map.on('error', function(err) {
-        throw new Error("To load the map, you must replace YOUR_MAPTILER_API_KEY_HERE first, see README");
-      });
-      
-
-    map.on('mousemove', (e) => {
-        document.getElementById('info').innerHTML =
-            // `e.point` is the x, y coordinates of the `mousemove` event
-            // relative to the top-left corner of the map.
-            JSON.stringify(e.point) +
-            '<br />' +
-            // `e.lngLat` is the longitude, latitude geographical position of the event.
-            JSON.stringify(e.lngLat.wrap());
-    });
-    
-    
- 
 
 
 
 
 
+map.on('mousemove', (e) => {
+    // Функция для округления чисел в JSON до 5 знаков
+    const roundToFive = (key, value) => {
+        if (typeof value === 'number') {
+            return parseFloat(value.toFixed(5));
+        }
+        return value;
+    };
+
+    const pointStr = JSON.stringify(e.point, roundToFive);
+    const lngLatStr = JSON.stringify(e.lngLat.wrap(), roundToFive);
+
+    document.getElementById('info').innerHTML = 
+        `${pointStr}<br />${lngLatStr}`;
+});
      
 
     </script>
