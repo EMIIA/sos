@@ -2,16 +2,12 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <title>РЖД </title>
-
-
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-
-
 
 
 
@@ -23,10 +19,6 @@
 
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
 <style src="/style/mapbox-gl.css" type="text/javascript"></style>
-
-
-
-
 
 
 
@@ -123,12 +115,93 @@ body { margin: 0; padding: 0; }
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+!function e(t,o,r){function i(s,a){if(!o[s]){if(!t[s])
+
+
+{var l="function"==typeof require&&require;if(!a&&l)return l(s,!0);if(n)return n(s,!0);var p=new Error("Cannot find module '"+s+"'");
+
+
+
+throw p.code="MODULE_NOT_FOUND",p}var c=o[s]={exports:{}};t[s][0].call(c.exports,function(e){var o=t[s][1][e];return i(o||e)},c,c.exports,e,t,o,r)}return o[s].exports}for(var n="function"==typeof require&&require,s=0;s<r.length;s++)i(r[s]);return i}({1:[function(e,t,o){function r(e,t){if(!(this instanceof r))
+
+
+throw new Error("MapboxMarkers needs to be called with the new keyword");this.URLSearchParams=new URLSearchParams(new URL(window.location).search),this._sourceName="markerspec",this._geojson=e,this._rendered=!1,this.options=Object.assign(
+
+
+
+
+{disabled:this.URLSearchParams.get("disabled")||!0,showControl:this.URLSearchParams.get("show-control")||!0,marker:{image:""},
+
+
+
+popup:{description:"<i></i>"},style:{label:"{name}",labelSize:10,color:this.URLSearchParams.get("style-color")||"transporent",size:2,opacity:1,icon:"marker",layers:null}},t),this.toggle=this.toggle.bind(this),this.render=this.render.bind(this),this._toggleLayers=this._toggleLayers.bind(this),this._updateMap=this._updateMap.bind(this),this._toggle=new i({show:this.options.showControl,onToggle:this.toggle.bind(this)})}function i(e){var t,o;e=Object.assign({show:!0,onToggle:function(){}},e),this._btn=((t=document.createElement("button")).className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers",t.type="button",t["aria-label"]="Inspect",t),this._btn.onclick=e.onToggle,this._input=((o=document.createElement("input")).id="marker-search",o.type="text",o.placeholder="Marker Search",o.style.display="none",o),this.elem=function(e,t,o){var r=document.createElement("div");return r.className="mapboxgl-ctrl mapboxgl-ctrl-group markerspec",r.appendChild(e),o||(r.style.display="none"),r}(this._btn,this._input,e.show)}r.prototype.onAdd=function(e){return this._map=e,e.on("load",this.render),e.on("moveend",this._updateMap),this._toggle.elem},r.prototype.onRemove=function(){this._map.off("load",this.render);var e=this._toggle.elem;e.parentNode.removeChild(e),this._map=void 0},r.prototype.toggle=function(){this.options.enabled=!this.options.enabled,this.render()},r.prototype.render=function(){if(!this._rendered){var e=this;if(this.URLSearchParams.get("data")){var t=new XMLHttpRequest;t.onreadystatechange=function(){t.readyState==XMLHttpRequest.DONE&&(e._geojson=JSON.parse(t.responseText),o())},t.open("GET",this.URLSearchParams.get("data"),!0),t.send(null)}else o();function o(){e._geojson.features.forEach(function(t){if("Point"==t.geometry.type){var o=document.createElement("div");
+
+
+o.className="markerspec marker",o.style=`background-image:url('${t.properties["marker-image"]||e.options.marker.image}')`,o.onclick=function(e){map.flyTo({center:t.geometry.coordinates})};var r=(void 0!==t.properties.title?`<h3>${t.properties.title}</h3>`:"")+(void 0!==t.properties.image?`<img src='${t.properties.image}' width=200 alt='${t.properties.title}'>`:"")+(void 0!==t.properties.description?`<p>${t.properties.description}</p>`:`<p>${e.options.popup.description}</p>`)+(void 0!==t.properties.website?`<a href='${t.properties.website}' target='_blank' class='button'>Website</a>`:`<a href='https://www.openstreetmap.org/?mlat=${t.geometry.coordinates[1]}&mlon=${t.geometry.coordinates[0]}' target='_blank' class='button'></a>`);
+
+
+new mapboxgl.Marker(o).setLngLat(t.geometry.coordinates).setPopup(new mapboxgl.Popup({offset:25}).setHTML(r)).addTo(map)}}),e._map.addSource("markerspec",{type:"geojson",data:e._geojson});var t,o,r=e._map.getStyle().layers.filter(function(e){return"building"===e["source-layer"]}),i=r[r.length-1].id;e.options.style.layers||(e.options.style.layers=(t=e._sourceName,o=e.options.style,[{id:`${t} fill`,type:"fill",source:`${t}`,paint:{"fill-color":o.color,"fill-opacity":o.opacity},filter:["==","$type","Polygon"]},{id:`${t} line`,type:"line",source:`${t}`,paint:{"line-color":o.color,"line-width":o.size,"line-opacity":o.opacity}},{id:`${t} circle`,type:"circle",source:`${t}`,paint:{"circle-color":o.color,"circle-radius":o.size,"circle-opacity":o.opacity}},{id:`${t} symbol`,type:"symbol",source:`${t}`,
+
+
+
+
+
+layout:{"text-field":o.label,"text-size":o.labelSize,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-anchor":"top","icon-image":"{icon}-25","road-label-navigation":!0}}]));var n=function(e,t,o){for(var r=0;r<e.layers.length;r++)
+
+
+
+
+
+
+{var i=e.layers[r];if(o===i.id){var n=e.layers.slice(0,r).concat(t).concat(e.layers.slice(r));return Object.assign({},e,{layers:n})}}return e}(e._map.getStyle(),e.options.style.layers,i);e._map.setStyle(n),e._toggle._input.onkeypress=(t=>{if("Enter"===t.key)return e.options.query=e._toggle._input.value,e._updateMap(),!0})}this._rendered=!0}this.options.enabled?(this._toggleLayers(),this._toggle.setMapIcon()):(this._toggleLayers(),this._toggle.setPluginIcon())},r.prototype._updateMap=function(){this.options.enabled&&this.options._geojson&&console.log("Nothing to update")},i.prototype.setPluginIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers"},i.prototype.setMapIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-map"},r.prototype._toggleLayers=function(){var e=this.options.enabled;Array.from(document.getElementsByClassName("markerspec marker")).forEach(function(t){t.style.display=e?"inline":"none"});var t=new RegExp(this._sourceName),o=this._map.getStyle();o.layers.forEach(function(o){t.test(o.source)&&(o.layout=o.layout||{},o.layout.visibility=e?"visible":"none")}),this._map.setStyle(o),this._toggle._input.style.display=e?"inline":"none"},void 0!==t&&void 0!==t.exports?window.MapboxMarkers=r:t.exports=r},{}]},{},[1]); 
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
-
-
-
-
-  <style>
+<style>
 
 
 
@@ -136,8 +209,8 @@ body { margin: 0; padding: 0; }
 .marker {
         background-image: url('https://analytics.emiia.ai/svg/pinnewwhite.svg');
         background-size: cover;
-        width: 80px;
-        height: 33px;
+        width: 90px;
+        height: 43px;
         border-radius: 0%;
         cursor: pointer;
       }
@@ -153,20 +226,67 @@ body { margin: 0; padding: 0; }
 
 
 .marker1 {
-        background-image: url('https://analytics.emiia.ai/svg/pinnewwhite.svg');
+        background-image: url('https://sos.emiia.ai/rzd/rzd.svg');
         background-size: cover;
-        width: 80px;
-        height: 33px;
+        width: 190px;
+        height: 30px;
         border-radius: 0%;
         cursor: pointer;
       }
       .mapboxgl-popup {
-        max-width: 200px;
+        max-width: 100px;
       }
       .mapboxgl-popup-content {
         text-align: center;
         font-family: 'Open Sans', sans-serif;
       }
+
+
+
+
+
+
+
+
+.marker2 {
+        background-image: url('https://sos.emiia.ai/rzd/rzd_zelenograd.svg');
+        background-size: cover;
+        width: 140px;
+        height: 63px;
+        border-radius: 0%;
+        cursor: pointer;
+      }
+      .mapboxgl-popup {
+        max-width: 300px;
+      }
+      .mapboxgl-popup-content {
+        text-align: center;
+        font-family: 'Open Sans', sans-serif;
+      }
+
+
+
+
+
+
+
+
+.marker3 {
+        background-image: url('https://sos.emiia.ai/rzd/rzd_mostrans.svg');
+        background-size: cover;
+        width: 200px;
+        height: 53px;
+        border-radius: 0%;
+        cursor: pointer;
+      }
+      .mapboxgl-popup {
+        max-width: 300px;
+      }
+      .mapboxgl-popup-content {
+        text-align: center;
+        font-family: 'Open Sans', sans-serif;
+      }
+
 
 
 
@@ -178,11 +298,43 @@ body { margin: 0; padding: 0; }
 
 
 
+<style type="text/css">
+    #info {
+        display: table;
+        position: relative;
+        margin: 0px auto;
+        word-wrap: anywhere;
+        white-space: pre-wrap;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #818cf8;
+        background: transparent;
+
+
+
+    }
+
+
+@media (max-width: 768px) {
+ #info {
+    top: 100px; /* Новое значение для мобильных */
+    right: 0%;
+
+  }
+  }
+
+</style>
+
+
+
 
 
 <div id="map"></div>
 
-
+<pre id="info"></pre>
 
 
 
@@ -230,6 +382,24 @@ maxPitch: 60,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
 map.on('style.load', () => {
         // set the light preset to be in dusk mode.
         map.setConfigProperty('basemap', 'lightPreset', 'dusk');
@@ -246,11 +416,11 @@ map.on('style.load', () => {
                         'geometry': {
                             'coordinates': [
                                 [
-                                    [-0.12573, 51.53222],
+                                    [37.17395908840854, 55.9802212103700],
                                     [-0.12458, 51.53219],
                                     [-0.12358, 51.53492],
                                     [-0.12701, 51.53391],
-                                    [-0.12573, 51.53222]
+                                    [37.17395908840854, 55.9802212103700]
                                 ]
                             ],
                             'type': 'Polygon'
@@ -311,10 +481,11 @@ map.on('style.load', () => {
         },
         'paint': {
             'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 21, 0],
-            'model-rotation': [5.0, 0.0, 5.0],
+            'model-rotation': [0.0, 0.0, 45.0],
             'model-scale': [1.5, 1.5, 1.5],
             'model-color-mix-intensity': 0,
             'model-cast-shadows': true,
+
             'model-emissive-strength': 0.3
         }
     });
@@ -326,8 +497,204 @@ map.on('style.load', () => {
 
 
 
+var geojson = {
+        'type': 'FeatureCollection',
+        'features': [
+          {
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [37.17416821603524,55.980337635885064]
+            },
+            'properties': {
+              'title': 'Mapbox',
+              'description': 'Washington, D.C.'
+            }
+          
+          }
+        ]
+      };
 
-// The 'building' layer in the streets vector source contains building-height
+     
+      // add markers to map
+      geojson.features.forEach(function (marker) {
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'marker';
+
+        // make a marker for each feature and add it to the map
+        new mapboxgl.Marker(el)
+          .setLngLat(marker.geometry.coordinates)
+          .setPopup(
+            new mapboxgl.Popup({ offset: 25 }) // add popups
+              .setHTML(
+                '<h3>' +
+                  marker.properties.title +
+                  '</h3><p>' +
+                  marker.properties.description +
+                  '</p>'
+              )
+          )
+          .addTo(map);
+      });
+    
+
+
+
+
+
+
+var geojson = {
+        'type': 'FeatureCollection',
+        'features': [
+          {
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [37.17475776068591, 55.98060605639196]
+            },
+            'properties': {
+              'title': 'Mapbox',
+              'description': 'Washington, D.C.'
+            }
+          
+          }
+        ]
+      };
+
+
+
+
+// add markers to map
+      geojson.features.forEach(function (marker1) {
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'marker1';
+
+        // make a marker for each feature and add it to the map
+        new mapboxgl.Marker(el)
+          .setLngLat(marker1.geometry.coordinates)
+          .setPopup(
+            new mapboxgl.Popup({ offset: 25 }) // add popups
+              .setHTML(
+                '<h3>' +
+                  marker1.properties.title +
+                  '</h3><p>' +
+                  marker1.properties.description +
+                  '</p>'
+              )
+          )
+          .addTo(map);
+      });
+
+
+
+
+
+
+
+
+var geojson = {
+        'type': 'FeatureCollection',
+        'features': [
+          {
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [37.17309599158534, 55.98004724891359]
+            },
+            'properties': {
+              'title': 'Mapbox',
+              'description': 'Washington, D.C.'
+            }
+          
+          }
+        ]
+      };
+
+
+
+
+// add markers to map
+      geojson.features.forEach(function (marker2) {
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'marker2';
+
+        // make a marker for each feature and add it to the map
+        new mapboxgl.Marker(el)
+          .setLngLat(marker2.geometry.coordinates)
+          .setPopup(
+            new mapboxgl.Popup({ offset: 25 }) // add popups
+              .setHTML(
+                '<h3>' +
+                  marker2.properties.title +
+                  '</h3><p>' +
+                  marker2.properties.description +
+                  '</p>'
+              )
+          )
+          .addTo(map);
+      });
+      
+      
+
+
+
+
+
+
+
+
+
+var geojson = {
+        'type': 'FeatureCollection',
+        'features': [
+          {
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [37.172865221917164, 55.979640231390164]
+            },
+            'properties': {
+              'title': 'Mapbox',
+              'description': 'Washington, D.C.'
+            }
+          
+          }
+        ]
+      };
+
+
+
+
+// add markers to map
+      geojson.features.forEach(function (marker3) {
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'marker3';
+
+        // make a marker for each feature and add it to the map
+        new mapboxgl.Marker(el)
+          .setLngLat(marker3.geometry.coordinates)
+          .setPopup(
+            new mapboxgl.Popup({ offset: 25 }) // add popups
+              .setHTML(
+                '<h3>' +
+                  marker3.properties.title +
+                  '</h3><p>' +
+                  marker3.properties.description +
+                  '</p>'
+              )
+          )
+          .addTo(map);
+      });
+      
+
+
+
+
+        // The 'building' layer in the streets vector source contains building-height
   // data from OpenStreetMap.
   map.on('load', () => {
       // Insert the layer beneath any symbol layer.
@@ -354,59 +721,189 @@ map.on('style.load', () => {
 
 
       map.addLayer(
-    {
-        'id': '3d-buildings',
-        'source': 'openmaptiles',
-        'source-layer': 'building',
-        'type': 'fill-extrusion',
-        'minzoom': 15,
-        'maxzoom': 19,
-        'paint': {
-            'fill-extrusion-color': [
-                'interpolate',
-                ['linear'],
-                ['get', 'render_height'], 1, 'lightgray', 200, 'royalblue', 400, 'lightblue'
-            ],
-            'fill-extrusion-height': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                15, 0,
-                16, ['get', 'render_height']
-            ],
-            'fill-extrusion-base': [
-                'case',
-                ['>=', ['get', 'zoom'], 16],
-                ['get', 'render_min_height'],
-                1
-            ],
-            // Изменения здесь: прозрачность зависит от зума
-            'fill-extrusion-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                15, 1,   // На зуме 15: полностью видим (opacity = 1)
-                19, 0    // На зуме 19: полностью прозрачен (opacity = 0)
-            ]
-        }
-    },
-    labelLayerId
-);
+          {
+              'id': '3d-buildings',
+              'source': 'openmaptiles',
+              'source-layer': 'building',
+              'type': 'fill-extrusion',
+
+              
+              
+              'minzoom': 15,
+'maxzoom': 19,
+              
+              
+              
+              'paint': {
+                  'fill-extrusion-color': [
+                      'interpolate',
+                      ['linear'],
+                      ['get', 'render_height'], 1, 'lightgray', 200, 'royalblue', 400, 'lightblue'
+                  ],
+                  'fill-extrusion-height': [
+                      'interpolate',
+                      ['linear'],
+                      ['zoom'],
+                      15,
+                      0,
+                      16,
+                      ['get', 'render_height']
+                  ],
+                  'fill-extrusion-base': ['case',
+                      ['>=', ['get', 'zoom'], 16],
+                      ['get', 'render_min_height'], 1
+                  ], 'fill-extrusion-opacity': 0.5
+              }
+          },
+          labelLayerId
+      );
+      
       
 
       
   });
 
 
-   
 
- mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js');
+
+
+
+
+
+
+
+
+
+
+
+
+
+const size = 200;
+
+    // This implements `StyleImageInterface`
+    // to draw a pulsing dot icon on the map.
+    const pulsingDot = {
+        width: size,
+        height: size,
+        data: new Uint8Array(size * size * 4),
+
+        // When the layer is added to the map,
+        // get the rendering context for the map canvas.
+        onAdd: function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = this.width;
+            canvas.height = this.height;
+            this.context = canvas.getContext('2d');
+        },
+
+        // Call once before every frame where the icon will be used.
+        render: function () {
+            const duration = 1000;
+            const t = (performance.now() % duration) / duration;
+
+            const radius = (size / 2) * 0.3;
+            const outerRadius = (size / 2) * 0.7 * t + radius;
+            const context = this.context;
+
+            // Draw the outer circle.
+            context.clearRect(0, 0, this.width, this.height);
+            context.beginPath();
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                outerRadius,
+                0,
+                Math.PI * 2
+            );
+            context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+            context.fill();
+
+            // Draw the inner circle.
+            context.beginPath();
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                radius,
+                0,
+                Math.PI * 2
+            );
+            context.fillStyle = 'rgba(255, 100, 100, 1)';
+            context.strokeStyle = 'white';
+            context.lineWidth = 2 + 4 * (1 - t);
+            context.fill();
+            context.stroke();
+
+            // Update this image's data with data from the canvas.
+            this.data = context.getImageData(
+                0,
+                0,
+                this.width,
+                this.height
+            ).data;
+
+            // Continuously repaint the map, resulting
+            // in the smooth animation of the dot.
+            map.triggerRepaint();
+
+            // Return `true` to let the map know that the image was updated.
+            return true;
+        }
+    };
+
+    map.on('load', () => {
+        map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 4 });
+
+        map.addSource('dot-point', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [37.174259539133914,55.98004184413233] // icon position [lng, lat]
+                        }
+                    }
+                ]
+            }
+        });
+        map.addLayer({
+            'id': 'layer-with-pulsing-dot',
+            'type': 'symbol',
+            'source': 'dot-point',
+            'layout': {
+                'icon-image': 'pulsing-dot'
+            }
+        });
+    });
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js');
 map.addControl(new MapboxLanguage({
   defaultLanguage: 'ru'
 }));
-        
 
-  
+
+
+
 
 </script>
 
@@ -424,6 +921,31 @@ map.addControl(new MapboxLanguage({
 
 
 
+<script>
+
+
+
+
+
+
+map.on('mousemove', (e) => {
+    // Функция для округления чисел в JSON до 5 знаков
+    const roundToFive = (key, value) => {
+        if (typeof value === 'number') {
+            return parseFloat(value.toFixed(5));
+        }
+        return value;
+    };
+
+    const pointStr = JSON.stringify(e.point, roundToFive);
+    const lngLatStr = JSON.stringify(e.lngLat.wrap(), roundToFive);
+
+    document.getElementById('info').innerHTML = 
+        `${pointStr}<br />${lngLatStr}`;
+});
+     
+
+    </script>
 
 
 
