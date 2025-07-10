@@ -503,9 +503,6 @@ map.on('load', () => {
 
 
 
-
-
-
 const size = 200;
 
 const pulsingDot = {
@@ -549,7 +546,7 @@ const pulsingDot = {
         const radius = (size / 2) * 0.3; // Размер точки
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        context.fillStyle = 'rgba(255, 100, 100, 1)'; // Цвет точки
+        context.fillStyle = 'rgba(61, 133, 198, 100)'; // Цвет точки
         context.strokeStyle = 'white'; // Белая обводка
         context.lineWidth = 6 + 4 * Math.abs(Math.sin(Math.PI * pulseT)); 
         context.fill();
