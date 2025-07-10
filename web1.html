@@ -1,0 +1,817 @@
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>WEB </title>
+
+
+
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js"></script>
+<script src="/style/mapbox-gl.js" type="text/javascript"></script>
+
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+<style src="/style/mapbox-gl.css" type="text/javascript"></style>
+
+
+
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+
+<style type="text/css">
+    #info {
+        display: table;
+        position: relative;
+        margin: 0px auto;
+        word-wrap: anywhere;
+        white-space: pre-wrap;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #818cf8;
+        background: transparent;
+
+
+
+    }
+
+
+@media (max-width: 768px) {
+ #info {
+    top: 100px; /* Новое значение для мобильных */
+    right: 0%;
+
+  }
+  }
+
+</style>
+
+
+
+
+<style>
+
+
+.header {
+    padding: 0rem;
+    position: fixed;
+    bottom: 70px;
+    z-index: 20000;
+    right: 5%;
+
+
+}
+
+
+@media (max-width: 768px) {
+ .header {
+    bottom: 25px; /* Новое значение для мобильных */
+    right: 1%;
+
+  }
+}
+</style>
+
+
+
+<style type="text/css">
+    
+    
+    
+    a.mapboxgl-ctrl-logo{
+    width: 0;
+    height: 0;
+    margin: 0 0 -4px-4px;
+    display: block;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    overflow: hidden;
+    background-image: url(data:image/svg+xml;charset=utf-8,%3Csvg width='88' height='23' viewBox='0 0 88 23' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill-rule='evenodd'%3E %3Cdefs%3E %3Cpath id='logo' d='M11.5 2.25c5.105 0 9.25 4.145 9.25 9.25s-4.145 9.25-9.25 9.25-9.25-4.145-9.25-9.25 4.145-9.25 9.25-9.25zM6.997 15.983c-.051-.338-.828-5.802 2.233-8.873a4.395 4.395 0 013.13-1.28c1.27 0 2.49.51 3.39 1.42.91.9 1.42 2.12 1.42 3.39 0 1.18-.449 2.301-1.28 3.13C12.72 16.93 7 16 7 16l-.003-.017zM15.3 10.5l-2 .8-.8 2-.8-2-2-.8 2-.8.8-2 .8 2 2 .8z'/%3E %3Cpath id='text' d='M50.63 8c.13 0 .23.1.23.23V9c.7-.76 1.7-1.18 2.73-1.18 2.17 0 3.95 1.85 3.95 4.17s-1.77 4.19-3.94 4.19c-1.04 0-2.03-.43-2.74-1.18v3.77c0 .13-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V8.23c0-.12.1-.23.23-.23h1.4zm-3.86.01c.01 0 .01 0 .01-.01.13 0 .22.1.22.22v7.55c0 .12-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V15c-.7.76-1.69 1.19-2.73 1.19-2.17 0-3.94-1.87-3.94-4.19 0-2.32 1.77-4.19 3.94-4.19 1.03 0 2.02.43 2.73 1.18v-.75c0-.12.1-.23.23-.23h1.4zm26.375-.19a4.24 4.24 0 00-4.16 3.29c-.13.59-.13 1.19 0 1.77a4.233 4.233 0 004.17 3.3c2.35 0 4.26-1.87 4.26-4.19 0-2.32-1.9-4.17-4.27-4.17zM60.63 5c.13 0 .23.1.23.23v3.76c.7-.76 1.7-1.18 2.73-1.18 1.88 0 3.45 1.4 3.84 3.28.13.59.13 1.2 0 1.8-.39 1.88-1.96 3.29-3.84 3.29-1.03 0-2.02-.43-2.73-1.18v.77c0 .12-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V5.23c0-.12.1-.23.23-.23h1.4zm-34 11h-1.4c-.13 0-.23-.11-.23-.23V8.22c.01-.13.1-.22.23-.22h1.4c.13 0 .22.11.23.22v.68c.5-.68 1.3-1.09 2.16-1.1h.03c1.09 0 2.09.6 2.6 1.55.45-.95 1.4-1.55 2.44-1.56 1.62 0 2.93 1.25 2.9 2.78l.03 5.2c0 .13-.1.23-.23.23h-1.41c-.13 0-.23-.11-.23-.23v-4.59c0-.98-.74-1.71-1.62-1.71-.8 0-1.46.7-1.59 1.62l.01 4.68c0 .13-.11.23-.23.23h-1.41c-.13 0-.23-.11-.23-.23v-4.59c0-.98-.74-1.71-1.62-1.71-.85 0-1.54.79-1.6 1.8v4.5c0 .13-.1.23-.23.23zm53.615 0h-1.61c-.04 0-.08-.01-.12-.03-.09-.06-.13-.19-.06-.28l2.43-3.71-2.39-3.65a.213.213 0 01-.03-.12c0-.12.09-.21.21-.21h1.61c.13 0 .24.06.3.17l1.41 2.37 1.4-2.37a.34.34 0 01.3-.17h1.6c.04 0 .08.01.12.03.09.06.13.19.06.28l-2.37 3.65 2.43 3.7c0 .05.01.09.01.13 0 .12-.09.21-.21.21h-1.61c-.13 0-.24-.06-.3-.17l-1.44-2.42-1.44 2.42a.34.34 0 01-.3.17zm-7.12-1.49c-1.33 0-2.42-1.12-2.42-2.51 0-1.39 1.08-2.52 2.42-2.52 1.33 0 2.42 1.12 2.42 2.51 0 1.39-1.08 2.51-2.42 2.52zm-19.865 0c-1.32 0-2.39-1.11-2.42-2.48v-.07c.02-1.38 1.09-2.49 2.4-2.49 1.32 0 2.41 1.12 2.41 2.51 0 1.39-1.07 2.52-2.39 2.53zm-8.11-2.48c-.01 1.37-1.09 2.47-2.41 2.47s-2.42-1.12-2.42-2.51c0-1.39 1.08-2.52 2.4-2.52 1.33 0 2.39 1.11 2.41 2.48l.02.08zm18.12 2.47c-1.32 0-2.39-1.11-2.41-2.48v-.06c.02-1.38 1.09-2.48 2.41-2.48s2.42 1.12 2.42 2.51c0 1.39-1.09 2.51-2.42 2.51z'/%3E %3C/defs%3E %3Cmask id='clip'%3E %3Crect x='0' y='0' width='100%25' height='100%25' fill='white'/%3E %3Cuse xlink:href='%23logo'/%3E %3Cuse xlink:href='%23text'/%3E %3C/mask%3E %3Cg id='outline' opacity='0.3' stroke='%23000' stroke-width='3'%3E %3Ccircle mask='url(%23clip)' cx='11.5' cy='11.5' r='9.25'/%3E %3Cuse xlink:href='%23text' mask='url(%23clip)'/%3E %3C/g%3E %3Cg id='fill' opacity='0.9' fill='%23fff'%3E %3Cuse xlink:href='%23logo'/%3E %3Cuse xlink:href='%23text'/%3E %3C/g%3E %3C/svg%3E);
+}
+
+
+
+    
+    
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+!function e(t,o,r){function i(s,a){if(!o[s]){if(!t[s])
+
+
+{var l="function"==typeof require&&require;if(!a&&l)return l(s,!0);if(n)return n(s,!0);var p=new Error("Cannot find module '"+s+"'");
+
+
+
+throw p.code="MODULE_NOT_FOUND",p}var c=o[s]={exports:{}};t[s][0].call(c.exports,function(e){var o=t[s][1][e];return i(o||e)},c,c.exports,e,t,o,r)}return o[s].exports}for(var n="function"==typeof require&&require,s=0;s<r.length;s++)i(r[s]);return i}({1:[function(e,t,o){function r(e,t){if(!(this instanceof r))
+
+
+throw new Error("MapboxMarkers needs to be called with the new keyword");this.URLSearchParams=new URLSearchParams(new URL(window.location).search),this._sourceName="markerspec",this._geojson=e,this._rendered=!1,this.options=Object.assign(
+
+
+
+
+{disabled:this.URLSearchParams.get("disabled")||!0,showControl:this.URLSearchParams.get("show-control")||!0,marker:{image:""},
+
+
+
+popup:{description:"<i></i>"},style:{label:"{name}",labelSize:10,color:this.URLSearchParams.get("style-color")||"transporent",size:2,opacity:1,icon:"marker",layers:null}},t),this.toggle=this.toggle.bind(this),this.render=this.render.bind(this),this._toggleLayers=this._toggleLayers.bind(this),this._updateMap=this._updateMap.bind(this),this._toggle=new i({show:this.options.showControl,onToggle:this.toggle.bind(this)})}function i(e){var t,o;e=Object.assign({show:!0,onToggle:function(){}},e),this._btn=((t=document.createElement("button")).className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers",t.type="button",t["aria-label"]="Inspect",t),this._btn.onclick=e.onToggle,this._input=((o=document.createElement("input")).id="marker-search",o.type="text",o.placeholder="Marker Search",o.style.display="none",o),this.elem=function(e,t,o){var r=document.createElement("div");return r.className="mapboxgl-ctrl mapboxgl-ctrl-group markerspec",r.appendChild(e),o||(r.style.display="none"),r}(this._btn,this._input,e.show)}r.prototype.onAdd=function(e){return this._map=e,e.on("load",this.render),e.on("moveend",this._updateMap),this._toggle.elem},r.prototype.onRemove=function(){this._map.off("load",this.render);var e=this._toggle.elem;e.parentNode.removeChild(e),this._map=void 0},r.prototype.toggle=function(){this.options.enabled=!this.options.enabled,this.render()},r.prototype.render=function(){if(!this._rendered){var e=this;if(this.URLSearchParams.get("data")){var t=new XMLHttpRequest;t.onreadystatechange=function(){t.readyState==XMLHttpRequest.DONE&&(e._geojson=JSON.parse(t.responseText),o())},t.open("GET",this.URLSearchParams.get("data"),!0),t.send(null)}else o();function o(){e._geojson.features.forEach(function(t){if("Point"==t.geometry.type){var o=document.createElement("div");
+
+
+o.className="markerspec marker",o.style=`background-image:url('${t.properties["marker-image"]||e.options.marker.image}')`,o.onclick=function(e){map.flyTo({center:t.geometry.coordinates})};var r=(void 0!==t.properties.title?`<h3>${t.properties.title}</h3>`:"")+(void 0!==t.properties.image?`<img src='${t.properties.image}' width=200 alt='${t.properties.title}'>`:"")+(void 0!==t.properties.description?`<p>${t.properties.description}</p>`:`<p>${e.options.popup.description}</p>`)+(void 0!==t.properties.website?`<a href='${t.properties.website}' target='_blank' class='button'>Website</a>`:`<a href='https://www.openstreetmap.org/?mlat=${t.geometry.coordinates[1]}&mlon=${t.geometry.coordinates[0]}' target='_blank' class='button'></a>`);
+
+
+new mapboxgl.Marker(o).setLngLat(t.geometry.coordinates).setPopup(new mapboxgl.Popup({offset:25}).setHTML(r)).addTo(map)}}),e._map.addSource("markerspec",{type:"geojson",data:e._geojson});var t,o,r=e._map.getStyle().layers.filter(function(e){return"building"===e["source-layer"]}),i=r[r.length-1].id;e.options.style.layers||(e.options.style.layers=(t=e._sourceName,o=e.options.style,[{id:`${t} fill`,type:"fill",source:`${t}`,paint:{"fill-color":o.color,"fill-opacity":o.opacity},filter:["==","$type","Polygon"]},{id:`${t} line`,type:"line",source:`${t}`,paint:{"line-color":o.color,"line-width":o.size,"line-opacity":o.opacity}},{id:`${t} circle`,type:"circle",source:`${t}`,paint:{"circle-color":o.color,"circle-radius":o.size,"circle-opacity":o.opacity}},{id:`${t} symbol`,type:"symbol",source:`${t}`,
+
+
+
+
+
+layout:{"text-field":o.label,"text-size":o.labelSize,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-anchor":"top","icon-image":"{icon}-25","road-label-navigation":!0}}]));var n=function(e,t,o){for(var r=0;r<e.layers.length;r++)
+
+
+
+
+
+
+{var i=e.layers[r];if(o===i.id){var n=e.layers.slice(0,r).concat(t).concat(e.layers.slice(r));return Object.assign({},e,{layers:n})}}return e}(e._map.getStyle(),e.options.style.layers,i);e._map.setStyle(n),e._toggle._input.onkeypress=(t=>{if("Enter"===t.key)return e.options.query=e._toggle._input.value,e._updateMap(),!0})}this._rendered=!0}this.options.enabled?(this._toggleLayers(),this._toggle.setMapIcon()):(this._toggleLayers(),this._toggle.setPluginIcon())},r.prototype._updateMap=function(){this.options.enabled&&this.options._geojson&&console.log("Nothing to update")},i.prototype.setPluginIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers"},i.prototype.setMapIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-map"},r.prototype._toggleLayers=function(){var e=this.options.enabled;Array.from(document.getElementsByClassName("markerspec marker")).forEach(function(t){t.style.display=e?"inline":"none"});var t=new RegExp(this._sourceName),o=this._map.getStyle();o.layers.forEach(function(o){t.test(o.source)&&(o.layout=o.layout||{},o.layout.visibility=e?"visible":"none")}),this._map.setStyle(o),this._toggle._input.style.display=e?"inline":"none"},void 0!==t&&void 0!==t.exports?window.MapboxMarkers=r:t.exports=r},{}]},{},[1]); 
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+<style type="text/css">
+    #info {
+        display: table;
+        position: relative;
+        margin: 0px auto;
+        word-wrap: anywhere;
+        white-space: pre-wrap;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #818cf8;
+        background: transparent;
+
+
+
+    }
+
+
+@media (max-width: 768px) {
+ #info {
+    top: 100px; /* Новое значение для мобильных */
+    right: 0%;
+
+  }
+  }
+
+</style>
+
+
+
+
+
+<div id="map"></div>
+
+
+
+
+
+
+<script>
+
+
+
+    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+
+    const map = new mapboxgl.Map({
+        container: 'map', // container id
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: 'https://api.maptiler.com/maps/956d0031-f050-44b9-8827-38067fe438b8/style.json?key=QN6ALYSRnAohNK6Y8BiB',
+        zoom: 17,
+
+      
+        minZoom: 14,
+        maxZoom: 24,
+
+minPitch: 0,
+
+maxPitch: 60,
+        
+        center: [37.17395908840854, 55.9802212103700],
+ 
+         
+        hash: true,
+        turn: false,
+         
+        attributionControl: false,
+        
+
+
+        bearing: 18, // bearing in degrees
+
+
+
+        
+	antialias: true // create the gl context with MSAA antialiasing, so custom layers are antialiased
+         
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  map.on('style.load', () => {
+        // set the light preset to be in dusk mode.
+        map.setConfigProperty('basemap', 'lightPreset', 'dusk');
+
+        // add a geojson source with a polygon to be used in the clip layer.
+        map.addSource('eraser', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': {
+                            'coordinates': [
+                                [
+                                    [0, 0],
+                                    [0, 0],
+                                    [0, 0],
+                                    [0, 0],
+                                    [0, 0]
+                                ]
+                            ],
+                            'type': 'Polygon'
+                        }
+                    }
+                ]
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+        // add a geojson source which specifies the custom model to be used by the model layer.
+        map.addSource('model', {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'properties': {
+                    'model-uri':
+                        'https://www.emiia.ru/relise/ofis_glb.glb'
+                },
+                'geometry': {
+                    'coordinates': [37.17395908840854, 55.9802212103700],
+                    'type': 'Point'
+                }
+            }
+        });
+
+
+        // add the clip layer and configure it to also remove symbols and trees.
+        // `clip-layer-scope` layout property is used to specify that only models from the Mapbox Standard Style should be clipped.
+        // this will prevent the newly added model from getting clipped.
+        map.addLayer({
+            'id': 'eraser',
+            'type': 'clip',
+            'source': 'eraser',
+            'layout': {
+                // specify the layer types to be removed by this clip layer
+                'clip-layer-types': ['symbol', 'model'],
+                'clip-layer-scope': ['basemap']
+            }
+        });
+
+        // add the model layer and specify the appropriate `slot` to ensure the symbols are rendered correctly.
+        
+
+
+
+   
+
+
+ map.addLayer({
+        'id': 'tower',
+        'type': 'model',
+        'slot': 'middle',
+        'source': 'model',
+        'minzoom': 15,
+        'maxzoom': 22,
+        'layout': {
+            'model-id': ['get', 'model-uri']
+        },
+        'paint': {
+            'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 22, 0],
+            'model-rotation': [0.0, 0.0, 450.0],
+            'model-scale': [1000.5, 1000.5, 1000.5],
+            'model-color-mix-intensity': 0,
+            'model-cast-shadows': true,
+
+            'model-emissive-strength': 1.5
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+      
+        // The 'building' layer in the streets vector source contains building-height
+  // data from OpenStreetMap.
+  map.on('load', () => {
+      // Insert the layer beneath any symbol layer.
+      const layers = map.getStyle().layers;
+
+      let labelLayerId;
+      for (let i = 0; i < layers.length; i++) {
+          if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+              labelLayerId = layers[i].id;
+              break;
+          }
+      }
+      
+      
+
+      map.addSource('openmaptiles', {
+          url: `https://api.maptiler.com/tiles/v3/tiles.json?key=QN6ALYSRnAohNK6Y8BiB`,
+          type: 'vector',
+      });
+
+
+      map.addLayer(
+          {
+              'id': '3d-buildings',
+              'source': 'openmaptiles',
+              'source-layer': 'building',
+              'type': 'fill-extrusion',
+
+              
+              
+              'minzoom': 15,
+'maxzoom': 19,
+              
+              
+              
+              'paint': {
+                  'fill-extrusion-color': [
+                      'interpolate',
+                      ['linear'],
+                      ['get', 'render_height'], 1, 'lightgray', 200, 'royalblue', 400, 'lightblue'
+                  ],
+                  'fill-extrusion-height': [
+                      'interpolate',
+                      ['linear'],
+                      ['zoom'],
+                      15,
+                      0,
+                      16,
+                      ['get', 'render_height']
+                  ],
+                  'fill-extrusion-base': ['case',
+                      ['>=', ['get', 'zoom'], 16],
+                      ['get', 'render_min_height'], 1
+                  ], 'fill-extrusion-opacity': 0.5
+              }
+          },
+          labelLayerId
+      );
+      
+      
+
+      
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const size = 200;
+
+    // This implements `StyleImageInterface`
+    // to draw a pulsing dot icon on the map.
+    const pulsingDot = {
+        width: size,
+        height: size,
+        data: new Uint8Array(size * size * 4),
+
+        // When the layer is added to the map,
+        // get the rendering context for the map canvas.
+        onAdd: function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = this.width;
+            canvas.height = this.height;
+            this.context = canvas.getContext('2d');
+        },
+
+        // Call once before every frame where the icon will be used.
+        render: function () {
+            const duration = 1000;
+            const t = (performance.now() % duration) / duration;
+
+            const radius = (size / 2) * 0.3;
+            const outerRadius = (size / 2) * 0.7 * t + radius;
+            const context = this.context;
+
+            // Draw the outer circle.
+            context.clearRect(0, 0, this.width, this.height);
+            context.beginPath();
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                outerRadius,
+                0,
+                Math.PI * 2
+            );
+            context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+            context.fill();
+
+            // Draw the inner circle.
+            context.beginPath();
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                radius,
+                0,
+                Math.PI * 2
+            );
+            context.fillStyle = 'rgba(255, 100, 100, 1)';
+            context.strokeStyle = 'white';
+            context.lineWidth = 2 + 4 * (1 - t);
+            context.fill();
+            context.stroke();
+
+            // Update this image's data with data from the canvas.
+            this.data = context.getImageData(
+                0,
+                0,
+                this.width,
+                this.height
+            ).data;
+
+            // Continuously repaint the map, resulting
+            // in the smooth animation of the dot.
+            map.triggerRepaint();
+
+            // Return `true` to let the map know that the image was updated.
+            return true;
+        }
+    };
+
+    map.on('load', () => {
+        map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 4 });
+
+        map.addSource('dot-point', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [37.174259539133914,55.98004184413233] // icon position [lng, lat]
+                        }
+                    }
+                ]
+            }
+        });
+        map.addLayer({
+            'id': 'layer-with-pulsing-dot',
+            'type': 'symbol',
+            'source': 'dot-point',
+            'layout': {
+                'icon-image': 'pulsing-dot'
+            }
+        });
+    });
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+map.on('mousemove', (e) => {
+    // Функция для округления чисел в JSON до 5 знаков
+    const roundToFive = (key, value) => {
+        if (typeof value === 'number') {
+            return parseFloat(value.toFixed(5));
+        }
+        return value;
+    };
+
+    const pointStr = JSON.stringify(e.point, roundToFive);
+    const lngLatStr = JSON.stringify(e.lngLat.wrap(), roundToFive);
+
+    document.getElementById('info').innerHTML = 
+        `${pointStr}<br />${lngLatStr}`;
+});
+     
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="header">
+  
+  
+ 
+<a class="header" href="https://sos.emiia.ai/rzd/ai.html">
+
+
+
+<svg xmlns="http://www.w3.org/2000/svg" width="75" height="75"  viewBox="0 0 100 100" id="wave" data-name="Layer 1">
+
+<path  id="Line_1" data-name="Line 1"  fill="#818cf8" stroke="#818cf8" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_1" data-name="Line 1"  fill="#818cf8" stroke="#818cf8" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_2" data-name="Line 2" fill="#818cf8" stroke="#818cf8" d="m41.362213 65.66929l0 0c-0.20874405 0 -0.3779602 -0.16921234 -0.3779602 -0.3779602l0 -30.58266c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921997 0.3779602 0.3779602l0 30.58266c0 0.20874786 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_2" data-name="Line 2" fill="#818cf8" stroke="#818cf8" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m41.362213 65.66929l0 0c-0.20874405 0 -0.3779602 -0.16921234 -0.3779602 -0.3779602l0 -30.58266c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921997 0.3779602 0.3779602l0 30.58266c0 0.20874786 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_3" data-name="Line 3" fill="#818cf8" stroke="#818cf8" d="m33.480324 55.842518l0 0c-0.20874405 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -10.929115c0 -0.100242615 0.03981781 -0.19638062 0.110702515 -0.2672615c0.07088089 -0.07088089 0.16701508 -0.1106987 0.2672577 -0.1106987l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 10.929115l0 0c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_3" data-name="Line 3" fill="#818cf8" stroke="#818cf8" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m33.480324 55.842518l0 0c-0.20874405 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -10.929115c0 -0.100242615 0.03981781 -0.19638062 0.110702515 -0.2672615c0.07088089 -0.07088089 0.16701508 -0.1106987 0.2672577 -0.1106987l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 10.929115l0 0c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_4" data-name="Line 4" fill="#818cf8" stroke="#818cf8" d="m57.12599 61.92126l0 0c-0.20874023 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -23.086601c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 23.086601l0 0c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_4" data-name="Line 4" fill="#818cf8" stroke="#818cf8"stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m57.12599 61.92126l0 0c-0.20874023 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -23.086601c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 23.086601l0 0c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_5" data-name="Line 5" fill="#818cf8" stroke="#818cf8" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 9.039352c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" />
+
+<path id="Line_5" data-name="Line 5" fill="#818cf8" stroke="#818cf8" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 9.039352c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" /></svg>
+
+
+
+
+
+
+
+
+
+</a>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<style>
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+#wave path {
+  fill: #818cf8;
+  transform-origin: 50% 50%;
+  animation: pulse 1s infinite;
+}
+#wave.stop path {
+  animation-play-state: paused;
+}
+
+#wave #Line_1 { animation-delay: 0.0s; }
+#wave #Line_2 { animation-delay: 0.15s; }
+#wave #Line_3 { animation-delay: 0.3s; }
+#wave #Line_4 { animation-delay: 0.45s; }
+#wave #Line_5 { animation-delay: 0.6s; }
+
+
+@keyframes pulse {
+  0%   { transform: scaleY(1);}
+  50%  { transform: scaleY(0.7);}
+  100% { transform: scaleY(1);}
+}
+
+
+
+/* Десктоп по умолчанию */
+textarea::placeholder {
+    color: #E2E8F0 !important;
+}
+
+/* Мобильная версия */
+@media (max-width: 640px) {
+    textarea::placeholder {
+        color: #E2E8F0 !important; /* Пример другого цвета для мобилок */
+    }
+
+
+
+</style>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
