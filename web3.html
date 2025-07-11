@@ -265,8 +265,8 @@ layout:{"text-field":o.label,"text-size":o.labelSize,"text-font":["Open Sans Sem
         zoom: 17,
 
       
-        minZoom: 14,
-        maxZoom: 24,
+        minZoom: 17,
+        maxZoom: 19,
 
 minPitch: 0,
 
@@ -300,13 +300,7 @@ maxPitch: 60,
 
 
 
-
-
-
-
-
-
-  map.on('style.load', () => {
+map.on('style.load', () => {
         // set the light preset to be in dusk mode.
         map.setConfigProperty('basemap', 'lightPreset', 'dusk');
 
@@ -340,6 +334,12 @@ maxPitch: 60,
 
 
 
+
+
+  
+
+
+
 const size = 180;
 
 const pulsingDot = {
@@ -358,7 +358,7 @@ const pulsingDot = {
         const duration = 1800; // Длительность вращения сектора
         const pulseDuration = 700; // Длительность пульсации линии
         const t = (performance.now() % duration) / duration;
-        const pulseT = (performance.now() % pulseDuration) / pulseDuration; // Пульсация линии
+        const pulseT = (performance.now() % pulseDuration) / pulseDuration;
         const context = this.context;
 
         // Очищаем канвас
@@ -368,24 +368,23 @@ const pulsingDot = {
         const centerX = this.width / 2;
         const centerY = this.height / 2;
         const maxRadius = size / 2 * 1;
-        // Увеличиваем угол сектора до 95% круга
-        const sweepAngle = Math.PI * 2 * 1.7 * t; // 95% полного круга
-        const opacity = 0.8 * Math.pow(1 - t, 2); // Усиливаем затухание
+        const sweepAngle = Math.PI * 2 * 1.7 * t;
+        const opacity = 0.8 * Math.pow(1 - t, 2);
 
         context.beginPath();
         context.moveTo(centerX, centerY);
         context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
         context.closePath();
-        context.fillStyle = `rgba(255, 0, 0, ${opacity})`;
+        context.fillStyle = `rgba(255, 0, 0, ${opacity})`; // Исправлен синтаксис
         context.fill();
 
         // Рисуем центральную точку
-        const radius = (size / 2) * 0.35; // Размер точки
+        const radius = (size / 2) * 0.35;
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        context.fillStyle = 'rgba(61, 133, 198, 100)'; // Цвет точки
-        context.strokeStyle = 'white'; // Белая обводка
-        context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT)); 
+        context.fillStyle = 'rgba(61, 133, 198, 1)';
+        context.strokeStyle = 'white';
+        context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
         context.fill();
         context.stroke();
 
@@ -400,6 +399,10 @@ const pulsingDot = {
 };
 
 map.on('load', () => {
+    // Устанавливаем 3D-наклон карты для эффекта поднятия
+    map.setPitch(45); // Наклон карты на 45 градусов
+    map.setBearing(0); // Опционально: угол поворота карты
+
     map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 4 });
 
     map.addSource('dot-point', {
@@ -411,19 +414,23 @@ map.on('load', () => {
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': [37.17405,55.97745] // icon position [lng, lat]
+                        'coordinates': [37.17405, 55.97745] // [lng, lat]
                     }
                 }
             ]
         }
     });
+
     map.addLayer({
         'id': 'layer-with-pulsing-dot',
         'type': 'symbol',
         'source': 'dot-point',
-'minzoom': 0,
+        'minzoom': 0,
         'layout': {
-            'icon-image': 'pulsing-dot'
+            'icon-image': 'pulsing-dot',
+            'icon-offset': [0, -25], // Поднимаем точку вверх на 20 пикселей
+            'icon-allow-overlap': true, // Игнорируем перекрытие
+            'icon-ignore-placement': true // Игнорируем размещение других символов
         }
     }, '3d-buildings');
 });
@@ -432,66 +439,117 @@ map.on('load', () => {
 
 
 
-        // add a geojson source which specifies the custom model to be used by the model layer.
-        map.addSource('model', {
-            'type': 'geojson',
-            'data': {
-                'type': 'Feature',
-                'properties': {
-                    'model-uri':
-                        'https://www.emiia.ru/relise/ofis_glb.glb'
-                },
-                'geometry': {
-                    'coordinates': [37.174099,55.977377],
-                    'type': 'Point'
-                }
-            }
-        });
-
-
-        // add the clip layer and configure it to also remove symbols and trees.
-        // `clip-layer-scope` layout property is used to specify that only models from the Mapbox Standard Style should be clipped.
-        // this will prevent the newly added model from getting clipped.
-        map.addLayer({
-            'id': 'eraser',
-            'type': 'clip',
-            'source': 'eraser',
-            'layout': {
-                // specify the layer types to be removed by this clip layer
-                'clip-layer-types': ['symbol', 'model'],
-                'clip-layer-scope': ['basemap']
-            }
-        });
-
-        // add the model layer and specify the appropriate `slot` to ensure the symbols are rendered correctly.
-        
 
 
 
-   
 
 
- map.addLayer({
-        'id': 'tower',
-        'type': 'model',
-        'slot': 'middle',
-        'source': 'model',
-        'minzoom': 15,
-        'maxzoom': 22,
-        'layout': {
-            'model-id': ['get', 'model-uri']
+
+
+// add a geojson source which specifies the custom model to be used by the model layer.
+map.addSource('model', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://www.emiia.ru/relise/ofis_glb.glb'
         },
-        'paint': {
-            'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 22, 0],
-            'model-rotation': [0.0, 0.0, -800.0],
-            'model-scale': [830.5, 840.5, 1001],
-            'model-color-mix-intensity': 0,
-            'model-cast-shadows': true,
-'model-translation': [0, 0, 0], // Поднимаем модель на 5 единиц по оси Z
-
-            'model-emissive-strength': 1.6
+        'geometry': {
+            'coordinates': [37.174099, 55.977377],
+            'type': 'Point'
         }
-    });
+    }
+});
+
+// add the clip layer and configure it to also remove symbols and trees.
+// clip-layer-scope layout property is used to specify that only models from the Mapbox Standard Style should be clipped.
+// this will prevent the newly added model from getting clipped.
+map.addLayer({
+    'id': 'eraser',
+    'type': 'clip',
+    'source': 'eraser',
+    'layout': {
+        // specify the layer types to be removed by this clip layer
+        'clip-layer-types': ['symbol', 'model'],
+        'clip-layer-scope': ['basemap']
+    }
+});
+
+
+
+
+// add the model layer and specify the appropriate slot to ensure the symbols are rendered correctly.
+map.addLayer({
+    'id': 'tower',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model',
+    'minzoom': 15,
+    'maxzoom': 22,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 22, 0],
+        'model-rotation': [0.0, 0.0, -800.0],
+        'model-scale': [830.5, 840.5, 1001],
+        'model-color-mix-intensity': 0,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 0], // Поднимаем модель на 5 единиц по оси Z
+        'model-emissive-strength': 0.7
+    }
+});
+
+
+
+
+
+
+
+// Добавляем второй источник для нового GLB-файла
+map.addSource('model2', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.174099, 55.977377], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower2',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model2',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 22, 0.5],
+        'model-rotation': [0.0, 0.0, -80.0],
+        'model-scale': [830.0, 830.0, 0.0],
+        'model-translation': [0, 0, 7], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+
+
+        'model-emissive-strength': 5
+
+
+
+    }
 });
 
 
@@ -503,6 +561,102 @@ map.on('load', () => {
 
 
 
+// Добавляем третий источник для нового GLB-файла
+map.addSource('model3', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.174099, 55.977377], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower3',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model3',
+    'minzoom': 15,
+    'maxzoom': 22,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 22, 0.5],
+        'model-rotation': [0.0, 0.0, -80.0],
+        'model-scale': [830.0, 810.0, 0.0],
+        'model-translation': [0, 0, 0.5], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+
+
+        'model-emissive-strength': 5
+
+
+
+    }
+});
+
+
+
+
+
+
+// Добавляем четвертый источник для нового GLB-файла
+map.addSource('model4', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.174099, 55.977377], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower4',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model4',
+    'minzoom': 15,
+    'maxzoom': 22,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 22, 0.5],
+        'model-rotation': [0.0, 0.0, -80.0],
+        'model-scale': [830.0, 830.0, 0.0],
+        'model-translation': [0, 0, 0.5], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+
+
+        'model-emissive-strength': 5
+
+
+
+    }
+});
 
 
 
@@ -510,6 +664,23 @@ map.on('load', () => {
 
 
 
+
+}); // Закрывающая скобка
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 
 
