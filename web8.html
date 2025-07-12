@@ -859,14 +859,47 @@ map.on('load', () => {
 
 
 
+map.on('load', () => {
+    map.addSource('polygon-source', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                    [37.174014825136595, 55.97747637225763],
+                    [37.174223117007614, 55.97745607738463],
+                    [37.17408018404612, 55.97699461722809],
+                    [37.173873474273904, 55.977014791684724],
+                    [37.174014825136595, 55.97747637225763]
+                ]]
+            },
+            properties: {
+                height: 6.9 // высота экструзии (над базой)
+            }
+        }
+    });
+
+    map.addLayer({
+        id: 'extruded-polygon',
+        type: 'fill-extrusion',
+        source: 'polygon-source',
+        paint: {
+            'fill-extrusion-color': '#3D85C6',
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 3.85,
+            'fill-extrusion-opacity': 0.2,
+            'fill-extrusion-ambient-occlusion-intensity': 0 // минимизирует тени
+        }
+    });
 
 
 
-
-
-
-
-
+// Отключение теней
+    map.setLight({
+        intensity: 0.09// Полностью убирает тени
+    });
+});
 
 
 </script>
