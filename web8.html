@@ -10,6 +10,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1040,7 +1041,7 @@ textarea::placeholder {
 height: 30px;
 width: 300px;
 position: absolute;
-bottom: 35px;
+bottom: 43px;
 left: 18px;
 background-color: transparent;
 padding: 9.5px;
@@ -1056,7 +1057,18 @@ color: #3d85c6;
 }
 
 .calculation-box p:not(:last-child) {
-    margin-bottom: 5px; /* Применяется ко всем <p>, кроме последнего */
+    margin-bottom: 10px; /* Применяется ко всем <p>, кроме последнего */
+}
+
+.highlight {
+    font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
+font-weight: 500; /* Жирность (700 = bold, 800 или 900 — ещё жирнее) */
+}
+
+.highlight1 {
+    position: relative;
+    top: 3px; /* Опускает стрелку на 3px вниз, измените значение по необходимости */
+font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
 }
 
 </style>
@@ -1067,8 +1079,11 @@ color: #3d85c6;
 
 
 <div class="calculation-box">
-<p>EMIIA.AI SIP: [SOS] ID: [R #3D4588]</p>
-<p> ID: [V #3D85C6] [37.17402, 55.97708] </p>
+
+
+<p>EMIIA.AI SIP: [SOS] ID: [R #3D4588] <span class="highlight1"> &nbsp;&nbsp; ❯ </span></p>
+
+<p> ID: [V #3D85C6] [37.17402, 55.97708]<span class="highlight"> [ 2 ]</span>  </p>
 
 
 <div id="calculated-area">
@@ -1175,6 +1190,8 @@ position: fixed;
 
 </body>
 </html>
+
+
 
 
 
