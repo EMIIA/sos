@@ -8,6 +8,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -819,7 +820,7 @@ map.on('load', () => {
             ],
             'fill-extrusion-base': [
                 'case',
-                ['>=', ['get', 'zoom'], 15.5],
+                ['>=', ['get', 'zoom'], 16.5],
                 ['get', 'render_min_height'],
                 0
             ],
@@ -1010,9 +1011,128 @@ textarea::placeholder {
 
 
 
+
+
 </style>
 
 
+
+
+<style>
+.calculation-box {
+height: 30px;
+width: 300px;
+position: absolute;
+bottom: 35px;
+left: 18px;
+background-color: transparent;
+padding: 9.5px;
+
+font-family: 'Montserrat', montserrat !important; 
+}
+ 
+p {
+font-family: 'Montserrat';
+margin: 0px;
+font-size: 10px;
+color: #3d85c6;
+}
+
+.calculation-box p:not(:last-child) {
+    margin-bottom: 5px; /* Применяется ко всем <p>, кроме последнего */
+}
+
+</style>
+
+
+
+
+
+
+<div class="calculation-box">
+<p>EMIIA.AI SIP: [SOS] ID: [R #3D4588]</p>
+<p> ID: [V #3D85C6] [37.17402, 55.97708] </p>
+
+
+<div id="calculated-area">
+
+</div>
+</div>
+
+
+
+
+
+
+
+
+<div class="mobile-logo">
+
+
+<a href="https://example.com" target="_blank" class="logo-link">
+
+
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"  viewBox="0 0 100 100">
+
+
+<path style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 33.244102l0 0c0 -0.20874405 0.16921806 -0.3779602 0.3779602 -0.3779602l58.70865 0c0.100242615 0 0.19637299 0.039821625 0.2672577 0.110702515c0.070877075 0.07088089 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602l-58.70865 0c-0.20874214 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602z" />
+
+<path  style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 33.244102l0 0c0 -0.20874405 0.16921806 -0.3779602 0.3779602 -0.3779602l58.70865 0c0.100242615 0 0.19637299 0.039821625 0.2672577 0.110702515c0.070877075 0.07088089 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602l-58.70865 0c-0.20874214 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+<path  style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 65.2441l0 0c0 -0.20874023 0.16921806 -0.3779602 0.3779602 -0.3779602l40.40943 0c0.100242615 0 0.1963768 0.03981781 0.2672577 0.110702515c0.07088089 0.070877075 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874023 -0.16921997 0.3779602 -0.3779602 0.3779602l-40.40943 0c-0.20874214 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+
+<path  style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 65.2441l0 0c0 -0.20874023 0.16921806 -0.3779602 0.3779602 -0.3779602l40.40943 0c0.100242615 0 0.1963768 0.03981781 0.2672577 0.110702515c0.07088089 0.070877075 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874023 -0.16921997 0.3779602 -0.3779602 0.3779602l-40.40943 0c-0.20874214 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+
+</svg>
+
+
+
+
+
+
+
+
+<style>
+
+  .mobile-logo {
+position: fixed;
+
+
+
+    top: 80px;
+    left: 35px;
+    width: 30px;
+    height: 30px;
+    z-index: 20000;
+  }
+
+  .mobile-logo svg {
+    width: 100%;
+    height: 100%;
+    fill: #E2E8F0;
+    stroke: #E2E8F0;
+  }
+
+  .logo-part1 {
+    stroke-width: 3px; /* Уменьшенная толщина линий */
+  }
+
+  .logo-center {
+    stroke-width: 8px; /* Уменьшенная толщина центрального круга */
+  }
+}
+
+
+</style>
+
+
+
+
+
+</div>
+</div>
 
 
 
