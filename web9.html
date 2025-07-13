@@ -937,10 +937,80 @@ map.on('load', () => {
 
 // Отключение теней
     map.setLight({
-        intensity: 0.2// Полностью убирает тени
+        intensity: 0.3// Полностью убирает тени
     });
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+map.on('load', () => {
+    map.addSource('polygon-source1', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                    [37.174014825136595, 55.97747637225763],
+                    [37.174223117007614, 55.97745607738463],
+                    [37.17408018404612, 55.97699461722809],
+                    [37.173873474273904, 55.977014791684724],
+                    [37.174014825136595, 55.97747637225763]
+                ]]
+            },
+            properties: {
+                height: 3.95 // высота экструзии (над базой)
+            }
+        }
+    });
+
+    map.addLayer({
+        id: 'extruded-polygon1',
+        type: 'fill-extrusion',
+        source: 'polygon-source1',
+        paint: {
+            'fill-extrusion-color': '#0047AB',
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 3.95,
+            'fill-extrusion-opacity': 0.2,
+
+
+            'fill-extrusion-ambient-occlusion-intensity': 0.1 // минимизирует тени
+        }
+    }, '3d-buildings');
+
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </script>
