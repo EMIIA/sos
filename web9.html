@@ -517,33 +517,33 @@ map.on('load', () => {
 
 
 
-
-
-
-// Добавить источник GeoJSON с указанием модели
-map.addSource('model', {
+// Добавляем третий источник для нового GLB-файла средний
+map.addSource('model3', {
     'type': 'geojson',
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://www.emiia.ru/relise/ofis_glb.glb'
+            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
         },
         'geometry': {
-            'coordinates': [37.174099, 55.977377],
+            'coordinates': [37.174099, 55.977377], // Другие координаты
             'type': 'Point'
         }
     }
 });
 
 
-// Добавить слой модели с плавным появлением
+
+
+
+
 map.addLayer({
-    'id': 'tower',
+    'id': 'tower3',
     'type': 'model',
     'slot': 'middle',
-    'source': 'model',
-    'minzoom': 18.3,
-    'maxzoom': 19.5,
+    'source': 'model3',
+    'minzoom': 15,
+    'maxzoom': 22,
     'layout': {
         'model-id': ['get', 'model-uri']
     },
@@ -552,17 +552,23 @@ map.addLayer({
             'interpolate',
             ['linear'],
             ['zoom'],
-            18.3, 0,    // Полная прозрачность (0%) на зуме 17
-            18.5, 0.5, // Средняя прозрачность (50%) на зуме 17.75
-            18.6, 0.9,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 0.9  // 90% прозрачности (90%) на зуме 18.5
+            17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
         ],
-        'model-rotation': [0.0, 0.0, -800.0],
-        'model-scale': [830.5, 840.5, 1001],
-        'model-color-mix-intensity': 0,
+        'model-rotation': [0.0, 0.0, -80.0],
+        'model-scale': [833.0, 853.0, 0.0],
+        'model-translation': [0, 0, 4], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
         'model-cast-shadows': true,
-        'model-translation': [0, 0, 0],
-        'model-emissive-strength': 0.9
+
+
+        'model-emissive-strength': 5
+
+
+
     }
 });
 
@@ -573,7 +579,80 @@ map.addLayer({
 
 
 
-// Добавляем второй источник для нового GLB-файла
+
+
+
+// Добавляем четвертый источник для нового GLB-файла нижний
+map.addSource('model4', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.174099, 55.977377], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower4',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model4',
+    'minzoom': 18.4,
+    'maxzoom': 22,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            17, 0,    // Полная прозрачность (0%) на зуме 17
+            18.4, 0.009, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.5      
+        ],
+        'model-rotation': [0.0, 0.0, -80.0],
+        'model-scale': [833.0, 853.0, 0.0],
+        'model-translation': [0, 0, 0.74], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+
+
+        'model-emissive-strength': 5
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавляем второй источник для нового GLB-файла верхний
 map.addSource('model2', {
     'type': 'geojson',
     'data': {
@@ -641,33 +720,31 @@ map.addLayer({
 
 
 
-// Добавляем третий источник для нового GLB-файла
-map.addSource('model3', {
+
+// Добавить источник GeoJSON с указанием модели главная модель
+map.addSource('model', {
     'type': 'geojson',
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
+            'model-uri': 'https://www.emiia.ru/relise/ofis_glb.glb'
         },
         'geometry': {
-            'coordinates': [37.174099, 55.977377], // Другие координаты
+            'coordinates': [37.174099, 55.977377],
             'type': 'Point'
         }
     }
 });
 
 
-
-
-
-
+// Добавить слой модели с плавным появлением
 map.addLayer({
-    'id': 'tower3',
+    'id': 'tower',
     'type': 'model',
     'slot': 'middle',
-    'source': 'model3',
-    'minzoom': 15,
-    'maxzoom': 22,
+    'source': 'model',
+    'minzoom': 18.3,
+    'maxzoom': 19.5,
     'layout': {
         'model-id': ['get', 'model-uri']
     },
@@ -676,83 +753,17 @@ map.addLayer({
             'interpolate',
             ['linear'],
             ['zoom'],
-            17, 0,    // Полная прозрачность (0%) на зуме 17
-            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
-18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
-            19, 1,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+            18.3, 0,    // Полная прозрачность (0%) на зуме 17
+            18.5, 0.5, // Средняя прозрачность (50%) на зуме 17.75
+            18.6, 0.9,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 0.9  // 90% прозрачности (90%) на зуме 18.5
         ],
-        'model-rotation': [0.0, 0.0, -80.0],
-        'model-scale': [833.0, 853.0, 0.0],
-        'model-translation': [0, 0, 4], // ЗДЕСЬ: поднятие на 10 единиц по Z
-        'model-color-mix-intensity': 1,
+        'model-rotation': [0.0, 0.0, -800.0],
+        'model-scale': [830.5, 840.5, 1001],
+        'model-color-mix-intensity': 0,
         'model-cast-shadows': true,
-
-
-        'model-emissive-strength': 5
-
-
-
-    }
-});
-
-
-
-
-
-
-// Добавляем четвертый источник для нового GLB-файла
-map.addSource('model4', {
-    'type': 'geojson',
-    'data': {
-        'type': 'Feature',
-        'properties': {
-            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
-        },
-        'geometry': {
-            'coordinates': [37.174099, 55.977377], // Другие координаты
-            'type': 'Point'
-        }
-    }
-});
-
-
-
-
-
-
-map.addLayer({
-    'id': 'tower4',
-    'type': 'model',
-    'slot': 'middle',
-    'source': 'model4',
-    'minzoom': 15,
-    'maxzoom': 22,
-    'layout': {
-        'model-id': ['get', 'model-uri']
-    },
-    'paint': {
-        'model-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            17, 0,    // Полная прозрачность (0%) на зуме 17
-            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
-18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
-            19, 1,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 1  // 90% прозрачности (90%) на зуме 18.5
-        ],
-        'model-rotation': [0.0, 0.0, -80.0],
-        'model-scale': [833.0, 853.0, 0.0],
-        'model-translation': [0, 0, 0.74], // ЗДЕСЬ: поднятие на 10 единиц по Z
-        'model-color-mix-intensity': 1,
-        'model-cast-shadows': true,
-
-
-        'model-emissive-strength': 5
-
-
-
+        'model-translation': [0, 0, 0],
+        'model-emissive-strength': 0.9
     }
 });
 
