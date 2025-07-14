@@ -13,6 +13,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -658,7 +659,7 @@ map.addSource('model2', {
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://sos.emiia.ai/Level_2-0.glb' // Замените на URL второго GLB
+            'model-uri': 'https://sos.emiia.ai/level_1_geojson_new.glb' // Замените на URL второго GLB
         },
         'geometry': {
             'coordinates': [37.174099, 55.977377], // Другие координаты
@@ -937,7 +938,7 @@ map.on('load', () => {
 
 // Отключение теней
     map.setLight({
-        intensity: 0.3// Полностью убирает тени
+        intensity: 0.5// Полностью убирает тени
     });
 
 });
