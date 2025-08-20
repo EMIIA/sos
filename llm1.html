@@ -1,0 +1,1698 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+    <title>EMIIA.AI</title>
+
+
+
+
+
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+
+
+
+
+    <style>
+        
+
+
+:root {
+    --bg: #f8f9fa;
+    --primary: #e06666;
+    --text: #E2E8F0;
+    --surface: linear-gradient(to right, rgba(224, 36, 86, 0.3), rgba(129, 140, 248, 0.7));
+    --success: #34D399;
+    --error: #F87171;
+}
+
+
+
+
+
+
+textarea#input {
+    width: 100%;
+    min-height: 50px;
+    max-height: 50px;
+    resize: vertical;
+    resize: none;
+    padding: 10px 12px;
+    border: 0px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 2.0;
+    box-sizing: border-box;
+    background: none;
+    color: #fff;
+    overflow: hidden;
+    transition: border 0.2s;
+}
+
+
+
+
+
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui;
+
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+
+
+
+background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Новые свойства */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+
+
+
+
+
+
+        }
+
+        .chat-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+font-size: 1.1rem;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 1.25rem;
+            border-radius: 1.5rem;
+            line-height: 1.6;
+            animation: slideIn 0.3s ease;
+
+        }
+
+        .user {
+            background: var(--surface);
+            margin-left: auto;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .assistant {
+            background: linear-gradient(135deg, var(--primary) 0%, #6366F1 100%);
+            margin-right: auto;
+            border-bottom-left-radius: 0.5rem;
+        }
+
+        
+.input-area {
+            position: relative;
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        }
+
+
+
+.chat-container {
+  padding-bottom: 80px; /* высота input-area */
+}
+.input-area {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  
+  margin: 0px auto;
+  right: 0;
+  z-index: 100;
+ 
+
+
+ width: 99%;
+  max-width: 800px;
+  margin: 0 auto;
+
+}
+
+
+
+
+
+
+        input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text);
+            padding: 1rem 3.0rem;
+            font-size: 1rem;
+            outline: none;
+        }
+
+       
+
+
+
+
+
+
+
+ button {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 0rem 0rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+           
+            height:2.5em;
+
+            margin-right: clamp(-1rem, 0%, 0rem); /* Адаптивный отступ */
+
+        }
+
+
+@media (max-width: 768px) {
+button {
+    
+    right: -20px;
+      
+    z-index: 10000;
+margin-right: clamp(-1rem, 0%, 0rem); /* Адаптивный отступ */
+
+height:2.5em;
+   
+}
+
+
+
+
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .loading {
+            display: inline-flex;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+            animation: pulse 1.4s infinite;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 640px) {
+            .message {
+                max-width: 90%;
+                padding: 1rem;
+            }
+            
+            button span {
+                display: none;
+            }
+
+
+
+
+
+
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+.menu-button {
+    position: fixed;
+    bottom: 13px;
+    left: 25px;
+    font-size: 30px;
+font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+    color: white;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: transform 0.3s;
+transform: scale(0.0);
+
+}
+
+.menu-button:hover {
+    transform: scale(1.1);
+}
+
+.menu {
+    position: fixed;
+    bottom: 60px;
+    left: -2px;
+    background-color: #1E293B;
+    border: 0px solid #dee2e6;
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+    
+    border-radius: 10px;
+  
+}
+
+.menu button {
+    
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 12px 12px;
+    cursor: pointer;
+    background-color: var(--surface);
+    color: #E2E8F0;
+    border: none;
+    text-align: center;
+
+    transition: background-color 0.3s, transform 0.3s;
+
+ 
+}
+
+.menu button:hover {
+    background-color: var(--primary);
+    transform: scale(1.02);
+}
+
+.menu button:last-child {
+    margin-bottom: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Для мобилок */
+@media (max-width: 768px) {
+    
+
+
+    .menu-button {
+        font-size: 29px;
+        bottom: 18px;
+        left: 2px;
+        -webkit-text-stroke: 1.6px #E2E8F0;
+        
+        /* Эффект поля */
+        padding: 9px 30px 6px 20px;
+        
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform: translateZ(0); /* Оптимизация анимации */  
+       transform: scale(1.1);
+
+border-radius: 10px 10px 10px 1px;
+
+
+
+    }
+
+
+
+
+
+
+@media (max-width: 768px) {
+.menu {
+    position: fixed;
+    bottom: 77.5px;
+    left: -2px;
+    background-color: transparent;
+    border: 0px solid #dee2e6;
+
+    padding: 10px 10px 10px 10px;
+    display: none;
+    z-index: 10000;
+   
+    border-radius: 1px 1px 1px 1px;
+
+
+
+}
+
+
+
+
+@media (max-width: 768px) {
+
+ .input-area {
+   box-shadow: 
+            0 0 0 0px rgba(226, 232, 240, 0.15),
+
+
+
+            0 0px 0px 0px rgba(30, 41, 59, 1),
+
+
+
+            0 0px 0px 0px rgba(30, 41, 59,  0.9);
+
+
+
+
+
+
+bottom: 12px;
+}
+
+
+
+
+
+@media (max-width: 768px) {
+.menu button {
+
+
+margin-bottom: 10px;
+    
+ border-radius: 12px 12px 12px 12px;
+
+  width: 44px;
+  height: 44px;
+
+ border: 0px solid #dee2e6;
+
+
+
+
+
+/* Многослойная тень */
+        box-shadow: 
+            0 0 0 0.0px rgba(226, 232, 240, 0.15),
+            0 0px 1px 0 rgba(226, 232, 240, 0.2),
+            0 0 3px 2px rgba(226, 232, 240, 0.1);
+
+
+
+ 
+}
+
+
+
+}
+
+
+
+</style>
+
+
+
+
+
+
+
+<style>
+
+.loader {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+#wave {
+	height: 70px;
+	width: 70px;
+	fill: #fff;
+}
+
+@for $i from 1 through 9 {
+	#Line_#{$i} {
+		animation: pulse 1s infinite;
+		animation-delay: $i * .15s;
+	}
+}
+
+@keyframes pulse {
+	0% {
+		transform: scaleY(1);
+		transform-origin: 50% 50%;
+	}
+	
+	50% {
+		transform: scaleY(.7);
+		transform-origin: 50% 50%;
+	}
+	
+	100% {
+		transform: scaleY(1);
+		transform-origin: 50% 50%;
+	}
+}
+
+</style>
+
+
+
+
+<style>
+textarea#input {
+  width: 100%;
+ min-height: 50px;
+  max-height: 50px; 
+  resize: vertical;
+
+resize: none; /* запретить растяжение */
+  padding: 10px 12px;
+  border: 0px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 2.0;
+  box-sizing: border-box;
+  background: none;
+  color: #fff; /* белый текст */
+  overflow: hidden;
+  transition: border 0.2s;
+}
+textarea#input:focus {
+  border: 0.0px solid #4a90e2;
+  outline: none;
+  background: none;
+padding-left: 60px;
+ 
+}
+
+
+
+textarea#input {
+  padding-left: 60px;
+  /* остальные стили */
+
+}
+
+
+
+.input-area {
+    background: var(--surface);
+    backdrop-filter: blur(10px); /* Мутный эффект */
+    
+}
+
+
+
+
+
+
+
+
+}
+
+</style>
+
+
+
+
+
+
+<style>
+button .arrow path {
+  transition: transform 0.3s;
+}
+button:hover .arrow path {
+  transform: translateX(4px);
+}
+
+</style>
+
+
+
+
+<style>
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+#wave path {
+  fill: #f8f9fa;
+  transform-origin: 50% 50%;
+  animation: pulse 1s infinite;
+}
+#wave.stop path {
+  animation-play-state: paused;
+}
+
+#wave #Line_1 { animation-delay: 0.0s; }
+#wave #Line_2 { animation-delay: 0.15s; }
+#wave #Line_3 { animation-delay: 0.3s; }
+#wave #Line_4 { animation-delay: 0.45s; }
+#wave #Line_5 { animation-delay: 0.6s; }
+
+
+@keyframes pulse {
+  0%   { transform: scaleY(1);}
+  50%  { transform: scaleY(0.7);}
+  100% { transform: scaleY(1);}
+}
+
+
+
+/* Десктоп по умолчанию */
+textarea::placeholder {
+    color: #F8F9FA !important;
+}
+
+/* Мобильная версия */
+@media (max-width: 640px) {
+    textarea::placeholder {
+        color: #F8F9FA !important; /* Пример другого цвета для мобилок */
+    }
+
+
+
+
+
+</style>
+
+
+
+
+
+<style>
+
+#input-container {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 9999; /* Увеличиваем z-index */
+    transition: transform 0.3s ease-out;
+}
+
+
+</style>
+
+
+<style>
+#input-container.focused {
+    transform: translateY(0);
+}
+
+#input-container.blurred {
+    transform: translateY(100%);
+}
+
+</style>
+
+
+
+
+
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+
+.input-area::before {
+    content: '';
+    position: absolute;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-9 0 45 45'%3E%3Cpath d='M18.4,13.95l-5.65-2.82a.79.79,0,0,0-.7,0L6.4,13.95' style='fill: none;stroke: %23E2E8F0; stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 1.5px'/%3E%3C/svg%3E");
+    width: 60px;
+    height: 60px;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%); /* Центрируем только по горизонтали */
+    background-size: contain;
+    opacity: 0.8;
+    animation: float 0s ease-in-out infinite;
+    pointer-events: none; /* Не мешает кликам */
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateX(-50%); /* Центр по горизонтали */
+    }
+    50% {
+        transform: translateX(-50%) translateY(-10px); /* Двигаем вверх */
+    }
+}
+
+@media (max-width: 640px) {
+    .input-area::before {
+        width: 80px;
+        height: 80px;
+        top: -35px;
+        left: 50%; /* Убеждаемся, что остается */
+        transform: translateX(-50%); /* Центрируем для мобилок */
+    }
+}
+
+
+
+</style>
+
+
+
+
+
+
+<style>
+
+
+.header {
+    padding: 0rem;
+    position: fixed;
+    top: 70px;
+    z-index: 20000;
+    left: 2%;
+
+
+}
+
+
+
+
+@media (max-width: 768px) {
+ .header {
+    top: 95px; /* Новое значение для мобильных */
+    left: 5%;
+ z-index: 20000;
+  }
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+
+
+<script type="text/javascript">
+    (function () {
+      const tele = window.Telegram.WebApp;
+      tele.ready()
+      tele.expand();
+     
+      tele.SettingsButton.show();
+      tele.setHeaderColor("#f8f9fa")
+      tele.setBackgroundColor("#f8f9fa")
+      tele.enableClosingConfirmation()
+      tele.disableVerticalSwipes()
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+#messages {
+    height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 80px 0px 50px 10px;
+
+
+}
+
+</style>
+
+ 
+
+
+
+
+
+
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+
+
+
+
+
+
+
+
+<div class="header">
+  
+  
+ 
+<a class="header" href="https://sos.emiia.ai/rzd/map.html">
+
+
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"  viewBox="0 0 100 100">
+
+
+<path style="fill: #E2E8F0; stroke: #E2E8F0;stroke-miterlimit: 4.5;stroke-width: 4.5px" d="m20.267717 33.244102l0 0c0 -0.20874405 0.16921806 -0.3779602 0.3779602 -0.3779602l58.70865 0c0.100242615 0 0.19637299 0.039821625 0.2672577 0.110702515c0.070877075 0.07088089 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602l-58.70865 0c-0.20874214 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602z" />
+
+<path  style="fill: #E2E8F0; stroke: #E2E8F0;stroke-miterlimit: 4.5;stroke-width: 4.5px" d="m20.267717 33.244102l0 0c0 -0.20874405 0.16921806 -0.3779602 0.3779602 -0.3779602l58.70865 0c0.100242615 0 0.19637299 0.039821625 0.2672577 0.110702515c0.070877075 0.07088089 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602l-58.70865 0c-0.20874214 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+<path  style="fill: #E2E8F0; stroke: #E2E8F0;stroke-miterlimit: 4.5;stroke-width: 4.5px" d="m20.267717 65.2441l0 0c0 -0.20874023 0.16921806 -0.3779602 0.3779602 -0.3779602l40.40943 0c0.100242615 0 0.1963768 0.03981781 0.2672577 0.110702515c0.07088089 0.070877075 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874023 -0.16921997 0.3779602 -0.3779602 0.3779602l-40.40943 0c-0.20874214 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+
+<path  style="fill: #E2E8F0; stroke: #E2E8F0;stroke-miterlimit: 4.5;stroke-width: 4.5px" d="m20.267717 65.2441l0 0c0 -0.20874023 0.16921806 -0.3779602 0.3779602 -0.3779602l40.40943 0c0.100242615 0 0.1963768 0.03981781 0.2672577 0.110702515c0.07088089 0.070877075 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874023 -0.16921997 0.3779602 -0.3779602 0.3779602l-40.40943 0c-0.20874214 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+
+</svg>
+
+
+
+
+
+
+
+
+
+</a>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+<div class="input-area">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <textarea 
+
+  style="background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-archive-fill%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M12.643%2015C13.979%2015%2015%2013.845%2015%2012.5V5H1v7.5C1%2013.845%202.021%2015%203.357%2015zM5.5%207h5a.5.5%200%200%201%200%201h-5a.5.5%200%200%201%200-1M.8%201a.8.8%200%200%200-.8.8V3a.8.8%200%200%200%20.8.8h14.4A.8.8%200%200%200%2016%203V1.8a.8.8%200%200%200-.8-.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: 150px 20px; padding-left: 30px;"
+
+
+  id="input" 
+  rows="3" 
+  cols="40" 
+  placeholder="     В ПУТЬ ❯"
+
+></textarea>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<button onclick="sendMessage()" >
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<svg  id="wave" data-name="Layer 1" width="60" height="60" viewBox="10 -20 50 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+
+
+<path  id="Line_1" data-name="Line 1"  fill="#f8f9fa" stroke="#f8f9fa" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="#f8f9fa"/>
+
+<path id="Line_1" data-name="Line 1"  fill="#f8f9fa" stroke="#f8f9fa" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_2" data-name="Line 2" fill="#f8f9fa" stroke="#f8f9fa" d="m41.362213 65.66929l0 0c-0.20874405 0 -0.3779602 -0.16921234 -0.3779602 -0.3779602l0 -30.58266c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921997 0.3779602 0.3779602l0 30.58266c0 0.20874786 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_2" data-name="Line 2" fill="#f8f9fa" stroke="#f8f9fa" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m41.362213 65.66929l0 0c-0.20874405 0 -0.3779602 -0.16921234 -0.3779602 -0.3779602l0 -30.58266c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921997 0.3779602 0.3779602l0 30.58266c0 0.20874786 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_3" data-name="Line 3" fill="#f8f9fa" stroke="#f8f9fa" d="m33.480324 55.842518l0 0c-0.20874405 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -10.929115c0 -0.100242615 0.03981781 -0.19638062 0.110702515 -0.2672615c0.07088089 -0.07088089 0.16701508 -0.1106987 0.2672577 -0.1106987l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 10.929115l0 0c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_3" data-name="Line 3" fill="#f8f9fa" stroke="#f8f9fa" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m33.480324 55.842518l0 0c-0.20874405 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -10.929115c0 -0.100242615 0.03981781 -0.19638062 0.110702515 -0.2672615c0.07088089 -0.07088089 0.16701508 -0.1106987 0.2672577 -0.1106987l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 10.929115l0 0c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_4" data-name="Line 4" fill="#f8f9fa" stroke="#f8f9fa" d="m57.12599 61.92126l0 0c-0.20874023 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -23.086601c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 23.086601l0 0c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_4" data-name="Line 4" fill="#f8f9fa" stroke="#f8f9fa"stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m57.12599 61.92126l0 0c-0.20874023 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -23.086601c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 23.086601l0 0c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_5" data-name="Line 5" fill="#f8f9fa" stroke="#f8f9fa" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 9.039352c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" />
+
+<path id="Line_5" data-name="Line 5" fill="#f8f9fa" stroke="#f8f9fa" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 9.039352c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" /></svg>
+
+  
+
+
+
+
+
+
+
+</button>
+
+
+
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+<div id="menuButton" class="menu-button">⋮</div>
+<div id="menu" class="menu" style="display: none;">
+    
+
+
+
+
+
+
+
+
+<button onclick="clearHistory()">
+
+<svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.10999 27C8.92999 27 8.76001 26.96 8.60001 26.9C8.43001 26.83 8.29 26.74 8.16 26.61C8.03 26.49 7.94 26.3499 7.87 26.1899C7.79999 26.0299 7.76001 25.8599 7.76001 25.6899L7.73001 23.04C7.34001 22.98 6.95001 22.8799 6.57001 22.7599C6.19001 22.6299 5.83001 22.48 5.48001 22.29C5.13001 22.1 4.79999 21.88 4.48999 21.63C4.17999 21.39 3.89 21.1199 3.63 20.82C3.37 20.52 3.13999 20.21 2.92999 19.87C2.72999 19.53 2.56001 19.18 2.42001 18.82C2.28001 18.45 2.17001 18.07 2.10001 17.69C2.03001 17.3 2 16.92 2 16.53V9.46995C2 9.03995 2.04 8.61995 2.12 8.19995C2.21 7.77995 2.34 7.36995 2.5 6.96995C2.67 6.57995 2.88 6.19995 3.12 5.84995C3.36 5.48995 3.64001 5.15995 3.95001 4.85995C4.26001 4.55995 4.59999 4.28995 4.95999 4.04995C5.32999 3.80995 5.70999 3.60995 6.10999 3.44995C6.51999 3.27995 6.94 3.15995 7.37 3.07995C7.79999 2.98995 8.23001 2.94995 8.67001 2.94995H13.3C13.46 2.94995 13.61 2.97995 13.76 3.03995C13.9 3.09995 14.03 3.17995 14.14 3.28995C14.25 3.39995 14.33 3.51995 14.39 3.65995C14.45 3.79995 14.48 3.94995 14.48 4.09995C14.48 4.25995 14.45 4.39995 14.39 4.54995C14.33 4.68995 14.25 4.80995 14.14 4.91995C14.03 5.02995 13.9 5.10995 13.76 5.16995C13.61 5.22995 13.46 5.25995 13.3 5.25995H8.67001C8.38001 5.25995 8.09999 5.27995 7.82999 5.33995C7.54999 5.38995 7.27999 5.46995 7.01999 5.57995C6.75999 5.67995 6.50999 5.80995 6.26999 5.96995C6.03999 6.11995 5.82 6.29995 5.62 6.48995C5.42 6.68995 5.23999 6.89995 5.07999 7.12995C4.92999 7.35995 4.78999 7.59995 4.67999 7.85995C4.57999 8.10995 4.49 8.37995 4.44 8.64995C4.38 8.91995 4.35999 9.18995 4.35999 9.46995V16.53C4.35999 16.81 4.38 17.08 4.44 17.36C4.5 17.63 4.58 17.9 4.69 18.16C4.8 18.42 4.93 18.67 5.09 18.9C5.25 19.13 5.43001 19.3499 5.64001 19.5499C5.84001 19.75 6.05999 19.92 6.29999 20.08C6.53999 20.24 6.79 20.37 7.06 20.47C7.32 20.58 7.6 20.66 7.88 20.72C8.16001 20.77 8.44001 20.7999 8.73001 20.7999C8.91001 20.7999 9.08 20.83 9.25 20.9C9.41 20.97 9.55999 21.0599 9.67999 21.18C9.80999 21.3099 9.91001 21.45 9.98001 21.61C10.05 21.77 10.08 21.94 10.09 22.11L10.1 23.74L13.08 21.61C13.84 21.07 14.69 20.7999 15.63 20.7999H19.32C19.61 20.7999 19.89 20.77 20.16 20.72C20.44 20.67 20.71 20.59 20.97 20.4799C21.23 20.3699 21.48 20.24 21.72 20.09C21.95 19.94 22.17 19.76 22.37 19.57C22.57 19.3699 22.75 19.16 22.91 18.93C23.07 18.7 23.2 18.46 23.31 18.2C23.41 17.95 23.5 17.68 23.55 17.41C23.61 17.14 23.63 16.87 23.63 16.59V12.94C23.63 12.79 23.66 12.64 23.72 12.5C23.78 12.36 23.87 12.23 23.98 12.13C24.09 12.02 24.22 11.93 24.36 11.88C24.51 11.82 24.66 11.79 24.82 11.79C24.97 11.79 25.12 11.82 25.27 11.88C25.41 11.93 25.54 12.02 25.65 12.13C25.76 12.23 25.85 12.36 25.91 12.5C25.97 12.64 26 12.79 26 12.94V16.59C26 17.02 25.95 17.44 25.87 17.86C25.78 18.28 25.66 18.69 25.49 19.08C25.32 19.48 25.11 19.8499 24.87 20.2099C24.63 20.57 24.35 20.9 24.04 21.2C23.73 21.5 23.39 21.7699 23.03 22.0099C22.67 22.2499 22.28 22.45 21.88 22.61C21.47 22.77 21.06 22.9 20.63 22.9799C20.2 23.07 19.76 23.11 19.32 23.11H16.4C15.47 23.11 14.62 23.3799 13.86 23.9199L9.91 26.74C9.67 26.91 9.39999 27 9.10999 27Z" fill="currentColor"></path><path d="M24.6805 5.14453H18.1874C17.5505 5.14453 17.0342 5.66086 17.0342 6.29778C17.0342 6.9347 17.5505 7.45102 18.1874 7.45102H24.6805C25.3175 7.45102 25.8338 6.9347 25.8338 6.29778C25.8338 5.66086 25.3175 5.14453 24.6805 5.14453Z" fill="currentColor"></path><path d="M22.6137 3.1804C22.6137 2.52848 22.0852 2 21.4333 2C20.7814 2 20.2529 2.52848 20.2529 3.1804V9.4168C20.2529 10.0687 20.7814 10.5972 21.4333 10.5972C22.0852 10.5972 22.6137 10.0687 22.6137 9.4168V3.1804Z" fill="currentColor"></path></svg>
+
+
+</button>
+
+
+
+
+<button onclick="clearHistory()">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-justify-right" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+</svg>
+
+
+</button>
+
+
+
+
+
+
+
+
+<button onclick="clearHistory()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe2" viewBox="0 0 16 16">
+  <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855q-.215.403-.395.872c.705.157 1.472.257 2.282.287zM4.249 3.539q.214-.577.481-1.078a7 7 0 0 1 .597-.933A7 7 0 0 0 3.051 3.05q.544.277 1.198.49zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9 9 0 0 1-1.565-.667A6.96 6.96 0 0 0 1.018 7.5zm1.4-2.741a12.3 12.3 0 0 0-.4 2.741H7.5V5.091c-.91-.03-1.783-.145-2.591-.332M8.5 5.09V7.5h2.99a12.3 12.3 0 0 0-.399-2.741c-.808.187-1.681.301-2.591.332zM4.51 8.5c.035.987.176 1.914.399 2.741A13.6 13.6 0 0 1 7.5 10.91V8.5zm3.99 0v2.409c.91.03 1.783.145 2.591.332.223-.827.364-1.754.4-2.741zm-3.282 3.696q.18.469.395.872c.552 1.035 1.218 1.65 1.887 1.855V11.91c-.81.03-1.577.13-2.282.287zm.11 2.276a7 7 0 0 1-.598-.933 9 9 0 0 1-.481-1.079 8.4 8.4 0 0 0-1.198.49 7 7 0 0 0 2.276 1.522zm-1.383-2.964A13.4 13.4 0 0 1 3.508 8.5h-2.49a6.96 6.96 0 0 0 1.362 3.675c.47-.258.995-.482 1.565-.667m6.728 2.964a7 7 0 0 0 2.275-1.521 8.4 8.4 0 0 0-1.197-.49 9 9 0 0 1-.481 1.078 7 7 0 0 1-.597.933M8.5 11.909v3.014c.67-.204 1.335-.82 1.887-1.855q.216-.403.395-.872A12.6 12.6 0 0 0 8.5 11.91zm3.555-.401c.57.185 1.095.409 1.565.667A6.96 6.96 0 0 0 14.982 8.5h-2.49a13.4 13.4 0 0 1-.437 3.008M14.982 7.5a6.96 6.96 0 0 0-1.362-3.675c-.47.258-.995.482-1.565.667.248.92.4 1.938.437 3.008zM11.27 2.461q.266.502.482 1.078a8.4 8.4 0 0 0 1.196-.49 7 7 0 0 0-2.275-1.52c.218.283.418.597.597.932m-.488 1.343a8 8 0 0 0-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077V4.09c.81-.03 1.577-.13 2.282-.287z"/>
+</svg></button>
+
+
+
+
+
+
+
+
+
+<button onclick="exportChat()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filetype-json" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M14 4.5V11h-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM4.151 15.29a1.2 1.2 0 0 1-.111-.449h.764a.58.58 0 0 0 .255.384q.105.073.25.114.142.041.319.041.245 0 .413-.07a.56.56 0 0 0 .255-.193.5.5 0 0 0 .084-.29.39.39 0 0 0-.152-.326q-.152-.12-.463-.193l-.618-.143a1.7 1.7 0 0 1-.539-.214 1 1 0 0 1-.352-.367 1.1 1.1 0 0 1-.123-.524q0-.366.19-.639.192-.272.528-.422.337-.15.777-.149.456 0 .779.152.326.153.5.41.18.255.2.566h-.75a.56.56 0 0 0-.12-.258.6.6 0 0 0-.246-.181.9.9 0 0 0-.37-.068q-.324 0-.512.152a.47.47 0 0 0-.185.384q0 .18.144.3a1 1 0 0 0 .404.175l.621.143q.326.075.566.211a1 1 0 0 1 .375.358q.135.222.135.56 0 .37-.188.656a1.2 1.2 0 0 1-.539.439q-.351.158-.858.158-.381 0-.665-.09a1.4 1.4 0 0 1-.478-.252 1.1 1.1 0 0 1-.29-.375m-3.104-.033a1.3 1.3 0 0 1-.082-.466h.764a.6.6 0 0 0 .074.27.5.5 0 0 0 .454.246q.285 0 .422-.164.137-.165.137-.466v-2.745h.791v2.725q0 .66-.357 1.005-.355.345-.985.345a1.6 1.6 0 0 1-.568-.094 1.15 1.15 0 0 1-.407-.266 1.1 1.1 0 0 1-.243-.39m9.091-1.585v.522q0 .384-.117.641a.86.86 0 0 1-.322.387.9.9 0 0 1-.47.126.9.9 0 0 1-.47-.126.87.87 0 0 1-.32-.387 1.55 1.55 0 0 1-.117-.641v-.522q0-.386.117-.641a.87.87 0 0 1 .32-.387.87.87 0 0 1 .47-.129q.265 0 .47.129a.86.86 0 0 1 .322.387q.117.255.117.641m.803.519v-.513q0-.565-.205-.973a1.46 1.46 0 0 0-.59-.63q-.38-.22-.916-.22-.534 0-.92.22a1.44 1.44 0 0 0-.589.628q-.205.407-.205.975v.513q0 .562.205.973.205.407.589.626.386.217.92.217.536 0 .917-.217.384-.22.589-.626.204-.41.205-.973m1.29-.935v2.675h-.746v-3.999h.662l1.752 2.66h.032v-2.66h.75v4h-.656l-1.761-2.676z"/>
+</svg></button>
+
+
+    <button onclick="clearHistory()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-text-wrap" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0 4a.5.5 0 0 1 .5-.5h9a2.5 2.5 0 0 1 0 5h-1.293l.647.646a.5.5 0 0 1-.708.708l-1.5-1.5a.5.5 0 0 1 0-.708l1.5-1.5a.5.5 0 0 1 .708.708l-.647.646H11.5a1.5 1.5 0 0 0 0-3h-9a.5.5 0 0 1-.5-.5m0 4a.5.5 0 0 1 .5-.5H7a.5.5 0 0 1 0 1H2.5a.5.5 0 0 1-.5-.5"/>
+</svg></button>
+
+
+<button onclick="clearHistory()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+  <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
+</svg></button>
+
+
+
+
+
+<button><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
+</svg></button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand();
+    window.Telegram.WebApp.ready();
+
+    var inputContainer = document.getElementById('input-container');
+    var input = document.getElementById('input');
+
+    input.addEventListener('focus', function() {
+        inputContainer.classList.add('focused');
+        inputContainer.classList.remove('blurred');
+    });
+
+    input.addEventListener('blur', function() {
+        inputContainer.classList.remove('focused');
+        inputContainer.classList.add('blurred');
+    });
+});
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand();
+    
+    var inputContainer = document.getElementById('input-container');
+    var input = document.getElementById('input');
+    
+    input.addEventListener('focus', function() {
+        inputContainer.style.transform = 'translateY(-' + window.innerHeight + 'px)';
+    });
+    
+    input.addEventListener('blur', function() {
+        inputContainer.style.transform = 'translateY(0)';
+    });
+});
+
+
+</script>
+
+<script>
+if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+}
+</script>
+
+<script type="module">
+        import { WebApp } from 'https://unpkg.com/@twa-dev/sdk@0.0.6/dist/web.js';
+
+        class TelegramChat {
+            constructor() {
+                this.chatContainer = document.querySelector('.chat-container');
+                this.messagesContainer = document.querySelector('.messages');
+                this.input = document.querySelector('input');
+                this.sendButton = document.querySelector('button');
+                
+                this.initialize();
+            }
+
+            initialize() {
+                WebApp.ready();
+                WebApp.expand();
+
+                this.setupEventListeners();
+                this.adjustHeight();
+                this.addTestMessages();
+            }
+
+            setupEventListeners() {
+                this.sendButton.addEventListener('click', () => this.handleSend());
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handleSend();
+                });
+
+                window.addEventListener('resize', () => this.adjustHeight());
+                WebApp.onEvent('viewportChanged', (params) => {
+                    document.documentElement.style.setProperty(
+                        '--keyboard-height', 
+                        `${params.height}px`
+                    );
+                    this.adjustHeight();
+                });
+            }
+
+            adjustHeight() {
+                const viewportHeight = WebApp.viewportHeight || window.innerHeight;
+                document.documentElement.style.setProperty(
+                    '--viewport-height', 
+                    `${viewportHeight}px`
+                );
+                
+                requestAnimationFrame(() => {
+                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+                });
+            }
+
+            async handleSend() {
+                const text = this.input.value.trim();
+                if (!text) return;
+
+                this.addMessage(text, 'user');
+                this.input.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    this.addMessage('This is a sample response', 'bot');
+                }, 1000);
+            }
+
+            addMessage(text, type) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${type}-message`;
+                messageEl.textContent = text;
+                this.messagesContainer.appendChild(messageEl);
+                this.adjustHeight();
+            }
+
+            addTestMessages() {
+                this.addMessage('Hello! How can I help you?', 'bot');
+                this.addMessage('Hi! This is a test message.', 'user');
+            }
+        }
+
+        // Initialize chat when WebApp is ready
+        WebApp.onEvent('ready', () => {
+            const chat = new TelegramChat();
+            window.chat = chat; // Expose for debugging
+        });
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.Telegram.WebApp.expand(); // Расширяет окно приложения
+    window.Telegram.WebApp.enableClosingConfirmation(); // Подтверждение перед закрытием
+
+    // Если клавиатура открывается, можно добавить обработчик события для её открытия
+    // Это зависит от того, как вы управляете показом клавиатуры, например, через фокусировку на input
+    var inputElement = document.getElementById('input-area');
+    inputElement.addEventListener('focus', function() {
+        // Здесь можно добавить дополнительную логику, если нужно
+        // Например, скролл до нужной позиции или изменение стилей
+    });
+});
+
+
+</script>
+
+
+
+
+
+
+<script>
+Telegram.WebApp.onEvent('viewportChanged', () => {
+  const viewport = Telegram.WebApp.viewportParams;
+  document.documentElement.style.setProperty('--keyboard-height', `${viewport.height}px`);
+  document.body.style.height = `${viewport.height}px`;
+});
+
+</script>
+
+
+
+
+
+
+
+   <script>
+
+document.addEventListener('click', function(e) {
+  const menu = document.querySelector('.menu');
+  const button = document.querySelector('.menu-button');
+  if (menu && menu.style.display === 'block' && !menu.contains(e.target) && !button.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+   </script>
+
+
+
+
+
+
+
+
+
+
+
+ <script>
+    const API_KEY = 'Z6GzPXyjyeG26SimUqFRKGAnIpVPOgMu';
+    const API_URL = 'https://api.mistral.ai/v1/chat/completions';
+    let isProcessing = false;
+
+    let history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+    renderHistory();
+
+    async function sendMessage() {
+        if (isProcessing || !API_KEY) return;
+        
+        const input = document.getElementById('input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        input.value = '';
+        isProcessing = true;
+        
+        addMessage('user', message);
+        
+        try {
+            const loader = addLoader();
+            
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "mistral-tiny",
+                    messages: [...history, { role: "user", content: message }],
+                    temperature: 0.7
+                })
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
+            const data = await response.json();
+            const reply = data.choices[0].message.content;
+            
+            addMessage('assistant', reply);
+            
+            history = [
+                ...history, 
+                { role: "user", content: message },
+                { role: "assistant", content: reply }
+            ];
+            saveHistory();
+
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            isProcessing = false;
+            removeLoader();
+        }
+    }
+
+    function addMessage(role, content) {
+        const messages = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = `message ${role}`;
+        div.textContent = content;
+        
+        // Добавляем сообщение в начало
+        messages.insertBefore(div, messages.firstChild);
+        
+        // Гарантированная прокрутка к новому сообщению
+        requestAnimationFrame(() => {
+            div.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        });
+    }
+
+    function renderHistory() {
+        // Восстанавливаем в обратном порядке
+        const reversedHistory = [...history].reverse();
+        reversedHistory.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = `message ${msg.role}`;
+            div.textContent = msg.content;
+            messages.appendChild(div);
+        });
+
+        // Прокрутка вниз при загрузке истории
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+        
+    // Остальные функции без изменений
+    function saveHistory() {
+        localStorage.setItem('chatHistory', JSON.stringify(history));
+    }
+
+    function addLoader() {
+        const loader = document.createElement('div');
+        loader.className = 'message assistant loading';
+        loader.innerHTML = `
+            <div class="dot"></div>
+            <div class="dot" style="animation-delay: 0.2s"></div>
+            <div class="dot" style="animation-delay: 0.4s"></div>
+        `;
+        messages.insertBefore(loader, messages.firstChild);
+        return loader;
+    }
+
+    function removeLoader() {
+        document.querySelector('.loading')?.remove();
+    }
+
+    function showError(message) {
+        const error = document.createElement('div');
+        error.className = 'message assistant';
+        error.style.color = 'var(--error)';
+        error.textContent = `Error: ${message}`;
+        messages.insertBefore(error, messages.firstChild);
+        error.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('input').addEventListener('keypress', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+</script>
+
+
+
+
+
+
+
+<script>
+
+document.getElementById('menuButton').addEventListener('click', function() {
+    const menu = document.getElementById('menu');
+    if (menu.style.display === 'none') {
+        menu.style.display = 'block';
+    } else {
+        menu.style.display = 'none';
+    }
+});
+
+function exportChat() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(history));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("download", "emiia_ai_chat_history.json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function clearHistory() {
+    if (confirm('Вы уверены, что хотите очистить историю чата с EMIIA.AI?')) {
+        history = [];
+        localStorage.removeItem('chatHistory');
+        document.getElementById('messages').innerHTML = '';
+    }
+}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+
+
+  // Преобразуем Markdown в HTML
+  document.getElementById('markdown-content').innerHTML = marked.parse(markdown);
+
+  // Подсветка кода
+  document.querySelectorAll('pre code').forEach(block => {
+    hljs.highlightElement(block);
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+<script>
+
+Telegram.WebApp.MainButton.onClick(function() {
+    document.activeElement.blur();
+});
+
+</script>
+
+<script>
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    input.addEventListener('blur', function() {
+        Telegram.WebApp.MainButton.hide(); // Скрываем кнопку, если есть
+        document.activeElement.blur();
+        window.focus();
+    });
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            input.blur();
+            Telegram.WebApp.MainButton.hide();
+        }
+    });
+});
+
+</script>
+
+
+
+<script>
+
+Telegram.WebApp.ready(function() {
+    const input = document.getElementById('search-input');
+    
+    function hideKeyboard() {
+        input.blur();
+        document.activeElement.blur();
+        Telegram.WebApp.expand(); // Сворачивает клавиатуру
+        setTimeout(() => window.focus(), 50);
+    }
+
+    input.addEventListener('blur', hideKeyboard);
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            hideKeyboard();
+        }
+    });
+});
+
+
+</script>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
