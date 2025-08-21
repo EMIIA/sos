@@ -1,0 +1,1829 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>WEB </title>
+
+
+
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js"></script>
+<script src="/style/mapbox-gl.js" type="text/javascript"></script>
+
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+<style src="/style/mapbox-gl.css" type="text/javascript"></style>
+
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+	<style>
+@import url('https://www.emiia.ru/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+  <style>  
+@import url('/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+<link rel="stylesheet" href="https://www.emiia.ru/cssfamily=Montserrat.css">
+<link rel="stylesheet" href="/cssfamily=Montserrat.css">
+
+
+
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; background: #f8f9fa; }
+</style>
+</head>
+<body>
+
+<style type="text/css">
+    #info {
+        display: table;
+        position: relative;
+        margin: 0px auto;
+        word-wrap: anywhere;
+        white-space: pre-wrap;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #818cf8;
+        background: transparent;
+
+
+
+    }
+
+
+@media (max-width: 768px) {
+ #info {
+    top: 100px; /* Новое значение для мобильных */
+    right: 0%;
+background: #f8f9fa;
+
+  }
+  }
+
+</style>
+
+
+
+
+<style>
+
+
+.header {
+    padding: 0rem;
+    position: fixed;
+    bottom: 70px;
+    z-index: 20000;
+    right: 5%;
+
+
+}
+
+
+@media (max-width: 768px) {
+ .header {
+    bottom: 25px; /* Новое значение для мобильных */
+    right: 1%;
+
+  }
+}
+</style>
+
+
+
+<style type="text/css">
+    
+    
+    
+    a.mapboxgl-ctrl-logo{
+    width: 0;
+    height: 0;
+    margin: 0 0 -4px-4px;
+    display: block;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    overflow: hidden;
+    background-image: url(data:image/svg+xml;charset=utf-8,%3Csvg width='88' height='23' viewBox='0 0 88 23' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill-rule='evenodd'%3E %3Cdefs%3E %3Cpath id='logo' d='M11.5 2.25c5.105 0 9.25 4.145 9.25 9.25s-4.145 9.25-9.25 9.25-9.25-4.145-9.25-9.25 4.145-9.25 9.25-9.25zM6.997 15.983c-.051-.338-.828-5.802 2.233-8.873a4.395 4.395 0 013.13-1.28c1.27 0 2.49.51 3.39 1.42.91.9 1.42 2.12 1.42 3.39 0 1.18-.449 2.301-1.28 3.13C12.72 16.93 7 16 7 16l-.003-.017zM15.3 10.5l-2 .8-.8 2-.8-2-2-.8 2-.8.8-2 .8 2 2 .8z'/%3E %3Cpath id='text' d='M50.63 8c.13 0 .23.1.23.23V9c.7-.76 1.7-1.18 2.73-1.18 2.17 0 3.95 1.85 3.95 4.17s-1.77 4.19-3.94 4.19c-1.04 0-2.03-.43-2.74-1.18v3.77c0 .13-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V8.23c0-.12.1-.23.23-.23h1.4zm-3.86.01c.01 0 .01 0 .01-.01.13 0 .22.1.22.22v7.55c0 .12-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V15c-.7.76-1.69 1.19-2.73 1.19-2.17 0-3.94-1.87-3.94-4.19 0-2.32 1.77-4.19 3.94-4.19 1.03 0 2.02.43 2.73 1.18v-.75c0-.12.1-.23.23-.23h1.4zm26.375-.19a4.24 4.24 0 00-4.16 3.29c-.13.59-.13 1.19 0 1.77a4.233 4.233 0 004.17 3.3c2.35 0 4.26-1.87 4.26-4.19 0-2.32-1.9-4.17-4.27-4.17zM60.63 5c.13 0 .23.1.23.23v3.76c.7-.76 1.7-1.18 2.73-1.18 1.88 0 3.45 1.4 3.84 3.28.13.59.13 1.2 0 1.8-.39 1.88-1.96 3.29-3.84 3.29-1.03 0-2.02-.43-2.73-1.18v.77c0 .12-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V5.23c0-.12.1-.23.23-.23h1.4zm-34 11h-1.4c-.13 0-.23-.11-.23-.23V8.22c.01-.13.1-.22.23-.22h1.4c.13 0 .22.11.23.22v.68c.5-.68 1.3-1.09 2.16-1.1h.03c1.09 0 2.09.6 2.6 1.55.45-.95 1.4-1.55 2.44-1.56 1.62 0 2.93 1.25 2.9 2.78l.03 5.2c0 .13-.1.23-.23.23h-1.41c-.13 0-.23-.11-.23-.23v-4.59c0-.98-.74-1.71-1.62-1.71-.8 0-1.46.7-1.59 1.62l.01 4.68c0 .13-.11.23-.23.23h-1.41c-.13 0-.23-.11-.23-.23v-4.59c0-.98-.74-1.71-1.62-1.71-.85 0-1.54.79-1.6 1.8v4.5c0 .13-.1.23-.23.23zm53.615 0h-1.61c-.04 0-.08-.01-.12-.03-.09-.06-.13-.19-.06-.28l2.43-3.71-2.39-3.65a.213.213 0 01-.03-.12c0-.12.09-.21.21-.21h1.61c.13 0 .24.06.3.17l1.41 2.37 1.4-2.37a.34.34 0 01.3-.17h1.6c.04 0 .08.01.12.03.09.06.13.19.06.28l-2.37 3.65 2.43 3.7c0 .05.01.09.01.13 0 .12-.09.21-.21.21h-1.61c-.13 0-.24-.06-.3-.17l-1.44-2.42-1.44 2.42a.34.34 0 01-.3.17zm-7.12-1.49c-1.33 0-2.42-1.12-2.42-2.51 0-1.39 1.08-2.52 2.42-2.52 1.33 0 2.42 1.12 2.42 2.51 0 1.39-1.08 2.51-2.42 2.52zm-19.865 0c-1.32 0-2.39-1.11-2.42-2.48v-.07c.02-1.38 1.09-2.49 2.4-2.49 1.32 0 2.41 1.12 2.41 2.51 0 1.39-1.07 2.52-2.39 2.53zm-8.11-2.48c-.01 1.37-1.09 2.47-2.41 2.47s-2.42-1.12-2.42-2.51c0-1.39 1.08-2.52 2.4-2.52 1.33 0 2.39 1.11 2.41 2.48l.02.08zm18.12 2.47c-1.32 0-2.39-1.11-2.41-2.48v-.06c.02-1.38 1.09-2.48 2.41-2.48s2.42 1.12 2.42 2.51c0 1.39-1.09 2.51-2.42 2.51z'/%3E %3C/defs%3E %3Cmask id='clip'%3E %3Crect x='0' y='0' width='100%25' height='100%25' fill='white'/%3E %3Cuse xlink:href='%23logo'/%3E %3Cuse xlink:href='%23text'/%3E %3C/mask%3E %3Cg id='outline' opacity='0.3' stroke='%23000' stroke-width='3'%3E %3Ccircle mask='url(%23clip)' cx='11.5' cy='11.5' r='9.25'/%3E %3Cuse xlink:href='%23text' mask='url(%23clip)'/%3E %3C/g%3E %3Cg id='fill' opacity='0.9' fill='%23fff'%3E %3Cuse xlink:href='%23logo'/%3E %3Cuse xlink:href='%23text'/%3E %3C/g%3E %3C/svg%3E);
+}
+
+
+
+    
+    
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+!function e(t,o,r){function i(s,a){if(!o[s]){if(!t[s])
+
+
+{var l="function"==typeof require&&require;if(!a&&l)return l(s,!0);if(n)return n(s,!0);var p=new Error("Cannot find module '"+s+"'");
+
+
+
+throw p.code="MODULE_NOT_FOUND",p}var c=o[s]={exports:{}};t[s][0].call(c.exports,function(e){var o=t[s][1][e];return i(o||e)},c,c.exports,e,t,o,r)}return o[s].exports}for(var n="function"==typeof require&&require,s=0;s<r.length;s++)i(r[s]);return i}({1:[function(e,t,o){function r(e,t){if(!(this instanceof r))
+
+
+throw new Error("MapboxMarkers needs to be called with the new keyword");this.URLSearchParams=new URLSearchParams(new URL(window.location).search),this._sourceName="markerspec",this._geojson=e,this._rendered=!1,this.options=Object.assign(
+
+
+
+
+{disabled:this.URLSearchParams.get("disabled")||!0,showControl:this.URLSearchParams.get("show-control")||!0,marker:{image:""},
+
+
+
+popup:{description:"<i></i>"},style:{label:"{name}",labelSize:10,color:this.URLSearchParams.get("style-color")||"transporent",size:2,opacity:1,icon:"marker",layers:null}},t),this.toggle=this.toggle.bind(this),this.render=this.render.bind(this),this._toggleLayers=this._toggleLayers.bind(this),this._updateMap=this._updateMap.bind(this),this._toggle=new i({show:this.options.showControl,onToggle:this.toggle.bind(this)})}function i(e){var t,o;e=Object.assign({show:!0,onToggle:function(){}},e),this._btn=((t=document.createElement("button")).className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers",t.type="button",t["aria-label"]="Inspect",t),this._btn.onclick=e.onToggle,this._input=((o=document.createElement("input")).id="marker-search",o.type="text",o.placeholder="Marker Search",o.style.display="none",o),this.elem=function(e,t,o){var r=document.createElement("div");return r.className="mapboxgl-ctrl mapboxgl-ctrl-group markerspec",r.appendChild(e),o||(r.style.display="none"),r}(this._btn,this._input,e.show)}r.prototype.onAdd=function(e){return this._map=e,e.on("load",this.render),e.on("moveend",this._updateMap),this._toggle.elem},r.prototype.onRemove=function(){this._map.off("load",this.render);var e=this._toggle.elem;e.parentNode.removeChild(e),this._map=void 0},r.prototype.toggle=function(){this.options.enabled=!this.options.enabled,this.render()},r.prototype.render=function(){if(!this._rendered){var e=this;if(this.URLSearchParams.get("data")){var t=new XMLHttpRequest;t.onreadystatechange=function(){t.readyState==XMLHttpRequest.DONE&&(e._geojson=JSON.parse(t.responseText),o())},t.open("GET",this.URLSearchParams.get("data"),!0),t.send(null)}else o();function o(){e._geojson.features.forEach(function(t){if("Point"==t.geometry.type){var o=document.createElement("div");
+
+
+o.className="markerspec marker",o.style=`background-image:url('${t.properties["marker-image"]||e.options.marker.image}')`,o.onclick=function(e){map.flyTo({center:t.geometry.coordinates})};var r=(void 0!==t.properties.title?`<h3>${t.properties.title}</h3>`:"")+(void 0!==t.properties.image?`<img src='${t.properties.image}' width=200 alt='${t.properties.title}'>`:"")+(void 0!==t.properties.description?`<p>${t.properties.description}</p>`:`<p>${e.options.popup.description}</p>`)+(void 0!==t.properties.website?`<a href='${t.properties.website}' target='_blank' class='button'>Website</a>`:`<a href='https://www.openstreetmap.org/?mlat=${t.geometry.coordinates[1]}&mlon=${t.geometry.coordinates[0]}' target='_blank' class='button'></a>`);
+
+
+new mapboxgl.Marker(o).setLngLat(t.geometry.coordinates).setPopup(new mapboxgl.Popup({offset:25}).setHTML(r)).addTo(map)}}),e._map.addSource("markerspec",{type:"geojson",data:e._geojson});var t,o,r=e._map.getStyle().layers.filter(function(e){return"building"===e["source-layer"]}),i=r[r.length-1].id;e.options.style.layers||(e.options.style.layers=(t=e._sourceName,o=e.options.style,[{id:`${t} fill`,type:"fill",source:`${t}`,paint:{"fill-color":o.color,"fill-opacity":o.opacity},filter:["==","$type","Polygon"]},{id:`${t} line`,type:"line",source:`${t}`,paint:{"line-color":o.color,"line-width":o.size,"line-opacity":o.opacity}},{id:`${t} circle`,type:"circle",source:`${t}`,paint:{"circle-color":o.color,"circle-radius":o.size,"circle-opacity":o.opacity}},{id:`${t} symbol`,type:"symbol",source:`${t}`,
+
+
+
+
+
+layout:{"text-field":o.label,"text-size":o.labelSize,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-anchor":"top","icon-image":"{icon}-25","road-label-navigation":!0}}]));var n=function(e,t,o){for(var r=0;r<e.layers.length;r++)
+
+
+
+
+
+
+{var i=e.layers[r];if(o===i.id){var n=e.layers.slice(0,r).concat(t).concat(e.layers.slice(r));return Object.assign({},e,{layers:n})}}return e}(e._map.getStyle(),e.options.style.layers,i);e._map.setStyle(n),e._toggle._input.onkeypress=(t=>{if("Enter"===t.key)return e.options.query=e._toggle._input.value,e._updateMap(),!0})}this._rendered=!0}this.options.enabled?(this._toggleLayers(),this._toggle.setMapIcon()):(this._toggleLayers(),this._toggle.setPluginIcon())},r.prototype._updateMap=function(){this.options.enabled&&this.options._geojson&&console.log("Nothing to update")},i.prototype.setPluginIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-markers"},i.prototype.setMapIcon=function(){this._btn.className="mapboxgl-ctrl-icon mapboxgl-ctrl-map"},r.prototype._toggleLayers=function(){var e=this.options.enabled;Array.from(document.getElementsByClassName("markerspec marker")).forEach(function(t){t.style.display=e?"inline":"none"});var t=new RegExp(this._sourceName),o=this._map.getStyle();o.layers.forEach(function(o){t.test(o.source)&&(o.layout=o.layout||{},o.layout.visibility=e?"visible":"none")}),this._map.setStyle(o),this._toggle._input.style.display=e?"inline":"none"},void 0!==t&&void 0!==t.exports?window.MapboxMarkers=r:t.exports=r},{}]},{},[1]); 
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+<style type="text/css">
+    #info {
+        display: table;
+        position: relative;
+        margin: 0px auto;
+        word-wrap: anywhere;
+        white-space: pre-wrap;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #818cf8;
+        background: transparent;
+
+
+
+    }
+
+
+@media (max-width: 768px) {
+ #info {
+    top: 100px; /* Новое значение для мобильных */
+    right: 0%;
+
+  }
+
+
+
+
+
+
+
+
+
+
+  }
+
+</style>
+
+
+
+
+
+
+<style>
+.calculation-box {
+height: 30px;
+width: 300px;
+position: absolute;
+bottom: 43px;
+left: 18px;
+background-color: transparent;
+padding: 9.5px;
+
+font-family: 'Montserrat', montserrat !important; 
+}
+ 
+p {
+font-family: 'Montserrat';
+margin: 0px;
+font-size: 10px;
+color: #3d85c6;
+}
+
+.calculation-box p:not(:last-child) {
+    margin-bottom: 10px; /* Применяется ко всем <p>, кроме последнего */
+}
+
+.highlight {
+    font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
+font-weight: 500; /* Жирность (700 = bold, 800 или 900 — ещё жирнее) */
+}
+
+.highlight1 {
+    position: relative;
+    top: 3px; /* Опускает стрелку на 3px вниз, измените значение по необходимости */
+font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
+}
+
+</style>
+
+
+
+
+
+
+
+
+<div id="map"></div>
+
+
+
+<div class="calculation-box">
+
+
+<p><strong>EMIIA.AI SIP:</strong> [SOS] ID: [R #3D4588] <span class="highlight1"> &nbsp;&nbsp; ❯ </span></p>
+
+<p> ID: [V #3D85C6] [37.17402, 55.97708]<span class="highlight"> [ 1 ]</span>  </p>
+
+
+<div id="calculated-area">
+
+
+
+
+
+
+<script>
+
+
+
+    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+
+    const map = new mapboxgl.Map({
+        container: 'map', // container id
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: 'https://api.maptiler.com/maps/956d0031-f050-44b9-8827-38067fe438b8/style.json?key=QN6ALYSRnAohNK6Y8BiB',
+              zoom: 17,
+
+      
+        minZoom: 15,
+        maxZoom: 22,
+
+minPitch: 0,
+
+maxPitch: 73,
+        center: [37.630907830210646, 55.8339924045205],
+ 
+         
+        hash: true,
+        turn: false,
+         
+        attributionControl: false,
+        
+
+
+        bearing: 18, // bearing in degrees
+
+
+
+        
+	antialias: true // create the gl context with MSAA antialiasing, so custom layers are antialiased
+         
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+  map.on('load', () => {
+        map.setPaintProperty('building', 'fill-color', [
+            'interpolate',
+            // Set the exponential rate of change to 0.5
+            ['exponential', 1],
+            ['zoom'],
+            // When zoom is 15, buildings will be beige.
+            15,
+            'red',
+            // When zoom is 18 or higher, buildings will be yellow.
+            18,
+            'red'
+        ]);
+
+        map.setPaintProperty('building', 'fill-opacity', [
+            'interpolate',
+            // Set the exponential rate of change to 0.5
+            ['exponential', 1],
+            ['zoom'],
+            // When zoom is 10, buildings will be 100% transparent.
+            10,
+            0.5,
+            // When zoom is 18 or higher, buildings will be 100% opaque.
+            18,
+            1
+        ]);
+    });
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+map.on('style.load', () => {
+        // set the light preset to be in dusk mode.
+        map.setConfigProperty('basemap', 'lightPreset', 'dusk');
+
+        // add a geojson source with a polygon to be used in the clip layer.
+        map.addSource('eraser', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': {
+                            'coordinates': [
+                                [
+                                    [
+            37.63138653415112,
+            55.83397767687967
+          ],
+          [
+            37.631323474598645,
+            55.83401161180973
+          ],
+          [
+            37.63138506034616,
+            55.834039583692146
+          ],
+          [
+            37.63144337877924,
+            55.83400424627024
+          ],
+          [
+            37.63138653415112,
+            55.83397767687967
+          ]
+                                ]
+                            ],
+                            'type': 'Polygon'
+                        }
+                    }
+                ]
+            }
+        });
+
+
+
+
+
+
+
+  
+
+
+
+const size = 180;
+
+const pulsingDot = {
+    width: size,
+    height: size,
+    data: new Uint8Array(size * size * 4),
+
+    onAdd: function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.context = canvas.getContext('2d', { willReadFrequently: true });
+    },
+
+    render: function () {
+        const duration = 1800; // Длительность вращения сектора
+        const pulseDuration = 700; // Длительность пульсации линии
+        const t = (performance.now() % duration) / duration;
+        const pulseT = (performance.now() % pulseDuration) / pulseDuration;
+        const context = this.context;
+
+        // Очищаем канвас
+        context.clearRect(0, 0, this.width, this.height);
+
+        // Рисуем вращающийся сектор
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        const maxRadius = size / 2 * 1;
+        const sweepAngle = Math.PI * 2 * 1.7 * t;
+        const opacity = 0.8 * Math.pow(1 - t, 2);
+
+        context.beginPath();
+        context.moveTo(centerX, centerY);
+        context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
+        context.closePath();
+        context.fillStyle = `rgba(224, 102, 102, ${opacity})`; // Исправлен синтаксис
+        context.fill();
+
+        // Рисуем центральную точку
+        const radius = (size / 2) * 0.35;
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        context.fillStyle = 'rgba(61, 133, 198, 1)';
+        context.strokeStyle = 'white';
+        context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
+        context.fill();
+        context.stroke();
+
+        // Обновляем данные изображения
+        this.data = context.getImageData(0, 0, this.width, this.height).data;
+
+        // Перерисовка карты
+        map.triggerRepaint();
+
+        return true;
+    }
+};
+
+map.on('load', () => {
+    // Устанавливаем 3D-наклон карты для эффекта поднятия
+    map.setPitch(45); // Наклон карты на 45 градусов
+    map.setBearing(0); // Опционально: угол поворота карты
+
+    map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 4 });
+
+    map.addSource('dot-point', {
+        'type': 'geojson',
+        'data': {
+            'type': 'FeatureCollection',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [37.6309459,55.83392391] // [lng, lat]
+                    }
+                }
+            ]
+        }
+    });
+
+    map.addLayer({
+        'id': 'layer-with-pulsing-dot',
+        'type': 'symbol',
+        'source': 'dot-point',
+        'minzoom': 18.5,
+        'layout': {
+            'icon-image': 'pulsing-dot',
+            'icon-offset': [0, 0], // Поднимаем точку вверх на 20 пикселей
+            'icon-allow-overlap': true, // Игнорируем перекрытие
+            'icon-ignore-placement': true // Игнорируем размещение других символов
+        }
+    }, '3d-buildings');
+});
+
+
+
+
+
+
+
+
+
+
+
+// Добавляем пятого источника для нового GLB-файла ласточка-тест
+        map.addSource('model5', {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'properties': {
+                    'model-uri':
+                        ''
+                },
+                'geometry': {
+                    'coordinates': [37.631367826980494,
+            55.833906458903954],
+                    'type': 'Point'
+                }
+            }
+        });
+
+
+        // add the clip layer and configure it to also remove symbols and trees.
+        // clip-layer-scope layout property is used to specify that only models from the Mapbox Standard Style should be clipped.
+        // this will prevent the newly added model from getting clipped.
+        map.addLayer({
+            'id': 'eraser',
+            'type': 'clip',
+            'source': 'eraser',
+            'layout': {
+                // specify the layer types to be removed by this clip layer
+                'clip-layer-types': ['symbol', 'model'],
+                'clip-layer-scope': ['basemap']
+            }
+        });
+
+        // add the model layer and specify the appropriate slot to ensure the symbols are rendered correctly.
+        
+
+
+
+    map.addLayer({
+        'id': 'tower5',
+        'type': 'model',
+        'slot': 'middle',
+        'source': 'model5',
+        'minzoom': 15,
+        'maxzoom': 21,
+        'layout': {
+            'model-id': ['get', 'model-uri']
+        },
+        'paint': {
+            'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 21, 0],
+            'model-rotation': [0.0, 0.0, 4.0],
+            'model-scale': [1.5, 1.5, 1.5],
+'model-translation': [0, 0, 4], // ЗДЕСЬ: поднятие на 10 единиц по Z
+            'model-color-mix-intensity': 0,
+            'model-cast-shadows': true,
+
+            'model-emissive-strength': 0.3
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавляем четвертый источник для нового GLB-файла нижний
+map.addSource('model4', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VDNH_verh_GLB.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.63113790199057,
+          55.834227583210094], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower4',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model4',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+
+17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+
+
+
+    
+        ],
+        
+
+
+
+
+        'model-rotation': [0.0, 0.0, -761.5],
+      
+
+
+'model-scale': [999.5, 1090.0, 1000],
+
+        'model-translation': [0, 0, 0.001], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+
+
+        'model-emissive-strength': 0.9
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавляем второй источник для нового GLB-файла верхний
+map.addSource('model2', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VDNH_verh_GLB.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.63113790199057,
+          55.834227583210094], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower2',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model2',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+
+
+
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+        ],
+
+        'model-rotation': [0.0, 0.0, -761.5],
+        'model-scale': [999.5, 1090.0, 100],
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 6.3],
+        'model-emissive-strength': 0.9
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавить источник GeoJSON с указанием модели зеленая модель
+map.addSource('model1', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VDNH_MINUS_GLB.glb'
+        },
+        'geometry': {
+            'coordinates': [37.63113790199057,
+          55.834227583210094],
+            'type': 'Point'
+        }
+    }
+});
+
+
+// Добавить слой модели с плавным появлением
+map.addLayer({
+    'id': 'tower1',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model1',
+    'minzoom': 18.3,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+            18.3, 0,    // Полная прозрачность (0%) на зуме 17
+            18.5, 0.5, // Средняя прозрачность (50%) на зуме 17.75
+            18.6, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 0.8  // 90% прозрачности (90%) на зуме 18.5
+
+
+        ],
+
+
+        'model-rotation': [0.0, 0.0, -761.5],
+        'model-scale': [999.5, 1090.0, 1000],
+        'model-color-mix-intensity': 0,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 0.3],
+        'model-emissive-strength': 0.99
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавить источник GeoJSON с указанием модели главная модель
+map.addSource('model', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VDNH-GLB.glb'
+        },
+        'geometry': {
+            'coordinates': [37.63113790199057,
+          55.834227583210094],
+            'type': 'Point'
+        }
+    }
+});
+
+
+// Добавить слой модели с плавным появлением
+map.addLayer({
+    'id': 'tower',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model',
+    'minzoom': 18.3,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+            18.3, 0,    // Полная прозрачность (0%) на зуме 17
+            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
+            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+20, 0.8,  // 90% прозрачности (90%) на зуме 18.5
+21, 0.9,  // 90% прозрачности (90%) на зуме 18.5
+22, 0.9,  // 90% прозрачности (90%) на зуме 18.5
+24, 0.9  // 90% прозрачности (90%) на зуме 18.5
+
+
+        ],
+
+
+        'model-rotation': [0.0, 0.0, -761.5],
+        'model-scale': [999.5, 1090.0, 1000],
+        'model-color-mix-intensity': 0,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 0.2],
+        'model-emissive-strength': 0.99
+    }
+});
+
+
+
+
+
+
+
+
+}); // Закрывающая скобка
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
+map.on('load', () => {
+    const layers = map.getStyle().layers;
+    let labelLayerId;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+            labelLayerId = layers[i].id;
+            break;
+        }
+    }
+
+    map.addSource('openmaptiles', {
+        url: 'https://api.maptiler.com/tiles/v3/tiles.json?key=QN6ALYSRnAohNK6Y8BiB',
+        type: 'vector',
+    });
+
+    map.addLayer({
+        'id': '3d-buildings',
+        'source': 'openmaptiles',
+        'source-layer': 'building',
+        'type': 'fill-extrusion',
+        'minzoom': 14,
+        'maxzoom': 19,
+        'paint': {
+            'fill-extrusion-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'render_height'],
+                1, 'lightgray',
+                200, 'royalblue',
+                400, 'lightblue'
+            ],
+            'fill-extrusion-height': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0, // Высота 0 при зуме 14
+                15.5, ['get', 'render_height'] // Полная высота при зуме 15.5
+            ],
+            'fill-extrusion-base': [
+                'case',
+                ['>=', ['get', 'zoom'], 16.5],
+                ['get', 'render_min_height'],
+                0
+            ],
+            'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0, // Полностью прозрачно при зуме 14
+                15.5, 0.5, // Максимальная прозрачность (0.5) при зуме 15.5
+                18, 0 // Полностью прозрачно при зуме 18
+            ]
+        }
+    }, labelLayerId);
+});
+
+
+
+
+
+
+map.on('load', () => {
+    map.addSource('polygon-source', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                    [37.174014825136595, 55.97747637225763],
+                    [37.174223117007614, 55.97745607738463],
+                    [37.17408018404612, 55.97699461722809],
+                    [37.173873474273904, 55.977014791684724],
+                    [37.174014825136595, 55.97747637225763]
+                ]]
+            },
+            properties: {
+                height: 6.9 // высота экструзии (над базой)
+            }
+        }
+    });
+
+    map.addLayer({
+        id: 'extruded-polygon',
+        type: 'fill-extrusion',
+        source: 'polygon-source',
+        paint: {
+            'fill-extrusion-color': '#0047AB',
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 3.85,
+          
+
+
+        'fill-extrusion-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+           
+
+
+
+
+17.9, 0.007,
+
+18.0, 0.009,
+ 
+18.1, 0.2, 
+
+
+
+        ],
+
+
+
+
+
+
+
+            'fill-extrusion-ambient-occlusion-intensity': 0 // минимизирует тени
+        }
+    });
+
+
+
+// Отключение теней
+    map.setLight({
+        intensity: 0.5// Полностью убирает тени
+    });
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+map.on('load', () => {
+    map.addSource('polygon-source1', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                    [37.174014825136595, 55.97747637225763],
+                    [37.174223117007614, 55.97745607738463],
+                    [37.17408018404612, 55.97699461722809],
+                    [37.173873474273904, 55.977014791684724],
+                    [37.174014825136595, 55.97747637225763]
+                ]]
+            },
+            properties: {
+                height: 3.95 // высота экструзии (над базой)
+            }
+        }
+    });
+
+    map.addLayer({
+        id: 'extruded-polygon1',
+        type: 'fill-extrusion',
+        source: 'polygon-source1',
+        paint: {
+            'fill-extrusion-color': '#0047AB',
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 3.95,
+            'fill-extrusion-opacity': 0.2,
+
+
+            'fill-extrusion-ambient-occlusion-intensity': 0.1 // минимизирует тени
+        }
+    }, '3d-buildings');
+
+
+
+
+});
+
+
+
+
+
+
+
+
+
+map.on('load', () => {
+    // Добавляем источник с полигоном
+    map.addSource('overlay-polygon', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                    [37.63125656186148, 55.83383282373481],
+                    [37.631067152172164, 55.83395371999572],
+                    [37.63152632128711, 55.834180149472445],
+                    [37.63171740706366, 55.83406258752953],
+                    [37.63125656186148, 55.83383282373481]
+                ]]
+            },
+            properties: {
+                height: 0.001 // Высота перекрытия (можно регулировать)
+            }
+        }
+    });
+
+    // Добавляем слой с выдавливанием
+    map.addLayer({
+        id: 'polygon-overlay',
+        type: 'fill-extrusion',
+        source: 'overlay-polygon',
+        paint: {
+            'fill-extrusion-color': '#f3f3f3', // Белый цвет
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 0,
+            'fill-extrusion-opacity': 1, // Полная непрозрачность
+            'fill-extrusion-ambient-occlusion-intensity': 0 // Без теней
+        }
+    }, '3d-buildings'); // Убедитесь, что это имя вашего слоя с 3D-зданиями
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+// ОЧЕНЬ ВАЖНЫЙ БЛОК
+
+map.on('style.load', () => {
+        map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 0,
+            'maxzoom': 24
+        });
+
+        // add the DEM source as a terrain layer
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
+
+ 
+ 
+// ВЫТАВЛЯЕМ ЗЕМЛЮ НА -1 
+
+
+
+map.addSource('geojson', {
+            'type': 'geojson',
+            'lineMetrics': true,
+            'data': {
+                'type': 'Feature',
+                'properties': {
+                    // add an array of elevation values.
+                    // the number of values doesn't need to match the number of coordinates.
+                    'elevation': [
+                        -4, 4, 4600, 4599, 4598, 4596, 4593, 4590, 4584,
+                        4578, 4569, 4559, 4547, 4533, 4516, 4497, 4475, 4450,
+                        4422, 4390, 4355, 4316, 4275, 4227, 4177, 4124, 4068,
+                        4009, 3946, 3880, 3776, 3693, 3599, 3502, 3398, 3290,
+                        3171, 3052, 2922, 2786, 2642, 2490, 2332, 2170, 1994,
+                        1810, 1612, 1432, 1216, 1000
+                    ]
+                },
+                'geometry': {
+                    'coordinates': [
+                        [37.630907830210646, 55.8339924045205],
+                            [37.6309770003019, 55.834026416653444],
+                            [37.63102306010572, 55.83405016143769],
+                            [37.630985892275106, 55.83407342928038],
+                            [37.63102376960197, 55.83409272070057],
+                            [37.63104878286134, 55.83407704245994],
+                            [37.631064443696175, 55.83408644819744],
+                            [37.631035875797664, 55.834100544725686],
+                            [37.630985631929235, 55.83409240096174],
+                            [37.63090707155243, 55.83414193095976],
+                            [37.630976940626425, 55.83417545769822],
+                            [37.631088091165566, 55.83423303998808],
+                            [37.631201354063506, 55.83428912501017],
+                            [37.63124002688102, 55.834234032072516],
+                            [37.63134534379628, 55.83416553782325],
+                            [37.63103528399293, 55.83401619712731]
+
+                    ],
+                    'type': 'LineString'
+                }
+            }
+        });
+
+        // add the elevated line layer
+
+// Линию делаем 0
+        map.addLayer({
+            'id': 'elevated-line',
+            'type': 'line',
+            'source': 'geojson',
+            'layout': {
+                'line-z-offset': [
+                    'at-interpolated',
+                    [
+                        '*',
+                        ['line-progress'],
+                        ['-', ['length', ['get', 'elevation']], 1]
+                    ],
+                    ['get', 'elevation']
+                ],
+                'line-elevation-reference': 'sea'
+            },
+            'paint': {
+                'line-emissive-strength': 0.0,
+                'line-width': 0.0,
+                'line-color': 'royalblue'
+            }
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+map.on('load', () => {
+        map.addSource('route', {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'properties': {},
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': [
+                        [37.63088726, 55.83399153],
+                            [37.6309893,55.83404027],
+                            [37.6309878,55.83406037],
+                           [37.63098217,55.83407239],
+                         
+                            [37.63095,55.83411],
+                            [37.63092323,55.83413374],
+                            [37.63100719,55.83417627],
+                            [37.63107888,55.83421063],
+                            [37.63116048,55.83425289],
+                            [37.6312313,55.83420817],
+                            [37.63129053,55.83417114],
+                            [37.6312401,55.8341485],
+
+ [37.63112045,55.83408876],
+ [37.63109693,55.83404414],
+ [37.63103578,55.83401419],
+                    ]
+                }
+            }
+        });
+        map.addLayer({
+            'id': 'route',
+            'type': 'line',
+
+
+ 'minzoom': 20,
+        'maxzoom': 22,
+
+            'source': 'route',
+            'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+            },
+            'paint': {
+                'line-color': '#c3ea4a',
+                'line-width': 5
+            }
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+       
+
+
+
+
+
+<script>
+
+map.on('mousemove', (e) => {
+    // Функция для округления чисел в JSON до 5 знаков
+    const roundToFive = (key, value) => {
+        if (typeof value === 'number') {
+            return parseFloat(value.toFixed(8));
+        }
+        return value;
+    };
+
+    const pointStr = JSON.stringify(e.point, roundToFive);
+    const lngLatStr = JSON.stringify(e.lngLat.wrap(), roundToFive);
+
+    document.getElementById('info').innerHTML = 
+        `${pointStr}<br />${lngLatStr}`;
+});
+     
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="header">
+  
+  
+ 
+
+<div class="header">
+  
+  
+ 
+<a class="header" href="https://sos.emiia.ai/rzd/ai.html">
+
+
+
+<svg xmlns="http://www.w3.org/2000/svg" width="75" height="75"  viewBox="0 0 100 100" id="wave" data-name="Layer 1">
+
+<path  id="Line_1" data-name="Line 1"  fill="#3D85C6" stroke="#3D85C6" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_1" data-name="Line 1"  fill="#3D85C6" stroke="#3D85C6" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_2" data-name="Line 2" fill="#3D85C6" stroke="#3D85C6" d="m41.362213 65.66929l0 0c-0.20874405 0 -0.3779602 -0.16921234 -0.3779602 -0.3779602l0 -30.58266c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921997 0.3779602 0.3779602l0 30.58266c0 0.20874786 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_2" data-name="Line 2" fill="#3D85C6" stroke="#3D85C6" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m41.362213 65.66929l0 0c-0.20874405 0 -0.3779602 -0.16921234 -0.3779602 -0.3779602l0 -30.58266c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921997 0.3779602 0.3779602l0 30.58266c0 0.20874786 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_3" data-name="Line 3" fill="#3D85C6" stroke="#3D85C6" d="m33.480324 55.842518l0 0c-0.20874405 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -10.929115c0 -0.100242615 0.03981781 -0.19638062 0.110702515 -0.2672615c0.07088089 -0.07088089 0.16701508 -0.1106987 0.2672577 -0.1106987l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 10.929115l0 0c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_3" data-name="Line 3" fill="#3D85C6" stroke="#3D85C6" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m33.480324 55.842518l0 0c-0.20874405 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -10.929115c0 -0.100242615 0.03981781 -0.19638062 0.110702515 -0.2672615c0.07088089 -0.07088089 0.16701508 -0.1106987 0.2672577 -0.1106987l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 10.929115l0 0c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_4" data-name="Line 4" fill="#3D85C6" stroke="#3D85C6" d="m57.12599 61.92126l0 0c-0.20874023 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -23.086601c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 23.086601l0 0c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_4" data-name="Line 4" fill="#3D85C6" stroke="#3D85C6"stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m57.12599 61.92126l0 0c-0.20874023 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -23.086601c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 23.086601l0 0c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
+
+<path id="Line_5" data-name="Line 5" fill="#3D85C6" stroke="#3D85C6" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 9.039352c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" />
+
+<path id="Line_5" data-name="Line 5" fill="#3D85C6" stroke="#3D85C6" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="butt" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 9.039352c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" /></svg>
+
+
+
+
+
+
+
+
+
+</a>
+
+
+
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<style>
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+#wave path {
+  fill: #818cf8;
+  transform-origin: 50% 50%;
+  animation: pulse 1s infinite;
+}
+#wave.stop path {
+  animation-play-state: paused;
+}
+
+#wave #Line_1 { animation-delay: 0.0s; }
+#wave #Line_2 { animation-delay: 0.15s; }
+#wave #Line_3 { animation-delay: 0.3s; }
+#wave #Line_4 { animation-delay: 0.45s; }
+#wave #Line_5 { animation-delay: 0.6s; }
+
+
+@keyframes pulse {
+  0%   { transform: scaleY(1);}
+  50%  { transform: scaleY(0.7);}
+  100% { transform: scaleY(1);}
+}
+
+
+
+/* Десктоп по умолчанию */
+textarea::placeholder {
+    color: #E2E8F0 !important;
+}
+
+/* Мобильная версия */
+@media (max-width: 640px) {
+    textarea::placeholder {
+        color: #E2E8F0 !important; /* Пример другого цвета для мобилок */
+    }
+
+
+
+
+
+</style>
+
+
+
+
+<style>
+.calculation-box {
+height: 30px;
+width: 300px;
+position: absolute;
+bottom: 43px;
+left: 18px;
+background-color: transparent;
+padding: 9.5px;
+
+font-family: 'Montserrat', montserrat !important; 
+}
+ 
+p {
+font-family: 'Montserrat';
+margin: 0px;
+font-size: 10px;
+color: #3d85c6;
+}
+
+.calculation-box p:not(:last-child) {
+    margin-bottom: 10px; /* Применяется ко всем <p>, кроме последнего */
+}
+
+.highlight {
+    font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
+font-weight: 500; /* Жирность (700 = bold, 800 или 900 — ещё жирнее) */
+}
+
+.highlight1 {
+    position: relative;
+    top: 3px; /* Опускает стрелку на 3px вниз, измените значение по необходимости */
+font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
+}
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="mobile-logo">
+
+
+<a href="https://example.com" target="_blank" class="logo-link">
+
+
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"  viewBox="0 0 100 100">
+
+
+<path style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 33.244102l0 0c0 -0.20874405 0.16921806 -0.3779602 0.3779602 -0.3779602l58.70865 0c0.100242615 0 0.19637299 0.039821625 0.2672577 0.110702515c0.070877075 0.07088089 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602l-58.70865 0c-0.20874214 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602z" />
+
+<path  style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 33.244102l0 0c0 -0.20874405 0.16921806 -0.3779602 0.3779602 -0.3779602l58.70865 0c0.100242615 0 0.19637299 0.039821625 0.2672577 0.110702515c0.070877075 0.07088089 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602l-58.70865 0c-0.20874214 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+<path  style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 65.2441l0 0c0 -0.20874023 0.16921806 -0.3779602 0.3779602 -0.3779602l40.40943 0c0.100242615 0 0.1963768 0.03981781 0.2672577 0.110702515c0.07088089 0.070877075 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874023 -0.16921997 0.3779602 -0.3779602 0.3779602l-40.40943 0c-0.20874214 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+
+<path  style="fill: #3D85C6; stroke: #3D85C6;stroke-miterlimit: 6.0;stroke-width: 6.0px" d="m20.267717 65.2441l0 0c0 -0.20874023 0.16921806 -0.3779602 0.3779602 -0.3779602l40.40943 0c0.100242615 0 0.1963768 0.03981781 0.2672577 0.110702515c0.07088089 0.070877075 0.110702515 0.16701508 0.110702515 0.2672577l0 1.511795c0 0.20874023 -0.16921997 0.3779602 -0.3779602 0.3779602l-40.40943 0c-0.20874214 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602z" fill-rule="evenodd"/>
+
+
+</svg>
+
+
+
+
+
+
+
+
+<style>
+
+  .mobile-logo {
+position: fixed;
+
+
+
+    top: 80px;
+    left: 35px;
+    width: 30px;
+    height: 30px;
+    z-index: 20000;
+  }
+
+  .mobile-logo svg {
+    width: 100%;
+    height: 100%;
+    fill: #E2E8F0;
+    stroke: #E2E8F0;
+  }
+
+  .logo-part1 {
+    stroke-width: 3px; /* Уменьшенная толщина линий */
+  }
+
+  .logo-center {
+    stroke-width: 8px; /* Уменьшенная толщина центрального круга */
+  }
+}
+
+
+</style>
+
+
+
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+	<style>
+@import url('https://www.emiia.ru/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+  <style>  
+@import url('/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+<link rel="stylesheet" href="https://www.emiia.ru/cssfamily=Montserrat.css">
+<link rel="stylesheet" href="/cssfamily=Montserrat.css">
+
+
+
+
+
+
+</div>
+</div>
+
+
+
+
+</body>
+</html>
+
+
+
