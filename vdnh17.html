@@ -1859,7 +1859,7 @@ map.addSource('geojson', {
             source: 'line',
 
 
- 'minzoom': 19,
+ 'minzoom': 19.5,
         'maxzoom': 24,
 
 
@@ -1897,7 +1897,7 @@ map.addSource('geojson', {
             // Update line-dasharray using the next value in dashArraySequence. The
             // divisor in the expression `timestamp / 50` controls the animation speed.
             const newStep = parseInt(
-                (timestamp / 60) % dashArraySequence.length
+                (timestamp / 80) % dashArraySequence.length
             );
 
             if (newStep !== step) {
