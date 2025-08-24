@@ -1673,7 +1673,7 @@ const title = document.getElementById('location-title');
                 // Increment index, looping back to the first after the last location.
                 index = (index + 1) % locations.length;
                 playback(index);
-            }, 2000); // After callback, show the location for 3 seconds.
+            }, 4000); // After callback, show the location for 3 seconds.
         });
     }
 
@@ -1891,13 +1891,13 @@ map.addSource('geojson', {
             [0, 3.5, 3, 0.5]
         ];
 
-        let step = 0;
+        let step = 1;
 
         function animateDashArray(timestamp) {
             // Update line-dasharray using the next value in dashArraySequence. The
             // divisor in the expression `timestamp / 50` controls the animation speed.
             const newStep = parseInt(
-                (timestamp / 50) % dashArraySequence.length
+                (timestamp / 60) % dashArraySequence.length
             );
 
             if (newStep !== step) {
