@@ -40,7 +40,7 @@
 
 <style>
 body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; background: #f8f9fa; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; background: #383838; }
 </style>
 </head>
 <body>
@@ -58,7 +58,7 @@ body { margin: 0; padding: 0; }
         font-size: 12px;
         text-align: center;
         color: #818cf8;
-        background: transparent;
+        background: #383838;
 
 
 
@@ -69,7 +69,7 @@ body { margin: 0; padding: 0; }
  #info {
     top: 100px; /* Новое значение для мобильных */
     right: 0%;
-background: #f8f9fa;
+background: #383838;
 
   }
   }
@@ -595,14 +595,14 @@ const pulsingDot = {
         context.moveTo(centerX, centerY);
         context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
         context.closePath();
-        context.fillStyle = `rgba(244, 102, 102, ${opacity})`; // Исправлен синтаксис
+        context.fillStyle = `rgba(87, 257, 157, ${opacity})`; // Исправлен синтаксис
         context.fill();
 
         // Рисуем центральную точку
         const radius = (size / 2) * 0.35;
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        context.fillStyle = 'rgba(61, 133, 198, 1)';
+        context.fillStyle = 'rgba(87, 257, 146, 1)';
         context.strokeStyle = 'white';
         context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
         context.fill();
@@ -1067,9 +1067,9 @@ map.on('load', () => {
                 'interpolate',
                 ['linear'],
                 ['get', 'render_height'],
-                1, 'lightgray',
-                200, 'royalblue',
-                400, 'lightblue'
+                1, '#57fc9d',
+                200, '#57fc9d',
+                400, '#57fc9d'
             ],
             'fill-extrusion-height': [
                 'interpolate',
@@ -1268,7 +1268,7 @@ map.on('load', () => {
         type: 'fill-extrusion',
         source: 'overlay-polygon',
         paint: {
-            'fill-extrusion-color': '#f3f3f3', // Белый цвет
+            'fill-extrusion-color': '#303030', // Белый цвет
             'fill-extrusion-height': ['get', 'height'],
             'fill-extrusion-base': 0,
             'fill-extrusion-opacity': 1, // Полная непрозрачность
