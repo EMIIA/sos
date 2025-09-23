@@ -756,7 +756,7 @@ map.addSource('model4', {
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://sos.emiia.ai/VDNH_verh_GLB.glb' // Замените на URL второго GLB
+            'model-uri': 'https://sos.emiia.ai/VDNH_verh_G_GLB.glb' // Замените на URL второго GLB
         },
         'geometry': {
             'coordinates': [37.63113790199057,
@@ -811,7 +811,7 @@ map.addLayer({
 'model-scale': [999.5, 1090.0, 1000],
 
         'model-translation': [0, 0, 0.001], // ЗДЕСЬ: поднятие на 10 единиц по Z
-        'model-color-mix-intensity': 1,
+        'model-color-mix-intensity': 0,
         'model-cast-shadows': true,
 
 
@@ -854,7 +854,10 @@ map.addSource('model2', {
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://sos.emiia.ai/VDNH_verh_GLB.glb' // Замените на URL второго GLB
+            'model-uri': 'https://sos.emiia.ai/VDNH_verh_G_GLB.glb' // Замените на URL второго GLB
+
+
+
         },
         'geometry': {
             'coordinates': [37.63113790199057,
@@ -896,7 +899,7 @@ map.addLayer({
 
         'model-rotation': [0.0, 0.0, -761.5],
         'model-scale': [999.5, 1090.0, 100],
-        'model-color-mix-intensity': 1,
+        'model-color-mix-intensity': 0,
         'model-cast-shadows': true,
         'model-translation': [0, 0, 6.3],
         'model-emissive-strength': 0.9
