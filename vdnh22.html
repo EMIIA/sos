@@ -570,6 +570,8 @@ map.on('style.load', () => {
 
 
 
+
+
 const size = 180;
 
 const pulsingDot = {
@@ -605,7 +607,7 @@ const pulsingDot = {
         context.moveTo(centerX, centerY);
         context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
         context.closePath();
-        context.fillStyle = `rgba(87, 257, 157, ${opacity})`; // Исправлен синтаксис
+        context.fillStyle = `rgba(87, 257, 157, ${opacity})`;
         context.fill();
 
         // Рисуем центральную точку
@@ -628,6 +630,30 @@ const pulsingDot = {
     }
 };
 
+// Координаты для анимации
+const coordinates = [
+ [
+            37.63095623,
+            55.83392605
+          ],
+          [
+            37.630965946880735,
+            55.833929205500965
+          ],
+          [
+            37.63096658453456,
+            55.83393231334793
+          ],
+          [
+            37.630958536109056,
+            55.83393180851519
+          ],
+          [
+             37.63095623,
+            55.83392605
+          ]
+];
+
 map.on('load', () => {
     // Устанавливаем 3D-наклон карты для эффекта поднятия
     map.setPitch(45); // Наклон карты на 45 градусов
@@ -644,7 +670,7 @@ map.on('load', () => {
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': [37.63095623,55.83392605] // [lng, lat]
+                        'coordinates': coordinates[0] // Начальная позиция
                     }
                 }
             ]
@@ -658,57 +684,72 @@ map.on('load', () => {
         'minzoom': 9,
         'layout': {
             'icon-image': 'pulsing-dot',
-            'icon-offset': [0, 0], // Поднимаем точку вверх на 20 пикселей
-            'icon-allow-overlap': true, // Игнорируем перекрытие
-            'icon-ignore-placement': true // Игнорируем размещение других символов
+            'icon-offset': [0, 0],
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
         }
     }, '3d-buildings');
-});
 
+    // Анимация перемещения точки
+    let currentIndex = 0;
+    const duration = 2000; // Длительность анимации между точками (мс)
 
+    function animatePoint() {
+        const nextIndex = (currentIndex + 1) % coordinates.length;
+        const startCoord = coordinates[currentIndex];
+        const endCoord = coordinates[nextIndex];
+        const startTime = performance.now();
 
-
-
-
-
-
-
-  
-
-map.on('load', () => {
-    //... твой код с инициализацией
-
-    const startLng = 37.63095623;
-    const startLat = 55.83392605;
-
-    function animateDot() {
-        const timestamp = performance.now();
-        // Двигаем точку по синусоиде в пределах ±0.01 градуса
-        const newLng = startLng + 0.01 * Math.sin(timestamp / 1000);
-        const newLat = startLat + 0.01 * Math.cos(timestamp / 1000);
-
-        const newData = {
-            'type': 'FeatureCollection',
-            'features': [
-                {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Point',
-                        'coordinates': [newLng, newLat]
+        function animate(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Линейная интерполяция между координатами
+            const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
+            const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
+            
+            // Обновляем позицию точки
+            map.getSource('dot-point').setData({
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [lng, lat]
+                        }
                     }
-                }
-            ]
-        };
+                ]
+            });
 
-        // Обновляем источник
-        map.getSource('dot-point').setData(newData);
+            if (progress < 1) {
+                // Продолжаем анимацию
+                requestAnimationFrame(animate);
+            } else {
+                // Переходим к следующей точке
+                currentIndex = nextIndex;
+                setTimeout(() => {
+                    requestAnimationFrame(animatePoint);
+                }, 500); // Пауза перед следующим перемещением
+            }
+        }
 
-        // Запускаем новую итерацию
-        requestAnimationFrame(animateDot);
+        requestAnimationFrame(animate);
     }
 
-    animateDot();
+    // Запускаем анимацию через небольшую задержку после загрузки карты
+    setTimeout(animatePoint, 1000);
 });
+
+
+
+
+
+
+
+
+
+
 
 
 
