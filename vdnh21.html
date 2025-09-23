@@ -345,9 +345,9 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
-<p><strong>EMIIA.AI SIP:</strong> [<strong><span style="color: red;"</span>SOS SIGNAL</strong>] ID: [R #3D4581] <span class="highlight1"></span></p>
+<p><strong>EMIIA.AI SIP:</strong> [<strong><span style="color: #90ffbfff;"</span>SOS SIGNAL</strong>] ID R: [#3D4581] <span class="highlight1"></span></p>
 
-<p> ID: [V #3D85C2] [37.17402780, 55.977085266]<span class="highlight"></span>  </p>
+<p> ID V: [#3D85C2] [37.17402780, 55.977085266]<span class="highlight"></span>  </p>
 
 
 
@@ -388,7 +388,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
       
-        minZoom: 15,
+        minZoom: 9,
         maxZoom: 22,
 
 minPitch: 0,
@@ -602,7 +602,7 @@ const pulsingDot = {
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
         context.fillStyle = 'rgba(87, 257, 146, 1)';
-        context.strokeStyle = 'white';
+        context.strokeStyle = '#b2ffd3ff';
         context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
         context.fill();
         context.stroke();
@@ -644,7 +644,7 @@ map.on('load', () => {
         'id': 'layer-with-pulsing-dot',
         'type': 'symbol',
         'source': 'dot-point',
-        'minzoom': 14,
+        'minzoom': 9,
         'layout': {
             'icon-image': 'pulsing-dot',
             'icon-offset': [0, 0], // Поднимаем точку вверх на 20 пикселей
@@ -1359,19 +1359,6 @@ const title = document.getElementById('location-title');
         
 
 
-        
-
-
-
-        
-
-
-
-
-
-
-
-
 
 
 
@@ -1684,7 +1671,7 @@ map.on('mousemove', (e) => {
   height: 100%;
 }
 #wave path {
-  fill: #f8f9fa;
+  fill: #90ffbfff;
   transform-origin: 50% 50%;
   animation: pulse 1s infinite;
 }
