@@ -348,11 +348,21 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 <p><strong>EMIIA.AI SIP:</strong> [<strong><span style="color: #90ffbfff;"</span>SOS SIGNAL</strong>] ID R: [#3D4581] <span class="highlight1"></span></p>
 
-<p> ID V: [#3D85C2] [37.17402780, 55.977085266]<span class="highlight"></span>  </p>
 
 
+<p>ID V: [#3D85C2] <span id="coords">37.17402780, 55.977085266</span></p>
 
+<script>
+  const coords = document.getElementById('coords');
 
+  setTimeout(() => {
+    coords.textContent = '38.17402780, 58.977085266'; // меняем через 1 сек
+  }, 5000);
+
+  setTimeout(() => {
+    coords.textContent = '39.17402780, 59.977085266'; // меняем через 1 + 5 = 6 сек
+  }, 10000);
+</script>
 
 
 
@@ -665,7 +675,40 @@ map.on('load', () => {
 
   
 
+map.on('load', () => {
+    //... твой код с инициализацией
 
+    const startLng = 37.63095623;
+    const startLat = 55.83392605;
+
+    function animateDot() {
+        const timestamp = performance.now();
+        // Двигаем точку по синусоиде в пределах ±0.01 градуса
+        const newLng = startLng + 0.01 * Math.sin(timestamp / 1000);
+        const newLat = startLat + 0.01 * Math.cos(timestamp / 1000);
+
+        const newData = {
+            'type': 'FeatureCollection',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [newLng, newLat]
+                    }
+                }
+            ]
+        };
+
+        // Обновляем источник
+        map.getSource('dot-point').setData(newData);
+
+        // Запускаем новую итерацию
+        requestAnimationFrame(animateDot);
+    }
+
+    animateDot();
+});
 
 
 
