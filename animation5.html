@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -119,13 +118,13 @@
             border: 1px solid #57fc9d;
             min-width: 220px;
             z-index: 1000;
-            display: none;
+            display: block; /* ИЗМЕНЕНО: изначально видимо */
             margin-top: 10px;
             border-radius: 3px;
             width: auto;
         }
-        .dropdown-menu.show {
-            display: block;
+        .dropdown-menu.hidden {
+            display: none; /* Скрываем только когда есть класс hidden */
         }
         .dropdown-menu a {
             color: #57fc9d;
@@ -230,7 +229,7 @@
         <!-- Кнопка меню и выпадающий список -->
         <div class="menu-container">
             <button class="menu-button">&ensp;&ensp;&ensp;&ensp;&ensp;ИНФОРМАЦИЯ (DATA) &ensp;&ensp;&ensp;&ensp;&ensp;</button>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu"> <!-- УБРАН класс show - меню изначально видимо -->
                 <a href="#about">САЙТ RU&ensp;&ensp;&ensp;&ensp;&ensp;</a>
                 <a href="#services">HOME EN&ensp;&ensp;&ensp;</a>
                 <a href="#projects">ПРЕЗЕНТАЦИЯ RU&ensp;&ensp;&ensp;&ensp;</a>
@@ -242,7 +241,7 @@
         </div>
         
         <!-- QR-код -->
-        <div class="qr-code" id="qrCode">
+        <div class="qr-code hidden" id="qrCode"> <!-- Добавлен класс hidden -->
             <img src="https://sos.emiia.ai/QR-01.png" alt="QR Code">
         </div>
     </div>
@@ -268,34 +267,41 @@
        const qrCode = document.getElementById('qrCode');
        const qrLink = document.querySelector('.qr-link');
        
-       function closeMenu() {
-           dropdownMenu.classList.remove('show');
-           qrCode.classList.remove('hidden');
+       // Меню изначально открыто, QR-код скрыт
+       dropdownMenu.classList.remove('hidden');
+       qrCode.classList.add('hidden');
+       
+       function toggleMenu() {
+           const isMenuVisible = !dropdownMenu.classList.contains('hidden');
+           
+           if (isMenuVisible) {
+               // Если меню видимо - скрываем его и показываем QR-код
+               dropdownMenu.classList.add('hidden');
+               qrCode.classList.remove('hidden');
+           } else {
+               // Если меню скрыто - показываем его и скрываем QR-код
+               dropdownMenu.classList.remove('hidden');
+               qrCode.classList.add('hidden');
+           }
        }
        
        menuButton.addEventListener('click', function(e) {
            e.stopPropagation();
-           const isOpening = !dropdownMenu.classList.contains('show');
-           dropdownMenu.classList.toggle('show');
-           
-           // Скрываем/показываем QR-код в зависимости от состояния меню
-           if (isOpening) {
-               qrCode.classList.add('hidden');
-           } else {
-               qrCode.classList.remove('hidden');
-           }
+           toggleMenu();
        });
        
        // Закрытие меню при клике на ссылку QR
        qrLink.addEventListener('click', function(e) {
            e.preventDefault();
-           closeMenu();
+           dropdownMenu.classList.add('hidden');
+           qrCode.classList.remove('hidden');
        });
        
        // Закрытие меню при клике вне его
-       document.addEventListener('click', function() {
-           if (dropdownMenu.classList.contains('show')) {
-               closeMenu();
+       document.addEventListener('click', function(e) {
+           if (!dropdownMenu.contains(e.target) && e.target !== menuButton) {
+               dropdownMenu.classList.add('hidden');
+               qrCode.classList.remove('hidden');
            }
        });
        
@@ -306,5 +312,3 @@
    });
 </script>
 </html>
-
-
