@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -152,7 +153,7 @@
         
         /* Стили для QR-кода */
         .qr-code {
-            margin-top: 20px;
+            margin-top: 8px;
             transition: all 0.3s ease;
             opacity: 1;
         }
@@ -186,7 +187,7 @@
                 white-space: nowrap;
             }
             .qr-code img {
-                max-width: 120px;
+                max-width: 325px;
             }
         }
         
@@ -236,7 +237,7 @@
                 <a href="#contact">PRESENTATION EN</a>
                 <a href="#projects">ИНВЕСТПРЕДЛОЖЕНИЕ RU&ensp;&ensp;&ensp;&ensp;&ensp;</a>
                 <a href="#contact">INVESTMENTPRO EN</a>
-                <a href="#contact">QR</a>
+                <a href="#QR" class="qr-link">QR</a>
             </div>
         </div>
         
@@ -265,6 +266,12 @@
        const menuButton = document.querySelector('.menu-button');
        const dropdownMenu = document.querySelector('.dropdown-menu');
        const qrCode = document.getElementById('qrCode');
+       const qrLink = document.querySelector('.qr-link');
+       
+       function closeMenu() {
+           dropdownMenu.classList.remove('show');
+           qrCode.classList.remove('hidden');
+       }
        
        menuButton.addEventListener('click', function(e) {
            e.stopPropagation();
@@ -279,11 +286,16 @@
            }
        });
        
+       // Закрытие меню при клике на ссылку QR
+       qrLink.addEventListener('click', function(e) {
+           e.preventDefault();
+           closeMenu();
+       });
+       
        // Закрытие меню при клике вне его
        document.addEventListener('click', function() {
            if (dropdownMenu.classList.contains('show')) {
-               dropdownMenu.classList.remove('show');
-               qrCode.classList.remove('hidden');
+               closeMenu();
            }
        });
        
@@ -294,3 +306,5 @@
    });
 </script>
 </html>
+
+
