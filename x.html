@@ -241,27 +241,27 @@
 
 
 
-<style>.fixed-block {
+<style>.fixed-wrapper {
   position: fixed;
   bottom: 0;
-  left: 50%;                   /* Ставим левый край в центр */
-  transform: translateX(-53%); /* Смещаем блок влево на половину ширины */
-
-  background: transparent;
+  left: -23px; right: 0;
+  display: flex;
+  justify-content: center; /* горизонтальное центрирование */
   padding: 35px;
+  pointer-events: none; /* чтобы клики не блокировались, если нужно */
+}.fixed-block {
+  pointer-events: auto;
   font-family: Montserrat, monospace!important;
   font-size: 13px;
-  text-align: center;
   color: #57fc9d;
   white-space: nowrap;
+  text-align: center;
 }.fixed-block a {
-  display: block;
-  margin-top: 0;
   color: #57fc9d;
   text-decoration: none;
+  display: block;
 }
 </style>
-
 
 
 
@@ -281,12 +281,21 @@
 </head>
 <body>
 
-<div class="fixed-block">
 
 
-<a href="https://www.emiia.ai/">Copyright © 2025 EMIIA LLC. All rights reserved.</a>
 
+
+
+
+<div class="fixed-wrapper">
+  <div class="fixed-block">
+   <a href="https://www.emiia.ai/">Copyright © 2025 EMIIA LLC. All rights reserved.</a>
+  </div>
 </div>
+
+
+
+
 
 
     <div class="container">
@@ -302,7 +311,7 @@
         
         <!-- Кнопка меню и выпадающий список -->
         <div class="menu-container">
-            <button class="menu-button">&nbsp; МАТЕРИАЛЫ ПРОЕКТА/DATA &emsp;</button>
+            <button class="menu-button">&nbsp;&nbsp;&nbsp; МАТЕРИАЛЫ ПРОЕКТА/DATA &nbsp;</button>
             <div class="dropdown-menu"> <!-- УБРАН класс show - меню изначально видимо -->
                 <a href="https://www.emiia.ru/">ИНТЕРНЕТ-РЕСУРС ПРОЕКТА RU </a>
                 <a href="https://www.emiia.ai/">INTERNET RESOURCE EN&ensp;&ensp;&ensp;</a>
