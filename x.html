@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -52,7 +53,9 @@
         }
         html, body {
             height: 100%;
-            overflow: hidden;
+           
+ overflow-y: auto;
+
         }
         body {
             background-color: #383838;
@@ -262,7 +265,14 @@
 
 
 
-
+<style>
+  body.no-scroll {
+    overflow-y: scroll; /* сохраняем полосу прокрутки */
+    position: fixed;
+    width: 100%;
+    top: calc(-1 * var(--scroll-position));
+  }
+</style>
 
 
 
@@ -310,69 +320,111 @@
         </div>
     </div>
 </body>
-<script>
-   var typing = new Typed(".text", {
-       strings: [" ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ", " SPATIAL INTELLIGENCE"],
-       typeSpeed: 100,
-       backSpeed: 40,
-       loop: true,
-       cursorChar: '_',
-       startDelay: 500,
-       fadeOut: false,
-       shuffle: false,
-       backDelay: 1500,
-       smartBackspace: true,
-   });
 
-   // JavaScript для меню и QR-кода
-   document.addEventListener('DOMContentLoaded', function() {
-       const menuButton = document.querySelector('.menu-button');
-       const dropdownMenu = document.querySelector('.dropdown-menu');
-       const qrCode = document.getElementById('qrCode');
-       const qrLink = document.querySelector('.qr-link');
-       
-       // Меню изначально открыто, QR-код скрыт
-       dropdownMenu.classList.remove('hidden');
-       qrCode.classList.add('hidden');
-       
-       function toggleMenu() {
-           const isMenuVisible = !dropdownMenu.classList.contains('hidden');
-           
-           if (isMenuVisible) {
-               // Если меню видимо - скрываем его и показываем QR-код
-               dropdownMenu.classList.add('hidden');
-               qrCode.classList.remove('hidden');
-           } else {
-               // Если меню скрыто - показываем его и скрываем QR-код
-               dropdownMenu.classList.remove('hidden');
-               qrCode.classList.add('hidden');
-           }
-       }
-       
-       menuButton.addEventListener('click', function(e) {
-           e.stopPropagation();
-           toggleMenu();
-       });
-       
-       // Закрытие меню при клике на ссылку QR
-       qrLink.addEventListener('click', function(e) {
-           e.preventDefault();
-           dropdownMenu.classList.add('hidden');
-           qrCode.classList.remove('hidden');
-       });
-       
-       // Закрытие меню при клике вне его
-       document.addEventListener('click', function(e) {
-           if (!dropdownMenu.contains(e.target) && e.target !== menuButton) {
-               dropdownMenu.classList.add('hidden');
-               qrCode.classList.remove('hidden');
-           }
-       });
-       
-       // Предотвращаем закрытие при клике на само меню
-       dropdownMenu.addEventListener('click', function(e) {
-           e.stopPropagation();
-       });
-   });
+
+
+
+<script>
+  // Отключаем авто-восстановление позиции прокрутки браузером
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
+  var typing = new Typed(".text", {
+    strings: [" ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ", " SPATIAL INTELLIGENCE"],
+    typeSpeed: 100,
+    backSpeed: 40,
+    loop: true,
+    cursorChar: '_',
+    startDelay: 500,
+    fadeOut: false,
+    shuffle: false,
+    backDelay: 1500,
+    smartBackspace: true,
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuButton = document.querySelector('.menu-button');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    const qrCode = document.getElementById('qrCode');
+    const qrLink = document.querySelector('.qr-link');
+
+    dropdownMenu.classList.remove('hidden');
+    qrCode.classList.add('hidden');
+
+    function toggleMenu() {
+      const isMenuVisible =!dropdownMenu.classList.contains('hidden');
+      if (isMenuVisible) {
+        dropdownMenu.classList.add('hidden');
+        qrCode.classList.remove('hidden');
+      } else {
+        dropdownMenu.classList.remove('hidden');
+        qrCode.classList.add('hidden');
+      }
+    }
+
+    menuButton.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    qrLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      dropdownMenu.classList.add('hidden');
+      qrCode.classList.remove('hidden');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!dropdownMenu.contains(e.target) && e.target!== menuButton) {
+        dropdownMenu.classList.add('hidden');
+        qrCode.classList.remove('hidden');
+      }
+    });
+
+    dropdownMenu.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    // При возврате назад сбрасываем скролл вручную (если надо)
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        window.scrollTo(0, 0);
+      }
+    });
+  });
 </script>
+
+
+
+
+
+
+
+<script>
+  // Функция отключения прокрутки и сохранения позиции
+  function disableScroll() {
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    document.documentElement.style.setProperty('--scroll-position', `${scrollY}px`);
+    document.body.classList.add('no-scroll');
+  }
+
+  // Функция включения прокрутки и возврата позиции
+  function enableScroll() {
+    const scrollY = document.documentElement.style.getPropertyValue('--scroll-position');
+    document.body.classList.remove('no-scroll');
+    document.documentElement.style.removeProperty('--scroll-position');
+    window.scrollTo(0, parseInt(scrollY || '0'));
+  }
+
+  // Пример использования: отключаем прокрутку сразу
+  disableScroll();
+
+  // Если нужно вернуть прокрутку, вызывай enableScroll()
+</script>
+
+
+
+
+
+
 </html>
