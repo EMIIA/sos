@@ -3,21 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    
-    <!-- Мета-теги для управления кешированием -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+
+
+
     
     <!-- Мета-теги для мобильного приложения -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="EMIIA.AI SIP">
     
+    
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#383838">
 
     <link rel="manifest" href="manifest_sip.json">
+
+
+
+
+
+
+
+
     <title>EMIIA.AI SIP</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js" integrity="sha512-BdHyGtczsUoFcEma+MfXc71KJLv/cd+sUsUaYYf2mXpfG/PtBjNXsPo78+rxWjscxUYN2Qr2+DbeGGiJx81ifg==" crossorigin="anonymous"></script>
 
@@ -46,33 +53,23 @@
         html, body {
             height: 100%;
             overflow: hidden;
-            position: fixed;
-            width: 100%;
         }
         body {
             background-color: #383838;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             font-family: Montserrat, monospace !important;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            padding: 0;
-            margin: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            padding-top: 5vh;
         }
         .container {
             width: 100%;
             max-width: 800px;
-            padding: 20px;
+            padding: 0px;
             text-align: center;
-            position: relative;
-            margin: 0 auto;
         }
         .text-container {
             display: inline-block;
@@ -143,13 +140,13 @@
             border: 2px solid #57fc9d;
             min-width: 220px;
             z-index: 1000;
-            display: block;
+            display: block; /* ИЗМЕНЕНО: изначально видимо */
             margin-top: 10px;
             border-radius: 3px;
             width: auto;
         }
         .dropdown-menu.hidden {
-            display: none;
+            display: none; /* Скрываем только когда есть класс hidden */
         }
         .dropdown-menu a {
             color: #57fc9d;
@@ -196,9 +193,6 @@
         
         /* Медиа-запросы для мобильных устройств */
         @media screen and (max-width: 480px) {
-            .container {
-                padding: 15px;
-            }
             .menu-button {
                 font-size: 16px;
                 padding: 20px 16px;
@@ -215,31 +209,6 @@
             }
             .qr-code img {
                 max-width: 325px;
-            }
-            .iam {
-                font-size: 60px;
-                margin-bottom: -25px;
-            }
-        }
-        
-        /* Для очень маленьких экранов */
-        @media screen and (max-height: 700px) {
-            .iam {
-                font-size: 60px;
-                margin-bottom: -25px;
-            }
-            .container {
-                padding: 10px;
-            }
-        }
-        
-        @media screen and (max-height: 600px) {
-            .iam {
-                font-size: 50px;
-                margin-bottom: -20px;
-            }
-            .text {
-                font-size: 13px;
             }
         }
         
@@ -265,35 +234,50 @@
                 -webkit-font-smoothing: subpixel-antialiased;
             }
         }
-
-        /* Стили для фиксированного блока */
-        .fixed-block {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: transparent;
-            padding: 20px;
-            font-family: Montserrat, monospace!important;
-            font-size: 13px;
-            text-align: center;
-            color: #57fc9d;
-            white-space: nowrap;
-            z-index: 1000;
-        }
-        .fixed-block a {
-            display: block;
-            margin-top: 0;
-            color: #57fc9d;
-            text-decoration: none;
-        }
     </style>
+
+
+
+<style>.fixed-block {
+  position: fixed;
+  bottom: 0;
+  left: 50%;                   /* Ставим левый край в центр */
+  transform: translateX(-50%); /* Смещаем блок влево на половину ширины */
+
+  background: transparent;
+  padding: 35px;
+  font-family: Montserrat, monospace!important;
+  font-size: 13px;
+  text-align: center;
+  color: #57fc9d;
+  white-space: nowrap;
+}.fixed-block a {
+  display: block;
+  margin-top: 0;
+  color: #57fc9d;
+  text-decoration: none;
+}
+</style>
+
+
+
+
+
+
+
+
+
+
 </head>
 <body>
 
 <div class="fixed-block">
-    <a href="https://www.emiia.ai/">Copyright © 2025 EMIIA LLC. All rights reserved.</a>
+
+
+<a href="https://www.emiia.ai/">Copyright © 2025 EMIIA LLC. All rights reserved.</a>
+
 </div>
+
 
     <div class="container">
         <div class="text-container">
@@ -309,7 +293,7 @@
         <!-- Кнопка меню и выпадающий список -->
         <div class="menu-container">
             <button class="menu-button">&ensp;&ensp;        ДАННЫЕ ПРОЕКТА/DATA     &ensp;&ensp;&ensp; </button>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu"> <!-- УБРАН класс show - меню изначально видимо -->
                 <a href="https://www.emiia.ru/">ИНТЕРНЕТ-РЕСУРС ПРОЕКТА RU </a>
                 <a href="https://www.emiia.ai/">INTERNET RESOURCE EN&ensp;&ensp;&ensp;</a>
                 <a href="https://www.emiia.ru/emiia_ai_ru_v1.pdf">ПРЕЗЕНТАЦИЯ RU&ensp;&ensp;&ensp;&ensp;</a>
@@ -321,13 +305,12 @@
         </div>
         
         <!-- QR-код -->
-        <div class="qr-code hidden" id="qrCode">
+        <div class="qr-code hidden" id="qrCode"> <!-- Добавлен класс hidden -->
             <img src="https://sos.emiia.ai/QR-01.png" alt="QR Code">
         </div>
     </div>
-
+</body>
 <script>
-   // Инициализация Typed.js
    var typing = new Typed(".text", {
        strings: [" ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ", " SPATIAL INTELLIGENCE"],
        typeSpeed: 100,
@@ -351,11 +334,6 @@
        // Меню изначально открыто, QR-код скрыт
        dropdownMenu.classList.remove('hidden');
        qrCode.classList.add('hidden');
-       
-       // Гарантируем, что страница всегда в начале
-       window.scrollTo(0, 0);
-       document.body.scrollTop = 0;
-       document.documentElement.scrollTop = 0;
        
        function toggleMenu() {
            const isMenuVisible = !dropdownMenu.classList.contains('hidden');
@@ -396,42 +374,5 @@
            e.stopPropagation();
        });
    });
-
-   // Обработчик для случаев, когда страница загружается из кеша
-   window.addEventListener('pageshow', function(event) {
-       if (event.persisted) {
-           // Переинициализировать элементы, которые могли сброситься
-           const dropdownMenu = document.querySelector('.dropdown-menu');
-           const qrCode = document.getElementById('qrCode');
-           
-           dropdownMenu.classList.remove('hidden');
-           qrCode.classList.add('hidden');
-           
-           // Гарантируем, что страница всегда в начале
-           window.scrollTo(0, 0);
-           document.body.scrollTop = 0;
-           document.documentElement.scrollTop = 0;
-       }
-   });
-
-   // Дополнительная защита - сброс прокрутки при загрузке
-   window.addEventListener('load', function() {
-       setTimeout(() => {
-           window.scrollTo(0, 0);
-       }, 100);
-   });
-
-   // Блокируем любую прокрутку
-   document.addEventListener('scroll', function(e) {
-       window.scrollTo(0, 0);
-   });
-
-   document.addEventListener('touchmove', function(e) {
-       e.preventDefault();
-   }, { passive: false });
-
-   document.addEventListener('wheel', function(e) {
-       e.preventDefault();
-   }, { passive: false });
 </script>
 </html>
