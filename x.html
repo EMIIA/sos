@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+
+
+    
+    <!-- Мета-теги для мобильного приложения -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EMIIA.AI SIP">
+    
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#383838">
+
+    <link rel="manifest" href="manifest_sip.json">
+
+
+
+
+
+
+
+
+    <title>EMIIA.AI SIP</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js" integrity="sha512-BdHyGtczsUoFcEma+MfXc71KJLv/cd+sUsUaYYf2mXpfG/PtBjNXsPo78+rxWjscxUYN2Qr2+DbeGGiJx81ifg==" crossorigin="anonymous"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+	<style>
+@import url('https://www.emiia.ru/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+  <style>  
+@import url('/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+<link rel="stylesheet" href="https://www.emiia.ru/cssfamily=Montserrat.css">
+<link rel="stylesheet" href="/cssfamily=Montserrat.css">
+
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            background-color: #383838;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            font-family: Montserrat, monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-top: 5vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 0px;
+            text-align: center;
+        }
+        .text-container {
+            display: inline-block;
+            text-align: left;
+            margin-bottom: 7px;
+        }
+        .text {
+            color: #57fc9d;
+            font-size: 14.7px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline;
+            text-align: left;
+            font-family: Montserrat, monospace !important;
+            letter-spacing: 1px;
+            margin-left: 0.0px;
+            -webkit-font-feature-settings: "kern" 1;
+            font-feature-settings: "kern" 1;
+        }
+        .typed-cursor {
+            color: #57fc9d;
+            font-size: 14px;
+            animation: blink 1s infinite;
+            display: inline;
+            font-family: Montserrat, monospace !important;
+            font-weight: 600;
+        }
+        .iam {
+            color: #57fc9d;
+            font-size: 77.5px;
+            font-weight: 400;
+            font-family: Montserrat, monospace !important;
+            margin-bottom: -32px;
+            text-align: left;
+            display: block;
+            -webkit-font-feature-settings: "kern" 1;
+            font-feature-settings: "kern" 1;
+        }
+        
+        /* Стили для меню */
+        .menu-container {
+            display: block;
+            text-align: center;
+            margin-top: 0px;
+            position: relative;
+        }
+        .menu-button {
+            background-color: transparent;
+            border: 2px solid #57fc9d;
+            color: #57fc9d;
+            padding: 20px 20px;
+            font-family: Montserrat, monospace !important;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+        .menu-button:hover {
+            background-color: #57fc9d;
+            color: #383838;
+        }
+        .dropdown-menu {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #383838;
+            border: 2px solid #57fc9d;
+            min-width: 220px;
+            z-index: 1000;
+            display: block; /* ИЗМЕНЕНО: изначально видимо */
+            margin-top: 10px;
+            border-radius: 3px;
+            width: auto;
+        }
+        .dropdown-menu.hidden {
+            display: none; /* Скрываем только когда есть класс hidden */
+        }
+        .dropdown-menu a {
+            color: #57fc9d;
+            padding: 15px 20px;
+            text-decoration: none;
+            display: block;
+            font-family: Montserrat, monospace !important;
+            font-size: 16px;
+            text-align: left;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #57fc9d;
+            white-space: nowrap;
+            min-width: max-content;
+        }
+        .dropdown-menu a:first-child {
+            border-top: none;
+        }
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-menu a:hover {
+            background-color: #57fc9d;
+            color: #383838;
+        }
+        
+        /* Стили для QR-кода */
+        .qr-code {
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+        .qr-code.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .qr-code img {
+            max-width: 325px;
+            height: auto;
+            border: 0px solid #57fc9d;
+            border-radius: 10px;
+            padding: 8px;
+            background: transparent;
+        }
+        
+        /* Медиа-запросы для мобильных устройств */
+        @media screen and (max-width: 480px) {
+            .menu-button {
+                font-size: 16px;
+                padding: 20px 16px;
+            }
+            .dropdown-menu {
+                min-width: 180px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .dropdown-menu a {
+                font-size: 16px;
+                padding: 14px 16px;
+                white-space: nowrap;
+            }
+            .qr-code img {
+                max-width: 325px;
+            }
+        }
+        
+        /* Специальные стили для iOS */
+        @supports (-webkit-touch-callout: none) {
+            .dropdown-menu a {
+                -webkit-font-smoothing: antialiased;
+                -webkit-text-size-adjust: 100%;
+            }
+            .menu-button {
+                -webkit-font-smoothing: antialiased;
+                -webkit-text-size-adjust: 100%;
+            }
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @supports (-webkit-touch-callout: none) {
+            .text, .iam {
+                -webkit-font-smoothing: subpixel-antialiased;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-container">
+            <div class="iam">
+<svg xmlns="http://www.w3.org/2000/svg" width="310.702" height="94" viewBox="0 0 66.067 11.642">
+<g aria-label="EMIIA.AI" style="line-height:1.25;-inkscape-font-specification:Montserrat" font-weight="400" font-size="107.126" font-family="Orbitron" letter-spacing="0" word-spacing="0" fill="#57fc9d" stroke-width="1.75">
+<path d="M10.66 0v1.31H1.313v3.848h7.512v1.326H1.314v3.848h9.345v1.31H0V0zM18.566 5.756L23.416 0h1.801v11.642h-1.314V1.488L18.566 7.81l-5.338-6.322v10.154h-1.314V0h1.8zM26.981 11.642V0h1.315v11.642zM30.562 11.642V0h1.314v11.642zM36.106 0h7.787q.812 0 1.38.566.567.566.567 1.374v9.702h-1.314V7.389h-9.053v4.253H34.16V1.94q0-.808.568-1.374Q35.295 0 36.106 0zm-.633 6.08h9.053V1.94q0-.258-.194-.436-.179-.194-.439-.194h-7.787q-.26 0-.454.194-.179.178-.179.436zM48.987 10.316v1.326h-1.33v-1.326zM53.154 0h7.787q.812 0 1.38.566.567.566.567 1.374v9.702h-1.314V7.389h-9.053v4.253h-1.314V1.94q0-.808.568-1.374Q52.343 0 53.154 0zm-.633 6.08h9.053V1.94q0-.258-.195-.436-.178-.194-.438-.194h-7.787q-.26 0-.454.194-.179.178-.179.436zM64.753 11.642V0h1.314v11.642z" style="-inkscape-font-specification:Orbitron"/></g>
+</svg>
+</div>
+            <span class="text"></span>
+        </div>
+        
+        <!-- Кнопка меню и выпадающий список -->
+        <div class="menu-container">
+            <button class="menu-button">&ensp;&ensp;        ДАННЫЕ ПРОЕКТА/DATA     &ensp;&ensp;&ensp; </button>
+            <div class="dropdown-menu"> <!-- УБРАН класс show - меню изначально видимо -->
+                <a href="#about">САЙТ RU&ensp;&ensp;&ensp;&ensp;&ensp;</a>
+                <a href="#services">HOME EN&ensp;&ensp;&ensp;</a>
+                <a href="#projects">ПРЕЗЕНТАЦИЯ RU&ensp;&ensp;&ensp;&ensp;</a>
+                <a href="#contact">PRESENTATION EN</a>
+                <a href="#projects">ИНВЕСТПРЕДЛОЖЕНИЕ RU&ensp;&ensp;&ensp;&ensp;&ensp;</a>
+                <a href="#contact">INVESTMENT PROPOSAL EN</a>
+                <a href="#QR" class="qr-link">QR</a>
+            </div>
+        </div>
+        
+        <!-- QR-код -->
+        <div class="qr-code hidden" id="qrCode"> <!-- Добавлен класс hidden -->
+            <img src="https://sos.emiia.ai/QR-01.png" alt="QR Code">
+        </div>
+    </div>
+</body>
+<script>
+   var typing = new Typed(".text", {
+       strings: [" ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ", " SPATIAL INTELLIGENCE"],
+       typeSpeed: 100,
+       backSpeed: 40,
+       loop: true,
+       cursorChar: '_',
+       startDelay: 500,
+       fadeOut: false,
+       shuffle: false,
+       backDelay: 1500,
+       smartBackspace: true,
+   });
+
+   // JavaScript для меню и QR-кода
+   document.addEventListener('DOMContentLoaded', function() {
+       const menuButton = document.querySelector('.menu-button');
+       const dropdownMenu = document.querySelector('.dropdown-menu');
+       const qrCode = document.getElementById('qrCode');
+       const qrLink = document.querySelector('.qr-link');
+       
+       // Меню изначально открыто, QR-код скрыт
+       dropdownMenu.classList.remove('hidden');
+       qrCode.classList.add('hidden');
+       
+       function toggleMenu() {
+           const isMenuVisible = !dropdownMenu.classList.contains('hidden');
+           
+           if (isMenuVisible) {
+               // Если меню видимо - скрываем его и показываем QR-код
+               dropdownMenu.classList.add('hidden');
+               qrCode.classList.remove('hidden');
+           } else {
+               // Если меню скрыто - показываем его и скрываем QR-код
+               dropdownMenu.classList.remove('hidden');
+               qrCode.classList.add('hidden');
+           }
+       }
+       
+       menuButton.addEventListener('click', function(e) {
+           e.stopPropagation();
+           toggleMenu();
+       });
+       
+       // Закрытие меню при клике на ссылку QR
+       qrLink.addEventListener('click', function(e) {
+           e.preventDefault();
+           dropdownMenu.classList.add('hidden');
+           qrCode.classList.remove('hidden');
+       });
+       
+       // Закрытие меню при клике вне его
+       document.addEventListener('click', function(e) {
+           if (!dropdownMenu.contains(e.target) && e.target !== menuButton) {
+               dropdownMenu.classList.add('hidden');
+               qrCode.classList.remove('hidden');
+           }
+       });
+       
+       // Предотвращаем закрытие при клике на само меню
+       dropdownMenu.addEventListener('click', function(e) {
+           e.stopPropagation();
+       });
+   });
+</script>
+</html>
