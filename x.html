@@ -45,7 +45,9 @@
         }
         html, body {
             height: 100%;
-            overflow: auto;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
         }
         body {
             background-color: #383838;
@@ -56,17 +58,21 @@
             font-family: Montserrat, monospace !important;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            padding: 20px;
+            padding: 0;
             margin: 0;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
         .container {
             width: 100%;
             max-width: 800px;
-            padding: 40px 20px;
+            padding: 20px;
             text-align: center;
             position: relative;
-            margin: auto;
+            margin: 0 auto;
         }
         .text-container {
             display: inline-block;
@@ -190,11 +196,8 @@
         
         /* Медиа-запросы для мобильных устройств */
         @media screen and (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
             .container {
-                padding: 20px 10px;
+                padding: 15px;
             }
             .menu-button {
                 font-size: 16px;
@@ -212,6 +215,31 @@
             }
             .qr-code img {
                 max-width: 325px;
+            }
+            .iam {
+                font-size: 60px;
+                margin-bottom: -25px;
+            }
+        }
+        
+        /* Для очень маленьких экранов */
+        @media screen and (max-height: 700px) {
+            .iam {
+                font-size: 60px;
+                margin-bottom: -25px;
+            }
+            .container {
+                padding: 10px;
+            }
+        }
+        
+        @media screen and (max-height: 600px) {
+            .iam {
+                font-size: 50px;
+                margin-bottom: -20px;
+            }
+            .text {
+                font-size: 13px;
             }
         }
         
@@ -259,21 +287,6 @@
             color: #57fc9d;
             text-decoration: none;
         }
-
-        /* Для очень маленьких экранов */
-        @media screen and (max-height: 600px) {
-            .container {
-                padding: 20px 10px;
-            }
-            .iam {
-                font-size: 60px;
-                margin-bottom: -25px;
-            }
-            .fixed-block {
-                padding: 15px;
-                position: relative;
-            }
-        }
     </style>
 </head>
 <body>
@@ -314,11 +327,6 @@
     </div>
 
 <script>
-   // Предотвращаем восстановление прокрутки
-   if (history.scrollRestoration) {
-       history.scrollRestoration = 'manual';
-   }
-
    // Инициализация Typed.js
    var typing = new Typed(".text", {
        strings: [" ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ", " SPATIAL INTELLIGENCE"],
@@ -344,12 +352,10 @@
        dropdownMenu.classList.remove('hidden');
        qrCode.classList.add('hidden');
        
-       // Принудительно сбросить прокрутку при загрузке
-       setTimeout(() => {
-           window.scrollTo(0, 0);
-           document.body.scrollTop = 0;
-           document.documentElement.scrollTop = 0;
-       }, 100);
+       // Гарантируем, что страница всегда в начале
+       window.scrollTo(0, 0);
+       document.body.scrollTop = 0;
+       document.documentElement.scrollTop = 0;
        
        function toggleMenu() {
            const isMenuVisible = !dropdownMenu.classList.contains('hidden');
@@ -401,28 +407,31 @@
            dropdownMenu.classList.remove('hidden');
            qrCode.classList.add('hidden');
            
-           // Сбросить прокрутку
-           setTimeout(() => {
-               window.scrollTo(0, 0);
-               document.body.scrollTop = 0;
-               document.documentElement.scrollTop = 0;
-           }, 50);
+           // Гарантируем, что страница всегда в начале
+           window.scrollTo(0, 0);
+           document.body.scrollTop = 0;
+           document.documentElement.scrollTop = 0;
        }
    });
 
-   // Дополнительная защита - сброс прокрутки при любом изменении видимости страницы
+   // Дополнительная защита - сброс прокрутки при загрузке
    window.addEventListener('load', function() {
        setTimeout(() => {
            window.scrollTo(0, 0);
        }, 100);
    });
 
-   // Сброс прокрутки при изменении размера окна (на всякий случай)
-   window.addEventListener('resize', function() {
-       setTimeout(() => {
-           window.scrollTo(0, 0);
-       }, 100);
+   // Блокируем любую прокрутку
+   document.addEventListener('scroll', function(e) {
+       window.scrollTo(0, 0);
    });
+
+   document.addEventListener('touchmove', function(e) {
+       e.preventDefault();
+   }, { passive: false });
+
+   document.addEventListener('wheel', function(e) {
+       e.preventDefault();
+   }, { passive: false });
 </script>
 </html>
-
