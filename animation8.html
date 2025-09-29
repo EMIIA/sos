@@ -357,33 +357,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
   const coords = document.getElementById('coords');
 
   setTimeout(() => {
-    coords.textContent = '37.63090783, 55.83399240'; // меняем через 1 сек
+    coords.textContent = '38.17402780, 58.977085266'; // меняем через 1 сек
   }, 5000);
 
   setTimeout(() => {
-    coords.textContent = '37.63102306, 55.83405016'; // меняем через 1 + 5 = 6 сек
+    coords.textContent = '39.17402780, 59.977085266'; // меняем через 1 + 5 = 6 сек
   }, 10000);
-
-
- setTimeout(() => {
-    coords.textContent = '37.63102306, 55.83405016'; // меняем через 1 + 5 = 6 сек
-  }, 12000);
-
-
-setTimeout(() => {
-    coords.textContent = '37.63102306, 55.83405016'; // меняем через 1 + 5 = 6 сек
-  }, 12000);
-
-
-setTimeout(() => {
-    coords.textContent = '37.63102376, 55.83409272'; // меняем через 1 + 5 = 6 сек
-  }, 14000);
-
-
-
-
-
-
 </script>
 
 
@@ -415,24 +394,18 @@ setTimeout(() => {
         container: 'map', // container id
         // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
         style: 'https://api.maptiler.com/maps/01997178-8b1b-727b-94f9-da8406965a06/style.json?key=QN6ALYSRnAohNK6Y8BiB',
-              zoom: 8,
+              zoom: 17,
 
 
 
 
       
         minZoom: 9,
-        maxZoom: 24,
+        maxZoom: 22,
 
-        minPitch: 0,
+minPitch: 0,
 
-        maxPitch: 70,
-
-        pitch: 180,
-
-        bearing: 18, // bearing in degrees
-
-           
+maxPitch: 73,
         center: [37.630907830210646, 55.8339924045205],
  
          
@@ -443,6 +416,7 @@ setTimeout(() => {
         
 
 
+        bearing: 18, // bearing in degrees
 
 
 
@@ -657,10 +631,8 @@ const pulsingDot = {
     }
 };
 
-// Координаты для анимации точки
+// Координаты для анимации
 const coordinates = [
-
-
  [
             37.63095623,
             55.83392605
@@ -681,8 +653,6 @@ const coordinates = [
              37.63095623,
             55.83392605
           ]
-
-
 ];
 
 map.on('load', () => {
@@ -712,7 +682,7 @@ map.on('load', () => {
         'id': 'layer-with-pulsing-dot',
         'type': 'symbol',
         'source': 'dot-point',
-        'minzoom': 8,
+        'minzoom': 9,
         'layout': {
             'icon-image': 'pulsing-dot',
             'icon-offset': [0, 0],
@@ -1460,7 +1430,8 @@ const title = document.getElementById('location-title');
 
 
 
-        {
+
+       {
             'id': '2',
             'title': 'ID [2]: #383838  ⋮',
             'description':
@@ -1470,7 +1441,7 @@ const title = document.getElementById('location-title');
                 center: [37.630907830210646, 55.8339924045205],
 
 
-                zoom: 8,
+                zoom: 12.5,
                 bearing: 18,
                 pitch: 280
             }
@@ -1536,9 +1507,6 @@ const title = document.getElementById('location-title');
             }
         }
     ];
-
-
-
 
     function highlightBorough(code) {
         // Only show the polygon feature that corresponds to `borocode` in the data.
@@ -1941,8 +1909,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 </body>
 </html>
-
-
 
 
 
