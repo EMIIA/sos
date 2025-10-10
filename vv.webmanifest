@@ -1,6 +1,6 @@
 {
   "background_color": "#1b2323",
-  "description": "ВкусВилл DS • ❯",
+  "description": "ВкусВилл • ❯",
   "display": "standalone",
   "icons": [
     {
@@ -9,7 +9,7 @@
             "type": "image/png"
     }
   ],
-  "name": "ВкусВилл DS • ❯",
-  "short_name": "ВкусВилл DS • ❯",
+  "name": "ВкусВилл • ❯",
+  "short_name": "ВкусВилл • ❯",
   "start_url": "/vv.html"
 }
