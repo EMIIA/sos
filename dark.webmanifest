@@ -1,17 +1,25 @@
 {
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "description": "ВкусВилл • ❯",
-  "display": "standalone",
-  "icons": [
-    {
-      "src": "/192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ],
   "name": "ВкусВилл • ❯",
   "short_name": "ВкусВилл • ❯",
+  "description": "ВкусВилл • ❯",
   "start_url": "/vv.html",
-  "orientation": "portrait"
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "https://sos.emiia.ai/192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://sos.emiia.ai/512x512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
