@@ -370,7 +370,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 .marker {
-        background-image: url('https://analytics.emiia.ai/svg/pinnewwhite.svg');
+        background-image: url('https://sos.emiia.ai/vv_g_m_emiia.svg');
         background-size: cover;
         width: 90px;
         height: 43px;
@@ -393,9 +393,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 :root {
   --popup-bg-color: lightgreen;
-  --popup-text-color: #3d85c6;; /* Цвет текста по умолчанию */
-  --close-button-color: #3d85c6;;
-  --close-button-hover-color: red;
+  --popup-text-color: #3d85c6;
+  --close-button-color: #3d85c6;
+  --close-button-hover-color: #383838;
+  --close-button-bg-hover: rgba(0, 0, 0, 0.1);
 }
 
 .marker1 {
@@ -416,14 +417,41 @@ font-size: 18px; /* Увеличьте значение по необходим�
   font-family: 'Montserrat', montserrat !important; 
   border-radius: 20px;
   background-color: var(--popup-bg-color);
-  color: var(--popup-text-color); /* Применяем переменную для цвета текста */
+  color: var(--popup-text-color);
   padding: 15px;
 }
 
-/* Делаем хвостик такого же цвета как popup */
-.mapboxgl-popup-tip {
-  border-top-color: var(--popup-bg-color) !important;
+/* Правильное окрашивание хвостика для всех положений */
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: var(--popup-bg-color) !important;
+}
 
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
+  border-bottom-color: var(--popup-bg-color) !important;
+}
+
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+  border-bottom-color: var(--popup-bg-color) !important;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: var(--popup-bg-color) !important;
+}
+
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
+  border-top-color: var(--popup-bg-color) !important;
+}
+
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+  border-top-color: var(--popup-bg-color) !important;
+}
+
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color: var(--popup-bg-color) !important;
+}
+
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color: var(--popup-bg-color) !important;
 }
 
 /* Стили для кнопки закрытия (крестика) */
@@ -434,11 +462,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
   margin: 2px;
   border: none;
   background: none;
-  border-radius: 50%;
+  border-radius: 10px;
 }
 
 .mapboxgl-popup-close-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--close-button-bg-hover);
   color: var(--close-button-hover-color);
 }
 
@@ -446,7 +474,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
   outline: none;
   box-shadow: none;
 }
-
 
 </style>
 
