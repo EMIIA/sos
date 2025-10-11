@@ -1,0 +1,15 @@
+{
+  "background_color": "#383838",
+  "description": "ВкусВилл • ❯",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+    }
+  ],
+  "name": "ВкусВилл • ❯",
+  "short_name": "ВкусВилл • ❯",
+  "start_url": "/vv.html"
+}
