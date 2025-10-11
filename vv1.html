@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -363,6 +364,108 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
+<style>
+
+
+
+
+.marker {
+        background-image: url('https://analytics.emiia.ai/svg/pinnewwhite.svg');
+        background-size: cover;
+        width: 90px;
+        height: 43px;
+        border-radius: 0%;
+        cursor: pointer;
+      }
+      .mapboxgl-popup {
+        max-width: 200px;
+
+      }
+      .mapboxgl-popup-content {
+        text-align: left;
+        font-family: 'Montserrat', montserrat !important; 
+        border-radius: 20px;
+        background-color: lightgreen;
+      }
+
+
+
+
+:root {
+  --popup-bg-color: lightgreen;
+  --popup-text-color: #3d85c6;; /* Цвет текста по умолчанию */
+  --close-button-color: #3d85c6;;
+  --close-button-hover-color: red;
+}
+
+.marker1 {
+  background-image: url('https://sos.emiia.ai/vv_g_m.svg');
+  background-size: cover;
+  width: 80px;
+  height: 80px;
+  border-radius: 0%;
+  cursor: pointer;
+}
+
+.mapboxgl-popup {
+  max-width: 290px;
+}
+
+.mapboxgl-popup-content {
+  text-align: left;
+  font-family: 'Montserrat', montserrat !important; 
+  border-radius: 20px;
+  background-color: var(--popup-bg-color);
+  color: var(--popup-text-color); /* Применяем переменную для цвета текста */
+  padding: 15px;
+}
+
+/* Делаем хвостик такого же цвета как popup */
+.mapboxgl-popup-tip {
+  border-top-color: var(--popup-bg-color) !important;
+
+}
+
+/* Стили для кнопки закрытия (крестика) */
+.mapboxgl-popup-close-button {
+  color: var(--close-button-color);
+  font-size: 18px;
+  padding: 8px;
+  margin: 2px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+}
+
+.mapboxgl-popup-close-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: var(--close-button-hover-color);
+}
+
+.mapboxgl-popup-close-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div id="map"></div>
 
@@ -442,6 +545,61 @@ pitch: 45,
 
 
 
+var geojson = {
+  'type': 'FeatureCollection',
+  'features': [
+    {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': [37.63147405, 55.83441285]
+      },
+      'properties': {
+        'title': 'EMIIA.AI SIP',
+        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯EMIIA.AI SIP: ВкусВиллID R: [#3D4581]'
+      }
+    }
+  ]
+};
+
+// add markers to map
+geojson.features.forEach(function (marker) {
+  // create a HTML element for each feature
+  var el = document.createElement('div');
+  el.className = 'marker';
+
+  // make a marker for each feature and add it to the map
+  var markerObj = new mapboxgl.Marker(el)
+    .setLngLat(marker.geometry.coordinates)
+    .setPopup(
+      new mapboxgl.Popup({ offset: 25 }) // add popups
+        .setHTML(
+          '<h3>' +
+            marker.properties.title +
+            '</h3><p>' +
+            marker.properties.description +
+            '</p>'
+        )
+    )
+    .addTo(map);
+
+  // Функция для показа/скрытия маркера в зависимости от зума
+  function updateMarkerVisibility() {
+    var zoom = map.getZoom();
+    if (zoom >= 17) {
+      el.style.display = 'none'; // Скрыть маркер
+    } else {
+      el.style.display = 'block'; // Показать маркер
+    }
+  }
+
+  // Слушаем событие изменения зума
+  map.on('zoom', updateMarkerVisibility);
+
+  // Проверяем видимость при загрузке
+  updateMarkerVisibility();
+});
+    
 
 
 
@@ -452,8 +610,65 @@ pitch: 45,
 
    
 
+var geojson = {
+        'type': 'FeatureCollection',
+        'features': [
+          {
+            'type': 'Feature',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [37.63252677, 55.83407767]
+            },
+            'properties': {
+             'title': 'EMIIA.AI SIP',
+              'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯EMIIA.AI SIP: ВкусВиллID R: [#3D4581]'
+            }
+          
+          }
+        ]
+      };
 
 
+
+
+// add markers to map
+      geojson.features.forEach(function (marker1) {
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'marker1';
+
+        // make a marker for each feature and add it to the map
+        new mapboxgl.Marker(el)
+          .setLngLat(marker1.geometry.coordinates)
+          .setPopup(
+            new mapboxgl.Popup({ offset: 25 }) // add popups
+              .setHTML(
+                '<h3>' +
+                  marker1.properties.title +
+                  '</h3><p>' +
+                  marker1.properties.description +
+                  '</p>'
+              )
+          )
+        .addTo(map);
+
+  // Функция для показа/скрытия маркера в зависимости от зума
+  function updateMarkerVisibility() {
+    var zoom = map.getZoom();
+    if (zoom >= 17) {
+      el.style.display = 'none'; // Скрыть маркер
+    } else {
+      el.style.display = 'block'; // Показать маркер
+    }
+  }
+
+  // Слушаем событие изменения зума
+  map.on('zoom', updateMarkerVisibility);
+
+  // Проверяем видимость при загрузке
+  updateMarkerVisibility();
+});
+    
 
 
 
