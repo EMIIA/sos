@@ -405,10 +405,11 @@ function toggleAccordion(header) {
 
 
 .marker {
-        background-image: url('https://sos.emiia.ai/vv_g_m.svg');
+        background-image: url('https://sos.emiia.ai/vv_g_m_DARKSTORE_21.svg');
         background-size: cover;
-  width: 80px;
+ width: 80px;
   height: 80px;
+  
   border-radius: 0%;
   cursor: pointer;
       }
@@ -435,10 +436,10 @@ function toggleAccordion(header) {
 }
 
 .marker1 {
-  background-image: url('https://sos.emiia.ai/vv_g_m_emiia.svg');
+  background-image: url('https://sos.emiia.ai/vv_g_m_STORE_33.svg');
   background-size: cover;
-  width: 110px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   border-radius: 0%;
   cursor: pointer;
 }
@@ -725,14 +726,7 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 
 <div id="map"></div>
-<pre id="info"></pre>
 
-
-<h2 id="location-title"></h2>
-       
-         <p id="location-description"></p>
-
-<div class="calculation-box">
 
 
 
@@ -776,7 +770,7 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 
 
-        center: [37.630907830210646, 55.8339924045205],
+        center: [37.63110809,55.83410166],
  
          
         hash: true,
@@ -833,7 +827,7 @@ var geojson = {
       'type': 'Feature',
       'geometry': {
         'type': 'Point',
-        'coordinates': [37.63147405, 55.83441285]
+        'coordinates': [37.63252677, 55.83407767 ]
       },
       'properties': {
         'title': 'EMIIA.AI SIP: API DATASET',
@@ -892,7 +886,7 @@ var geojson = {
             'type': 'Feature',
             'geometry': {
                 'type': 'Point',
-                'coordinates': [37.63252677, 55.83407767]
+                'coordinates': [37.63147405, 55.83441285]
             },
             'properties': {
                 'title': 'EMIIA.AI SIP: API DATASET',
@@ -929,7 +923,7 @@ function formatISSData(issData) {
     
     return `
         <div class="iss-data">
-            <h3>ВкусВилл Dark Store: #33</h3>
+            <h3>ВкусВилл Store: #21</h3>
             <div class="data-grid">
                 <div class="data-item">
                     <strong>Широта:</strong> ${issData.latitude ? issData.latitude.toFixed(4) : 'N/A'}°
