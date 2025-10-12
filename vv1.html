@@ -484,11 +484,21 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
+<style>
 
+/* Основные стили для размытия */
+.blur-background {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.1);
+}
 
+/* Альтернатива для браузеров без поддержки backdrop-filter */
+.no-backdropfilter .blur-background {
+    background-color: rgba(255, 255, 255, 0.8);
+}
 
-
-
+</style>
 
 
 
@@ -2084,6 +2094,134 @@ map.on('mousemove', (e) => {
 
 
 
+<script>
+
+class EnhancedBlurHandler {
+    constructor() {
+        this.isVisible = true;
+        this.blurIntensity = 10;
+        this.init();
+    }
+
+    init() {
+        this.createBlurOverlay();
+        this.setupEventListeners();
+    }
+
+    createBlurOverlay() {
+        const overlay = document.createElement('div');
+        overlay.id = 'blur-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            background-color: rgba(255, 255, 255, 0);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+        `;
+        document.body.appendChild(overlay);
+        this.overlay = overlay;
+    }
+
+    setupEventListeners() {
+        // Page Visibility API
+        document.addEventListener('visibilitychange', () => {
+            this.handleVisibilityChange();
+        });
+
+        // Резервные события
+        window.addEventListener('blur', () => this.handleBlur());
+        window.addEventListener('focus', () => this.handleFocus());
+
+        // Проверка поддержки
+        this.checkBackdropFilterSupport();
+    }
+
+    handleVisibilityChange() {
+        this.isVisible = !document.hidden;
+        this.animateBlur();
+    }
+
+    handleBlur() {
+        this.isVisible = false;
+        this.animateBlur();
+    }
+
+    handleFocus() {
+        this.isVisible = true;
+        this.animateBlur();
+    }
+
+    animateBlur() {
+        if (!this.isVisible) {
+            this.overlay.style.backdropFilter = `blur(${this.blurIntensity}px)`;
+            this.overlay.style.webkitBackdropFilter = `blur(${this.blurIntensity}px)`;
+            this.overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            this.overlay.style.opacity = '1';
+        } else {
+            this.overlay.style.backdropFilter = 'blur(0px)';
+            this.overlay.style.webkitBackdropFilter = 'blur(0px)';
+            this.overlay.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+            this.overlay.style.opacity = '0';
+        }
+    }
+
+    checkBackdropFilterSupport() {
+        if (!CSS.supports('backdrop-filter', 'blur(10px)') && 
+            !CSS.supports('-webkit-backdrop-filter', 'blur(10px)')) {
+            console.warn('Backdrop-filter не поддерживается');
+            // Можно добавить альтернативное решение
+        }
+    }
+
+    // Метод для изменения интенсивности размытия
+    setBlurIntensity(intensity) {
+        this.blurIntensity = intensity;
+        if (!this.isVisible) {
+            this.animateBlur();
+        }
+    }
+}
+
+// Использование
+const enhancedBlur = new EnhancedBlurHandler();
+
+// Опционально: изменить интенсивность размытия
+// enhancedBlur.setBlurIntensity(15);
+
+
+ </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2271,6 +2409,14 @@ font-size: 18px; /* Увеличьте значение по необходим�
 <link rel="stylesheet" href="/cssfamily=Montserrat.css">
 
 
+
+
+
+
+
+
+
+ 
 
 
 
