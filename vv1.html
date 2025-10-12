@@ -850,10 +850,15 @@ function formatISSData(issData) {
                 <div class="data-item">
                     <strong>Видимость:</strong> ${issData.visibility}
                 </div>
-                <div class="data-item">
-                    <strong>Обновлено:</strong> ${new Date().toLocaleTimeString()}
-                </div>
+
+ <div class="data-item">
+    <strong>Обновлено:</strong> ${new Date().toLocaleTimeString('ru-RU') + '.' + new Date().getMilliseconds().toString().padStart(3, '0')}
+</div>
+
+
             </div>
+
+
             <div class="update-info">
                 Автообновление каждые 5 ms
             </div>
