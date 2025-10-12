@@ -783,16 +783,6 @@ geojson.features.forEach(function (marker) {
   // Проверяем видимость при загрузке
   updateMarkerVisibility();
 });
-    
-
-
-
-
-
-
-
-
-   
 
 var geojson = {
     'type': 'FeatureCollection',
@@ -823,44 +813,47 @@ async function fetchISSData() {
     }
 }
 
+// Функция для даты (ВЫНЕСЕНА ИЗ fetchISSData)
+function getCurrentDate() {
+    return new Date().toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
 // Функция для форматирования данных ISS
 function formatISSData(issData) {
-    if (!issData) return 'Данные не доступны';
+    if (!issData) return '<div class="error">Данные не доступны</div>';
     
     return `
         <div class="iss-data">
             <h3>EMIIA.AI SIP: API REAL TIME</h3>
             <div class="data-grid">
                 <div class="data-item">
-                    <strong>Широта:</strong> ${issData.latitude.toFixed(4)}°
+                    <strong>Широта:</strong> ${issData.latitude ? issData.latitude.toFixed(4) : 'N/A'}°
                 </div>
                 <div class="data-item">
-                    <strong>Долгота:</strong> ${issData.longitude.toFixed(4)}°
+                    <strong>Долгота:</strong> ${issData.longitude ? issData.longitude.toFixed(4) : 'N/A'}°
                 </div>
                 <div class="data-item">
-                    <strong>Высота:</strong> ${issData.altitude.toFixed(2)} см
+                    <strong>Высота:</strong> ${issData.altitude ? issData.altitude.toFixed(2) : 'N/A'} км
                 </div>
-
-
-<div class="data-item">
-    <strong>Скорость:</strong> ${issData.velocity.toFixed(2).replace(/(\d)(?=\d{4,})/, '$1,').replace('.', ',')} км/ч
-</div>
-
-
                 <div class="data-item">
-                    <strong>Видимость:</strong> ${issData.visibility}
+                    <strong>Скорость:</strong> ${issData.velocity ? issData.velocity.toFixed(2).replace(/(\d)(?=\d{4,})/, '$1,').replace('.', ',') : 'N/A'} км/ч
                 </div>
-
- <div class="data-item">
-    <strong>Обновлено:</strong> ${new Date().toLocaleTimeString('ru-RU') + '.' + new Date().getMilliseconds().toString().padStart(3, '0')}
-</div>
-
-
+                <div class="data-item">
+                    <strong>Видимость:</strong> ${issData.visibility || 'N/A'}
+                </div>
+                <div class="data-item">
+                    <strong>Обновлено:</strong> ${new Date().toLocaleTimeString('ru-RU') + '.' + new Date().getMilliseconds().toString().padStart(3, '0')}
+                </div>
+                <div class="data-item">
+                    <strong>Дата:</strong> ${getCurrentDate()}
+                </div>
             </div>
-
-
             <div class="update-info">
-                Автообновление каждые 5 ms
+                Автообновление каждые 0.5 секунды
             </div>
         </div>
     `;
@@ -874,7 +867,6 @@ geojson.features.forEach(function (marker1) {
     // Создаем popup с первоначальным контентом
     var popup = new mapboxgl.Popup({ 
         offset: 25,
-       
         maxWidth: '400px'
     }).setHTML(`
         <div class="popup-content">
@@ -909,7 +901,7 @@ geojson.features.forEach(function (marker1) {
     marker.getElement().addEventListener('click', function() {
         // Запускаем обновление при открытии popup
         updateISSData();
-        updateInterval = setInterval(updateISSData, 500); // Обновление каждые 1 секунд
+        updateInterval = setInterval(updateISSData, 500); // Обновление каждые 0.5 секунд
     });
 
     // Останавливаем обновление при закрытии popup
@@ -941,14 +933,6 @@ geojson.features.forEach(function (marker1) {
     map.on('zoom', updateMarkerVisibility);
     updateMarkerVisibility();
 });
-
-
-
-
-
-
-
-
 
 
 
