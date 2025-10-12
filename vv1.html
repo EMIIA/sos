@@ -992,14 +992,14 @@ const pulsingDot = {
         context.moveTo(centerX, centerY);
         context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
         context.closePath();
-        context.fillStyle = `rgba(61, 133, 198, ${opacity})`; // Исправлен синтаксис
+        context.fillStyle = `rgba(45, 190, 100, ${opacity})`; // Исправлен синтаксис
         context.fill();
 
         // Рисуем центральную точку
         const radius = (size / 2) * 0.35;
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        context.fillStyle = 'rgba(61, 133, 198, 1)';
+        context.fillStyle = 'rgba(144, 238, 144, 1)';
         context.strokeStyle = 'white';
         context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
         context.fill();
