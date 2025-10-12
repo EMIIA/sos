@@ -519,6 +519,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
     border-radius: 6px;
     border-left: 0px solid #3d85c6;
     max-width: 250px;
+z-index: 10000 !important; /* Очень высокий z-index */
 }
 
 .data-grid {
@@ -528,6 +529,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
     margin: 10px 0;
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 300;
+z-index: 10000 !important; /* Очень высокий z-index */
 }
 
 .data-item {
@@ -539,6 +541,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
     line-height: 1.3;
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 300; /* Тонкое начертание */
+z-index: 10000 !important; /* Очень высокий z-index */
 }
 
 .data-item strong {
@@ -647,6 +650,23 @@ font-size: 18px; /* Увеличьте значение по необходим�
 .data-item, .update-info, .loading, .error {
     letter-spacing: 0.02em; /* Небольшой межбуквенный интервал */
 }
+
+
+
+/* Стили для popup поверх всех элементов */
+.top-popup {
+    z-index: 10000 !important; /* Очень высокий z-index */
+}
+
+.mapboxgl-popup.top-popup {
+    z-index: 10000 !important;
+}
+
+.mapboxgl-popup-content.top-popup {
+    z-index: 10001 !important;
+}
+
+
 </style>
 
 
@@ -871,6 +891,7 @@ geojson.features.forEach(function (marker1) {
     // Создаем popup с первоначальным контентом
     var popup = new mapboxgl.Popup({ 
         offset: 25,
+className: 'top-popup', // Добавляем класс для позиционирования поверх всех
         maxWidth: '400px'
     }).setHTML(`
         <div class="popup-content">
