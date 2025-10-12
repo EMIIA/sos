@@ -509,7 +509,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 <style>
 
 .iss-data {
-    font-family: Arial, sans-serif;
+ font-family: 'Montserrat', montserrat !important; 
     margin-top: 12px;
     padding: 12px;
     background: #90ee90;
@@ -804,9 +804,13 @@ function formatISSData(issData) {
                 <div class="data-item">
                     <strong>Высота:</strong> ${issData.altitude.toFixed(2)} см
                 </div>
-                <div class="data-item">
-                    <strong>Скорость:</strong> ${issData.velocity.toFixed(2)} км/ч
-                </div>
+
+
+<div class="data-item">
+    <strong>Скорость:</strong> ${issData.velocity.toFixed(2).replace(/(\d)(?=\d{4,})/, '$1,').replace('.', ',')} км/ч
+</div>
+
+
                 <div class="data-item">
                     <strong>Видимость:</strong> ${issData.visibility}
                 </div>
@@ -815,7 +819,7 @@ function formatISSData(issData) {
                 </div>
             </div>
             <div class="update-info">
-                Автообновление каждые 2 секунды
+                Автообновление каждые 5 ms
             </div>
         </div>
     `;
@@ -829,7 +833,7 @@ geojson.features.forEach(function (marker1) {
     // Создаем popup с первоначальным контентом
     var popup = new mapboxgl.Popup({ 
         offset: 25,
-        closeOnClick: false,
+       
         maxWidth: '400px'
     }).setHTML(`
         <div class="popup-content">
@@ -864,7 +868,7 @@ geojson.features.forEach(function (marker1) {
     marker.getElement().addEventListener('click', function() {
         // Запускаем обновление при открытии popup
         updateISSData();
-        updateInterval = setInterval(updateISSData, 2000); // Обновление каждые 5 секунд
+        updateInterval = setInterval(updateISSData, 500); // Обновление каждые 1 секунд
     });
 
     // Останавливаем обновление при закрытии popup
