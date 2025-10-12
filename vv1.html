@@ -592,8 +592,8 @@ var geojson = {
         'coordinates': [37.63147405, 55.83441285]
       },
       'properties': {
-        'title': 'EMIIA.AI SIP',
-        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯EMIIA.AI SIP: ВкусВиллID R: [#3D4581]'
+        'title': 'EMIIA.AI SIP: API DATASET',
+        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВиллID R: [#3D4581]'
       }
     }
   ]
@@ -648,65 +648,179 @@ geojson.features.forEach(function (marker) {
    
 
 var geojson = {
-        'type': 'FeatureCollection',
-        'features': [
-          {
+    'type': 'FeatureCollection',
+    'features': [
+        {
             'type': 'Feature',
             'geometry': {
-              'type': 'Point',
-              'coordinates': [37.63252677, 55.83407767]
+                'type': 'Point',
+                'coordinates': [37.63252677, 55.83407767]
             },
             'properties': {
-             'title': 'EMIIA.AI SIP',
-              'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯EMIIA.AI SIP: ВкусВиллID R: [#3D4581]'
+                'title': 'EMIIA.AI SIP: API DATASET',
+                'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯EMIIA.AI SIP: ВкусВиллID R: [#3D4581]'
             }
-          
-          }
-        ]
-      };
+        }
+    ]
+};
 
-
-
+// Хранилище для маркеров и popup
+var markers = [];
 
 // add markers to map
-      geojson.features.forEach(function (marker1) {
-        // create a HTML element for each feature
-        var el = document.createElement('div');
-        el.className = 'marker1';
+geojson.features.forEach(function (marker1) {
+    // create a HTML element for each feature
+    var el = document.createElement('div');
+    el.className = 'marker1';
 
-        // make a marker for each feature and add it to the map
-        new mapboxgl.Marker(el)
-          .setLngLat(marker1.geometry.coordinates)
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 }) // add popups
-              .setHTML(
-                '<h3>' +
-                  marker1.properties.title +
-                  '</h3><p>' +
-                  marker1.properties.description +
-                  '</p>'
-              )
-          )
+    // Создаем popup
+    var popup = new mapboxgl.Popup({ 
+        offset: 25,
+        closeOnClick: false
+    }).setHTML(
+        '<h3>' +
+        marker1.properties.title +
+        '</h3><p>' +
+        marker1.properties.description +
+        '</p>'
+    );
+
+    // make a marker for each feature and add it to the map
+    var marker = new mapboxgl.Marker(el)
+        .setLngLat(marker1.geometry.coordinates)
+        .setPopup(popup)
         .addTo(map);
 
-  // Функция для показа/скрытия маркера в зависимости от зума
-  function updateMarkerVisibility() {
-    var zoom = map.getZoom();
-    if (zoom >= 17) {
-      el.style.display = 'none'; // Скрыть маркер
-    } else {
-      el.style.display = 'block'; // Показать маркер
+    // Сохраняем маркер и popup для управления видимостью
+    markers.push({
+        marker: marker,
+        element: el,
+        popup: popup
+    });
+
+    // Функция для показа/скрытия маркера и popup в зависимости от зума
+    function updateMarkerVisibility() {
+        var zoom = map.getZoom();
+        if (zoom >= 17) {
+            // Скрыть маркер
+            el.style.display = 'none';
+            // Закрыть popup если открыт
+            if (marker.getPopup().isOpen()) {
+                marker.getPopup().remove();
+            }
+        } else {
+            // Показать маркер
+            el.style.display = 'block';
+        }
     }
-  }
 
-  // Слушаем событие изменения зума
-  map.on('zoom', updateMarkerVisibility);
+    // Слушаем событие изменения зума
+    map.on('zoom', updateMarkerVisibility);
 
-  // Проверяем видимость при загрузке
-  updateMarkerVisibility();
+    // Слушаем открытие popup и проверяем зум
+    map.on('popupopen', function(e) {
+        var zoom = map.getZoom();
+        if (zoom >= 17) {
+            // Закрываем popup если зум >= 17
+            if (e.popup && e.popup === popup) {
+                popup.remove();
+            }
+        }
+    });
+
+    // Проверяем видимость при загрузке
+    updateMarkerVisibility();
 });
-    
 
+// Дополнительная функция для управления всеми маркерами
+function updateAllMarkersVisibility() {
+    var zoom = map.getZoom();
+    
+    markers.forEach(function(markerObj) {
+        if (zoom >= 17) {
+            // Скрыть маркер
+            markerObj.element.style.display = 'none';
+            // Закрыть popup
+            if (markerObj.marker.getPopup().isOpen()) {
+                markerObj.marker.getPopup().remove();
+            }
+        } else {
+            // Показать маркер
+            markerObj.element.style.display = 'block';
+        }
+    });
+}
+
+// Альтернативный подход с более строгим контролем
+function setupZoomControl() {
+    var zoomThreshold = 17;
+    
+    map.on('zoom', function() {
+        var currentZoom = map.getZoom();
+        
+        markers.forEach(function(markerObj) {
+            var marker = markerObj.marker;
+            var element = markerObj.element;
+            var popup = markerObj.popup;
+            
+            if (currentZoom >= zoomThreshold) {
+                // Скрываем элемент маркера
+                element.style.display = 'none';
+                
+                // Закрываем popup если открыт
+                if (marker.getPopup().isOpen()) {
+                    marker.togglePopup();
+                }
+                
+                // Блокируем открытие popup
+                element.style.pointerEvents = 'none';
+            } else {
+                // Показываем элемент маркера
+                element.style.display = 'block';
+                element.style.pointerEvents = 'auto';
+            }
+        });
+    });
+}
+
+// Инициализируем контроль зума
+setupZoomControl();
+
+// CSS для плавного скрытия
+var style = document.createElement('style');
+style.textContent = `
+    .marker1 {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .marker1.hidden {
+        opacity: 0;
+        transform: scale(0.5);
+        pointer-events: none;
+    }
+`;
+document.head.appendChild(style);
+
+// Улучшенная версия с анимацией
+function updateMarkerVisibilityWithAnimation() {
+    var zoom = map.getZoom();
+    
+    markers.forEach(function(markerObj) {
+        var element = markerObj.element;
+        var marker = markerObj.marker;
+        
+        if (zoom >= 17) {
+            element.classList.add('hidden');
+            if (marker.getPopup().isOpen()) {
+                marker.togglePopup();
+            }
+        } else {
+            element.classList.remove('hidden');
+        }
+    });
+}
+
+// Используем улучшенную версию
+map.on('zoom', updateMarkerVisibilityWithAnimation);
 
 
 
