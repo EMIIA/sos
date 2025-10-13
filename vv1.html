@@ -717,7 +717,7 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
       
         minZoom: 14,
-        maxZoom: 22,
+        maxZoom: 20.5,
 
 
         center: [37.630907830210646, 55.8339924045205],
@@ -1124,15 +1124,15 @@ const pulsingDot = {
         context.moveTo(centerX, centerY);
         context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
         context.closePath();
-        context.fillStyle = `rgba(45, 190, 100, ${opacity})`; // Исправлен синтаксис
+        context.fillStyle = `rgba(87, 257, 157, ${opacity})`;
         context.fill();
 
         // Рисуем центральную точку
         const radius = (size / 2) * 0.35;
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        context.fillStyle = 'rgba(144, 238, 144, 1)';
-        context.strokeStyle = 'white';
+        context.fillStyle = 'rgba(87, 257, 146, 1)';
+        context.strokeStyle = '#b2ffd3ff';
         context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
         context.fill();
         context.stroke();
@@ -1147,10 +1147,48 @@ const pulsingDot = {
     }
 };
 
+// Координаты для анимации
+const coordinates = [
+    [37.63095623, 55.83392605],
+    [37.630965946880735, 55.833929205500965],
+    [37.63096658453456, 55.83393231334793],
+    [37.630958536109056, 55.83393180851519],
+    [37.63095623, 55.83392605]
+];
+
 map.on('load', () => {
     // Устанавливаем 3D-наклон карты для эффекта поднятия
     map.setPitch(45); // Наклон карты на 45 градусов
     map.setBearing(0); // Опционально: угол поворота карты
+
+    // Добавляем источник для линии траектории
+    map.addSource('line-route', {
+        'type': 'geojson',
+        'data': {
+            'type': 'Feature',
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': coordinates
+            }
+        }
+    });
+
+    // Добавляем слой линии траектории
+    map.addLayer({
+        'id': 'route-line',
+        'type': 'line',
+        'source': 'line-route',
+'minzoom': 17,
+        'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#888888',  // Цвет линии
+            'line-width': 3,          // Толщина линии
+            'line-opacity': 0.6       // Прозрачность линии
+        }
+    }, '3d-buildings');
 
     map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 4 });
 
@@ -1163,7 +1201,7 @@ map.on('load', () => {
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': [37.63126405,55.83415987] // [lng, lat]
+                        'coordinates': coordinates[0] // Начальная позиция
                     }
                 }
             ]
@@ -1174,19 +1212,65 @@ map.on('load', () => {
         'id': 'layer-with-pulsing-dot',
         'type': 'symbol',
         'source': 'dot-point',
-        'minzoom': 14,
+        'minzoom': 17,
         'layout': {
             'icon-image': 'pulsing-dot',
-            'icon-offset': [0, 0], // Поднимаем точку вверх на 20 пикселей
-            'icon-allow-overlap': true, // Игнорируем перекрытие
-            'icon-ignore-placement': true // Игнорируем размещение других символов
+            'icon-offset': [0, 0],
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
         }
     }, '3d-buildings');
+
+    // Анимация перемещения точки
+    let currentIndex = 0;
+    const duration = 2000; // Длительность анимации между точками (мс)
+
+    function animatePoint() {
+        const nextIndex = (currentIndex + 1) % coordinates.length;
+        const startCoord = coordinates[currentIndex];
+        const endCoord = coordinates[nextIndex];
+        const startTime = performance.now();
+
+        function animate(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Линейная интерполяция между координатами
+            const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
+            const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
+            
+            // Обновляем позицию точки
+            map.getSource('dot-point').setData({
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [lng, lat]
+                        }
+                    }
+                ]
+            });
+
+            if (progress < 1) {
+                // Продолжаем анимацию
+                requestAnimationFrame(animate);
+            } else {
+                // Переходим к следующей точке
+                currentIndex = nextIndex;
+                setTimeout(() => {
+                    requestAnimationFrame(animatePoint);
+                }, 500); // Пауза перед следующим перемещением
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // Запускаем анимацию через небольшую задержку после загрузки карты
+    setTimeout(animatePoint, 1000);
 });
-
-
-
-
 
 
 
