@@ -1125,7 +1125,7 @@ const pulsingDot = {
         context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
         context.closePath();
 
- context.fillStyle = `rgba(45, 190, 100, ${opacity})`; // Исправлен синтаксис
+        context.fillStyle = `rgba(45, 190, 100, ${opacity})`;
         context.fill();
 
         // Рисуем центральную точку
@@ -1134,7 +1134,7 @@ const pulsingDot = {
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
         context.fillStyle = 'rgba(144, 238, 144, 1)';
         context.strokeStyle = '#f8f9fa';
- 
+
         context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
         context.fill();
         context.stroke();
@@ -1158,10 +1158,86 @@ const coordinates = [
     [37.63095623, 55.83392605]
 ];
 
+// Функция для получения данных ISS
+async function fetchISSData() {
+    try {
+        const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Ошибка получения данных ISS:', error);
+        return null;
+    }
+}
+
+// Функция для даты
+function getCurrentDate() {
+    return new Date().toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+// Функция для форматирования данных ISS
+function formatISSData(issData) {
+    if (!issData) return '<div class="error">Данные не доступны</div>';
+    
+    return `
+        <div class="iss-data">
+            <h3>ВкусВилл Dark Store: #33</h3>
+            <div class="data-grid">
+                <div class="data-item">
+                    <strong>Широта:</strong> ${issData.latitude ? issData.latitude.toFixed(4) : 'N/A'}°
+                </div>
+                <div class="data-item">
+                    <strong>Долгота:</strong> ${issData.longitude ? issData.longitude.toFixed(4) : 'N/A'}°
+                </div>
+                <div class="data-item">
+                    <strong>Высота:</strong> ${issData.altitude ? issData.altitude.toFixed(2) : 'N/A'} см
+                </div>
+                <div class="data-item">
+                    <strong>Скорость:</strong> ${issData.velocity ? issData.velocity.toFixed(2).replace(/(\d)(?=\d{4,})/, '$1,').replace('.', ',') : 'N/A'} км/ч
+                </div>
+                <div class="data-item">
+                    <strong>Видимость:</strong> ${issData.visibility || 'N/A'}
+                </div>
+                <div class="data-item">
+                    <strong>Обновлено:</strong> ${new Date().toLocaleTimeString('ru-RU') + '.' + new Date().getMilliseconds().toString().padStart(3, '0')}
+                </div>
+                <div class="data-item">
+                    <strong>Дата:</strong> ${getCurrentDate()}
+                </div>
+            </div>
+            <div class="update-info">
+                Автообновление каждые 500 ms
+            </div>
+        </div>
+    `;
+}
+
+// Создаем popup для точки
+let pointPopup = null;
+let updateInterval = null;
+
+// Функция для обновления данных в popup
+async function updatePopupData() {
+    const issData = await fetchISSData();
+    if (pointPopup && pointPopup.isOpen()) {
+        pointPopup.setHTML(`
+            <div class="popup-content">
+                <h3>EMIIA.AI SIP: API DATASET</h3>
+                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581]</p>
+                ${formatISSData(issData)}
+            </div>
+        `);
+    }
+}
+
 map.on('load', () => {
     // Устанавливаем 3D-наклон карты для эффекта поднятия
-    map.setPitch(45); // Наклон карты на 45 градусов
-    map.setBearing(0); // Опционально: угол поворота карты
+    map.setPitch(45);
+    map.setBearing(0);
 
     // Добавляем источник для линии траектории
     map.addSource('line-route', {
@@ -1180,15 +1256,15 @@ map.on('load', () => {
         'id': 'route-line',
         'type': 'line',
         'source': 'line-route',
-'minzoom': 17,
+        'minzoom': 17,
         'layout': {
             'line-join': 'round',
             'line-cap': 'round'
         },
         'paint': {
-            'line-color': '#888888',  // Цвет линии
-            'line-width': 3,          // Толщина линии
-            'line-opacity': 0.6       // Прозрачность линии
+            'line-color': '#888888',
+            'line-width': 3,
+            'line-opacity': 0.6
         }
     }, '3d-buildings');
 
@@ -1203,7 +1279,7 @@ map.on('load', () => {
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': coordinates[0] // Начальная позиция
+                        'coordinates': coordinates[0]
                     }
                 }
             ]
@@ -1223,9 +1299,45 @@ map.on('load', () => {
         }
     }, '3d-buildings');
 
+    // Создаем popup для точки (УБРАН closeOnClick: false)
+    pointPopup = new mapboxgl.Popup({ 
+        offset: 25,
+        className: 'top-popup',
+        maxWidth: '400px'
+        // closeOnClick теперь по умолчанию true - закрывается при клике на карту
+    });
+
+    // Обработчик клика по точке
+    map.on('click', 'layer-with-pulsing-dot', function(e) {
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        
+        // Запускаем обновление данных
+        updatePopupData();
+        updateInterval = setInterval(updatePopupData, 500);
+        
+        pointPopup
+            .setLngLat(coordinates)
+            .setHTML(`
+                <div class="popup-content">
+                    <h3>EMIIA.AI SIP: API DATASET</h3>
+                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581]</p>
+                    <div class="loading">Загрузка данных EMIIA.AI SIP: API...</div>
+                </div>
+            `)
+            .addTo(map);
+    });
+
+    // Останавливаем обновление при закрытии popup
+    pointPopup.on('close', function() {
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
+    });
+
     // Анимация перемещения точки
     let currentIndex = 0;
-    const duration = 2000; // Длительность анимации между точками (мс)
+    const duration = 2000;
 
     function animatePoint() {
         const nextIndex = (currentIndex + 1) % coordinates.length;
@@ -1237,7 +1349,6 @@ map.on('load', () => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
             
-            // Линейная интерполяция между координатами
             const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
             const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             
@@ -1255,24 +1366,33 @@ map.on('load', () => {
                 ]
             });
 
+            // Обновляем позицию popup если он открыт
+            if (pointPopup && pointPopup.isOpen()) {
+                pointPopup.setLngLat([lng, lat]);
+            }
+
             if (progress < 1) {
-                // Продолжаем анимацию
                 requestAnimationFrame(animate);
             } else {
-                // Переходим к следующей точке
                 currentIndex = nextIndex;
                 setTimeout(() => {
                     requestAnimationFrame(animatePoint);
-                }, 500); // Пауза перед следующим перемещением
+                }, 500);
             }
         }
 
         requestAnimationFrame(animate);
     }
 
-    // Запускаем анимацию через небольшую задержку после загрузки карты
     setTimeout(animatePoint, 1000);
 });
+
+
+
+
+
+
+
 
 
 
