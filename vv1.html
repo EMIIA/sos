@@ -1787,6 +1787,163 @@ map.addLayer({
 
 
 
+
+
+
+
+
+// Добавляем второй источник для нового GLB-файла верхний ВкусВилл
+map.addSource('model21', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.63576835,55.83837975], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower21',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model21',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+
+
+
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+        ],
+
+        'model-rotation': [0, 0.0, -155.9],
+        'model-scale': [1170.5, 1090.0, 1170],
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 7.3],
+        'model-emissive-strength': 0.9
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+// Добавляем четвертый источник для нового GLB-файла нижний ВкусВилл
+map.addSource('model22', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+            'coordinates': [37.63576835,55.83837975], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower22',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model22',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+
+17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+
+
+
+    
+        ],
+        
+
+
+
+
+        
+
+
+
+
+
+'model-rotation': [0, 0.0, -155.9],
+        'model-scale': [1170.5, 1090.0, 1170],
+
+
+
+
+        'model-translation': [0, 0, 0.000], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+
+
+        'model-emissive-strength': 0.9
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
 }); // Закрывающая скобка
 
 
