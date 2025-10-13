@@ -3,6 +3,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1719,6 +1720,67 @@ map.addLayer({
 });
 
 
+
+
+
+
+
+// Добавить источник GeoJSON с указанием модели ВКУСВИЛЛ
+map.addSource('model20', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_BASE_GLB.glb'
+        },
+        'geometry': {
+            'coordinates': [37.63577435,55.83838975],
+            'type': 'Point'
+        }
+    }
+});
+
+
+// Добавить слой модели с плавным появлением
+map.addLayer({
+    'id': 'tower20',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model20',
+    'minzoom': 18.3,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+        18.3, 0,    // Полная прозрачность (0%) на зуме 17
+            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
+            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+20, 0.8,  // 90% прозрачности (90%) на зуме 18.5
+21, 0.9,  // 90% прозрачности (90%) на зуме 18.5
+22, 0.9,  // 90% прозрачности (90%) на зуме 18.5
+24, 0.9  // 90% прозрачности (90%) на зуме 18.5
+
+
+
+        ],
+
+
+        'model-rotation': [0, 0.0, -155.5],
+        'model-scale': [1100.5, 1009.0, 1009],
+        'model-color-mix-intensity': 0,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 0.2],
+        'model-emissive-strength': 0.99
+    }
+});
 
 
 
