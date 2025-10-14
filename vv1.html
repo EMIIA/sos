@@ -1255,10 +1255,26 @@ const coordinates = [
 ];
 
 // Определяем точки остановок (индексы в массиве coordinates)
-const stopPoints = [3, 7]; // Остановки на 3-й, 6-й и 9-й точках
+const stopPoints = [3, 7]; // Остановки на 3-й и 7-й точках
+const finalDestination = coordinates.length - 1; // Конечная точка
 
 // Массив для отслеживания пройденных остановок
 const completedStops = new Set();
+
+// Текущая цель маршрута
+let currentTargetIndex = 0;
+
+// Функция для получения следующей цели маршрута
+function getNextTarget() {
+    // Если есть непройденные остановки, берем первую из них
+    for (let stop of stopPoints) {
+        if (!completedStops.has(stop)) {
+            return stop;
+        }
+    }
+    // Если все остановки пройдены, цель - конечная точка
+    return finalDestination;
+}
 
 // Функция для получения данных ISS
 async function fetchISSData() {
@@ -1339,6 +1355,7 @@ async function updatePopupData() {
 // Функция для сброса точек остановок
 function resetStopPoints() {
     completedStops.clear();
+    currentTargetIndex = getNextTarget();
     
     const stopFeatures = stopPoints.map(index => ({
         'type': 'Feature',
@@ -1551,10 +1568,12 @@ map.on('load', () => {
         }
     });
 
+    // Инициализируем первую цель
+    currentTargetIndex = getNextTarget();
+
     // Анимация перемещения точки и линии
     let currentIndex = 0;
     const duration = 8000;
-    const lookAheadSegments = 3;
 
     function animatePoint() {
         const nextIndex = (currentIndex + 1) % coordinates.length;
@@ -1595,6 +1614,9 @@ map.on('load', () => {
             if (stopPoints.includes(currentIndex) && !completedStops.has(currentIndex)) {
                 completedStops.add(currentIndex);
                 
+                // Обновляем текущую цель
+                currentTargetIndex = getNextTarget();
+                
                 // Обновляем данные точек остановок
                 const stopFeatures = stopPoints.map(index => ({
                     'type': 'Feature',
@@ -1629,13 +1651,25 @@ map.on('load', () => {
                 }
             });
 
-            // Обновляем ПРЕДСТОЯЩИЙ путь
+            // Обновляем ПРЕДСТОЯЩИЙ путь - теперь только до текущей цели
             const futureCoords = [currentPoint];
             
-            for (let i = 1; i <= lookAheadSegments; i++) {
-                const futureIndex = (currentIndex + i) % coordinates.length;
-                if (futureIndex !== currentIndex) {
-                    futureCoords.push(coordinates[futureIndex]);
+            // Добавляем точки от текущей позиции до текущей цели
+            let targetReached = false;
+            for (let i = currentIndex + 1; i < coordinates.length && !targetReached; i++) {
+                futureCoords.push(coordinates[i]);
+                if (i === currentTargetIndex) {
+                    targetReached = true;
+                }
+            }
+            
+            // Если цель не достигнута в текущем цикле, продолжаем с начала массива
+            if (!targetReached) {
+                for (let i = 0; i <= currentTargetIndex && !targetReached; i++) {
+                    futureCoords.push(coordinates[i]);
+                    if (i === currentTargetIndex) {
+                        targetReached = true;
+                    }
                 }
             }
             
