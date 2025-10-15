@@ -1010,7 +1010,6 @@ map.on('style.load', () => {
 
 
 
-
 const size = 180;
 
 // Первая точка (зеленая) - оригинальная
@@ -1080,7 +1079,7 @@ const pulsingDotOrange = {
     },
 
     render: function () {
-        const duration = 1800;
+        const duration = 1500;
         const pulseDuration = 700;
         const t = (performance.now() % duration) / duration;
         const pulseT = (performance.now() % pulseDuration) / pulseDuration;
@@ -1298,10 +1297,11 @@ const grayOrangeDot = {
 // Координаты для первой точки (зеленая)
 const coordinates1 = [
     [37.63585261,55.83839169],
+    [37.63583652,55.83837213],
     [37.63594252,55.83834578],
     [37.63598143,55.8383977],
-    [37.63563796,55.83848348],
-    [37.63556514, 55.83851082],
+    [37.63563796,55.83848348], // ЧЕТВЕРТАЯ
+    [37.63556925,55.83850933],
     [37.63559508,55.83854435],
     [37.63564159,55.83860005],
     [37.63585585,55.83854527],
@@ -1315,17 +1315,20 @@ const coordinates1 = [
 const coordinates2 = [
     [37.63573089, 55.83832215],
     [37.63543959, 55.83839318],
-    [37.63549496, 55.83846146],
+    [37.63551033, 55.83847803], // ТОЧКА ОСТАНОВКИ (индекс 2)
+    [37.63553685,55.83851043], // ТОЧКА ИЗГИБА
+    [37.63563796,55.83848348], // ТОЧКА ТОВАРА И ОСТАНОВКИ (индекс 4)
+    [37.63553685,55.83851043], // ТОЧКА ИЗГИБА
     [37.63543959, 55.83839318],
     [37.63573089, 55.83832215]
 ];
 
 // Определяем точки остановок для первой точки
-const stopPoints1 = [3, 7];
+const stopPoints1 = [4, 8];
 const finalDestination1 = coordinates1.length - 1;
 
-// Определяем точки остановок для второй точки (последняя точка)
-const stopPoints2 = [coordinates2.length - 1];
+// Определяем точки остановок для второй точки (две остановки)
+const stopPoints2 = [2, 4]; // Остановки на 2-й и 4-й точках
 const finalDestination2 = coordinates2.length - 1;
 
 // Массивы для отслеживания пройденных остановок
@@ -1446,7 +1449,7 @@ function refreshStopPointsLayer2() {
     }, 'layer-with-pulsing-dot-2');
 }
 
-// Функции для данных ISS и popup (остаются без изменений)
+// Функции для данных ISS и popup
 async function fetchISSData() {
     try {
         const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
@@ -1861,7 +1864,7 @@ map.on('load', () => {
 
     // Анимация перемещения точек и линий
     let currentIndex1 = 0;
-    let currentIndex2 = 0;
+    let currentIndex2 = 1;
     const duration = 8000;
 
     function animatePoint1() {
@@ -2006,10 +2009,9 @@ map.on('load', () => {
                 ]
             });
 
-          
 
 
-if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
+            if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
                 completedStops2.add(currentIndex2);
                 currentTargetIndex2 = getNextTarget2();
                 
@@ -2093,8 +2095,6 @@ if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) 
         requestAnimationFrame(animatePoint2);
     }, 1000);
 });
-
-
 
 
 
@@ -3904,6 +3904,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 </body>
 </html>
+
+
 
 
 
