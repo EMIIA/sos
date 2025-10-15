@@ -481,6 +481,52 @@ font-size: 18px; /* Увеличьте значение по необходим�
   box-shadow: none;
 }
 
+
+
+
+
+
+/* Стили для кнопки закрытия (крестика) */
+.mapboxgl-popup-close-button {
+  color: var(--close-button-color);
+  font-size: 24px; /* Увеличил с 18px до 24px */
+  padding: 12px; /* Увеличил с 8px до 12px */
+  margin: 4px; /* Увеличил с 2px до 4px */
+  border: none;
+  background: none;
+  border-radius: 12px; /* Увеличил с 10px до 12px */
+  width: 40px; /* Добавил фиксированную ширину */
+  height: 40px; /* Добавил фиксированную высоту */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Увеличение на мобильных устройствах */
+@media (max-width: 768px) {
+  .mapboxgl-popup-close-button {
+    font-size: 28px; /* Еще больше на мобильных */
+    padding: 14px;
+    margin: 6px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Ховер-эффекты для лучшей UX */
+.mapboxgl-popup-close-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+
+.mapboxgl-popup-close-button:active {
+  transform: scale(0.95);
+}
+
+
+
+
 </style>
 
 
@@ -631,6 +677,7 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 .mapboxgl-popup {
     max-width: 250px;
+min-width: 250px;
     border-radius: 15px;
     font-family: 'Montserrat', sans-serif !important;
 }
