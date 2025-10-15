@@ -3995,12 +3995,6 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 
 
-
-
-
-
-
-
 <div class="header">
     <a class="header" href="javascript:void(0)" onclick="showPopup()">
         <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 100 100" id="wave" data-name="Layer 1">
@@ -4019,8 +4013,8 @@ const enhancedBlur = new EnhancedBlurHandler();
     </a>
 </div>
 
-<div id="popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); z-index: 999; font-family: 'Montserrat', sans-serif;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 85%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #e0e0e0;">
+<div id="popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); z-index: 10000; font-family: 'Montserrat', sans-serif;">
+    <div id="popup-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 85%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #e0e0e0;">
         <h3 style="margin-top: 0; color: #3D85C6; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 20px;">Основные параметры</h3>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
             <p style="line-height: 1.6; color: #333; font-family: 'Montserrat', sans-serif; font-size: 14px; margin: 0;">
@@ -4041,46 +4035,51 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 <script>
 function showPopup() {
+    // Просто показываем наш popup с высоким z-index
     document.getElementById('popup').style.display = 'block';
+    adjustForMobile(); // Обновляем адаптивность
 }
 
 function closePopup() {
     document.getElementById('popup').style.display = 'none';
 }
 
-// Закрытие при клике на поле
+// Закрытие при клике на поле (простая версия)
 document.getElementById('popup').addEventListener('click', function(e) {
     if (e.target === this) {
         closePopup();
     }
 });
 
-// Адаптивность для мобильных
-document.addEventListener('DOMContentLoaded', function() {
-    const popup = document.getElementById('popup');
-    const content = popup.querySelector('div');
+// Адаптивность для мобильных (упрощенная версия)
+function adjustForMobile() {
+    const content = document.getElementById('popup-content');
     
-    // Адаптация для мобильных
-    function adjustForMobile() {
-        if (window.innerWidth <= 768) {
-            content.style.width = '90%';
-            content.style.padding = '20px';
-            content.style.maxWidth = '320px';
-        } else {
-            content.style.width = '85%';
-            content.style.padding = '30px';
-            content.style.maxWidth = '400px';
-        }
+    if (window.innerWidth <= 768) {
+        // Больше отступы на мобильных - через transform с учетом отступов
+        content.style.width = 'calc(100% - 80px)';
+        content.style.maxWidth = '320px';
+        content.style.padding = '25px';
+    } else {
+        content.style.width = '85%';
+        content.style.maxWidth = '400px';
+        content.style.padding = '30px';
     }
-    
-    // Проверяем при загрузке и изменении размера
-    adjustForMobile();
-    window.addEventListener('resize', adjustForMobile);
-});
+}
+
+// Инициализация при загрузке и изменении размера
+document.addEventListener('DOMContentLoaded', adjustForMobile);
+window.addEventListener('resize', adjustForMobile);
 </script>
 
 <!-- Подключение шрифта Montserrat -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+
+
+
+
+
+
 
 
 
