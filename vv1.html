@@ -6,6 +6,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -764,8 +765,8 @@ var geojson = {
         'coordinates': [37.63147405, 55.83441285]
       },
       'properties': {
-        'title': 'EMIIA.AI SIP: API DATASET',
-        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВиллID R: [#3D4581]'
+        'title': 'ВкусВилл STORE #21',
+        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581] <br> ВкусВилл #21'
       }
     }
   ]
@@ -813,155 +814,62 @@ geojson.features.forEach(function (marker) {
 
 
 
+
+
+
 var geojson = {
-    'type': 'FeatureCollection',
-    'features': [
-        {
-            'type': 'Feature',
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [37.63563151,55.83852133]
-            },
-            'properties': {
-                'title': 'EMIIA.AI SIP: API DATASET',
-                'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581]'
-            }
-        }
-    ]
+  'type': 'FeatureCollection',
+  'features': [
+    {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': [37.63563151,55.83852133]
+      },
+      'properties': {
+        'title': 'DARK STORE #33',
+        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581] <br> ВкусВилл Dark Store #33'
+      }
+    }
+  ]
 };
 
-// Функция для получения данных ISS
-async function fetchISSData() {
-    try {
-        const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Ошибка получения данных ISS:', error);
-        return null;
+// add markers to map
+geojson.features.forEach(function (marker) {
+  // create a HTML element for each feature
+  var el = document.createElement('div');
+  el.className = 'marker1';
+
+  // make a marker for each feature and add it to the map
+  var markerObj = new mapboxgl.Marker(el)
+    .setLngLat(marker.geometry.coordinates)
+    .setPopup(
+      new mapboxgl.Popup({ offset: 25 }) // add popups
+        .setHTML(
+          '<h3>' +
+            marker.properties.title +
+            '</h3><p>' +
+            marker.properties.description +
+            '</p>'
+        )
+    )
+    .addTo(map);
+
+  // Функция для показа/скрытия маркера в зависимости от зума
+  function updateMarkerVisibility() {
+    var zoom = map.getZoom();
+    if (zoom >= 17) {
+      el.style.display = 'none'; // Скрыть маркер
+    } else {
+      el.style.display = 'block'; // Показать маркер
     }
-}
+  }
 
-// Функция для даты (ВЫНЕСЕНА ИЗ fetchISSData)
-function getCurrentDate() {
-    return new Date().toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-}
+  // Слушаем событие изменения зума
+  map.on('zoom', updateMarkerVisibility);
 
-// Функция для форматирования данных ISS
-function formatISSData(issData) {
-    if (!issData) return '<div class="error">Данные не доступны</div>';
-    
-    return `
-        <div class="iss-data">
-            <h3>ВкусВилл Dark Store: #33</h3>
-            <div class="data-grid">
-                <div class="data-item">
-                    <strong>Широта:</strong> ${issData.latitude ? issData.latitude.toFixed(4) : 'N/A'}°
-                </div>
-                <div class="data-item">
-                    <strong>Долгота:</strong> ${issData.longitude ? issData.longitude.toFixed(4) : 'N/A'}°
-                </div>
-                <div class="data-item">
-                    <strong>Высота:</strong> ${issData.altitude ? issData.altitude.toFixed(2) : 'N/A'} см
-                </div>
-                <div class="data-item">
-                    <strong>Скорость:</strong> ${issData.velocity ? issData.velocity.toFixed(2).replace(/(\d)(?=\d{4,})/, '$1,').replace('.', ',') : 'N/A'} км/ч
-                </div>
-                <div class="data-item">
-                    <strong>Видимость:</strong> ${issData.visibility || 'N/A'}
-                </div>
-                <div class="data-item">
-                    <strong>Обновлено:</strong> ${new Date().toLocaleTimeString('ru-RU') + '.' + new Date().getMilliseconds().toString().padStart(3, '0')}
-                </div>
-                <div class="data-item">
-                    <strong>Дата:</strong> ${getCurrentDate()}
-                </div>
-            </div>
-            <div class="update-info">
-                Автообновление каждые 5 ms
-            </div>
-        </div>
-    `;
-}
-
-// Добавляем маркеры с автообновляемыми popup
-geojson.features.forEach(function (marker1) {
-    var el = document.createElement('div');
-    el.className = 'marker1';
-
-    // Создаем popup с первоначальным контентом
-    var popup = new mapboxgl.Popup({ 
-        offset: 25,
-className: 'top-popup', // Добавляем класс для позиционирования поверх всех
-        maxWidth: '400px'
-    }).setHTML(`
-        <div class="popup-content">
-            <h3>${marker1.properties.title}</h3>
-            <p>${marker1.properties.description}</p>
-            <div id="iss-data-container-${marker1.properties.title.replace(/\s+/g, '-')}">
-                <div class="loading">Загрузка данных EMIIA.AI SIP: API...</div>
-            </div>
-        </div>
-    `);
-
-    var marker = new mapboxgl.Marker(el)
-        .setLngLat(marker1.geometry.coordinates)
-        .setPopup(popup)
-        .addTo(map);
-
-    // Переменная для хранения интервала обновления
-    var updateInterval;
-
-    // Функция обновления данных
-    async function updateISSData() {
-        const issData = await fetchISSData();
-        const containerId = `iss-data-container-${marker1.properties.title.replace(/\s+/g, '-')}`;
-        const container = document.getElementById(containerId);
-        
-        if (container) {
-            container.innerHTML = formatISSData(issData);
-        }
-    }
-
-    // Обработчики для открытия/закрытия popup
-    marker.getElement().addEventListener('click', function() {
-        // Запускаем обновление при открытии popup
-        updateISSData();
-        updateInterval = setInterval(updateISSData, 500); // Обновление каждые 0.5 секунд
-    });
-
-    // Останавливаем обновление при закрытии popup
-    popup.on('close', function() {
-        if (updateInterval) {
-            clearInterval(updateInterval);
-            updateInterval = null;
-        }
-    });
-
-    // Функция для показа/скрытия маркера в зависимости от зума
-    function updateMarkerVisibility() {
-        var zoom = map.getZoom();
-        if (zoom >= 17) {
-            el.style.display = 'none';
-            if (popup.isOpen()) {
-                popup.remove();
-            }
-            // Останавливаем обновление при скрытии
-            if (updateInterval) {
-                clearInterval(updateInterval);
-                updateInterval = null;
-            }
-        } else {
-            el.style.display = 'block';
-        }
-    }
-
-    map.on('zoom', updateMarkerVisibility);
-    updateMarkerVisibility();
+  // Проверяем видимость при загрузке
+  updateMarkerVisibility();
 });
 
 
@@ -969,7 +877,8 @@ className: 'top-popup', // Добавляем класс для позицион
 
 
 
-   
+
+
 
 
 
@@ -1098,6 +1007,7 @@ map.on('style.load', () => {
 
 const size = 180;
 
+// Первая точка (зеленая) - оригинальная
 const pulsingDot = {
     width: size,
     height: size,
@@ -1137,6 +1047,59 @@ const pulsingDot = {
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, Math.PI * 2);
         context.fillStyle = 'rgba(144, 238, 144, 1)';
+        context.strokeStyle = '#f8f9fa';
+
+        context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
+        context.fill();
+        context.stroke();
+
+        this.data = context.getImageData(0, 0, this.width, this.height).data;
+        map.triggerRepaint();
+
+        return true;
+    }
+};
+
+// Вторая точка (оранжевая)
+const pulsingDotOrange = {
+    width: size,
+    height: size,
+    data: new Uint8Array(size * size * 4),
+
+    onAdd: function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.context = canvas.getContext('2d', { willReadFrequently: true });
+    },
+
+    render: function () {
+        const duration = 1800;
+        const pulseDuration = 700;
+        const t = (performance.now() % duration) / duration;
+        const pulseT = (performance.now() % pulseDuration) / pulseDuration;
+        const context = this.context;
+
+        context.clearRect(0, 0, this.width, this.height);
+
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        const maxRadius = size / 2 * 1;
+        const sweepAngle = Math.PI * 2 * 1.7 * t;
+        const opacity = 0.8 * Math.pow(1 - t, 2);
+
+        context.beginPath();
+        context.moveTo(centerX, centerY);
+        context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
+        context.closePath();
+
+        context.fillStyle = `rgba(255, 165, 0, ${opacity})`; // Оранжевый цвет
+        context.fill();
+
+        const radius = (size / 2) * 0.35;
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        context.fillStyle = 'rgba(255, 200, 100, 1)'; // Светло-оранжевый
         context.strokeStyle = '#f8f9fa';
 
         context.lineWidth = 4 + 4 * Math.abs(Math.sin(Math.PI * pulseT));
@@ -1199,6 +1162,55 @@ const redDot = {
     }
 };
 
+// Создаем изображение для оранжевой точки остановки
+const orangeDot = {
+    width: 40,
+    height: 40,
+    data: new Uint8Array(40 * 40 * 4),
+
+    onAdd: function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.context = canvas.getContext('2d', { willReadFrequently: true });
+    },
+
+    render: function () {
+        const context = this.context;
+        context.clearRect(0, 0, this.width, this.height);
+
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        const radius = 15;
+
+        // Внешнее свечение
+        const gradient = context.createRadialGradient(centerX, centerY, radius, centerX, centerY, radius + 5);
+        gradient.addColorStop(0, 'rgba(255, 165, 0, 0.8)'); // Оранжевый цвет
+        gradient.addColorStop(1, 'rgba(255, 165, 0, 0)');
+
+        context.beginPath();
+        context.arc(centerX, centerY, radius + 5, 0, Math.PI * 2);
+        context.fillStyle = gradient;
+        context.fill();
+
+        // Основная точка
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        context.fillStyle = '#ffa500'; // Оранжевый
+        context.fill();
+
+        // Белая обводка
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        context.strokeStyle = '#ffffff';
+        context.lineWidth = 3;
+        context.stroke();
+
+        this.data = context.getImageData(0, 0, this.width, this.height).data;
+        return true;
+    }
+};
+
 // Создаем изображение для серой точки (пройденная остановка)
 const grayDot = {
     width: 40,
@@ -1238,8 +1250,47 @@ const grayDot = {
     }
 };
 
-// Координаты для анимации
-const coordinates = [
+// Создаем изображение для серой оранжевой точки (пройденная остановка оранжевой точки)
+const grayOrangeDot = {
+    width: 40,
+    height: 40,
+    data: new Uint8Array(40 * 40 * 4),
+
+    onAdd: function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.context = canvas.getContext('2d', { willReadFrequently: true });
+    },
+
+    render: function () {
+        const context = this.context;
+        context.clearRect(0, 0, this.width, this.height);
+
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        const radius = 12;
+
+        // Основная точка
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        context.fillStyle = '#cccc00'; // Желто-серый для оранжевой точки
+        context.fill();
+
+        // Белая обводка
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        context.strokeStyle = '#ffffff';
+        context.lineWidth = 2;
+        context.stroke();
+
+        this.data = context.getImageData(0, 0, this.width, this.height).data;
+        return true;
+    }
+};
+
+// Координаты для первой точки (зеленая)
+const coordinates1 = [
     [37.63585261,55.83839169],
     [37.63594252,55.83834578],
     [37.63598143,55.8383977],
@@ -1254,29 +1305,142 @@ const coordinates = [
     [37.63585261,55.83839169]
 ];
 
-// Определяем точки остановок (индексы в массиве coordinates)
-const stopPoints = [3, 7]; // Остановки на 3-й и 7-й точках
-const finalDestination = coordinates.length - 1; // Конечная точка
+// Координаты для второй точки (оранжевая)
+const coordinates2 = [
+    [37.63573089, 55.83832215],
+    [37.63543959, 55.83839318],
+    [37.63549496, 55.83846146],
+    [37.63543959, 55.83839318],
+    [37.63573089, 55.83832215]
+];
 
-// Массив для отслеживания пройденных остановок
-const completedStops = new Set();
+// Определяем точки остановок для первой точки
+const stopPoints1 = [3, 7];
+const finalDestination1 = coordinates1.length - 1;
 
-// Текущая цель маршрута
-let currentTargetIndex = 0;
+// Определяем точки остановок для второй точки (последняя точка)
+const stopPoints2 = [coordinates2.length - 1];
+const finalDestination2 = coordinates2.length - 1;
 
-// Функция для получения следующей цели маршрута
-function getNextTarget() {
-    // Если есть непройденные остановки, берем первую из них
-    for (let stop of stopPoints) {
-        if (!completedStops.has(stop)) {
+// Массивы для отслеживания пройденных остановок
+const completedStops1 = new Set();
+const completedStops2 = new Set();
+
+// Текущие цели маршрутов
+let currentTargetIndex1 = 0;
+let currentTargetIndex2 = 0;
+
+// Функции для получения следующей цели маршрута
+function getNextTarget1() {
+    for (let stop of stopPoints1) {
+        if (!completedStops1.has(stop)) {
             return stop;
         }
     }
-    // Если все остановки пройдены, цель - конечная точка
-    return finalDestination;
+    return finalDestination1;
 }
 
-// Функция для получения данных ISS
+function getNextTarget2() {
+    for (let stop of stopPoints2) {
+        if (!completedStops2.has(stop)) {
+            return stop;
+        }
+    }
+    return finalDestination2;
+}
+
+// Функция для сброса точек остановок для первой точки
+function resetStopPoints1() {
+    completedStops1.clear();
+    currentTargetIndex1 = getNextTarget1();
+    
+    const stopFeatures = stopPoints1.map(index => ({
+        'type': 'Feature',
+        'geometry': {
+            'type': 'Point',
+            'coordinates': coordinates1[index]
+        },
+        'properties': {
+            'index': index,
+            'isCompleted': false
+        }
+    }));
+    
+    map.getSource('stop-points-1').setData({
+        'type': 'FeatureCollection',
+        'features': stopFeatures
+    });
+}
+
+// Функция для сброса точек остановок для второй точки
+function resetStopPoints2() {
+    completedStops2.clear();
+    currentTargetIndex2 = getNextTarget2();
+    
+    const stopFeatures = stopPoints2.map(index => ({
+        'type': 'Feature',
+        'geometry': {
+            'type': 'Point',
+            'coordinates': coordinates2[index]
+        },
+        'properties': {
+            'index': index,
+            'isCompleted': false
+        }
+    }));
+    
+    map.getSource('stop-points-2').setData({
+        'type': 'FeatureCollection',
+        'features': stopFeatures
+    });
+}
+
+// Функции для принудительного обновления слоев точек остановок
+function refreshStopPointsLayer1() {
+    if (map.getLayer('stop-points-layer-1')) {
+        map.removeLayer('stop-points-layer-1');
+    }
+    
+    map.addLayer({
+        'id': 'stop-points-layer-1',
+        'type': 'symbol',
+        'source': 'stop-points-1',
+        'minzoom': 20,
+        'layout': {
+            'icon-image': ['case',
+                ['==', ['get', 'isCompleted'], true], 'gray-dot',
+                'red-dot'
+            ],
+            'icon-offset': [0, 0],
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
+        }
+    }, 'layer-with-pulsing-dot-1');
+}
+
+function refreshStopPointsLayer2() {
+    if (map.getLayer('stop-points-layer-2')) {
+        map.removeLayer('stop-points-layer-2');
+    }
+    
+    map.addLayer({
+        'id': 'stop-points-layer-2',
+        'type': 'symbol',
+        'source': 'stop-points-2',
+        'minzoom': 20,
+        'layout': {
+            'icon-image': ['case',
+                ['==', ['get', 'isCompleted'], true], 'gray-orange-dot',
+                'orange-dot'
+            ],
+            'icon-offset': [0, 0],
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
+        }
+    }, 'layer-with-pulsing-dot-2');
+}
+
+// Функции для данных ISS и popup (остаются без изменений)
 async function fetchISSData() {
     try {
         const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
@@ -1288,7 +1452,6 @@ async function fetchISSData() {
     }
 }
 
-// Функция для даты
 function getCurrentDate() {
     return new Date().toLocaleDateString('ru-RU', {
         day: '2-digit',
@@ -1297,7 +1460,6 @@ function getCurrentDate() {
     });
 }
 
-// Функция для форматирования данных ISS
 function formatISSData(issData) {
     if (!issData) return '<div class="error">Данные не доступны</div>';
     
@@ -1334,17 +1496,19 @@ function formatISSData(issData) {
     `;
 }
 
-// Создаем popup для точки
-let pointPopup = null;
-let updateInterval = null;
+// Создаем popup для точек
+let pointPopup1 = null;
+let pointPopup2 = null;
+let updateInterval1 = null;
+let updateInterval2 = null;
 
-// Функция для обновления данных в popup
-async function updatePopupData() {
+// Функции для обновления данных в popup
+async function updatePopupData1() {
     const issData = await fetchISSData();
-    if (pointPopup && pointPopup.isOpen()) {
-        pointPopup.setHTML(`
+    if (pointPopup1 && pointPopup1.isOpen()) {
+        pointPopup1.setHTML(`
             <div class="popup-content">
-                <h3>EMIIA.AI SIP: API DATASET</h3>
+                <h3>EMIIA.AI SIP: API DATASET <br>Сотрудник: ID D [#353837]</h3>
                 <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581]</p>
                 ${formatISSData(issData)}
             </div>
@@ -1352,51 +1516,17 @@ async function updatePopupData() {
     }
 }
 
-// Функция для сброса точек остановок
-function resetStopPoints() {
-    completedStops.clear();
-    currentTargetIndex = getNextTarget();
-    
-    const stopFeatures = stopPoints.map(index => ({
-        'type': 'Feature',
-        'geometry': {
-            'type': 'Point',
-            'coordinates': coordinates[index]
-        },
-        'properties': {
-            'index': index,
-            'isCompleted': false
-        }
-    }));
-    
-    map.getSource('stop-points').setData({
-        'type': 'FeatureCollection',
-        'features': stopFeatures
-    });
-}
-
-// Функция для принудительного обновления слоя точек остановок
-function refreshStopPointsLayer() {
-    // Временно удаляем и заново добавляем слой
-    if (map.getLayer('stop-points-layer')) {
-        map.removeLayer('stop-points-layer');
+async function updatePopupData2() {
+    const issData = await fetchISSData();
+    if (pointPopup2 && pointPopup2.isOpen()) {
+        pointPopup2.setHTML(`
+            <div class="popup-content">
+                <h3>EMIIA.AI SIP: API DATASET <br>Робот: ID D [#309945]</h3>
+                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#FFA500]</p>
+                ${formatISSData(issData)}
+            </div>
+        `);
     }
-    
-    map.addLayer({
-        'id': 'stop-points-layer',
-        'type': 'symbol',
-        'source': 'stop-points',
-        'minzoom': 20,
-        'layout': {
-            'icon-image': ['case',
-                ['==', ['get', 'isCompleted'], true], 'gray-dot',
-                'red-dot'
-            ],
-            'icon-offset': [0, 0],
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true
-        }
-    }, 'layer-with-pulsing-dot'); // Добавляем ПОД движущейся точкой
 }
 
 map.on('load', () => {
@@ -1404,8 +1534,8 @@ map.on('load', () => {
     map.setPitch(45);
     map.setBearing(0);
 
-    // Добавляем источник для ПРОЙДЕННОГО пути (серый)
-    map.addSource('passed-route', {
+    // Добавляем источники для ПРОЙДЕННОГО пути (серый) для обеих точек
+    map.addSource('passed-route-1', {
         'type': 'geojson',
         'data': {
             'type': 'Feature',
@@ -1416,8 +1546,7 @@ map.on('load', () => {
         }
     });
 
-    // Добавляем источник для ПРЕДСТОЯЩЕГО пути (зеленый)
-    map.addSource('future-route', {
+    map.addSource('passed-route-2', {
         'type': 'geojson',
         'data': {
             'type': 'Feature',
@@ -1428,11 +1557,34 @@ map.on('load', () => {
         }
     });
 
-    // СНАЧАЛА добавляем слой пройденного пути (серый)
+    // Добавляем источники для ПРЕДСТОЯЩЕГО пути (зеленый) для обеих точек
+    map.addSource('future-route-1', {
+        'type': 'geojson',
+        'data': {
+            'type': 'Feature',
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': []
+            }
+        }
+    });
+
+    map.addSource('future-route-2', {
+        'type': 'geojson',
+        'data': {
+            'type': 'Feature',
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': []
+            }
+        }
+    });
+
+    // СНАЧАЛА добавляем слои пройденного пути (серый)
     map.addLayer({
-        'id': 'passed-route-line',
+        'id': 'passed-route-line-1',
         'type': 'line',
-        'source': 'passed-route',
+        'source': 'passed-route-1',
         'minzoom': 20,
         'layout': {
             'line-join': 'round',
@@ -1445,11 +1597,27 @@ map.on('load', () => {
         }
     }, '3d-buildings');
 
-    // Добавляем слой предстоящего пути (зеленый)
     map.addLayer({
-        'id': 'future-route-line',
+        'id': 'passed-route-line-2',
         'type': 'line',
-        'source': 'future-route',
+        'source': 'passed-route-2',
+        'minzoom': 20,
+        'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#f8f9fa',
+            'line-width': 8,
+            'line-opacity': 0.2
+        }
+    }, 'passed-route-line-1');
+
+    // Добавляем слои предстоящего пути (зеленый и оранжевый)
+    map.addLayer({
+        'id': 'future-route-line-1',
+        'type': 'line',
+        'source': 'future-route-1',
         'minzoom': 20,
         'layout': {
             'line-join': 'round',
@@ -1460,15 +1628,34 @@ map.on('load', () => {
             'line-width': 8,
             'line-opacity': 1
         }
-    }, 'passed-route-line');
+    }, 'passed-route-line-2');
+
+    map.addLayer({
+        'id': 'future-route-line-2',
+        'type': 'line',
+        'source': 'future-route-2',
+        'minzoom': 20,
+        'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#ffb366', // Оранжевый цвет для второй линии
+            'line-width': 8,
+            'line-opacity': 1
+        }
+    }, 'future-route-line-1');
 
     // Добавляем изображения точек
     map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 4 });
+    map.addImage('pulsing-dot-orange', pulsingDotOrange, { pixelRatio: 4 });
     map.addImage('red-dot', redDot, { pixelRatio: 2 });
+    map.addImage('orange-dot', orangeDot, { pixelRatio: 2 });
     map.addImage('gray-dot', grayDot, { pixelRatio: 2 });
+    map.addImage('gray-orange-dot', grayOrangeDot, { pixelRatio: 2 });
 
-    // Источник для движущейся точки
-    map.addSource('dot-point', {
+    // Источники для движущихся точек
+    map.addSource('dot-point-1', {
         'type': 'geojson',
         'data': {
             'type': 'FeatureCollection',
@@ -1477,23 +1664,39 @@ map.on('load', () => {
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': coordinates[0]
+                        'coordinates': coordinates1[0]
                     }
                 }
             ]
         }
     });
 
-    // Источник для точек остановок
-    map.addSource('stop-points', {
+    map.addSource('dot-point-2', {
         'type': 'geojson',
         'data': {
             'type': 'FeatureCollection',
-            'features': stopPoints.map(index => ({
+            'features': [
+                {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': coordinates2[0]
+                    }
+                }
+            ]
+        }
+    });
+
+    // Источники для точек остановок
+    map.addSource('stop-points-1', {
+        'type': 'geojson',
+        'data': {
+            'type': 'FeatureCollection',
+            'features': stopPoints1.map(index => ({
                 'type': 'Feature',
                 'geometry': {
                     'type': 'Point',
-                    'coordinates': coordinates[index]
+                    'coordinates': coordinates1[index]
                 },
                 'properties': {
                     'index': index,
@@ -1503,11 +1706,29 @@ map.on('load', () => {
         }
     });
 
-    // СНАЧАЛА добавляем слой точек остановок (ПОД движущейся точкой)
+    map.addSource('stop-points-2', {
+        'type': 'geojson',
+        'data': {
+            'type': 'FeatureCollection',
+            'features': stopPoints2.map(index => ({
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': coordinates2[index]
+                },
+                'properties': {
+                    'index': index,
+                    'isCompleted': false
+                }
+            }))
+        }
+    });
+
+    // СНАЧАЛА добавляем слои точек остановок
     map.addLayer({
-        'id': 'stop-points-layer',
+        'id': 'stop-points-layer-1',
         'type': 'symbol',
-        'source': 'stop-points',
+        'source': 'stop-points-1',
         'minzoom': 20,
         'layout': {
             'icon-image': ['case',
@@ -1520,39 +1741,74 @@ map.on('load', () => {
         }
     }, '3d-buildings');
 
-    // ПОТОМ добавляем слой движущейся точки (ПОВЕРХ точек остановок)
     map.addLayer({
-        'id': 'layer-with-pulsing-dot',
+        'id': 'stop-points-layer-2',
         'type': 'symbol',
-        'source': 'dot-point',
-        'minzoom': 17,
+        'source': 'stop-points-2',
+        'minzoom': 20,
+        'layout': {
+            'icon-image': ['case',
+                ['==', ['get', 'isCompleted'], true], 'gray-orange-dot',
+                'orange-dot'
+            ],
+            'icon-offset': [0, 0],
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
+        }
+    }, 'stop-points-layer-1');
+
+    // ПОТОМ добавляем слои движущихся точек
+    map.addLayer({
+        'id': 'layer-with-pulsing-dot-1',
+        'type': 'symbol',
+        'source': 'dot-point-1',
+        'minzoom': 18,
         'layout': {
             'icon-image': 'pulsing-dot',
             'icon-offset': [0, 0],
             'icon-allow-overlap': true,
             'icon-ignore-placement': true
         }
-    }, 'stop-points-layer'); // Добавляем поверх точек остановок
+    }, 'stop-points-layer-2');
 
-    // Создаем popup для точки
-    pointPopup = new mapboxgl.Popup({ 
+    map.addLayer({
+        'id': 'layer-with-pulsing-dot-2',
+        'type': 'symbol',
+        'source': 'dot-point-2',
+        'minzoom': 18,
+        'layout': {
+            'icon-image': 'pulsing-dot-orange',
+            'icon-offset': [0, 0],
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
+        }
+    }, 'layer-with-pulsing-dot-1');
+
+    // Создаем popup для точек
+    pointPopup1 = new mapboxgl.Popup({ 
         offset: 25,
         className: 'top-popup',
         maxWidth: '400px'
     });
 
-    // Обработчик клика по движущейся точке
-    map.on('click', 'layer-with-pulsing-dot', function(e) {
+    pointPopup2 = new mapboxgl.Popup({ 
+        offset: 25,
+        className: 'top-popup',
+        maxWidth: '400px'
+    });
+
+    // Обработчики клика по движущимся точкам
+    map.on('click', 'layer-with-pulsing-dot-1', function(e) {
         const coordinates = e.features[0].geometry.coordinates.slice();
         
-        updatePopupData();
-        updateInterval = setInterval(updatePopupData, 500);
+        updatePopupData1();
+        updateInterval1 = setInterval(updatePopupData1, 500);
         
-        pointPopup
+        pointPopup1
             .setLngLat(coordinates)
             .setHTML(`
                 <div class="popup-content">
-                    <h3>EMIIA.AI SIP: API DATASET</h3>
+                    <h3>EMIIA.AI SIP: API DATASET <br> Сотрудник:</h3>
                     <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581]</p>
                     <div class="loading">Загрузка данных EMIIA.AI SIP: API...</div>
                 </div>
@@ -1560,32 +1816,57 @@ map.on('load', () => {
             .addTo(map);
     });
 
+    map.on('click', 'layer-with-pulsing-dot-2', function(e) {
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        
+        updatePopupData2();
+        updateInterval2 = setInterval(updatePopupData2, 500);
+        
+        pointPopup2
+            .setLngLat(coordinates)
+            .setHTML(`
+                <div class="popup-content">
+                    <h3>EMIIA.AI SIP: API DATASET <br> Робот:</h3>
+                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#FFA500]</p>
+                    <div class="loading">Загрузка данных EMIIA.AI SIP: API...</div>
+                </div>
+            `)
+            .addTo(map);
+    });
+
     // Останавливаем обновление при закрытии popup
-    pointPopup.on('close', function() {
-        if (updateInterval) {
-            clearInterval(updateInterval);
-            updateInterval = null;
+    pointPopup1.on('close', function() {
+        if (updateInterval1) {
+            clearInterval(updateInterval1);
+            updateInterval1 = null;
         }
     });
 
-    // Инициализируем первую цель
-    currentTargetIndex = getNextTarget();
+    pointPopup2.on('close', function() {
+        if (updateInterval2) {
+            clearInterval(updateInterval2);
+            updateInterval2 = null;
+        }
+    });
 
-    // Анимация перемещения точки и линии
-    let currentIndex = 0;
+    // Инициализируем первые цели
+    currentTargetIndex1 = getNextTarget1();
+    currentTargetIndex2 = getNextTarget2();
+
+    // Анимация перемещения точек и линий
+    let currentIndex1 = 0;
+    let currentIndex2 = 0;
     const duration = 8000;
 
-    function animatePoint() {
-        const nextIndex = (currentIndex + 1) % coordinates.length;
-        const startCoord = coordinates[currentIndex];
-        const endCoord = coordinates[nextIndex];
+    function animatePoint1() {
+        const nextIndex = (currentIndex1 + 1) % coordinates1.length;
+        const startCoord = coordinates1[currentIndex1];
+        const endCoord = coordinates1[nextIndex];
         const startTime = performance.now();
 
-        // Проверяем, начинается ли новый круг (возврат к начальной точке)
         if (nextIndex === 0) {
-            resetStopPoints();
-            // Принудительно обновляем слой после сброса
-            setTimeout(refreshStopPointsLayer, 100);
+            resetStopPoints1();
+            setTimeout(refreshStopPointsLayer1, 100);
         }
 
         function animate(currentTime) {
@@ -1596,8 +1877,7 @@ map.on('load', () => {
             const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
             
-            // Обновляем позицию точки
-            map.getSource('dot-point').setData({
+            map.getSource('dot-point-1').setData({
                 'type': 'FeatureCollection',
                 'features': [
                     {
@@ -1610,40 +1890,34 @@ map.on('load', () => {
                 ]
             });
 
-            // Проверяем, достигли ли точки остановки
-            if (stopPoints.includes(currentIndex) && !completedStops.has(currentIndex)) {
-                completedStops.add(currentIndex);
+            if (stopPoints1.includes(currentIndex1) && !completedStops1.has(currentIndex1)) {
+                completedStops1.add(currentIndex1);
+                currentTargetIndex1 = getNextTarget1();
                 
-                // Обновляем текущую цель
-                currentTargetIndex = getNextTarget();
-                
-                // Обновляем данные точек остановок
-                const stopFeatures = stopPoints.map(index => ({
+                const stopFeatures = stopPoints1.map(index => ({
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': coordinates[index]
+                        'coordinates': coordinates1[index]
                     },
                     'properties': {
                         'index': index,
-                        'isCompleted': completedStops.has(index)
+                        'isCompleted': completedStops1.has(index)
                     }
                 }));
                 
-                map.getSource('stop-points').setData({
+                map.getSource('stop-points-1').setData({
                     'type': 'FeatureCollection',
                     'features': stopFeatures
                 });
 
-                // Принудительно обновляем слой после изменения цвета
-                setTimeout(refreshStopPointsLayer, 50);
+                setTimeout(refreshStopPointsLayer1, 50);
             }
 
-            // Обновляем ПРОЙДЕННЫЙ путь
-            const passedCoords = coordinates.slice(0, currentIndex + 1);
+            const passedCoords = coordinates1.slice(0, currentIndex1 + 1);
             passedCoords.push(currentPoint);
             
-            map.getSource('passed-route').setData({
+            map.getSource('passed-route-1').setData({
                 'type': 'Feature',
                 'geometry': {
                     'type': 'LineString',
@@ -1651,29 +1925,25 @@ map.on('load', () => {
                 }
             });
 
-            // Обновляем ПРЕДСТОЯЩИЙ путь - теперь только до текущей цели
             const futureCoords = [currentPoint];
-            
-            // Добавляем точки от текущей позиции до текущей цели
             let targetReached = false;
-            for (let i = currentIndex + 1; i < coordinates.length && !targetReached; i++) {
-                futureCoords.push(coordinates[i]);
-                if (i === currentTargetIndex) {
+            for (let i = currentIndex1 + 1; i < coordinates1.length && !targetReached; i++) {
+                futureCoords.push(coordinates1[i]);
+                if (i === currentTargetIndex1) {
                     targetReached = true;
                 }
             }
             
-            // Если цель не достигнута в текущем цикле, продолжаем с начала массива
             if (!targetReached) {
-                for (let i = 0; i <= currentTargetIndex && !targetReached; i++) {
-                    futureCoords.push(coordinates[i]);
-                    if (i === currentTargetIndex) {
+                for (let i = 0; i <= currentTargetIndex1 && !targetReached; i++) {
+                    futureCoords.push(coordinates1[i]);
+                    if (i === currentTargetIndex1) {
                         targetReached = true;
                     }
                 }
             }
             
-            map.getSource('future-route').setData({
+            map.getSource('future-route-1').setData({
                 'type': 'Feature',
                 'geometry': {
                     'type': 'LineString',
@@ -1681,17 +1951,16 @@ map.on('load', () => {
                 }
             });
 
-            // Обновляем позицию popup если он открыт
-            if (pointPopup && pointPopup.isOpen()) {
-                pointPopup.setLngLat(currentPoint);
+            if (pointPopup1 && pointPopup1.isOpen()) {
+                pointPopup1.setLngLat(currentPoint);
             }
 
             if (progress < 1) {
                 requestAnimationFrame(animate);
             } else {
-                currentIndex = nextIndex;
+                currentIndex1 = nextIndex;
                 setTimeout(() => {
-                    requestAnimationFrame(animatePoint);
+                    requestAnimationFrame(animatePoint1);
                 }, 500);
             }
         }
@@ -1699,9 +1968,125 @@ map.on('load', () => {
         requestAnimationFrame(animate);
     }
 
-    setTimeout(animatePoint, 1000);
-});
+    function animatePoint2() {
+        const nextIndex = (currentIndex2 + 1) % coordinates2.length;
+        const startCoord = coordinates2[currentIndex2];
+        const endCoord = coordinates2[nextIndex];
+        const startTime = performance.now();
 
+        if (nextIndex === 0) {
+            resetStopPoints2();
+            setTimeout(refreshStopPointsLayer2, 100);
+        }
+
+        function animate(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
+            const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
+            const currentPoint = [lng, lat];
+            
+            map.getSource('dot-point-2').setData({
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': currentPoint
+                        }
+                    }
+                ]
+            });
+
+          
+
+
+if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
+                completedStops2.add(currentIndex2);
+                currentTargetIndex2 = getNextTarget2();
+                
+                const stopFeatures = stopPoints2.map(index => ({
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': coordinates2[index]
+                    },
+                    'properties': {
+                        'index': index,
+                        'isCompleted': completedStops2.has(index)
+                    }
+                }));
+                
+                map.getSource('stop-points-2').setData({
+                    'type': 'FeatureCollection',
+                    'features': stopFeatures
+                });
+
+                setTimeout(refreshStopPointsLayer2, 50);
+            }
+
+            const passedCoords = coordinates2.slice(0, currentIndex2 + 1);
+            passedCoords.push(currentPoint);
+            
+            map.getSource('passed-route-2').setData({
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': passedCoords
+                }
+            });
+
+            const futureCoords = [currentPoint];
+            let targetReached = false;
+            for (let i = currentIndex2 + 1; i < coordinates2.length && !targetReached; i++) {
+                futureCoords.push(coordinates2[i]);
+                if (i === currentTargetIndex2) {
+                    targetReached = true;
+                }
+            }
+            
+            if (!targetReached) {
+                for (let i = 0; i <= currentTargetIndex2 && !targetReached; i++) {
+                    futureCoords.push(coordinates2[i]);
+                    if (i === currentTargetIndex2) {
+                        targetReached = true;
+                    }
+                }
+            }
+            
+            map.getSource('future-route-2').setData({
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': futureCoords
+                }
+            });
+
+            if (pointPopup2 && pointPopup2.isOpen()) {
+                pointPopup2.setLngLat(currentPoint);
+            }
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                currentIndex2 = nextIndex;
+                setTimeout(() => {
+                    requestAnimationFrame(animatePoint2);
+                }, 500);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // Запускаем анимацию обеих точек
+    setTimeout(() => {
+        requestAnimationFrame(animatePoint1);
+        requestAnimationFrame(animatePoint2);
+    }, 1000);
+});
 
 
 
@@ -3513,6 +3898,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 </body>
 </html>
+
 
 
 
