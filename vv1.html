@@ -1000,6 +1000,306 @@ map.on('style.load', () => {
 
 
 
+// Создаем пульсирующий красный восклицательный знак
+const exclamationSign = {
+    width: 150,
+    height: 150,
+    data: new Uint8Array(150 * 150 * 4),
+
+    onAdd: function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.context = canvas.getContext('2d', { willReadFrequently: true });
+    },
+
+    render: function () {
+        const duration = 2000;
+        const t = (performance.now() % duration) / duration;
+        const context = this.context;
+
+        context.clearRect(0, 0, this.width, this.height);
+
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        
+        // Уменьшенная пульсация размера
+        const scale = 0.9 + 0.1 * Math.sin(t * Math.PI * 2);
+        const baseSize = 33;
+        const size = baseSize * scale;
+        const opacity = 0.9 + 0.1 * Math.sin(t * Math.PI * 2);
+
+        // Рисуем круглый фон
+        context.beginPath();
+        context.arc(centerX, centerY, size * 0.8, 0, Math.PI * 2);
+        context.fillStyle = `rgba(224, 102, 102, ${opacity})`; // #e06666
+        context.fill();
+
+        // Обводка круга
+        context.strokeStyle = '#f8f9fa';
+        context.lineWidth = 5;
+        context.stroke();
+
+        // Восклицательный знак - правильное центрирование
+        context.fillStyle = '#f8f9fa';
+        context.font = `bold ${size * 1.3}px Arial`;
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        
+        // Восклицательный знак по центру
+        const textY = centerY + size * 0.08;
+        context.fillText('!', centerX, textY);
+
+        this.data = context.getImageData(0, 0, this.width, this.height).data;
+        map.triggerRepaint();
+
+        return true;
+    }
+};
+
+// Добавляем изображение восклицательного знака
+map.addImage('exclamation-sign', exclamationSign, { pixelRatio: 2 });
+
+// Создаем источники для восклицательных знаков
+map.addSource('exclamation-sign-point-1', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [37.63601843, 55.83841419]
+                },
+                'properties': {
+                    'title': 'ВКУСВИЛЛ <br>DARK STORE #33',
+                    'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581] <br> ВкусВилл Dark Store #33'
+                }
+            }
+        ]
+    }
+});
+
+map.addSource('exclamation-sign-point-2', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [37.63572873, 55.83860633]
+                },
+                'properties': {
+                    'title': 'ВКУСВИЛЛ <br>DARK STORE #33',
+                    'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581] <br> ВкусВилл Dark Store #33'
+                }
+            }
+        ]
+    }
+});
+
+// Создаем источник для ТРЕТЬЕГО знака
+map.addSource('exclamation-sign-point-3', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [37.63573239, 55.83853784]
+                },
+                'properties': {
+                    'title': 'ВКУСВИЛЛ <br>DARK STORE #33',
+                    'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581] <br> ВкусВилл Dark Store #33'
+                }
+            }
+        ]
+    }
+});
+
+// Добавляем слои восклицательных знаков
+map.addLayer({
+    'id': 'exclamation-sign-layer-1',
+    'type': 'symbol',
+    'source': 'exclamation-sign-point-1',
+    'minzoom': 18,
+    'layout': {
+        'icon-image': 'exclamation-sign',
+        'icon-offset': [0, 0],
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true
+    }
+});
+
+map.addLayer({
+    'id': 'exclamation-sign-layer-2',
+    'type': 'symbol',
+    'source': 'exclamation-sign-point-2',
+    'minzoom': 18,
+    'layout': {
+        'icon-image': 'exclamation-sign',
+        'icon-offset': [0, 0],
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true
+    }
+});
+
+// Добавляем слой для ТРЕТЬЕГО знака
+map.addLayer({
+    'id': 'exclamation-sign-layer-3',
+    'type': 'symbol',
+    'source': 'exclamation-sign-point-3',
+    'minzoom': 18,
+    'layout': {
+        'icon-image': 'exclamation-sign',
+        'icon-offset': [0, 0],
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true
+    }
+});
+
+// Создаем popup для восклицательных знаков
+const exclamationPopup = new mapboxgl.Popup({ 
+    offset: 25,
+    className: 'top-popup',
+    maxWidth: '400px'
+});
+
+// HTML для первого знака
+const redLinesHTML1 = `
+<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+    <div style="color: #ff0000; font-size: 14px; margin-bottom: 8px;">
+        Проблема: нарушение температурного режима
+    </div>
+    <div style="color: #ff0000; font-size: 14px;">
+        <a href="https://vkusvill.ru/temperature-report" 
+           target="_blank" 
+           style="color: #ff0000; text-decoration: none;">
+           Отчет по температуре ❯
+        </a>
+    </div>
+</div>
+`;
+
+// HTML для второго знака
+const redLinesHTML2 = `
+<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+    <div style="color: #ff0000; font-size: 14px; margin-bottom: 8px;">
+        Проблема: сбой системы вентиляции
+    </div>
+    <div style="color: #ff0000; font-size: 14px;">
+        <a href="https://vkusvill.ru/ventilation-report" 
+           target="_blank" 
+           style="color: #ff0000; text-decoration: none;">
+           Отчет по вентиляции ❯
+        </a>
+    </div>
+</div>
+`;
+
+// HTML для ТРЕТЬЕГО знака
+const redLinesHTML3 = `
+<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+    <div style="color: #ff0000; font-size: 14px; margin-bottom: 8px;">
+        Проблема: неисправность холодильного оборудования
+    </div>
+    <div style="color: #ff0000; font-size: 14px;">
+        <a href="https://vkusvill.ru/refrigeration-report" 
+           target="_blank" 
+           style="color: #ff0000; text-decoration: none;">
+           Отчет по холодильникам ❯
+        </a>
+    </div>
+</div>
+`;
+
+// Обработчики клика по восклицательным знакам
+map.on('click', 'exclamation-sign-layer-1', function(e) {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const description = e.features[0].properties.description;
+    const title = e.features[0].properties.title;
+    
+    exclamationPopup
+        .setLngLat(coordinates)
+        .setHTML(
+            '<h3>' + title + '</h3><p>' + description + '</p>' + redLinesHTML1
+        )
+        .addTo(map);
+});
+
+map.on('click', 'exclamation-sign-layer-2', function(e) {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const description = e.features[0].properties.description;
+    const title = e.features[0].properties.title;
+    
+    exclamationPopup
+        .setLngLat(coordinates)
+        .setHTML(
+            '<h3>' + title + '</h3><p>' + description + '</p>' + redLinesHTML2
+        )
+        .addTo(map);
+});
+
+// Обработчик для ТРЕТЬЕГО знака
+map.on('click', 'exclamation-sign-layer-3', function(e) {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const description = e.features[0].properties.description;
+    const title = e.features[0].properties.title;
+    
+    exclamationPopup
+        .setLngLat(coordinates)
+        .setHTML(
+            '<h3>' + title + '</h3><p>' + description + '</p>' + redLinesHTML3
+        )
+        .addTo(map);
+});
+
+// Обработчики для показа курсора при наведении
+map.on('mouseenter', 'exclamation-sign-layer-1', function() {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'exclamation-sign-layer-1', function() {
+    map.getCanvas().style.cursor = '';
+});
+
+map.on('mouseenter', 'exclamation-sign-layer-2', function() {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'exclamation-sign-layer-2', function() {
+    map.getCanvas().style.cursor = '';
+});
+
+// Обработчики для ТРЕТЬЕГО знака
+map.on('mouseenter', 'exclamation-sign-layer-3', function() {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'exclamation-sign-layer-3', function() {
+    map.getCanvas().style.cursor = '';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
