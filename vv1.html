@@ -4060,7 +4060,6 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 
 
-
 <div class="header">
     <a class="header" href="javascript:void(0)" onclick="showPopup()">
         <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 100 100" id="wave" data-name="Layer 1">
@@ -4088,7 +4087,7 @@ const enhancedBlur = new EnhancedBlurHandler();
             </p>
         </div>
         <button onclick="closePopup()" 
-                style="background: #3D85C6; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 14px; transition: all 0.2s ease; transform: scale(1);"
+                style="background: #3D85C6; color: white; border: none; padding: 16px 32px; border-radius: 10px; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 16px; transition: all 0.2s ease; transform: scale(1); min-height: 50px;"
                 onmousedown="this.style.transform='scale(0.95)'; this.style.background='#2a6ba5';"
                 onmouseup="this.style.transform='scale(1)'; this.style.background='#3D85C6';"
                 onmouseleave="this.style.transform='scale(1)'; this.style.background='#3D85C6';"
@@ -4101,28 +4100,24 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 <script>
 function showPopup() {
-    // Просто показываем наш popup с высоким z-index
     document.getElementById('popup').style.display = 'block';
-    adjustForMobile(); // Обновляем адаптивность
+    adjustForMobile();
 }
 
 function closePopup() {
     document.getElementById('popup').style.display = 'none';
 }
 
-// Закрытие при клике на поле (простая версия)
 document.getElementById('popup').addEventListener('click', function(e) {
     if (e.target === this) {
         closePopup();
     }
 });
 
-// Адаптивность для мобильных (упрощенная версия)
 function adjustForMobile() {
     const content = document.getElementById('popup-content');
     
     if (window.innerWidth <= 768) {
-        // Больше отступы на мобильных - через transform с учетом отступов
         content.style.width = 'calc(100% - 80px)';
         content.style.maxWidth = '320px';
         content.style.padding = '25px';
@@ -4133,12 +4128,10 @@ function adjustForMobile() {
     }
 }
 
-// Инициализация при загрузке и изменении размера
 document.addEventListener('DOMContentLoaded', adjustForMobile);
 window.addEventListener('resize', adjustForMobile);
 </script>
 
-<!-- Подключение шрифта Montserrat -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
 
