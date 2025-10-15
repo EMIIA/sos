@@ -723,7 +723,7 @@ z-index: 10000 !important; /* Очень высокий z-index */
         maxZoom: 21,
 
 
-        center: [37.630907830210646, 55.8339924045205],
+        center: [37.63546406, 55.83737711],
  
          
         hash: true,
@@ -782,7 +782,7 @@ geojson.features.forEach(function (marker) {
   var markerObj = new mapboxgl.Marker(el)
     .setLngLat(marker.geometry.coordinates)
     .setPopup(
-      new mapboxgl.Popup({ offset: 25 }) // add popups
+      new mapboxgl.Popup({ offset: 25 })
         .setHTML(
           '<h3>' +
             marker.properties.title +
@@ -793,13 +793,17 @@ geojson.features.forEach(function (marker) {
     )
     .addTo(map);
 
-  // Функция для показа/скрытия маркера в зависимости от зума
+  // Функция для плавного показа/скрытия маркера в зависимости от зума
   function updateMarkerVisibility() {
     var zoom = map.getZoom();
+    var opacity = Math.max(0, Math.min(1, (17 - zoom) / 2));
+    
+    el.style.opacity = opacity;
+    
     if (zoom >= 17) {
-      el.style.display = 'none'; // Скрыть маркер
+      el.style.display = 'none';
     } else {
-      el.style.display = 'block'; // Показать маркер
+      el.style.display = 'block';
     }
   }
 
@@ -855,13 +859,17 @@ geojson.features.forEach(function (marker) {
     )
     .addTo(map);
 
-  // Функция для показа/скрытия маркера в зависимости от зума
+  // Функция для плавного показа/скрытия маркера в зависимости от зума
   function updateMarkerVisibility() {
     var zoom = map.getZoom();
+    var opacity = Math.max(0, Math.min(1, (17 - zoom) / 2));
+    
+    el.style.opacity = opacity;
+    
     if (zoom >= 17) {
-      el.style.display = 'none'; // Скрыть маркер
+      el.style.display = 'none';
     } else {
-      el.style.display = 'block'; // Показать маркер
+      el.style.display = 'block';
     }
   }
 
@@ -871,8 +879,6 @@ geojson.features.forEach(function (marker) {
   // Проверяем видимость при загрузке
   updateMarkerVisibility();
 });
-
-
 
 
 
