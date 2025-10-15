@@ -1439,8 +1439,8 @@ function refreshStopPointsLayer2() {
         'minzoom': 20,
         'layout': {
             'icon-image': ['case',
-                ['==', ['get', 'isCompleted'], true], 'gray-orange-dot',
-                'orange-dot'
+                ['==', ['get', 'isCompleted'], true], 'gray-dot',
+                'red-dot'
             ],
             'icon-offset': [0, 0],
             'icon-allow-overlap': true,
@@ -1757,8 +1757,8 @@ map.on('load', () => {
         'minzoom': 20,
         'layout': {
             'icon-image': ['case',
-                ['==', ['get', 'isCompleted'], true], 'gray-orange-dot',
-                'orange-dot'
+                ['==', ['get', 'isCompleted'], true], 'gray-dot',
+                'red-dot'
             ],
             'icon-offset': [0, 0],
             'icon-allow-overlap': true,
