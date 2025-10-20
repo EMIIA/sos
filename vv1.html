@@ -13,7 +13,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -1093,68 +1092,110 @@ map.on('style.load', () => {
 
 
 
-// Создаем пульсирующий красный восклицательный знак
-const exclamationSign = {
-    width: 150,
-    height: 150,
-    data: new Uint8Array(150 * 150 * 4),
 
-    onAdd: function () {
-        const canvas = document.createElement('canvas');
-        canvas.width = this.width;
-        canvas.height = this.height;
-        this.context = canvas.getContext('2d', { willReadFrequently: true });
-    },
 
-    render: function () {
-        const duration = 2000;
-        const t = (performance.now() % duration) / duration;
-        const context = this.context;
 
-        context.clearRect(0, 0, this.width, this.height);
 
-        const centerX = this.width / 2;
-        const centerY = this.height / 2;
-        
-        // Уменьшенная пульсация размера
-        const scale = 0.9 + 0.1 * Math.sin(t * Math.PI * 2);
-        const baseSize = 33;
-        const size = baseSize * scale;
-        const opacity = 0.9 + 0.1 * Math.sin(t * Math.PI * 2);
 
-        // Рисуем круглый фон
-        context.beginPath();
-        context.arc(centerX, centerY, size * 0.8, 0, Math.PI * 2);
-        context.fillStyle = `rgba(224, 102, 102, ${opacity})`; // #e06666
-        context.fill();
 
-        // Обводка круга
-        context.strokeStyle = '#f8f9fa';
-        context.lineWidth = 5;
-        context.stroke();
 
-        // Восклицательный знак - правильное центрирование
-        context.fillStyle = '#f8f9fa';
-        context.font = `bold ${size * 1.3}px Arial`;
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        
-        // Восклицательный знак по центру
-        const textY = centerY + size * 0.08;
-        context.fillText('!', centerX, textY);
 
-        this.data = context.getImageData(0, 0, this.width, this.height).data;
-        map.triggerRepaint();
 
-        return true;
-    }
+
+
+// Создаем универсальную пульсирующую SVG иконку с настраиваемым размером и частотой
+const createPulsingSVGIcon = (svgPath, baseSize = 70, pulseDuration = 1600) => {
+    return {
+        width: 250,
+        height: 250,
+        data: new Uint8Array(250 * 250 * 4),
+
+        onAdd: function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = this.width;
+            canvas.height = this.height;
+            this.context = canvas.getContext('2d', { willReadFrequently: true });
+            
+            // Загружаем SVG изображение
+            this.img = new Image();
+            this.img.src = 'data:image/svg+xml;charset=utf-8,' + 
+                encodeURIComponent(svgPath);
+        },
+
+        render: function () {
+            const duration = pulseDuration;
+            const t = (performance.now() % duration) / duration;
+            const context = this.context;
+
+            context.clearRect(0, 0, this.width, this.height);
+
+            const centerX = this.width / 2;
+            const centerY = this.height / 2;
+            
+            // Пульсация размера
+            const scale = 0.9 + 0.1 * Math.sin(t * Math.PI * 2);
+            const opacity = 0.8 + 0.2 * Math.sin(t * Math.PI * 2);
+
+            // Размер иконки (базовый размер + пульсация)
+            const iconSize = baseSize * scale;
+
+            // Рисуем SVG иконку
+            if (this.img.complete) {
+                context.save();
+                context.globalAlpha = opacity;
+                context.drawImage(
+                    this.img, 
+                    centerX - iconSize / 2, 
+                    centerY - iconSize / 2, 
+                    iconSize, 
+                    iconSize
+                );
+                context.restore();
+            }
+
+            this.data = context.getImageData(0, 0, this.width, this.height).data;
+            map.triggerRepaint();
+
+            return true;
+        }
+    };
 };
 
-// Добавляем изображение восклицательного знака
-map.addImage('exclamation-sign', exclamationSign, { pixelRatio: 2 });
+// SVG для первого знака (восклицательный знак)
+const svgExclamation = `
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-octagon" viewBox="0 0 16 16">
+  <path  fill="#dc3545" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z"/>
+  <path  fill="#dc3545" d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+</svg>
+`;
 
-// Создаем источники для восклицательных знаков
-map.addSource('exclamation-sign-point-1', {
+// SVG для второго знака (энергия/молния)
+const svgEnergy = `
+<svg fill="#000000" width="800px" height="800px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <path fill="#dc3545" d="M595.344 64.72h.176-.176zm0 0l-72.207 379.377 261.584.88L428.657 959.28l72.208-417.376-261.568-.912zm.049-63.999c-1.728 0-3.455.063-5.151.19-11.296.913-18.785 4.689-27.664 10.657a64.304 64.304 0 0 0-13.392 11.936 56.688 56.688 0 0 0-3.297 4.288L187.281 502.4c-14.16 19.408-16.24 45.025-5.36 66.433 10.864 21.408 32.832 34.976 56.912 35.152l184.736 1.344-58.08 342.192c-5.52 29.408 10.16 58.72 37.76 70.528a64.19 64.19 0 0 0 25.391 5.216c20.112 0 36.64-9.408 49.041-26.4L836.737 482.56c14.16-19.409 16.225-45.057 5.36-66.433-10.864-21.408-32.832-34.977-56.912-35.152l-184.736-.32 57.456-300.88a62.46 62.46 0 0 0 1.825-15.056c0-34.624-27.569-62.848-62.065-63.968-.767-.032-1.52-.032-2.271-.032z"/>
+</svg>
+`;
+
+// SVG для третьего знака (термометр)
+const svgThermometer = `
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <path fill="#dc3545" d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V2.5a.5.5 0 0 1 1 0v8.585a1.5 1.5 0 0 1 1 1.415"/>
+    <path fill="#dc3545" d="M5.5 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM8 1a1.5 1.5 0 0 0-1.5 1.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0l-.166-.15V2.5A1.5 1.5 0 0 0 8 1"/>
+</svg>
+`;
+
+// Создаем пульсирующие иконки для всех трех знаков с РАЗНЫМИ размерами и частотами
+const exclamationPulsing = createPulsingSVGIcon(svgExclamation, 60, 2000);   // Первый знак: размер 60, медленная пульсация (2000ms)
+const energyPulsing = createPulsingSVGIcon(svgEnergy, 80, 1400);             // Второй знак: размер 80, быстрая пульсация (1000ms)
+const thermometerPulsing = createPulsingSVGIcon(svgThermometer, 70, 1600);   // Третий знак: размер 70, средняя пульсация (1600ms)
+
+// Добавляем пульсирующие версии
+map.addImage('exclamation-pulsing', exclamationPulsing, { pixelRatio: 2 });
+map.addImage('energy-pulsing', energyPulsing, { pixelRatio: 2 });
+map.addImage('thermometer-pulsing', thermometerPulsing, { pixelRatio: 2 });
+
+// Создаем источники для знаков
+map.addSource('point-1', {
     'type': 'geojson',
     'data': {
         'type': 'FeatureCollection',
@@ -1174,7 +1215,7 @@ map.addSource('exclamation-sign-point-1', {
     }
 });
 
-map.addSource('exclamation-sign-point-2', {
+map.addSource('point-2', {
     'type': 'geojson',
     'data': {
         'type': 'FeatureCollection',
@@ -1194,8 +1235,7 @@ map.addSource('exclamation-sign-point-2', {
     }
 });
 
-// Создаем источник для ТРЕТЬЕГО знака
-map.addSource('exclamation-sign-point-3', {
+map.addSource('point-3', {
     'type': 'geojson',
     'data': {
         'type': 'FeatureCollection',
@@ -1215,14 +1255,14 @@ map.addSource('exclamation-sign-point-3', {
     }
 });
 
-// Добавляем слои восклицательных знаков
+// Добавляем слои для всех трех знаков с SVG иконками
 map.addLayer({
-    'id': 'exclamation-sign-layer-1',
+    'id': 'layer-1',
     'type': 'symbol',
-    'source': 'exclamation-sign-point-1',
+    'source': 'point-1',
     'minzoom': 18,
     'layout': {
-        'icon-image': 'exclamation-sign',
+        'icon-image': 'exclamation-pulsing',
         'icon-offset': [0, 0],
         'icon-allow-overlap': true,
         'icon-ignore-placement': true
@@ -1230,33 +1270,32 @@ map.addLayer({
 });
 
 map.addLayer({
-    'id': 'exclamation-sign-layer-2',
+    'id': 'layer-2',
     'type': 'symbol',
-    'source': 'exclamation-sign-point-2',
+    'source': 'point-2',
     'minzoom': 18,
     'layout': {
-        'icon-image': 'exclamation-sign',
+        'icon-image': 'energy-pulsing',
         'icon-offset': [0, 0],
         'icon-allow-overlap': true,
         'icon-ignore-placement': true
     }
 });
 
-// Добавляем слой для ТРЕТЬЕГО знака
 map.addLayer({
-    'id': 'exclamation-sign-layer-3',
+    'id': 'layer-3',
     'type': 'symbol',
-    'source': 'exclamation-sign-point-3',
+    'source': 'point-3',
     'minzoom': 18,
     'layout': {
-        'icon-image': 'exclamation-sign',
+        'icon-image': 'thermometer-pulsing',
         'icon-offset': [0, 0],
         'icon-allow-overlap': true,
         'icon-ignore-placement': true
     }
 });
 
-// Создаем popup для восклицательных знаков
+// Создаем popup для знаков
 const exclamationPopup = new mapboxgl.Popup({ 
     offset: 25,
     className: 'top-popup',
@@ -1295,16 +1334,13 @@ const redLinesHTML2 = `
 </div>
 `;
 
-// HTML для ТРЕТЬЕГО знака
+// HTML для третьего знака
 const redLinesHTML3 = `
 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
     <div style="color: #ff0000; font-size: 14px; margin-bottom: 8px;">
         • Нарушен температурный режим<br>
         • Нарушен микроклимат<br>
         • Выявлены загрязнители воздуха
-
-
-
     </div>
     <div style="color: #ff0000; font-size: 14px;">
         <a href="https://www.emiia.ai/" 
@@ -1316,8 +1352,8 @@ const redLinesHTML3 = `
 </div>
 `;
 
-// Обработчики клика по восклицательным знакам
-map.on('click', 'exclamation-sign-layer-1', function(e) {
+// Обработчики клика по знакам
+map.on('click', 'layer-1', function(e) {
     const coordinates = e.features[0].geometry.coordinates.slice();
     const description = e.features[0].properties.description;
     const title = e.features[0].properties.title;
@@ -1330,7 +1366,7 @@ map.on('click', 'exclamation-sign-layer-1', function(e) {
         .addTo(map);
 });
 
-map.on('click', 'exclamation-sign-layer-2', function(e) {
+map.on('click', 'layer-2', function(e) {
     const coordinates = e.features[0].geometry.coordinates.slice();
     const description = e.features[0].properties.description;
     const title = e.features[0].properties.title;
@@ -1343,8 +1379,7 @@ map.on('click', 'exclamation-sign-layer-2', function(e) {
         .addTo(map);
 });
 
-// Обработчик для ТРЕТЬЕГО знака
-map.on('click', 'exclamation-sign-layer-3', function(e) {
+map.on('click', 'layer-3', function(e) {
     const coordinates = e.features[0].geometry.coordinates.slice();
     const description = e.features[0].properties.description;
     const title = e.features[0].properties.title;
@@ -1358,30 +1393,37 @@ map.on('click', 'exclamation-sign-layer-3', function(e) {
 });
 
 // Обработчики для показа курсора при наведении
-map.on('mouseenter', 'exclamation-sign-layer-1', function() {
+map.on('mouseenter', 'layer-1', function() {
     map.getCanvas().style.cursor = 'pointer';
 });
 
-map.on('mouseleave', 'exclamation-sign-layer-1', function() {
+map.on('mouseleave', 'layer-1', function() {
     map.getCanvas().style.cursor = '';
 });
 
-map.on('mouseenter', 'exclamation-sign-layer-2', function() {
+map.on('mouseenter', 'layer-2', function() {
     map.getCanvas().style.cursor = 'pointer';
 });
 
-map.on('mouseleave', 'exclamation-sign-layer-2', function() {
+map.on('mouseleave', 'layer-2', function() {
     map.getCanvas().style.cursor = '';
 });
 
-// Обработчики для ТРЕТЬЕГО знака
-map.on('mouseenter', 'exclamation-sign-layer-3', function() {
+map.on('mouseenter', 'layer-3', function() {
     map.getCanvas().style.cursor = 'pointer';
 });
 
-map.on('mouseleave', 'exclamation-sign-layer-3', function() {
+map.on('mouseleave', 'layer-3', function() {
     map.getCanvas().style.cursor = '';
 });
+
+
+
+
+
+
+
+
 
 
 
@@ -2247,38 +2289,19 @@ map.on('load', () => {
         }
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-       // Инициализируем первые цели
+    // Инициализируем первые цели
     currentTargetIndex1 = getNextTarget1();
     currentTargetIndex2 = getNextTarget2();
 
     // Анимация перемещения точек и линий
     let currentIndex1 = 0;
     let currentIndex2 = 1;
-    const pointSpeed = 0.00000002; // Скорость движения точек
+    const duration = 8000;
 
     function animatePoint1() {
         const nextIndex = (currentIndex1 + 1) % coordinates1.length;
         const startCoord = coordinates1[currentIndex1];
         const endCoord = coordinates1[nextIndex];
-        
-        // Вычисляем расстояние и время анимации
-        const dx = endCoord[0] - startCoord[0];
-        const dy = endCoord[1] - startCoord[1];
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const duration = Math.max(2000, distance / pointSpeed);
-        
         const startTime = performance.now();
 
         if (nextIndex === 0) {
@@ -2290,28 +2313,50 @@ map.on('load', () => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
             
-            // Плавное движение с easing
-            const easeProgress = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-            
-            const lng = startCoord[0] + dx * easeProgress;
-            const lat = startCoord[1] + dy * easeProgress;
+            const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
+            const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
             
-            // ОБНОВЛЯЕМ ВСЕ В ОДНОМ МЕСТЕ
             map.getSource('dot-point-1').setData({
                 'type': 'FeatureCollection',
-                'features': [{
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': currentPoint
+                        }
+                    }
+                ]
+            });
+
+            if (stopPoints1.includes(currentIndex1) && !completedStops1.has(currentIndex1)) {
+                completedStops1.add(currentIndex1);
+                currentTargetIndex1 = getNextTarget1();
+                
+                const stopFeatures = stopPoints1.map(index => ({
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': currentPoint
+                        'coordinates': coordinates1[index]
+                    },
+                    'properties': {
+                        'index': index,
+                        'isCompleted': completedStops1.has(index)
                     }
-                }]
-            });
+                }));
+                
+                map.getSource('stop-points-1').setData({
+                    'type': 'FeatureCollection',
+                    'features': stopFeatures
+                });
 
-            // Пройденный путь
+                setTimeout(refreshStopPointsLayer1, 50);
+            }
+
             const passedCoords = coordinates1.slice(0, currentIndex1 + 1);
             passedCoords.push(currentPoint);
+            
             map.getSource('passed-route-1').setData({
                 'type': 'Feature',
                 'geometry': {
@@ -2320,16 +2365,22 @@ map.on('load', () => {
                 }
             });
 
-            // Будущий путь - ПРОСТАЯ И ТОЧНАЯ ЛОГИКА
             const futureCoords = [currentPoint];
-            let i = currentIndex1 + 1;
-            let found = false;
+            let targetReached = false;
+            for (let i = currentIndex1 + 1; i < coordinates1.length && !targetReached; i++) {
+                futureCoords.push(coordinates1[i]);
+                if (i === currentTargetIndex1) {
+                    targetReached = true;
+                }
+            }
             
-            while (!found && i !== currentIndex1) {
-                const idx = i % coordinates1.length;
-                futureCoords.push(coordinates1[idx]);
-                if (idx === currentTargetIndex1) found = true;
-                i = (i + 1) % coordinates1.length;
+            if (!targetReached) {
+                for (let i = 0; i <= currentTargetIndex1 && !targetReached; i++) {
+                    futureCoords.push(coordinates1[i]);
+                    if (i === currentTargetIndex1) {
+                        targetReached = true;
+                    }
+                }
             }
             
             map.getSource('future-route-1').setData({
@@ -2340,28 +2391,6 @@ map.on('load', () => {
                 }
             });
 
-            // Проверка остановок
-            if (stopPoints1.includes(currentIndex1) && !completedStops1.has(currentIndex1) && progress > 0.5) {
-                completedStops1.add(currentIndex1);
-                currentTargetIndex1 = getNextTarget1();
-                
-                map.getSource('stop-points-1').setData({
-                    'type': 'FeatureCollection',
-                    'features': stopPoints1.map(index => ({
-                        'type': 'Feature',
-                        'geometry': {
-                            'type': 'Point',
-                            'coordinates': coordinates1[index]
-                        },
-                        'properties': {
-                            'index': index,
-                            'isCompleted': completedStops1.has(index)
-                        }
-                    }))
-                });
-                setTimeout(refreshStopPointsLayer1, 50);
-            }
-
             if (pointPopup1 && pointPopup1.isOpen()) {
                 pointPopup1.setLngLat(currentPoint);
             }
@@ -2370,8 +2399,9 @@ map.on('load', () => {
                 requestAnimationFrame(animate);
             } else {
                 currentIndex1 = nextIndex;
-                // Сразу запускаем следующую анимацию без задержки
-                requestAnimationFrame(animatePoint1);
+                setTimeout(() => {
+                    requestAnimationFrame(animatePoint1);
+                }, 500);
             }
         }
 
@@ -2382,13 +2412,6 @@ map.on('load', () => {
         const nextIndex = (currentIndex2 + 1) % coordinates2.length;
         const startCoord = coordinates2[currentIndex2];
         const endCoord = coordinates2[nextIndex];
-        
-        // Вычисляем расстояние и время анимации
-        const dx = endCoord[0] - startCoord[0];
-        const dy = endCoord[1] - startCoord[1];
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const duration = Math.max(2000, distance / pointSpeed);
-        
         const startTime = performance.now();
 
         if (nextIndex === 0) {
@@ -2400,28 +2423,52 @@ map.on('load', () => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
             
-            // Плавное движение с easing
-            const easeProgress = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-            
-            const lng = startCoord[0] + dx * easeProgress;
-            const lat = startCoord[1] + dy * easeProgress;
+            const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
+            const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
             
-            // ОБНОВЛЯЕМ ВСЕ В ОДНОМ МЕСТЕ
             map.getSource('dot-point-2').setData({
                 'type': 'FeatureCollection',
-                'features': [{
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': currentPoint
+                        }
+                    }
+                ]
+            });
+
+
+
+            if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
+                completedStops2.add(currentIndex2);
+                currentTargetIndex2 = getNextTarget2();
+                
+                const stopFeatures = stopPoints2.map(index => ({
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Point',
-                        'coordinates': currentPoint
+                        'coordinates': coordinates2[index]
+                    },
+                    'properties': {
+                        'index': index,
+                        'isCompleted': completedStops2.has(index)
                     }
-                }]
-            });
+                }));
+                
+                map.getSource('stop-points-2').setData({
+                    'type': 'FeatureCollection',
+                    'features': stopFeatures
+                });
 
-            // Пройденный путь
+                setTimeout(refreshStopPointsLayer2, 50);
+            }
+
             const passedCoords = coordinates2.slice(0, currentIndex2 + 1);
             passedCoords.push(currentPoint);
+            
             map.getSource('passed-route-2').setData({
                 'type': 'Feature',
                 'geometry': {
@@ -2430,16 +2477,22 @@ map.on('load', () => {
                 }
             });
 
-            // Будущий путь - ПРОСТАЯ И ТОЧНАЯ ЛОГИКА
             const futureCoords = [currentPoint];
-            let i = currentIndex2 + 1;
-            let found = false;
+            let targetReached = false;
+            for (let i = currentIndex2 + 1; i < coordinates2.length && !targetReached; i++) {
+                futureCoords.push(coordinates2[i]);
+                if (i === currentTargetIndex2) {
+                    targetReached = true;
+                }
+            }
             
-            while (!found && i !== currentIndex2) {
-                const idx = i % coordinates2.length;
-                futureCoords.push(coordinates2[idx]);
-                if (idx === currentTargetIndex2) found = true;
-                i = (i + 1) % coordinates2.length;
+            if (!targetReached) {
+                for (let i = 0; i <= currentTargetIndex2 && !targetReached; i++) {
+                    futureCoords.push(coordinates2[i]);
+                    if (i === currentTargetIndex2) {
+                        targetReached = true;
+                    }
+                }
             }
             
             map.getSource('future-route-2').setData({
@@ -2450,28 +2503,6 @@ map.on('load', () => {
                 }
             });
 
-            // Проверка остановок
-            if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2) && progress > 0.5) {
-                completedStops2.add(currentIndex2);
-                currentTargetIndex2 = getNextTarget2();
-                
-                map.getSource('stop-points-2').setData({
-                    'type': 'FeatureCollection',
-                    'features': stopPoints2.map(index => ({
-                        'type': 'Feature',
-                        'geometry': {
-                            'type': 'Point',
-                            'coordinates': coordinates2[index]
-                        },
-                        'properties': {
-                            'index': index,
-                            'isCompleted': completedStops2.has(index)
-                        }
-                    }))
-                });
-                setTimeout(refreshStopPointsLayer2, 50);
-            }
-
             if (pointPopup2 && pointPopup2.isOpen()) {
                 pointPopup2.setLngLat(currentPoint);
             }
@@ -2480,8 +2511,9 @@ map.on('load', () => {
                 requestAnimationFrame(animate);
             } else {
                 currentIndex2 = nextIndex;
-                // Сразу запускаем следующую анимацию без задержки
-                requestAnimationFrame(animatePoint2);
+                setTimeout(() => {
+                    requestAnimationFrame(animatePoint2);
+                }, 500);
             }
         }
 
@@ -2491,12 +2523,11 @@ map.on('load', () => {
     // Запускаем анимацию обеих точек
     setTimeout(() => {
         requestAnimationFrame(animatePoint1);
-        // Вторая точка начинается с задержкой для визуального разделения
-        setTimeout(() => {
-            requestAnimationFrame(animatePoint2);
-        }, 1000);
+        requestAnimationFrame(animatePoint2);
     }, 1000);
 });
+
+
 
 
 
@@ -4393,21 +4424,4 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
