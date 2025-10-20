@@ -2303,13 +2303,14 @@ map.on('load', () => {
     // Анимация перемещения точек и линий
     let currentIndex1 = 0;
     let currentIndex2 = 1;
-    const duration = 8000;
+    const segmentDuration = 5900;
 
     function animatePoint1() {
         const nextIndex = (currentIndex1 + 1) % coordinates1.length;
         const startCoord = coordinates1[currentIndex1];
         const endCoord = coordinates1[nextIndex];
-        const startTime = performance.now();
+        let startTime = performance.now();
+        let lastTime = startTime;
 
         if (nextIndex === 0) {
             resetStopPoints1();
@@ -2317,32 +2318,39 @@ map.on('load', () => {
         }
 
         function animate(currentTime) {
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+            
             const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
+            let progress = Math.min(elapsed / segmentDuration, 1);
+            
+            if (deltaTime > 32) {
+                progress = Math.min(progress + (deltaTime - 16) / segmentDuration, 1);
+            }
             
             const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
             const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
             
-            // СИНХРОННОЕ ОБНОВЛЕНИЕ ВСЕГО СРАЗУ
-            const passedCoords = coordinates1.slice(0, currentIndex1 + 1);
-            passedCoords.push(currentPoint);
+            // УПРОЩЕННАЯ ЛОГИКА ПУТЕЙ
+            // Пройденный путь: все точки до текущего индекса + текущая позиция
+            const passedCoords = [...coordinates1.slice(0, currentIndex1 + 1)];
+            if (progress > 0) {
+                passedCoords.push(currentPoint);
+            }
             
+            // Будущий путь: от текущей позиции до цели
             const futureCoords = [currentPoint];
-            if (currentTargetIndex1 >= currentIndex1) {
-                for (let i = currentIndex1 + 1; i <= currentTargetIndex1; i++) {
-                    futureCoords.push(coordinates1[i]);
-                }
-            } else {
-                for (let i = currentIndex1 + 1; i < coordinates1.length; i++) {
-                    futureCoords.push(coordinates1[i]);
-                }
-                for (let i = 0; i <= currentTargetIndex1; i++) {
-                    futureCoords.push(coordinates1[i]);
-                }
+            let i = nextIndex;
+            let found = false;
+            
+            while (!found && i !== currentIndex1) {
+                futureCoords.push(coordinates1[i]);
+                if (i === currentTargetIndex1) found = true;
+                i = (i + 1) % coordinates1.length;
             }
 
-            // ОДНОВРЕМЕННОЕ ОБНОВЛЕНИЕ ВСЕХ ИСТОЧНИКОВ
+            // СИНХРОННОЕ ОБНОВЛЕНИЕ
             map.getSource('dot-point-1').setData({
                 'type': 'FeatureCollection',
                 'features': [{
@@ -2361,7 +2369,7 @@ map.on('load', () => {
                 'geometry': {'type': 'LineString', 'coordinates': futureCoords}
             });
 
-            if (stopPoints1.includes(currentIndex1) && !completedStops1.has(currentIndex1)) {
+            if (stopPoints1.includes(currentIndex1) && !completedStops1.has(currentIndex1) && progress > 0.95) {
                 completedStops1.add(currentIndex1);
                 currentTargetIndex1 = getNextTarget1();
                 
@@ -2384,9 +2392,7 @@ map.on('load', () => {
                 requestAnimationFrame(animate);
             } else {
                 currentIndex1 = nextIndex;
-                setTimeout(() => {
-                    requestAnimationFrame(animatePoint1);
-                }, 500);
+                requestAnimationFrame(animatePoint1);
             }
         }
 
@@ -2397,7 +2403,8 @@ map.on('load', () => {
         const nextIndex = (currentIndex2 + 1) % coordinates2.length;
         const startCoord = coordinates2[currentIndex2];
         const endCoord = coordinates2[nextIndex];
-        const startTime = performance.now();
+        let startTime = performance.now();
+        let lastTime = startTime;
 
         if (nextIndex === 0) {
             resetStopPoints2();
@@ -2405,32 +2412,39 @@ map.on('load', () => {
         }
 
         function animate(currentTime) {
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+            
             const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
+            let progress = Math.min(elapsed / segmentDuration, 1);
+            
+            if (deltaTime > 32) {
+                progress = Math.min(progress + (deltaTime - 16) / segmentDuration, 1);
+            }
             
             const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
             const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
             
-            // СИНХРОННОЕ ОБНОВЛЕНИЕ ВСЕГО СРАЗУ
-            const passedCoords = coordinates2.slice(0, currentIndex2 + 1);
-            passedCoords.push(currentPoint);
+            // УПРОЩЕННАЯ ЛОГИКА ПУТЕЙ
+            // Пройденный путь: все точки до текущего индекса + текущая позиция
+            const passedCoords = [...coordinates2.slice(0, currentIndex2 + 1)];
+            if (progress > 0) {
+                passedCoords.push(currentPoint);
+            }
             
+            // Будущий путь: от текущей позиции до цели
             const futureCoords = [currentPoint];
-            if (currentTargetIndex2 >= currentIndex2) {
-                for (let i = currentIndex2 + 1; i <= currentTargetIndex2; i++) {
-                    futureCoords.push(coordinates2[i]);
-                }
-            } else {
-                for (let i = currentIndex2 + 1; i < coordinates2.length; i++) {
-                    futureCoords.push(coordinates2[i]);
-                }
-                for (let i = 0; i <= currentTargetIndex2; i++) {
-                    futureCoords.push(coordinates2[i]);
-                }
+            let i = nextIndex;
+            let found = false;
+            
+            while (!found && i !== currentIndex2) {
+                futureCoords.push(coordinates2[i]);
+                if (i === currentTargetIndex2) found = true;
+                i = (i + 1) % coordinates2.length;
             }
 
-            // ОДНОВРЕМЕННОЕ ОБНОВЛЕНИЕ ВСЕХ ИСТОЧНИКОВ
+            // СИНХРОННОЕ ОБНОВЛЕНИЕ
             map.getSource('dot-point-2').setData({
                 'type': 'FeatureCollection',
                 'features': [{
@@ -2449,7 +2463,7 @@ map.on('load', () => {
                 'geometry': {'type': 'LineString', 'coordinates': futureCoords}
             });
 
-            if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
+            if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2) && progress > 0.95) {
                 completedStops2.add(currentIndex2);
                 currentTargetIndex2 = getNextTarget2();
                 
@@ -2472,9 +2486,7 @@ map.on('load', () => {
                 requestAnimationFrame(animate);
             } else {
                 currentIndex2 = nextIndex;
-                setTimeout(() => {
-                    requestAnimationFrame(animatePoint2);
-                }, 500);
+                requestAnimationFrame(animatePoint2);
             }
         }
 
@@ -2484,7 +2496,9 @@ map.on('load', () => {
     // Запускаем анимацию обеих точек
     setTimeout(() => {
         requestAnimationFrame(animatePoint1);
-        requestAnimationFrame(animatePoint2);
+        setTimeout(() => {
+            requestAnimationFrame(animatePoint2);
+        }, 1000);
     }, 1000);
 
  });
