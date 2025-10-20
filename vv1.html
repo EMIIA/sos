@@ -13,6 +13,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -2331,21 +2332,21 @@ map.on('load', () => {
                 }
             });
 
+            // ИСПРАВЛЕННЫЙ БЛОК ДЛЯ ПЕРВОЙ ТОЧКИ
             const futureCoords = [currentPoint];
-            let targetReached = false;
-            for (let i = currentIndex1 + 1; i < coordinates1.length && !targetReached; i++) {
-                futureCoords.push(coordinates1[i]);
-                if (i === currentTargetIndex1) {
-                    targetReached = true;
-                }
-            }
-            
-            if (!targetReached) {
-                for (let i = 0; i <= currentTargetIndex1 && !targetReached; i++) {
+
+            if (currentTargetIndex1 >= currentIndex1) {
+                // Цель впереди по массиву
+                for (let i = currentIndex1 + 1; i <= currentTargetIndex1; i++) {
                     futureCoords.push(coordinates1[i]);
-                    if (i === currentTargetIndex1) {
-                        targetReached = true;
-                    }
+                }
+            } else {
+                // Цель позади - нужно пройти до конца массива и с начала
+                for (let i = currentIndex1 + 1; i < coordinates1.length; i++) {
+                    futureCoords.push(coordinates1[i]);
+                }
+                for (let i = 0; i <= currentTargetIndex1; i++) {
+                    futureCoords.push(coordinates1[i]);
                 }
             }
             
@@ -2392,6 +2393,10 @@ map.on('load', () => {
             const lng = startCoord[0] + (endCoord[0] - startCoord[0]) * progress;
             const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
+
+
+
+
             
             map.getSource('dot-point-2').setData({
                 'type': 'FeatureCollection',
@@ -2408,7 +2413,10 @@ map.on('load', () => {
 
 
 
-            if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
+
+
+
+               if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
                 completedStops2.add(currentIndex2);
                 currentTargetIndex2 = getNextTarget2();
                 
@@ -2443,21 +2451,21 @@ map.on('load', () => {
                 }
             });
 
+            // ИСПРАВЛЕННЫЙ БЛОК ДЛЯ ВТОРОЙ ТОЧКИ
             const futureCoords = [currentPoint];
-            let targetReached = false;
-            for (let i = currentIndex2 + 1; i < coordinates2.length && !targetReached; i++) {
-                futureCoords.push(coordinates2[i]);
-                if (i === currentTargetIndex2) {
-                    targetReached = true;
-                }
-            }
-            
-            if (!targetReached) {
-                for (let i = 0; i <= currentTargetIndex2 && !targetReached; i++) {
+
+            if (currentTargetIndex2 >= currentIndex2) {
+                // Цель впереди по массиву
+                for (let i = currentIndex2 + 1; i <= currentTargetIndex2; i++) {
                     futureCoords.push(coordinates2[i]);
-                    if (i === currentTargetIndex2) {
-                        targetReached = true;
-                    }
+                }
+            } else {
+                // Цель позади - нужно пройти до конца массива и с начала
+                for (let i = currentIndex2 + 1; i < coordinates2.length; i++) {
+                    futureCoords.push(coordinates2[i]);
+                }
+                for (let i = 0; i <= currentTargetIndex2; i++) {
+                    futureCoords.push(coordinates2[i]);
                 }
             }
             
@@ -2492,8 +2500,6 @@ map.on('load', () => {
         requestAnimationFrame(animatePoint2);
     }, 1000);
 });
-
-
 
 
 
@@ -4390,6 +4396,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 </body>
 </html>
+
+
 
 
 
