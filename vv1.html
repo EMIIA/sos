@@ -2323,42 +2323,7 @@ map.on('load', () => {
             const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
             
-            // СНАЧАЛА обновляем пути (они рендерятся медленнее)
-            const passedCoords = coordinates1.slice(0, currentIndex1 + 1);
-            passedCoords.push(currentPoint);
-            
-            const futureCoords = [currentPoint];
-            let targetReached = false;
-            
-            for (let i = currentIndex1 + 1; i < coordinates1.length && !targetReached; i++) {
-                futureCoords.push(coordinates1[i]);
-                if (i === currentTargetIndex1) targetReached = true;
-            }
-            
-            if (!targetReached) {
-                for (let i = 0; i <= currentTargetIndex1 && !targetReached; i++) {
-                    futureCoords.push(coordinates1[i]);
-                    if (i === currentTargetIndex1) targetReached = true;
-                }
-            }
-            
-            map.getSource('passed-route-1').setData({
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'LineString',
-                    'coordinates': passedCoords
-                }
-            });
-            
-            map.getSource('future-route-1').setData({
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'LineString',
-                    'coordinates': futureCoords
-                }
-            });
-
-            // ПОТОМ обновляем точку (рендерится быстрее)
+            // СНАЧАЛА обновляем точку (рендерится МЕДЛЕННЕЕ на мобильном)
             map.getSource('dot-point-1').setData({
                 'type': 'FeatureCollection',
                 'features': [
@@ -2372,8 +2337,46 @@ map.on('load', () => {
                 ]
             });
 
-            // Принудительно триггерим ререндер карты
-            map.triggerRepaint();
+            // Микро-задержка для синхронизации на мобильных
+            setTimeout(() => {
+                // ПОТОМ обновляем пути (рендерятся БЫСТРЕЕ)
+                const passedCoords = coordinates1.slice(0, currentIndex1 + 1);
+                passedCoords.push(currentPoint);
+                
+                const futureCoords = [currentPoint];
+                let targetReached = false;
+                
+                for (let i = currentIndex1 + 1; i < coordinates1.length && !targetReached; i++) {
+                    futureCoords.push(coordinates1[i]);
+                    if (i === currentTargetIndex1) targetReached = true;
+                }
+                
+                if (!targetReached) {
+                    for (let i = 0; i <= currentTargetIndex1 && !targetReached; i++) {
+                        futureCoords.push(coordinates1[i]);
+                        if (i === currentTargetIndex1) targetReached = true;
+                    }
+                }
+                
+                map.getSource('passed-route-1').setData({
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': passedCoords
+                    }
+                });
+                
+                map.getSource('future-route-1').setData({
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': futureCoords
+                    }
+                });
+
+                // Принудительно триггерим ререндер карты
+                map.triggerRepaint();
+            }, 16); // ~1 кадр
 
             if (stopPoints1.includes(currentIndex1) && !completedStops1.has(currentIndex1)) {
                 completedStops1.add(currentIndex1);
@@ -2435,42 +2438,7 @@ map.on('load', () => {
             const lat = startCoord[1] + (endCoord[1] - startCoord[1]) * progress;
             const currentPoint = [lng, lat];
             
-            // СНАЧАЛА обновляем пути (они рендерятся медленнее)
-            const passedCoords = coordinates2.slice(0, currentIndex2 + 1);
-            passedCoords.push(currentPoint);
-            
-            const futureCoords = [currentPoint];
-            let targetReached = false;
-            
-            for (let i = currentIndex2 + 1; i < coordinates2.length && !targetReached; i++) {
-                futureCoords.push(coordinates2[i]);
-                if (i === currentTargetIndex2) targetReached = true;
-            }
-            
-            if (!targetReached) {
-                for (let i = 0; i <= currentTargetIndex2 && !targetReached; i++) {
-                    futureCoords.push(coordinates2[i]);
-                    if (i === currentTargetIndex2) targetReached = true;
-                }
-            }
-            
-            map.getSource('passed-route-2').setData({
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'LineString',
-                    'coordinates': passedCoords
-                }
-            });
-            
-            map.getSource('future-route-2').setData({
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'LineString',
-                    'coordinates': futureCoords
-                }
-            });
-
-            // ПОТОМ обновляем точку (рендерится быстрее)
+            // СНАЧАЛА обновляем точку (рендерится МЕДЛЕННЕЕ на мобильном)
             map.getSource('dot-point-2').setData({
                 'type': 'FeatureCollection',
                 'features': [
@@ -2484,8 +2452,46 @@ map.on('load', () => {
                 ]
             });
 
-            // Принудительно триггерим ререндер карты
-            map.triggerRepaint();
+            // Микро-задержка для синхронизации на мобильных
+            setTimeout(() => {
+                // ПОТОМ обновляем пути (рендерятся БЫСТРЕЕ)
+                const passedCoords = coordinates2.slice(0, currentIndex2 + 1);
+                passedCoords.push(currentPoint);
+                
+                const futureCoords = [currentPoint];
+                let targetReached = false;
+                
+                for (let i = currentIndex2 + 1; i < coordinates2.length && !targetReached; i++) {
+                    futureCoords.push(coordinates2[i]);
+                    if (i === currentTargetIndex2) targetReached = true;
+                }
+                
+                if (!targetReached) {
+                    for (let i = 0; i <= currentTargetIndex2 && !targetReached; i++) {
+                        futureCoords.push(coordinates2[i]);
+                        if (i === currentTargetIndex2) targetReached = true;
+                    }
+                }
+                
+                map.getSource('passed-route-2').setData({
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': passedCoords
+                    }
+                });
+                
+                map.getSource('future-route-2').setData({
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': futureCoords
+                    }
+                });
+
+                // Принудительно триггерим ререндер карты
+                map.triggerRepaint();
+            }, 16); // ~1 кадр
 
             if (stopPoints2.includes(currentIndex2) && !completedStops2.has(currentIndex2)) {
                 completedStops2.add(currentIndex2);
@@ -2536,10 +2542,7 @@ map.on('load', () => {
     setTimeout(() => {
         requestAnimationFrame(animatePoint2);
     }, 1000);
-
-  
 });
-
 
 
 
