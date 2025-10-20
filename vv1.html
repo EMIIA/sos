@@ -2269,7 +2269,6 @@ map.on('load', () => {
 
 
 
-
 // Анимация перемещения точек и линий
 let currentIndex1 = 0;
 let currentIndex2 = 1;
@@ -2507,9 +2506,7 @@ setTimeout(() => {
     requestAnimationFrame(animatePoint2);
 }, 1000);
 
-
-
-});
+}); // ← ВОТ ЭТА ЗАКРЫВАЮЩАЯ СКОБКА ДЛЯ map.on('load', () => {
 
 
 
