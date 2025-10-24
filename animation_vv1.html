@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Typing Animation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js" integrity="sha512-BdHyGtczsUoFcEma+MfXc71KJLv/cd+sUsUaYYf2mXpfG/PtBjNXsPo78+rxWjscxUYN2Qr2+DbeGGiJx81ifg==" crossorigin="anonymous"></script>
+
+    <style>
+        /* ===== ПОДКЛЮЧЕНИЕ ШРИФТА ORBITRON ===== */
+        @font-face {
+            font-family: 'Orbitron';
+            font-style: normal;
+            font-weight: 400;
+            src: url('https://fonts.gstatic.com/s/orbitron/v29/yMJRMIlzdpvBhQQL_QIA3g.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Orbitron';
+            font-style: normal;
+            font-weight: 700;
+            src: url('https://fonts.gstatic.com/s/orbitron/v29/yMJRMIlzdpvBhQQLWQH3g.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        /* ===== СБРОС СТИЛЕЙ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ===== ОСНОВНОЙ КОНТЕЙНЕР СТРАНИЦЫ ===== */
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Orbitron', monospace !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* ===== ГЛАВНЫЙ КОНТЕЙНЕР КОНТЕНТА ===== */
+        .container {
+            width: 100%;
+            max-width: 1800px;
+min-height 800px;
+
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* ===== КОНТЕЙНЕР ДЛЯ ТЕКСТА ===== */
+        .text-container {
+            display: inline-block;
+            text-align: left;
+            position: relative;
+        }
+        
+        /* ===== АНИМИРОВАННЫЙ ТЕКСТ (печатающийся) ===== */
+        .text {
+            color: #3d85c6;
+            font-size: 20.5px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: inline;
+            text-align: left;
+            font-family: 'Orbitron', monospace !important;
+            letter-spacing: 1px;
+            margin-left: 4.5px;
+            vertical-align: top;
+        }
+
+        /* ===== КАСТОМНЫЙ КУРСОР С ЖИРНОЙ ТОЧКОЙ ===== */
+        .custom-cursor {
+            color: #3d85c6;
+            font-size: 20.5px;
+            display: inline;
+            font-family: 'Orbitron', monospace !important;
+            vertical-align: top;
+            line-height: 1.2;
+        }
+
+        .cursor-dot {
+            font-weight: 700 !important;
+            font-family: 'Arial Black', 'Arial', sans-serif !important; /* Другой шрифт для жирной точки */
+        }
+        
+        .cursor-arrow {
+            font-weight: 600 !important;
+        }
+        
+        /* ===== ЛОГОТИП/ЗАГОЛОВОК ===== */
+        .iam {
+            color: #aaaaaa;
+            font-size: 77.5px;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace !important;
+            margin-bottom: -8px;
+            text-align: left;
+            display: block;
+        }
+        
+        /* ===== ПРИНУДИТЕЛЬНОЕ ПРИМЕНЕНИЕ ШРИФТА ===== */
+        .text, .iam, .custom-cursor, body {
+            font-family: 'Orbitron', 'Courier New', Courier, monospace !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div class="container">
+        <!-- КОНТЕЙНЕР ТЕКСТА -->
+        <div class="text-container">
+            <!-- ЛОГОТИП - "EMIIA.AI" -->
+            <div class="iam"></div>
+            <!-- АНИМИРОВАННЫЙ ТЕКСТ - здесь будет "ЭВОЛЮЦИЯ ЛОГИСТИКИ" -->
+            <span class="text"></span>
+            <!-- КАСТОМНЫЙ КУРСОР -->
+            <span class="custom-cursor">
+                <span class="cursor-dot">•</span><span class="cursor-arrow"> ❯</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- СКРЫТЫЙ ЭЛЕМЕНТ ДЛЯ ПРИНУДИТЕЛЬНОЙ ЗАГРУЗКИ ШРИФТА -->
+    <div style="font-family: 'Orbitron'; opacity: 0; position: absolute; font-size: 1px;">.</div>
+</body>
+<script>
+   // Ждем загрузки шрифтов перед запуском анимации
+   document.fonts.ready.then(function() {
+       console.log('Шрифт Orbitron загружен');
+
+
+
+       
+       // Скрываем стандартный курсор Typed.js
+       var typed = new Typed(".text", {
+           strings: ["  АВТОНОМНАЯ AI-ИНФРАСТРУКТУРА", " ЛОКАЛЬНОЕ ПО И БАЗЫ ДАННЫХ", " АДАПТИВНАЯ НАВИГАЦИЯ", " РОБОТИЗАЦИЯ, ДАТАСЕТЫ, НЕЙРОСЕТИ" , " ДЕПЛОЙ, ХОСТИНГ, ИНФЕРЕНС", " ЦИФРОВЫЕ ДВОЙНИКИ ФИЗИЧЕСКИХ ОБЪЕКТОВ И БИЗНЕС-ПРОЦЕССОВ" , " ВЫСОКОРОСТНАЯ БЕСПРОВОДНАЯ СЕТЬ ДЛЯ ЛЮДЕЙ И РОБОТОВ"],
+           typeSpeed: 100,
+           backSpeed: 40,
+           loop: true,
+           cursorChar: '', // Пустой курсор
+           startDelay: 500,
+           fadeOut: false,
+           shuffle: false,
+           backDelay: 1500,
+           smartBackspace: true,
+           onBegin: function(self) {
+               // Показываем кастомный курсор когда начинается печать
+               document.querySelector('.custom-cursor').style.display = 'inline';
+           }
+       });
+       
+       // Анимация мигания для кастомного курсора
+       function blinkCursor() {
+           var cursor = document.querySelector('.custom-cursor');
+           if (cursor) {
+               var isVisible = cursor.style.opacity !== '1';
+               cursor.style.opacity = isVisible ? '1' : '1';
+           }
+       }
+       
+       // Запускаем мигание курсора
+       setInterval(blinkCursor, 500);
+   }).catch(function(error) {
+       console.log('Ошибка загрузки шрифта:', error);
+   });
+</script>
+</html>
+
