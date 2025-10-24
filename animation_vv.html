@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анимация с регулировкой шрифтов</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js" integrity="sha512-BdHyGtczsUoFcEma+MfXc71KJLv/cd+sUsUaYYf2mXpfG/PtBjNXsPo78+rxWjscxUYN2Qr2+DbeGGiJx81ifg==" crossorigin="anonymous"></script>
+
+    <style>
+        /* ===== ПОДКЛЮЧЕНИЕ ШРИФТА ORBITRON ===== */
+        /* Обычное начертание (400) */
+        @font-face {
+            font-family: 'Orbitron';
+            font-style: normal;
+            font-weight: 400;
+            src: url('https://fonts.gstatic.com/s/orbitron/v29/yMJRMIlzdpvBhQQL_QIA3g.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        /* Среднее начертание (500) */
+        @font-face {
+            font-family: 'Orbitron';
+            font-style: normal;
+            font-weight: 500;
+            src: url('https://fonts.gstatic.com/s/orbitron/v29/yMJRMIlzdpvBhQQL_QIA3g.woff2') format('woff2'); /* Используем тот же файл */
+            font-display: swap;
+        }
+
+        /* Полужирное начертание (600) */
+        @font-face {
+            font-family: 'Orbitron';
+            font-style: normal;
+            font-weight: 600;
+            src: url('https://fonts.gstatic.com/s/orbitron/v29/yMJRMIlzdpvBhQQLWQH3g.woff2') format('woff2'); /* Используем жирный файл */
+            font-display: swap;
+        }
+
+        /* Жирное начертание (700) */
+        @font-face {
+            font-family: 'Orbitron';
+            font-style: normal;
+            font-weight: 700;
+            src: url('https://fonts.gstatic.com/s/orbitron/v29/yMJRMIlzdpvBhQQLWQH3g.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        /* ===== СБРОС СТИЛЕЙ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ===== ОСНОВНОЙ КОНТЕЙНЕР СТРАНИЦЫ ===== */
+        body {
+            background-color: #f8f9fa;  /* Цвет фона страницы */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;          /* Минимальная высота на весь экран */
+            font-family: 'Orbitron', monospace !important;
+            -webkit-font-smoothing: antialiased;  /* Сглаживание для WebKit */
+            -moz-osx-font-smoothing: grayscale;   /* Сглаживание для Firefox */
+        }
+        
+        /* ===== ГЛАВНЫЙ КОНТЕЙНЕР КОНТЕНТА ===== */
+        .container {
+            width: 100%;
+            max-width: 800px;           /* Максимальная ширина блока */
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* ===== КОНТЕЙНЕР ДЛЯ ТЕКСТА ===== */
+        .text-container {
+            display: inline-block;
+            text-align: left;            /* Выравнивание текста слева */
+        }
+        
+        /* ===== АНИМИРОВАННЫЙ ТЕКСТ (печатающийся) ===== */
+        .text {
+            color: #3d85c6;              /* Синий цвет текста */
+            font-size: 20.5px;           /* Размер шрифта */
+            font-weight: 500;            /* Полужирное начертание (можно изменить на 500, 600 или 700) */
+            white-space: nowrap;         /* Запрет переноса строк */
+            display: inline;
+            text-align: left;
+            font-family: 'Orbitron', monospace !important;
+            letter-spacing: 1px;         /* Межбуквенный интервал */
+            margin-left: 4.5px;          /* Отступ слева */
+        }
+        
+        /* ===== МИГАЮЩИЙ КУРСОР ===== */
+        .typed-cursor {
+            color: #3d85c6;              /* Цвет курсора */
+            font-size: 14px;             /* Размер курсора */
+            animation: blink 1s infinite; /* Анимация мигания */
+            display: inline;
+            font-family: 'Orbitron', monospace !important;
+            font-weight: 600;            /* Полужирное начертание */
+        }
+        
+        /* ===== ЛОГОТИП/ЗАГОЛОВОК ===== */
+        .iam {
+            color: #aaaaaa;              /* Серый цвет текста */
+            font-size: 77.5px;           /* Крупный размер шрифта */
+            font-weight: 500;            /* Жирное начертание (можно изменить на 500, 600 или 700) */
+            font-family: 'Orbitron', monospace !important;
+            margin-bottom: -8px;         /* Отрицательный отступ снизу */
+            text-align: left;            /* Выравнивание слева */
+            display: block;
+        }
+
+       
+        
+        /* ===== АНИМАЦИЯ МИГАНИЯ КУРСОРА ===== */
+        @keyframes blink {
+            0%, 50% { opacity: 1; }     /* Видим 50% времени */
+            51%, 100% { opacity: 0; }   /* Невидим 50% времени */
+        }
+
+        /* ===== ПРИНУДИТЕЛЬНОЕ ПРИМЕНЕНИЕ ШРИФТА ===== */
+        .text, .iam, .typed-cursor, body, .weight-demo {
+            font-family: 'Orbitron', 'Courier New', Courier, monospace !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div class="container">
+        <!-- КОНТЕЙНЕР ТЕКСТА -->
+        <div class="text-container">
+            <!-- ЛОГОТИП - "EMIIA.AI" -->
+            <div class="iam">EMIIA.AI</div>
+            <!-- АНИМИРОВАННЫЙ ТЕКСТ - здесь будет "ЭВОЛЮЦИЯ ЛОГИСТИКИ" -->
+            <span class="text"></span>
+        </div>
+
+
+    </div>
+
+    <!-- СКРЫТЫЙ ЭЛЕМЕНТ ДЛЯ ПРИНУДИТЕЛЬНОЙ ЗАГРУЗКИ ШРИФТА -->
+    <div style="font-family: 'Orbitron'; opacity: 0; position: absolute; font-size: 1px;">.</div>
+</body>
+<script>
+   // Ждем загрузки шрифтов перед запуском анимации
+   document.fonts.ready.then(function() {
+       console.log('Шрифт Orbitron загружен');
+       
+       // ИНИЦИАЛИЗАЦИЯ АНИМАЦИИ ПЕЧАТАНИЯ
+       var typing = new Typed(".text", {
+           strings: [" ЭВОЛЮЦИЯ ЛОГИСТИКИ", " ЭВОЛЮЦИЯ ЛОГИСТИКИ"], // Текст для анимации
+           typeSpeed: 100,        // Скорость печати (меньше = быстрее)
+           backSpeed: 40,         // Скорость стирания (меньше = быстрее)
+           loop: true,            // Бесконечное повторение
+           cursorChar: '_',       // Символ курсора
+           startDelay: 500,       // Задержка перед стартом (мс)
+           fadeOut: false,        // Без эффекта исчезновения
+           shuffle: false,        // Без перемешивания текста
+           backDelay: 1500,       // Пауза перед стиранием (мс)
+           smartBackspace: true,  // Умное стирание
+       });
+   }).catch(function(error) {
+       console.log('Ошибка загрузки шрифта:', error);
+   });
+
+   // ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА ЗАГРУЗКИ ШРИФТА
+   setTimeout(function() {
+       var testElem = document.createElement('span');
+       testElem.style.fontFamily = 'Orbitron';
+       testElem.style.fontSize = '40px';
+       testElem.style.position = 'absolute';
+       testElem.style.left = '-9999px';
+       testElem.innerHTML = 'EMIIA.AI';
+       document.body.appendChild(testElem);
+       
+       console.log('Шрифт применен к тестовому элементу');
+   }, 1000);
+</script>
+</html>
