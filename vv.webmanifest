@@ -1,6 +1,6 @@
 {
   "background_color": "#1b2323",
-  "description": "ВкусВилл • ❯",
+  "description": "DARK STORE • ❯",
   "display": "standalone",
   "icons": [
     {
@@ -10,6 +10,6 @@
     }
   ],
   "name": "ВкусВилл • ❯",
-  "short_name": "ВкусВилл • ❯",
+  "short_name": "DARK STORE • ❯",
   "start_url": "/vv.html"
 }
