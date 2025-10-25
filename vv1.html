@@ -4202,9 +4202,9 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 
 
-        <!-- Крестик в верхнем правом углу -->
+               <!-- Крестик в верхнем правом углу -->
         <button class="mapboxgl-popup-close-button" onclick="closePopup()" 
-                style="position: absolute; top: 16px; right: 16px; color: #3D85C6; font-size: 28px; padding: 14px; margin: 4px; border: none; background: none; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; cursor: pointer;"
+                style="position: fixed; top: 20px; right: 20px; color: #3D85C6; font-size: 28px; padding: 14px; margin: 0; border: none; background: none; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; cursor: pointer; z-index: 10001;"
                 onmouseover="this.style.background='rgba(128, 128, 128, 0.1)'; this.style.color='#666'; this.style.transform='scale(1.05)';"
                 onmouseout="this.style.background='none'; this.style.color='#3D85C6'; this.style.transform='scale(1)';"
                 ontouchstart="this.style.background='rgba(128, 128, 128, 0.1)'; this.style.color='#666'; this.style.transform='scale(0.95)';"
@@ -4222,7 +4222,7 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 
 
-        <h3 style="margin-top: 0; color: #3D85C6; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 20px;">EMIIA.AI LLM: МОДУЛЬ AI WMS <br><strong>DARK STORE #33</strong></h3>
+        <h3 style="margin-top: 0; color: #3D85C6; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 20px;">EMIIA.AI LLM: WMS <br><strong>DARK STORE #33</strong></h3>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 23px; margin-bottom: 25px; border: 1px solid #3D85C6; ">
 
             <p style="line-height: 2; color: #333; font-family: 'Montserrat', sans-serif; font-size: 14px; margin: 0;  font-weight: 400;">
@@ -4236,9 +4236,7 @@ const enhancedBlur = new EnhancedBlurHandler();
   <circle cx="8" cy="8" r="8"/>
 </svg> ❯ EMIIA.AI OAI</strong>  — операционный агент<br>
 
-<svg width="100%" height="2">
-    <line x1="0" y1="1" x2="100%" y2="1" stroke="#D5D5D5" stroke-width="2"/>
-</svg>
+
 
 <strong style="color: #3D85C6; font-weight: 400;">Субагенты:</strong><br>
 
