@@ -4692,35 +4692,8 @@ function showPopup() {
 }
 
 function closePopup() {
-    const popup = document.getElementById('popup');
-    const popupContent = document.getElementById('popup-content');
-    
-    // Находим элементы
-    const title = popupContent.querySelector('h3');
-    const description = popupContent.querySelector('div');
-    const button = popupContent.querySelector('button[onclick*="window.open"]');
-    
-    // Анимация скрытия
-    [title, description, button].forEach(element => {
-        if (element) {
-            element.style.opacity = '0';
-            element.style.transform = 'translateY(20px)';
-        }
-    });
-    
-    // Скрываем после анимации
-    setTimeout(() => {
-        popup.style.display = 'none';
-        
-        // Восстанавливаем стили
-        [title, description, button].forEach(element => {
-            if (element) {
-                element.style.opacity = '';
-                element.style.transform = '';
-                element.style.transition = '';
-            }
-        });
-    }, 400);
+    // Просто скрываем popup без анимации
+    document.getElementById('popup').style.display = 'none';
 }
 
 function closePopupByBackdrop(event) {
@@ -4755,10 +4728,6 @@ window.addEventListener('resize', adjustForMobile);
 
 
 
-
-
-
-
 <style>
 #popup-content h3,
 #popup-content div,
@@ -4766,8 +4735,6 @@ window.addEventListener('resize', adjustForMobile);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 </style>
-
-
 
 
 
