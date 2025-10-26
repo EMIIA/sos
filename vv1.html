@@ -4606,28 +4606,14 @@ const enhancedBlur = new EnhancedBlurHandler();
     </div>
 </div>
 
-<script>
-function showPopup() {
-    document.getElementById('popup').style.display = 'block';
-}
 
-function closePopup() {
-    document.getElementById('popup').style.display = 'none';
-}
 
-function closePopupByBackdrop(event) {
-    if (event.target === document.getElementById('popup')) {
-        closePopup();
-    }
-}
 
-// Закрытие по ESC
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closePopup();
-    }
-});
-</script>
+
+
+
+
+
 
 
 
@@ -4651,7 +4637,7 @@ font.load().then(function(loadedFont) {
     fontLoaded = true;
 }).catch(function(error) {
     console.log('Font loading failed: ', error);
-    fontLoaded = true; // Все равно показываем попап, даже если шрифт не загрузился
+    fontLoaded = true;
 });
 
 function showPopup() {
@@ -4661,19 +4647,87 @@ function showPopup() {
         return;
     }
     
-    document.getElementById('popup').style.display = 'block';
+    const popup = document.getElementById('popup');
+    const popupContent = document.getElementById('popup-content');
+    
+    // Находим все элементы контента (исключая кнопку закрытия)
+    const title = popupContent.querySelector('h3');
+    const description = popupContent.querySelector('div');
+    const button = popupContent.querySelector('button[onclick*="window.open"]');
+    
+    // Сбрасываем стили для анимации
+    [title, description, button].forEach(element => {
+        if (element) {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'all 0.5s ease';
+        }
+    });
+    
+    // Показываем popup
+    popup.style.display = 'block';
     adjustForMobile();
+    
+    // Последовательное появление элементов
+    setTimeout(() => {
+        if (title) {
+            title.style.opacity = '1';
+            title.style.transform = 'translateY(0)';
+        }
+    }, 100);
+    
+    setTimeout(() => {
+        if (description) {
+            description.style.opacity = '1';
+            description.style.transform = 'translateY(0)';
+        }
+    }, 300);
+    
+    setTimeout(() => {
+        if (button) {
+            button.style.opacity = '1';
+            button.style.transform = 'translateY(0)';
+        }
+    }, 500);
 }
 
 function closePopup() {
-    document.getElementById('popup').style.display = 'none';
+    const popup = document.getElementById('popup');
+    const popupContent = document.getElementById('popup-content');
+    
+    // Находим элементы
+    const title = popupContent.querySelector('h3');
+    const description = popupContent.querySelector('div');
+    const button = popupContent.querySelector('button[onclick*="window.open"]');
+    
+    // Анимация скрытия
+    [title, description, button].forEach(element => {
+        if (element) {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+        }
+    });
+    
+    // Скрываем после анимации
+    setTimeout(() => {
+        popup.style.display = 'none';
+        
+        // Восстанавливаем стили
+        [title, description, button].forEach(element => {
+            if (element) {
+                element.style.opacity = '';
+                element.style.transform = '';
+                element.style.transition = '';
+            }
+        });
+    }, 400);
 }
 
-document.getElementById('popup').addEventListener('click', function(e) {
-    if (e.target === this) {
+function closePopupByBackdrop(event) {
+    if (event.target === document.getElementById('popup')) {
         closePopup();
     }
-});
+}
 
 function adjustForMobile() {
     const content = document.getElementById('popup-content');
@@ -4692,10 +4746,8 @@ function adjustForMobile() {
 // Предварительная настройка для мобильных устройств
 document.addEventListener('DOMContentLoaded', function() {
     adjustForMobile();
-    
-    // Предварительно создаем элементы для ускорения отображения
     const popup = document.getElementById('popup');
-    popup.style.display = 'none'; // Гарантируем, что попап скрыт
+    popup.style.display = 'none';
 });
 
 window.addEventListener('resize', adjustForMobile);
@@ -4707,16 +4759,13 @@ window.addEventListener('resize', adjustForMobile);
 
 
 
-
-
-
-
-
-
-
-
-
-
+<style>
+#popup-content h3,
+#popup-content div,
+#popup-content button[onclick*="window.open"] {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+</style>
 
 
 
