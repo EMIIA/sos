@@ -16,6 +16,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -134,7 +135,7 @@ background: #f8f9fa;
 
 @media (max-width: 768px) {
  .header {
-    bottom: 25px; /* Новое значение для мобильных */
+    bottom: 10.5px; /* Новое значение для мобильных */
     right: 1%;
 
   }
@@ -772,20 +773,266 @@ font-size: 18px; /* Увеличьте значение по необходим�
 </style>
 
 
+
+
+
+
+
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        
+        
+
+        .emiia-button-container {
+            position: fixed;
+            bottom: 90px;
+            left: 40px;
+            z-index: 1000;
+        }
+
+        
+
+
+
+.emiia-button {
+            background: rgba(204, 204, 204, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            padding: 12px 10px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            border: 1px solid rgba(204, 204, 204, 0.2);
+        }
+
+
+
+
+        .emiia-button:hover {
+            background: rgba(204, 204, 204, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transform: translateY(-2px);
+        }
+
+        .emiia-button:active {
+            transform: translateY(0);
+        }
+
+        .arrow-icon {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            transition: transform 0.3s ease;
+            stroke: white;
+            stroke-width: 1.5;
+        }
+
+        .emiia-button.active .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .emiia-menu {
+            position: absolute;
+            bottom: 100%;
+            left: 0; /* Теперь меню точно выровнено по левому краю кнопки */
+            margin-bottom: 10px;
+            background: transparent;
+            border-radius: 12px;
+         
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .emiia-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+       
+
+        .menu-content {
+            padding: 0px 0px;
+        }
+
+        .menu-item {
+            padding: 0px 0;
+            border-bottom: 0px solid #eee;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            font-family: 'Montserrat', monospace;
+            font-weight: 500;
+        }
+
+        .menu-item:hover {
+            color: #666;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .emiia-button-container {
+                bottom: 35px;
+                left: 25px;
+            }
+            
+            .emiia-button {
+                padding: 5px 12px;
+                font-size: 12px;
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+            
+            .emiia-menu {
+                min-width: 270px;
+                /* Убрано смещение left: -10px для мобильных */
+            }
+
+
+
+
+
+
+
+
+
+
+#info {
+    background: transparent;
+    padding: 0px;
+
+    margin: 0;
+    font-family: 'Montserrat', monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+   
+    overflow-y: auto;
+    
+   
+   
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .emiia-menu {
+
+ min-width: 280px;
+    }
+    
+    .menu-content {
+        padding: 12px 15px;
+    }
+    
+    #info {
+        font-size: 11px;
+        max-height: 145px;
+    }
+    
+    /* Улучшение читаемости на мобильных */
+    #location-title {
+        font-size: 14px;
+    }
+    
+    #location-description {
+        font-size: 13px;
+    }
+    
+    .calculation-box {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+
+
+
+
+
+
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+ <!-- Кнопка EMIIA.AI -->
+    <div class="emiia-button-container">
+        <button class="emiia-button" id="emiiaButton">
+            <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 17 17">
+                <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+            </svg>
+            EMIIA.AI SIP
+        </button>
+        
+       <div class="emiia-menu" id="emiiaMenu">
+
+
+
+
+            
+            <div class="menu-content">
+             <div class="menu-item"></div>
+
+
+              <pre id="info"></pre>
+
+<p>EMIIA.AI API: JSON DATASET OUTPUT ❯<br>EMIIA.AI SIP: [<strong><span </span>AI WMS</strong>] ID R: [#3D4581] 
+
+<span class="highlight1"></span></p>
+
+ 
+                
+
+            
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div id="map"></div>
 
 
 
 
 
-<pre id="info"></pre>
-
-
-<h2 id="location-title"></h2>
-       
-         <p id="location-description"></p>
-
-<div class="calculation-box">
 
 
 
@@ -793,9 +1040,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
-<p>EMIIA.AI API: JSON DATASET OUTPUT ❯<br>EMIIA.AI SIP: [<strong><span </span>AI WMS</strong>] ID R: [#3D4581] 
 
-<span class="highlight1"></span></p>
+
 
 
 
@@ -4170,10 +4416,15 @@ const enhancedBlur = new EnhancedBlurHandler();
 <div class="header">
     <a class="header" href="javascript:void(0)" onclick="showPopup()" 
    style="display: inline-block; padding: 0px; border-radius: 20px; transition: all 0.2s ease;"
-   onmouseover="this.style.background='rgba(61, 133, 198, 0.08)'; this.style.transform='scale(1.02)';"
+
    onmouseout="this.style.background='none'; this.style.transform='scale(1)';"
    ontouchstart="this.style.background='rgba(61, 133, 198, 0.08)'; this.style.transform='scale(0.98)';"
    ontouchend="this.style.background='none'; this.style.transform='scale(1)';">
+
+
+
+
+
 
         <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 100 100" id="wave" data-name="Layer 1">
             <path id="Line_1" data-name="Line 1" fill="#3D85C6" stroke="#3D85C6" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
@@ -4192,9 +4443,9 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 <div id="popup" onclick="closePopupByBackdrop(event)" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); z-index: 10000; font-family: 'Montserrat', sans-serif; ">
 
-    <div id="popup-content" onclick="event.stopPropagation()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #f8f9fa; padding: 30px; border-radius: 36px; max-width: 400px; width: 85%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 0px solid #3D85C6; ">
 
-       
+
+           <div id="popup-content" onclick="event.stopPropagation()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #f8f9fa; padding: 30px; border-radius: 36px; max-width: 400px; width: 85%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 0px solid #3D85C6; ">
 
 
 
@@ -4530,42 +4781,6 @@ textarea::placeholder {
 
 
 
-<style>
-.calculation-box {
-height: 30px;
-width: 300px;
-position: absolute;
-bottom: 43px;
-left: 18px;
-background-color: transparent;
-padding: 9.5px;
-
-font-family: 'Montserrat', montserrat !important; 
-}
- 
-p {
-font-family: 'Montserrat';
-margin: 0px;
-font-size: 10px;
-color: #3d85c6;
-}
-
-.calculation-box p:not(:last-child) {
-    margin-bottom: 10px; /* Применяется ко всем <p>, кроме последнего */
-}
-
-.highlight {
-    font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
-font-weight: 500; /* Жирность (700 = bold, 800 или 900 — ещё жирнее) */
-}
-
-.highlight1 {
-    position: relative;
-    top: 3px; /* Опускает стрелку на 3px вниз, измените значение по необходимости */
-font-size: 18px; /* Увеличьте значение по необходимости, например, 18px */
-}
-
-</style>
 
 
 
@@ -4576,8 +4791,48 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emiiaButton = document.getElementById('emiiaButton');
+            const emiiaMenu = document.getElementById('emiiaMenu');
 
+            // Функция для переключения меню
+            function toggleMenu() {
+                const isActive = emiiaMenu.classList.contains('active');
+                
+                if (isActive) {
+                    // Закрываем меню
+                    emiiaMenu.classList.remove('active');
+                    emiiaButton.classList.remove('active');
+                } else {
+                    // Открываем меню
+                    emiiaMenu.classList.add('active');
+                    emiiaButton.classList.add('active');
+                }
+            }
 
+            // Обработчик клика по кнопке - ТОЛЬКО так закрывается меню
+            emiiaButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMenu();
+            });
+
+            // Обработчики для пунктов меню (не закрывают меню)
+            const menuItems = emiiaMenu.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Здесь можно добавить логику для каждого пункта меню
+                    console.log('Клик по пункту:', this.textContent);
+                    // Меню НЕ закрывается при клике на пункты
+                });
+            });
+
+            // Предотвращаем закрытие при клике внутри меню
+            emiiaMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
 
 
 
@@ -4620,6 +4875,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 </body>
 </html>
+
+
 
 
 
