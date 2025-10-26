@@ -86,32 +86,7 @@ body { margin: 0; padding: 0; }
 <body>
 
 <style type="text/css">
-    #info {
-        display: table;
-        position: relative;
-        margin: 0px auto;
-        word-wrap: anywhere;
-        white-space: pre-wrap;
-        padding: 10px;
-        border: none;
-        border-radius: 3px;
-        font-size: 12px;
-        text-align: center;
-        color: #818cf8;
-        background: transparent;
-
-
-
-    }
-
-
-@media (max-width: 768px) {
- #info {
-    top: 100px; /* Новое значение для мобильных */
-    right: 0%;
-background: #f8f9fa;
-
-  }
+   
   }
 
 </style>
@@ -264,48 +239,6 @@ layout:{"text-field":o.label,"text-size":o.labelSize,"text-font":["Open Sans Sem
 
 
 
-<style type="text/css">
-    #info {
-        
-
- position: absolute;
-        margin: 0px auto;
-        word-wrap: anywhere;
-        white-space: pre-wrap;
-        padding: 10px;
-        border: none;
-        border-radius: 3px;
-        font-size: 12px;
-        text-align: left;
-        color: #3d85c6;
-        background: transparent;
-        bottom: 55px !important;
-        left: 8px;
-        background-color: transparent;
-        padding: 19.5px;
-        font-family: 'Montserrat', montserrat !important; 
-
-
-
-    }
-
-
-@media (max-width: 768px) {
- #info {
-    bottom: 55px !important; /* Сохранить как в десктопе */
-        left: 8px; /* Сохранить как в десктопе */
-        top: auto; /* Отменить top если он был установлен */
-        right: auto; /* Отменить right если он был установлен */
-
-  }
-
-
-
-
-
-  }
-
-</style>
 
 
 
@@ -931,36 +864,40 @@ font-size: 18px; /* Увеличьте значение по необходим�
    
 }
 
+
+
+
+
+
+
+
+
+
+
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
     .emiia-menu {
 
  min-width: 280px;
+
     }
     
     .menu-content {
-        padding: 12px 15px;
+        padding: 0px 0px;
+
+
     }
     
-    #info {
-        font-size: 11px;
-        max-height: 145px;
-    }
-    
-    /* Улучшение читаемости на мобильных */
-    #location-title {
-        font-size: 14px;
-    }
-    
-    #location-description {
-        font-size: 13px;
-    }
-    
-    .calculation-box {
-        padding: 12px;
-        font-size: 14px;
-    }
-}
+   
+   
+
+
+
+
+
+
+
+
 
 
 
@@ -970,6 +907,65 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         }
     </style>
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+    #info {
+        
+
+ position: absolute;
+        margin: 0px auto;
+        word-wrap: anywhere;
+        white-space: pre-wrap;
+        padding: 0px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: left;
+        color: #3d85c6;
+        background: transparent;
+        bottom: 40px !important;
+        left: 0px;
+        background-color: transparent;
+        padding: 0.5px;
+        font-family: 'Montserrat', montserrat !important; 
+
+
+
+    }
+
+
+@media (max-width: 768px) {
+ #info {
+    bottom: 40px !important; /* Сохранить как в десктопе */
+        left: -1px; /* Сохранить как в десктопе */
+        top: auto; /* Отменить top если он был установлен */
+        right: auto; /* Отменить right если он был установлен */
+
+  }
+
+
+
+
+
+  }
+
+</style>
+
+
+
+
+
 
 
 
