@@ -1053,8 +1053,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
     const map = new mapboxgl.Map({
         container: 'map', // container id
         // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-        style: 'https://sos.emiia.ai/style.json',
-              zoom: 20,
+        style: 'https://raw.githubusercontent.com/EMIIA/www.emiia.ru/master/style/emiia_style_test.json',
+              zoom: 18.3,
 
       
         minZoom: 14,
@@ -1081,6 +1081,25 @@ pitch: 45,
 	antialias: true // create the gl context with MSAA antialiasing, so custom layers are antialiased
          
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4221,17 +4240,6 @@ map.addSource('geojson', {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 </script>
 
 
@@ -4240,6 +4248,75 @@ map.addSource('geojson', {
 
 
 
+
+
+
+
+<script>
+// Убедитесь, что этот код выполняется после полной загрузки карты
+map.on('load', function() {
+    // Общие данные GeoJSON
+    const geoJsonData = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "height": 9
+                },
+                "geometry": {
+                    "coordinates": [
+                        [
+                            [37.63623267958914, 55.83858608472792],
+                            [37.635924239992505, 55.838205919256666],
+                            [37.635295481554095, 55.83836646017602],
+                            [37.63560420713637, 55.83874600795269],
+                            [37.63623267958914, 55.83858608472792]
+                        ]
+                    ],
+                    "type": "Polygon"
+                }
+            }
+        ]
+    };
+
+    // Первый слой - плоская подложка (всегда видима)
+    map.addLayer({
+        id: 'base-layer',
+        type: 'fill',
+        source: {
+            type: 'geojson',
+            data: geoJsonData
+        },
+        paint: {
+            'fill-color': '#a4c2f4',
+            'fill-opacity': 0.6
+        }
+    });
+
+    // Второй слой - экструзия (исчезает при зуме 19 и выше)
+    map.addLayer({
+        id: 'extruded-layer',
+        type: 'fill-extrusion',
+        source: {
+            type: 'geojson',
+            data: geoJsonData
+        },
+        paint: {
+            'fill-extrusion-color': '#a4c2f4',
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 0,
+            'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                18, 0.4,    // при зуме 18 - прозрачность 0.4
+                19, 0       // при зуме 19 и выше - полностью прозрачна
+            ]
+        }
+    });
+});
+</script>
 
 
 
