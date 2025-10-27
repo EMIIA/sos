@@ -19,6 +19,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1063,8 +1064,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
               zoom: 18.3,
 
       
-        minZoom: 14,
-        maxZoom: 21,
+        minZoom: 9,
+        maxZoom: 20.5,
 
 
         center: [37.63567614,55.83837533],
@@ -1092,17 +1093,203 @@ pitch: 45,
 
 
 
+map.on('load', function() {
+    // Общие данные GeoJSON
+    const geoJsonData = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "height": 9
+                },
+                "geometry": {
+                    "coordinates": [
+                        [
+                            [37.63623267958914, 55.83858608472792],
+                            [37.635924239992505, 55.838205919256666],
+                            [37.635295481554095, 55.83836646017602],
+                            [37.63560420713637, 55.83874600795269],
+                            [37.63623267958914, 55.83858608472792]
+                        ]
+                    ],
+                    "type": "Polygon"
+                }
+            }
+        ]
+    };
+
+    // Первый слой - плоская подложка (всегда видима)
+    map.addLayer({
+        id: 'base-layer',
+        type: 'fill',
+        source: {
+            type: 'geojson',
+            data: geoJsonData
+        },
+        paint: {
+            'fill-color': '#a4c2f4',
+            'fill-opacity': 0.6
+        }
+    });
+
+    // Второй слой - экструзия (исчезает при зуме 19 и выше)
+    map.addLayer({
+        id: 'extruded-layer',
+        type: 'fill-extrusion',
+        source: {
+            type: 'geojson',
+            data: geoJsonData
+        },
+        paint: {
+            'fill-extrusion-color': '#a4c2f4',
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 0,
+            'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                18, 0.09,    // при зуме 18 - прозрачность 0.4
+                19, 0       // при зуме 19 и выше - полностью прозрачна
+            ]
+        }
+    });
+});
 
 
 
 
+map.on('load', function() {
+    // Первый источник - районы Москвы
+    map.addSource('moscow-data', {
+        type: 'geojson',
+        data: 'https://sos.emiia.ai/moscow.geojson'
+    });
+    
+    // Второй источник - линии метро
+    map.addSource('metro-lines', {
+        type: 'geojson',
+        data: 'https://www.emiia.ru/mapnew/data/Metro-lines-230302.geojson'
+    });
+    
+    // Заливка районов
+    map.addLayer({
+        id: 'moscow-districts-fill',
+        type: 'fill',
+        source: 'moscow-data',
+        paint: {
+            'fill-color': [
+                'case',
+                ['has', 'color'], ['get', 'color'],
+                'transparent'
+            ],
+            'fill-opacity': 0.2
+        }
+    });
+    
+    // Границы районов с динамической толщиной
+    map.addLayer({
+        id: 'moscow-districts-border',
+        type: 'line',
+        source: 'moscow-data',
+        paint: {
+            'line-color': 'white',
+            'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                8, 1,    // при зуме 8 - толщина 1px
+                12, 3,   // при зуме 12 - толщина 3px  
+                16, 5    // при зуме 16 - толщина 5px
+            ],
+            'line-opacity': 0.8
+        }
+    });
+    
+    // Подписи районов
+    map.addLayer({
+        id: 'moscow-districts-labels',
+        type: 'symbol',
+        source: 'moscow-data',
+        layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 12,
+            'text-font': ['Open Sans Bold']
+        },
+        paint: {
+            'text-color': 'transparent',
+            'text-halo-color': 'transparent',
+            'text-halo-width': 1
+        }
+    });
 
+    // Линии метро с динамической толщиной
+    map.addLayer({
+        id: 'metro-lines',
+        type: 'line',
+        source: 'metro-lines',
+        paint: {
+            'line-color': [
+                'case',
+                ['has', 'color'], ['get', 'color'],
+                'white'
+            ],
+            'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                8, 2,    // при зуме 8 - толщина 2px
+                12, 4,   // при зуме 12 - толщина 4px
+                16, 6    // при зуме 16 - толщина 6px
+            ],
+            'line-opacity': 0.8
+        }
+    });
 
+    // Контур линий метро с динамической толщиной
+    map.addLayer({
+        id: 'metro-lines-outline',
+        type: 'line',
+        source: 'metro-lines',
+        paint: {
+            'line-color': 'white',
+            'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                8, 3,    // при зуме 8 - толщина 3px
+                12, 5,   // при зуме 12 - толщина 5px
+                16, 7    // при зуме 16 - толщина 7px
+            ],
+            'line-opacity': 0.6
+        }
+    });
 
-
-
-
-
+    // Подписи линий метро с динамическим размером текста
+    map.addLayer({
+        id: 'metro-lines-labels',
+        type: 'symbol',
+        source: 'metro-lines',
+        layout: {
+            'text-field': ['get', 'name'],
+            'text-size': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                8, 8,    // при зуме 8 - размер 8px
+                12, 10,  // при зуме 12 - размер 10px
+                16, 12   // при зуме 16 - размер 12px
+            ],
+            'text-font': ['Open Sans Bold'],
+            'symbol-placement': 'line'
+        },
+        paint: {
+            'text-color': '#c2d2eb',
+            'text-halo-color': '#f8f9fa',
+            'text-halo-width': 2
+        }
+    });
+});
 
 
 
@@ -3937,46 +4124,6 @@ map.on('load', () => {
 
 
 
-// ПЕРЕКРЫВАЕМ ПАРКОВКУ
-map.on('load', () => {
-    // Добавляем источник с полигоном
-    map.addSource('overlay-polygon', {
-        type: 'geojson',
-        data: {
-            type: 'Feature',
-            geometry: {
-                type: 'Polygon',
-                coordinates: [[
-                    [37.63125656186148, 55.83383282373481],
-                    [37.631067152172164, 55.83395371999572],
-                    [37.63152632128711, 55.834180149472445],
-                    [37.63171740706366, 55.83406258752953],
-                    [37.63125656186148, 55.83383282373481]
-                ]]
-            },
-            properties: {
-                height: 0.01 // Высота перекрытия (можно регулировать)
-            }
-        }
-    });
-
-    // Добавляем слой с выдавливанием
-    map.addLayer({
-        id: 'polygon-overlay',
-        type: 'fill-extrusion',
-        source: 'overlay-polygon',
-        paint: {
-            'fill-extrusion-color': '#f3f3f3', // Белый цвет
-            'fill-extrusion-height': ['get', 'height'],
-            'fill-extrusion-base': 0,
-            'fill-extrusion-opacity': 1, // Полная непрозрачность
-            'fill-extrusion-ambient-occlusion-intensity': 0 // Без теней
-        }
-    }, '3d-buildings'); // Убедитесь, что это имя вашего слоя с 3D-зданиями
-});
-
-
-
 
 
 
@@ -4258,71 +4405,6 @@ map.addSource('geojson', {
 
 
 
-<script>
-// Убедитесь, что этот код выполняется после полной загрузки карты
-map.on('load', function() {
-    // Общие данные GeoJSON
-    const geoJsonData = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "properties": {
-                    "height": 9
-                },
-                "geometry": {
-                    "coordinates": [
-                        [
-                            [37.63623267958914, 55.83858608472792],
-                            [37.635924239992505, 55.838205919256666],
-                            [37.635295481554095, 55.83836646017602],
-                            [37.63560420713637, 55.83874600795269],
-                            [37.63623267958914, 55.83858608472792]
-                        ]
-                    ],
-                    "type": "Polygon"
-                }
-            }
-        ]
-    };
-
-    // Первый слой - плоская подложка (всегда видима)
-    map.addLayer({
-        id: 'base-layer',
-        type: 'fill',
-        source: {
-            type: 'geojson',
-            data: geoJsonData
-        },
-        paint: {
-            'fill-color': '#a4c2f4',
-            'fill-opacity': 0.6
-        }
-    });
-
-    // Второй слой - экструзия (исчезает при зуме 19 и выше)
-    map.addLayer({
-        id: 'extruded-layer',
-        type: 'fill-extrusion',
-        source: {
-            type: 'geojson',
-            data: geoJsonData
-        },
-        paint: {
-            'fill-extrusion-color': '#a4c2f4',
-            'fill-extrusion-height': ['get', 'height'],
-            'fill-extrusion-base': 0,
-            'fill-extrusion-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                18, 0.4,    // при зуме 18 - прозрачность 0.4
-                19, 0       // при зуме 19 и выше - полностью прозрачна
-            ]
-        }
-    });
-});
-</script>
 
 
 
@@ -4993,6 +5075,7 @@ textarea::placeholder {
 
 </body>
 </html>
+
 
 
 
