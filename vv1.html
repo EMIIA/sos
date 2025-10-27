@@ -1,25 +1,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,12 +37,15 @@
 
 
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js"></script>
-<script src="/style/mapbox-gl.js" type="text/javascript"></script>
+<script src="/mapbox-gl.js" type="text/javascript"></script>
 
 
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
-<style src="/style/mapbox-gl.css" type="text/javascript"></style>
+
+<link href="/mapbox-gl.css" rel="stylesheet">
 
 
 <style>
@@ -1055,13 +1039,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
-    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+    mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
 
     const map = new mapboxgl.Map({
-        container: 'map', // container id
-        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-        style: 'https://raw.githubusercontent.com/EMIIA/www.emiia.ru/master/style/emiia_style_test.json',
-              zoom: 18.3,
+        container: 'map', 
+        style: 'https://sos.emiia.ai/moscow_style_2.json',
+        zoom: 18.3,
 
       
         minZoom: 9,
@@ -1080,13 +1063,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         bearing: 0, // bearing in degrees
 
-pitch: 45,
+        pitch: 45,
 
 
 
         
-	antialias: true // create the gl context with MSAA antialiasing, so custom layers are antialiased
-         
+	    antialias: true 
     });
 
 
