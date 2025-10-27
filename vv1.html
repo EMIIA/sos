@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -3892,21 +3893,6 @@ map.addLayer({
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-      
-      
-      
 map.on('load', () => {
     const layers = map.getStyle().layers;
     let labelLayerId;
@@ -3934,9 +3920,9 @@ map.on('load', () => {
                 'interpolate',
                 ['linear'],
                 ['get', 'render_height'],
-                1, 'lightgray',
-                200, '#6d9eeb',
-                400, 'white'
+                1, '#e4e4e4',
+                200, '#e4e4e4',
+                400, '#e4e4e4'
             ],
             'fill-extrusion-height': [
                 'interpolate',
@@ -3956,14 +3942,29 @@ map.on('load', () => {
                 ['linear'],
                 ['zoom'],
                 14, 0, // Полностью прозрачно при зуме 14
-                15.5, 0.5, // Максимальная прозрачность (0.5) при зуме 15.5
-                18, 0 // Полностью прозрачно при зуме 18
+                15.5, 0.8, // Максимальная прозрачность (0.5) при зуме 15.5
+                18, 0.0
             ]
         }
     }, labelLayerId);
 });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+      
 
 
 
@@ -3995,7 +3996,7 @@ map.on('load', () => {
         type: 'fill-extrusion',
         source: 'polygon-source',
         paint: {
-            'fill-extrusion-color': '#0047AB',
+            'fill-extrusion-color': '#e4e4e4',
             'fill-extrusion-height': ['get', 'height'],
             'fill-extrusion-base': 3.85,
           
@@ -4033,7 +4034,7 @@ map.on('load', () => {
 
 // Отключение теней
     map.setLight({
-        intensity: 0.5// Полностью убирает тени
+        intensity: 0.03// Полностью убирает тени
     });
 
 });
