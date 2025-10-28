@@ -3,6 +3,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1070,6 +1071,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
+
+
+
+
+
 .menu-compass-container {
     position: absolute;
     top: -32px;
@@ -1091,6 +1097,29 @@ font-size: 18px; /* Увеличьте значение по необходим�
     position: relative;
     padding: 0px 0px 0px 0px; /* Больше padding сверху для иконки */
 }
+
+
+
+
+
+.mapboxgl-ctrl button.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon {
+    background-image: url(https://www.emiia.ai/icon/compass.svg);
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1134,30 +1163,22 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
+
+        
+        <div class="menu-item"></div>
+
+
+
 <!-- Основное меню (EMIIA.AI SIP + стрелка) -->
 <div class="emiia-menu" id="emiiaMenu">
     <div class="menu-content">
-        <!-- Вращающаяся иконка курсора вверху слева -->
-        <div class="menu-compass-container">
-            <div class="menu-compass" id="menuCompass">
-
-
-
-                <svg id="резерв" xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 29 29">
-  <title>местоположение</title>
-  <circle cx="14.71" cy="14.52" r="2.77" style="fill: #333"/>
-  <circle cx="14.71" cy="14.52" r="2.77" style="fill: #3D85C6"/>
-  <path d="M21.58,13.64H19.65a.3.3,0,0,1-.29-.23,4.8,4.8,0,0,0-3.55-3.54.3.3,0,0,1-.23-.29V7.66a.31.31,0,0,1,.32-.3h0a7.26,7.26,0,0,1,6,5.94.31.31,0,0,1-.28.34Z" style="fill: #3D85C6"/>
-  <path d="M25.28,13.64h-1.9a.29.29,0,0,1-.29-.26,8.46,8.46,0,0,0-7.25-7.24.29.29,0,0,1-.26-.29V4a.31.31,0,0,1,.32-.3h0a11,11,0,0,1,9.67,9.66.31.31,0,0,1-.29.33Z" style="fill: #3D85C6"/>
-  <path d="M21.94,15.67a7.3,7.3,0,0,1-6,6.05.31.31,0,0,1-.35-.3V19.48a.29.29,0,0,1,.23-.29,4.81,4.81,0,0,0,3.56-3.63.3.3,0,0,1,.29-.24h1.93A.31.31,0,0,1,21.94,15.67Z" style="fill: #3D85C6"/>
-  <path d="M13.94,19.51v1.94a.31.31,0,0,1-.35.3,7.3,7.3,0,0,1-6.11-6.08.31.31,0,0,1,.3-.35H9.72a.29.29,0,0,1,.29.24,4.81,4.81,0,0,0,3.69,3.66A.29.29,0,0,1,13.94,19.51Z" style="fill: #3D85C6"/>
-  <path d="M13.94,7.59V9.53a.3.3,0,0,1-.24.29A4.8,4.8,0,0,0,10,13.41a.29.29,0,0,1-.29.23H7.8a.31.31,0,0,1-.3-.35,7.31,7.31,0,0,1,6.09-6A.31.31,0,0,1,13.94,7.59Z" style="fill: #3D85C6"/>
-</svg>
-
-            </div>
-        </div>
         
-        <div class="menu-item"></div>
+
+
+
+
+
+
         <pre id="info"></pre>
         <p>EMIIA.AI API: JSON DATASET OUTPUT ❯<br>EMIIA.AI SIP: [<strong><span </span>AI WMS</strong>] ID R: [#3D4581] 
         <span class="highlight1"></span></p>
@@ -1333,24 +1354,56 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
-
-// Синхронизация компаса меню с картой
-function updateMenuCompass() {
-    const bearing = map.getBearing();
-    const compassElement = document.getElementById('menuCompass');
-    if (compassElement) {
-        compassElement.style.transform = `rotate(${-bearing}deg)`;
-    }
-}
-
-// Обновляем компас при вращении карты
-map.on('rotate', updateMenuCompass);
-map.on('move', updateMenuCompass);
-
-// Также обновляем при открытии меню
-emiiaButton.addEventListener('click', function() {
-    setTimeout(updateMenuCompass, 100);
+// Добавляем компас
+const navControl = new mapboxgl.NavigationControl({
+  visualizePitch: true,
+  showZoom: false
 });
+map.addControl(navControl);
+
+// Убираем фон и контур у компаса
+setTimeout(() => {
+  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+  if (compassButton) {
+    // Убираем фон
+    compassButton.style.background = 'none';
+    compassButton.style.backgroundColor = 'transparent';
+    
+    // Убираем контур и границы
+    compassButton.style.border = 'none';
+    compassButton.style.boxShadow = 'none';
+    
+    // Убираем стандартные стили Mapbox
+    compassButton.classList.add('custom-compass');
+    
+    // Скрываем изначально
+    compassButton.style.opacity = '0';
+    compassButton.style.visibility = 'hidden';
+    compassButton.style.transition = 'opacity 0.3s ease, visibility 0.3s ease';
+  }
+}, 50);
+
+// Показываем компас при начале вращения
+map.on('rotatestart', function() {
+  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+  if (compassButton) {
+    compassButton.style.opacity = '1';
+    compassButton.style.visibility = 'visible';
+  }
+});
+
+// Скрываем компас сразу после окончания вращения
+map.on('rotateend', function() {
+  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+  if (compassButton) {
+    compassButton.style.opacity = '0';
+    compassButton.style.visibility = 'hidden';
+  }
+});
+
+
+
+
 
 
 
