@@ -1132,17 +1132,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
 }
 
 
-.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
-    
-margin-left: 18.5px !important;
-    
-margin-top: 15em !important;
 
-}
+
 
 
 .mapboxgl-ctrl-group {
-    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.0) !important;
 }
 
 .mapboxgl-ctrl-group {
@@ -1153,6 +1148,25 @@ margin-top: 15em !important;
 
 
 
+
+.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+    margin: 1em !important;
+}
+
+/* Мобильные */
+@media (max-width: 767px) {
+    .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+        margin-left: 10px !important;
+        margin-top: 21em !important;
+    }
+}
+
+/* Ноутбуки и десктопы */
+@media (min-width: 768px) {
+    .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+        margin-left: 18.5px !important;
+        margin-top: 17em !important;
+    }
 
 
 
