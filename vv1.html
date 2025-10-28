@@ -693,6 +693,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
+
+
 </style>
 
 
@@ -703,307 +705,449 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        
-        
 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const emiiaButton = document.getElementById('emiiaButton');
+        const dotsButton = document.getElementById('dotsButton');
+        const emiiaMenu = document.getElementById('emiiaMenu');
+        const dotsMenu = document.getElementById('dotsMenu');
+        const refreshItem = document.getElementById('refreshItem');
+        const settingsItem = document.getElementById('settingsItem');
+        const installItem = document.getElementById('installItem');
+        const termsItem = document.getElementById('termsItem');
+        const privacyItem = document.getElementById('privacyItem');
+
+        // Функция для переключения основного меню (EMIIA.AI SIP + стрелка)
+        function toggleMainMenu() {
+            const isActive = emiiaMenu.classList.contains('active');
+            
+            if (isActive) {
+                // Закрываем меню
+                emiiaMenu.classList.remove('active');
+                emiiaButton.classList.remove('active');
+            } else {
+                // Открываем меню
+                emiiaMenu.classList.add('active');
+                emiiaButton.classList.add('active');
+                // Закрываем меню точек при открытии основного
+                closeDotsMenu();
+            }
+        }
+
+        // Функция для переключения меню точек
+        function toggleDotsMenu() {
+            const isActive = dotsMenu.classList.contains('active');
+            
+            if (isActive) {
+                closeDotsMenu();
+            } else {
+                // Открываем меню
+                dotsMenu.classList.add('active');
+                dotsButton.classList.add('active');
+                // Делаем кнопку текста неактивной
+                emiiaButton.style.pointerEvents = 'none';
+                emiiaButton.style.opacity = '0.6';
+            }
+        }
+
+        // Функция для закрытия меню точек
+        function closeDotsMenu() {
+            dotsMenu.classList.remove('active');
+            dotsButton.classList.remove('active');
+            // Восстанавливаем кнопку текста
+            emiiaButton.style.pointerEvents = 'auto';
+            emiiaButton.style.opacity = '1';
+        }
+
+        // Обработчик клика по основной части кнопки (текст + стрелка)
+        emiiaButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleMainMenu();
+        });
+
+        // Обработчик клика по точкам
+        dotsButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleDotsMenu();
+        });
+
+        // Обработчики для пунктов меню - теперь закрывают меню после клика
+        function handleMenuItemClick(action) {
+            closeDotsMenu();
+            action();
+        }
+
+        refreshItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleMenuItemClick(() => location.reload());
+        });
+
+        settingsItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleMenuItemClick(() => window.open('https://emiia.ai', '_blank'));
+        });
+
+        installItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleMenuItemClick(() => window.open('https://emiia.ai/install', '_blank'));
+        });
+
+        termsItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleMenuItemClick(() => window.open('https://emiia.ai/terms', '_blank'));
+        });
+
+        privacyItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleMenuItemClick(() => window.open('https://emiia.ai/privacy', '_blank'));
+        });
+
+        // Предотвращаем закрытие при клике внутри основного меню
+        emiiaMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Закрываем меню точек при ЛЮБОМ событии вне кнопки точек
+        function handleOutsideInteraction(e) {
+            // Проверяем, было ли взаимодействие с кнопкой точек или меню точек
+            const isInteractionWithDots = dotsButton.contains(e.target) || dotsMenu.contains(e.target);
+            
+            // Закрываем меню точек при любом взаимодействии, кроме взаимодействия с самим меню
+            if (!isInteractionWithDots) {
+                closeDotsMenu();
+            }
+        }
+
+        // Добавляем обработчики для всех возможных событий
+        document.addEventListener('click', handleOutsideInteraction);
+        document.addEventListener('mousedown', handleOutsideInteraction);
+        document.addEventListener('mouseup', handleOutsideInteraction);
+        document.addEventListener('touchstart', handleOutsideInteraction);
+        document.addEventListener('touchend', handleOutsideInteraction);
+        document.addEventListener('scroll', handleOutsideInteraction);
+        document.addEventListener('wheel', handleOutsideInteraction);
+        document.addEventListener('contextmenu', handleOutsideInteraction);
+        document.addEventListener('keydown', function(e) {
+            // Закрываем при нажатии Escape
+            if (e.key === 'Escape') {
+                closeDotsMenu();
+            }
+        });
+
+        // ОСНОВНОЕ МЕНЮ закрывается только при клике на кнопку
+        // Не добавляем закрытие по клику вне области для emiiaMenu
+    });
+</script>
+
+<style>
+    .emiia-button-container {
+        position: fixed;
+        bottom: 70px;
+        left: 30px;
+        z-index: 1000;
+    }
+
+    .emiia-button-wrapper {
+        display: flex;
+        align-items: center;
+        background: rgba(204, 204, 204, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 18px;
+        padding: 5.5px 12px;
+        gap: 11px;
+        box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(204, 204, 204, 0.1);
+        transition: all 0.3s ease;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    .emiia-button-wrapper:hover {
+        background: rgba(204, 204, 204, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transform: translateY(-2px);
+    }
+
+    .emiia-button-wrapper:active {
+        transform: translateY(0);
+    }
+
+    .dots-button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .dots-icon {
+        width: 16px;
+        height: 16px;
+        fill: white;
+    }
+
+    .emiia-button {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600; /* Более толстый шрифт */
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-family: 'Orbitron', sans-serif;
+        padding: 0;
+    }
+
+    .arrow-icon {
+        width: 18px;
+        height: 18px;
+        fill: white;
+        stroke: white;
+        stroke-width: 1.5;
+        transition: transform 0.3s ease;
+    }
+
+    .emiia-button.active .arrow-icon {
+        transform: rotate(180deg);
+    }
+
+    .emiia-menu {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        margin-bottom: 10px;
+        background: transparent;
+        border-radius: 12px;
+        min-width: 250px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    .emiia-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dots-menu {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 18px;
+        min-width: 280px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1001;
+        padding: 8px 0;
+        color: #383838;
+        font-family: 'Montserrat', monospace;
+        font-size: 14px;
+        font-weight: 500; /* Более толстый шрифт для меню */
+        line-height: 1.4;
+    }
+
+    .dots-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .menu-item {
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border-bottom: none;
+    }
+
+    .menu-item:hover {
+        background-color: rgba(245, 245, 245, 0.8);
+        color: #383838;
+    }
+
+    .refresh-item, .settings-item, .install-item, .terms-item, .privacy-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border-bottom: none;
+        font-weight: 500; /* Более толстый шрифт для пунктов меню */
+    }
+
+    .refresh-item:hover, .settings-item:hover, .install-item:hover, .terms-item:hover, .privacy-item:hover {
+        background-color: rgba(245, 245, 245, 0.8);
+    }
+
+    .refresh-icon, .settings-icon, .install-icon, .terms-icon, .privacy-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    .menu-divider {
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: 4px 0;
+    }
+
+    .menu-content {
+        padding: 0px 0px;
+    }
+
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 768px) {
         .emiia-button-container {
-            position: fixed;
-            bottom: 70px;
-            left: 30px;
-            z-index: 1000;
+            bottom: 24px;
+            left: 18px;
         }
-
         
-
-
-
-.emiia-button {
-            background: rgba(204, 204, 204, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: white;
-            border: none;
-            padding: 5.5px 12px;
-            border-radius: 18px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            font-family: 'Orbitron', sans-serif;
-            border: 1px solid rgba(204, 204, 204, 0.1);
+        .emiia-button-wrapper {
+            padding: 6.5px 12px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
-
-
-
-
-        .emiia-button:hover {
-            background: rgba(204, 204, 204, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transform: translateY(-2px);
+        
+        .emiia-button {
+            font-size: 12px;
+            font-weight: 600; /* Сохраняем толстый шрифт на мобильных */
         }
-
-        .emiia-button:active {
-            transform: translateY(0);
-        }
-
-        .arrow-icon {
-            width: 18px;
-            height: 18px;
-            fill: white;
-            transition: transform 0.3s ease;
-            stroke: white;
-            stroke-width: 1.5;
-        }
-
-        .emiia-button.active .arrow-icon {
-            transform: rotate(180deg);
-        }
-
+        
         .emiia-menu {
-            position: absolute;
-            bottom: 100%;
-            left: 0; /* Теперь меню точно выровнено по левому краю кнопки */
-            margin-bottom: 10px;
-            background: transparent;
-            border-radius: 12px;
-         
-            min-width: 250px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
+            min-width: 270px;
         }
 
-        .emiia-menu.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+        .dots-menu {
+            min-width: 280px;
+            font-weight: 500; /* Сохраняем толстый шрифт на мобильных */
         }
+    }
 
-       
+    #info {
+        background: transparent;
+        padding: 0px;
+        margin: 0px;
+        position: relative;
+        top: -7px;
+        color: #3d85c6;
+        font-family: 'Montserrat', monospace;
+        font-size: 12px;
+        font-weight: 500; /* Более толстый шрифт для информации */
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-y: auto;
+    }
 
+    @media (max-width: 768px) {
+        .emiia-menu {
+            min-width: 280px;
+        }
+        
         .menu-content {
             padding: 0px 0px;
         }
-
-        .menu-item {
-            padding: 0px 0;
-            border-bottom: 0px solid #eee;
-            cursor: pointer;
-            transition: color 0.3s ease;
-            font-family: 'Montserrat', monospace;
-            font-weight: 500;
-        }
-
-        .menu-item:hover {
-            color: #666;
-        }
-
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Адаптивность для мобильных устройств */
-        @media (max-width: 768px) {
-            .emiia-button-container {
-                bottom: 24px;
-                left: 18px;
-            }
-            
-            .emiia-button {
-                padding: 6.5px 12px;
-                font-size: 12px;
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-            }
-            
-            .emiia-menu {
-                min-width: 270px;
-                /* Убрано смещение left: -10px для мобильных */
-            }
-
-
-
-
-
-
-
-
-
-
-#info {
-    background: transparent;
-    padding: 0px;
-
-    margin: 0;
-    font-family: 'Montserrat', monospace;
-    font-size: 12px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-   
-    overflow-y: auto;
-    
-   
-   
-}
-
-
-
-
-
-
-
-
-
-
-
-/* Адаптивность для мобильных устройств */
-@media (max-width: 768px) {
-    .emiia-menu {
-
- min-width: 280px;
-
     }
-    
-    .menu-content {
-        padding: 0px 0px;
-
-
-    }
-    
-   
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        }
-    </style>
-
-
-
-
-
-
-
-
-
-
-
-
-<style type="text/css">
-    #info {
-        
-
- position: absolute;
-        margin: 0px auto;
-        word-wrap: anywhere;
-        white-space: pre-wrap;
-        padding: 0px;
-        border: none;
-        border-radius: 3px;
-        font-size: 12px;
-        text-align: left;
-        color: #3d85c6;
-        background: transparent;
-        bottom: 40px !important;
-        left: 0px;
-        background-color: transparent;
-        padding: 0.5px;
-        font-family: 'Montserrat', montserrat !important; 
-
-
-
-    }
-
-
-@media (max-width: 768px) {
- #info {
-    bottom: 40px !important; /* Сохранить как в десктопе */
-        left: -1px; /* Сохранить как в десктопе */
-        top: auto; /* Отменить top если он был установлен */
-        right: auto; /* Отменить right если он был установлен */
-
-  }
-
-
-
-
-
-  }
-
 </style>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- <!-- Кнопка EMIIA.AI -->
-    <div class="emiia-button-container">
-        <button class="emiia-button" id="emiiaButton">
-
-
-<svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 17 17">
-    <path stroke="currentColor" stroke-width="0.8" fill="currentColor" fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-</svg>
-
-
-
-            EMIIA.AI SIP
+<!-- Кнопка EMIIA.AI -->
+<div class="emiia-button-container">
+    <div class="emiia-button-wrapper">
+        <button class="dots-button" id="dotsButton">
+            <svg class="dots-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+            </svg>
         </button>
         
-       <div class="emiia-menu" id="emiiaMenu">
-
-
-
-
-            
-            <div class="menu-content">
-             <div class="menu-item"></div>
-
-
-              <pre id="info"></pre>
-
-<p>EMIIA.AI API: JSON DATASET OUTPUT ❯<br>EMIIA.AI SIP: [<strong><span </span>AI WMS</strong>] ID R: [#3D4581] 
-
-<span class="highlight1"></span></p>
-
- 
-                
-
-            
-                </div>
-            </div>
+        <button class="emiia-button" id="emiiaButton">
+            EMIIA.AI SIP
+            <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 17 17">
+                <path stroke="currentColor" stroke-width="0.8" fill="currentColor" fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Основное меню (EMIIA.AI SIP + стрелка) -->
+    <div class="emiia-menu" id="emiiaMenu">
+        <div class="menu-content">
+            <div class="menu-item"></div>
+            <pre id="info"></pre>
+            <p>EMIIA.AI API: JSON DATASET OUTPUT ❯<br>EMIIA.AI SIP: [<strong><span </span>AI WMS</strong>] ID R: [#3D4581] 
+            <span class="highlight1"></span></p>
         </div>
+    </div>
+
+    <!-- Меню точек -->
+    <div class="dots-menu" id="dotsMenu">
+        <div class="settings-item" id="settingsItem">
+            <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#383838" viewBox="0 0 16 16">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+            </svg>
+            Настройки
+        </div>
+        
+        <div class="menu-divider"></div>
+        
+        <div class="refresh-item" id="refreshItem">
+            <svg class="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#383838" viewBox="0 0 16 16">
+                <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+            </svg>
+            Обновить страницу
+        </div>
+        
+        <div class="menu-divider"></div>
+        
+        <div class="install-item" id="installItem">
+            <svg class="install-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#383838" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+            </svg>
+            Установить ПО
+        </div>
+        
+        <div class="menu-divider"></div>
+        
+        <div class="terms-item" id="termsItem">
+            <svg class="terms-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#383838" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+            </svg>
+            Условия использования
+        </div>
+        
+        <div class="menu-divider"></div>
+        
+        <div class="privacy-item" id="privacyItem">
+            <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#383838" viewBox="0 0 16 16">
+                <path d="M5.338 1.59a61 61 0 0 0-2.837.856.48.48 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.7 10.7 0 0 0 2.287 2.233c.346.244.652.42.893.533q.18.085.293.118a1 1 0 0 0 .101.025 1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56"/>
+                <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+            </svg>
+            Политика конфиденциальности
+        </div>
+    </div>
+</div>
+
+
+
 
 
 
@@ -4205,6 +4349,10 @@ map.on('load', () => {
 
 
 
+
+
+
+
 <script>
 
 
@@ -4224,10 +4372,6 @@ map.on('style.load', () => {
  
  
 // ВЫТАВЛЯЕМ ЗЕМЛЮ НА -1 
-
-
-
-
 
 
 
@@ -4283,16 +4427,6 @@ map.addSource('geojson', {
             }
         });
     });
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -5038,48 +5172,22 @@ textarea::placeholder {
 
 
 
-<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const emiiaButton = document.getElementById('emiiaButton');
-            const emiiaMenu = document.getElementById('emiiaMenu');
 
-            // Функция для переключения меню
-            function toggleMenu() {
-                const isActive = emiiaMenu.classList.contains('active');
-                
-                if (isActive) {
-                    // Закрываем меню
-                    emiiaMenu.classList.remove('active');
-                    emiiaButton.classList.remove('active');
-                } else {
-                    // Открываем меню
-                    emiiaMenu.classList.add('active');
-                    emiiaButton.classList.add('active');
-                }
-            }
 
-            // Обработчик клика по кнопке - ТОЛЬКО так закрывается меню
-            emiiaButton.addEventListener('click', function(e) {
-                e.stopPropagation();
-                toggleMenu();
-            });
 
-            // Обработчики для пунктов меню (не закрывают меню)
-            const menuItems = emiiaMenu.querySelectorAll('.menu-item');
-            menuItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    // Здесь можно добавить логику для каждого пункта меню
-                    console.log('Клик по пункту:', this.textContent);
-                    // Меню НЕ закрывается при клике на пункты
-                });
-            });
 
-            // Предотвращаем закрытие при клике внутри меню
-            emiiaMenu.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-    </script>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
