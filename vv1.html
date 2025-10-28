@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -91,6 +92,7 @@ body { margin: 0; padding: 0; }
     bottom: 50px;
     z-index: 20000;
     right: 5%;
+
 
 
 }
@@ -1071,6 +1073,128 @@ font-size: 18px; /* Увеличьте значение по необходим�
         
 	    antialias: true 
     });
+
+
+
+
+
+
+
+
+
+
+map.on('load', () => {
+    const layers = map.getStyle().layers;
+    let labelLayerId;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+            labelLayerId = layers[i].id;
+            break;
+        }
+    }
+
+    map.addSource('openmaptiles', {
+        url: 'https://sos.emiia.ai/tiles.json',
+        type: 'vector',
+    });
+
+    // Добавляем зеленую подложку ПОД зданиями
+    map.addLayer({
+        'id': 'green-base',
+        'source': 'openmaptiles',
+        'source-layer': 'building',
+        'type': 'fill',
+        'minzoom': 14,
+        'maxzoom': 24,
+        'paint': {
+            'fill-color': '#a4c2f4',
+            'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0.3,
+                15.5, 0.3,
+                18, 0.3,
+                22, 0.3
+            ]
+        }
+    }, labelLayerId);
+
+    // Добавляем белые линии по контуру зданий
+    map.addLayer({
+        'id': 'building-outlines',
+        'source': 'openmaptiles',
+        'source-layer': 'building',
+        'type': 'line',
+        'minzoom': 14,
+        'maxzoom': 24,
+        'paint': {
+            'line-color': '#ffffff', // Белый цвет
+            'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 1,  // Тонкая линия при отдалении
+                16, 2,    // Средняя толщина
+                18, 2,    // Толще при приближении
+                20, 5     // Еще толще при максимальном приближении
+            ],
+            'line-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 1,
+                15.5, 1,
+                18, 1,
+                22, 1
+            ]
+        }
+    }, labelLayerId);
+
+    // Затем добавляем 3D здания поверх зеленой подложки и контуров
+    map.addLayer({
+        'id': '3d-buildings',
+        'source': 'openmaptiles',
+        'source-layer': 'building',
+        'type': 'fill-extrusion',
+        'minzoom': 14,
+        'maxzoom': 19,
+        'paint': {
+            'fill-extrusion-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'render_height'],
+                1, '#e4e4e4',
+                200, '#e4e4e4',
+                400, '#e4e4e4'
+            ],
+            'fill-extrusion-height': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,
+                15.5, ['get', 'render_height']
+            ],
+            'fill-extrusion-base': [
+                'case',
+                ['>=', ['get', 'zoom'], 16.5],
+                ['get', 'render_min_height'],
+                0
+            ],
+            'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,
+                15.5, 0.8,
+                18, 0.0
+            ]
+        }
+    }, labelLayerId);
+});
+
+
+
 
 
 
@@ -3901,78 +4025,10 @@ map.addLayer({
 
 
 
-map.on('load', () => {
-    const layers = map.getStyle().layers;
-    let labelLayerId;
-    for (let i = 0; i < layers.length; i++) {
-        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-            labelLayerId = layers[i].id;
-            break;
-        }
-    }
-
-    map.addSource('openmaptiles', {
-        url: 'https://sos.emiia.ai/tiles.json',
-        type: 'vector',
-    });
-
-    map.addLayer({
-        'id': '3d-buildings',
-        'source': 'openmaptiles',
-        'source-layer': 'building',
-        'type': 'fill-extrusion',
-        'minzoom': 14,
-        'maxzoom': 19,
-        'paint': {
-            'fill-extrusion-color': [
-                'interpolate',
-                ['linear'],
-                ['get', 'render_height'],
-                1, '#e4e4e4',
-                200, '#e4e4e4',
-                400, '#e4e4e4'
-            ],
-            'fill-extrusion-height': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                14, 0, // Высота 0 при зуме 14
-                15.5, ['get', 'render_height'] // Полная высота при зуме 15.5
-            ],
-            'fill-extrusion-base': [
-                'case',
-                ['>=', ['get', 'zoom'], 16.5],
-                ['get', 'render_min_height'],
-                0
-            ],
-            'fill-extrusion-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                14, 0, // Полностью прозрачно при зуме 14
-                15.5, 0.8, // Максимальная прозрачность (0.5) при зуме 15.5
-                18, 0.0
-            ]
-        }
-    }, labelLayerId);
-});
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-      
-      
-      
 
 
 
@@ -4568,7 +4624,7 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 <div class="header">
     <a class="header" href="javascript:void(0)" onclick="showPopup()" 
-   style="display: inline-block; padding: 0px; border-radius: 20px; transition: all 0.2s ease;"
+   style="display: inline-block; padding: 0px; border-radius: 20px; transition: all 0.2s ease; "
 
    onmouseout="this.style.background='none'; this.style.transform='scale(1)';"
    ontouchstart="this.style.background='rgba(61, 133, 198, 0.08)'; this.style.transform='scale(0.98)';"
@@ -4598,7 +4654,7 @@ const enhancedBlur = new EnhancedBlurHandler();
 
 
 
-           <div id="popup-content" onclick="event.stopPropagation()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #f8f9fa; padding: 30px; border-radius: 36px; max-width: 400px; width: 85%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 0px solid #3D85C6; ">
+           <div id="popup-content" onclick="event.stopPropagation()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #f8f9fa; padding: 30px; border-radius: 36px; max-width: 400px; width: 85%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 0px solid #3D85C6;">
 
 
 
@@ -4887,7 +4943,7 @@ function adjustForMobile() {
         content.style.padding = '25px';
     } else {
         content.style.width = '85%';
-        content.style.maxWidth = '400px';
+        content.style.maxWidth = '300px';
         content.style.padding = '30px';
     }
 }
