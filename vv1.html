@@ -896,7 +896,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         let dotsMenuActive = false;
 
-        // Создаем оверлей
+        // Создаем оверлей который перекрывает ВСЕ
         const overlay = document.createElement('div');
         overlay.style.cssText = `
             position: fixed;
@@ -937,12 +937,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
             dotsButton.classList.add('active');
             dotsMenuActive = true;
             
-            // ПОКАЗЫВАЕМ ОВЕРЛЕЙ
+            // ПОКАЗЫВАЕМ ОВЕРЛЕЙ - он перекроет ВСЕ элементы
             overlay.style.display = 'block';
             
-            // БЛОКИРУЕМ основную кнопку
-            emiiaButton.style.pointerEvents = 'none';
-            emiiaButton.style.opacity = '0.5';
+            // ДОБАВЛЯЕМ КЛАСС ДЛЯ CSS БЛОКИРОВКИ
+            document.body.classList.add('dots-menu-active');
         }
 
         function closeDotsMenu() {
@@ -953,24 +952,47 @@ font-size: 18px; /* Увеличьте значение по необходим�
             // СКРЫВАЕМ ОВЕРЛЕЙ
             overlay.style.display = 'none';
             
-            // РАЗБЛОКИРУЕМ основную кнопку
-            emiiaButton.style.pointerEvents = 'auto';
-            emiiaButton.style.opacity = '1';
+            // УБИРАЕМ КЛАСС БЛОКИРОВКИ
+            document.body.classList.remove('dots-menu-active');
         }
 
-        // Оверлей закрывает меню точек при клике
+        // ЛЮБОЕ ДЕЙСТВИЕ НА ОВЕРЛЕЕ СВОРАЧИВАЕТ МЕНЮ
         overlay.addEventListener('click', closeDotsMenu);
         overlay.addEventListener('touchstart', closeDotsMenu);
+        overlay.addEventListener('mousedown', closeDotsMenu);
+        overlay.addEventListener('mouseup', closeDotsMenu);
+        overlay.addEventListener('pointerdown', closeDotsMenu);
+        overlay.addEventListener('pointerup', closeDotsMenu);
+        overlay.addEventListener('contextmenu', closeDotsMenu);
 
         // Обработчики для основной кнопки
         emiiaButton.addEventListener('click', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
             e.stopPropagation();
-            if (dotsMenuActive) return;
             toggleMainMenu();
+        });
+
+        // ДОПОЛНИТЕЛЬНАЯ БЛОКИРОВКА ДЛЯ ТАЧЕЙ
+        emiiaButton.addEventListener('touchstart', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }
         });
 
         // Обработчики для кнопки точек
         dotsButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openDotsMenu();
+        });
+
+        dotsButton.addEventListener('touchstart', function(e) {
             e.stopPropagation();
             openDotsMenu();
         });
@@ -1006,17 +1028,19 @@ font-size: 18px; /* Увеличьте значение по необходим�
             window.open('https://emiia.ai/privacy', '_blank');
         });
 
-        // Закрываем меню точек при других событиях
-        function closeDotsMenuOnAnyInteraction() {
-            if (dotsMenuActive) {
-                closeDotsMenu();
+        // ДОБАВЛЯЕМ CSS ДЛЯ ПОЛНОЙ БЛОКИРОВКИ
+        const style = document.createElement('style');
+        style.textContent = `
+            .dots-menu-active #emiiaButton {
+                pointer-events: none !important;
+                touch-action: none !important;
+                opacity: 0.5 !important;
             }
-        }
-
-        document.addEventListener('scroll', closeDotsMenuOnAnyInteraction, { passive: true });
-        document.addEventListener('wheel', closeDotsMenuOnAnyInteraction, { passive: true });
-        window.addEventListener('orientationchange', closeDotsMenuOnAnyInteraction);
-        window.addEventListener('resize', closeDotsMenuOnAnyInteraction);
+            #dotsMenu {
+                z-index: 9999 !important;
+            }
+        `;
+        document.head.appendChild(style);
 
         // Закрываем по Escape
         document.addEventListener('keydown', function(e) {
@@ -1024,11 +1048,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 closeDotsMenu();
             }
         });
-
-        // Убедимся что меню точек поверх оверлея
-        if (dotsMenu) {
-            dotsMenu.style.zIndex = '9999';
-        }
     });
 </script>
 
