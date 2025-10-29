@@ -896,8 +896,16 @@ font-size: 18px; /* Увеличьте значение по необходим�
         const termsItem = document.getElementById('termsItem');
         const privacyItem = document.getElementById('privacyItem');
 
+        let dotsMenuActive = false;
+
         // Функция для переключения основного меню (EMIIA.AI SIP + стрелка)
         function toggleMainMenu() {
+            // Если меню точек активно, сначала закрываем его
+            if (dotsMenuActive) {
+                closeDotsMenu();
+                return;
+            }
+            
             const isActive = emiiaMenu.classList.contains('active');
             
             if (isActive) {
@@ -923,6 +931,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 // Открываем меню
                 dotsMenu.classList.add('active');
                 dotsButton.classList.add('active');
+                dotsMenuActive = true;
                 // Делаем кнопку текста неактивной
                 emiiaButton.style.pointerEvents = 'none';
                 emiiaButton.style.opacity = '0.6';
@@ -933,22 +942,47 @@ font-size: 18px; /* Увеличьте значение по необходим�
         function closeDotsMenu() {
             dotsMenu.classList.remove('active');
             dotsButton.classList.remove('active');
+            dotsMenuActive = false;
             // Восстанавливаем кнопку текста
             emiiaButton.style.pointerEvents = 'auto';
             emiiaButton.style.opacity = '1';
         }
 
-        // Обработчик клика по основной части кнопки (текст + стрелка)
-        emiiaButton.addEventListener('click', function(e) {
+        // Обработчик для основной кнопки - используем touchstart для мобильных
+        function handleEmiiaButton(e) {
+            e.preventDefault();
             e.stopPropagation();
-            toggleMainMenu();
-        });
+            
+            // На мобильных устройствах добавляем небольшую задержку
+            if ('ontouchstart' in window) {
+                setTimeout(() => {
+                    toggleMainMenu();
+                }, 50);
+            } else {
+                toggleMainMenu();
+            }
+        }
 
-        // Обработчик клика по точкам
-        dotsButton.addEventListener('click', function(e) {
+        // Обработчик для кнопки точек
+        function handleDotsButton(e) {
+            e.preventDefault();
             e.stopPropagation();
-            toggleDotsMenu();
-        });
+            
+            if ('ontouchstart' in window) {
+                setTimeout(() => {
+                    toggleDotsMenu();
+                }, 50);
+            } else {
+                toggleDotsMenu();
+            }
+        }
+
+        // Добавляем обработчики для десктопа и мобильных
+        emiiaButton.addEventListener('click', handleEmiiaButton);
+        emiiaButton.addEventListener('touchstart', handleEmiiaButton, { passive: false });
+
+        dotsButton.addEventListener('click', handleDotsButton);
+        dotsButton.addEventListener('touchstart', handleDotsButton, { passive: false });
 
         // Обработчики для пунктов меню - теперь закрывают меню после клика
         function handleMenuItemClick(action) {
@@ -956,56 +990,60 @@ font-size: 18px; /* Увеличьте значение по необходим�
             action();
         }
 
-        refreshItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => location.reload());
-        });
+        function createMenuItemHandler(item, action) {
+            function handler(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleMenuItemClick(action);
+            }
+            
+            item.addEventListener('click', handler);
+            item.addEventListener('touchstart', handler, { passive: false });
+        }
 
-        settingsItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => window.open('https://emiia.ai', '_blank'));
-        });
-
-        installItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => window.open('https://emiia.ai/install', '_blank'));
-        });
-
-        termsItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => window.open('https://emiia.ai/terms', '_blank'));
-        });
-
-        privacyItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => window.open('https://emiia.ai/privacy', '_blank'));
-        });
+        createMenuItemHandler(refreshItem, () => location.reload());
+        createMenuItemHandler(settingsItem, () => window.open('https://emiia.ai', '_blank'));
+        createMenuItemHandler(installItem, () => window.open('https://emiia.ai/install', '_blank'));
+        createMenuItemHandler(termsItem, () => window.open('https://emiia.ai/terms', '_blank'));
+        createMenuItemHandler(privacyItem, () => window.open('https://emiia.ai/privacy', '_blank'));
 
         // Предотвращаем закрытие при клике внутри основного меню
         emiiaMenu.addEventListener('click', function(e) {
             e.stopPropagation();
         });
 
-        // Закрываем меню точек при ЛЮБОМ событии вне кнопки точек
+        emiiaMenu.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+        }, { passive: false });
+
+        // Улучшенная функция для закрытия меню точек
         function handleOutsideInteraction(e) {
             // Проверяем, было ли взаимодействие с кнопкой точек или меню точек
             const isInteractionWithDots = dotsButton.contains(e.target) || dotsMenu.contains(e.target);
+            const isInteractionWithEmiia = emiiaButton.contains(e.target) || emiiaMenu.contains(e.target);
             
-            // Закрываем меню точек при любом взаимодействии, кроме взаимодействия с самим меню
-            if (!isInteractionWithDots) {
+            // Если кликнули на основную кнопку при открытом меню точек - закрываем меню точек
+            if (dotsMenuActive && isInteractionWithEmiia) {
+                closeDotsMenu();
+                return;
+            }
+            
+            // Закрываем меню точек при любом другом взаимодействии
+            if (!isInteractionWithDots && !isInteractionWithEmiia) {
                 closeDotsMenu();
             }
         }
 
         // Добавляем обработчики для всех возможных событий
-        document.addEventListener('click', handleOutsideInteraction);
-        document.addEventListener('mousedown', handleOutsideInteraction);
-        document.addEventListener('mouseup', handleOutsideInteraction);
-        document.addEventListener('touchstart', handleOutsideInteraction);
-        document.addEventListener('touchend', handleOutsideInteraction);
-        document.addEventListener('scroll', handleOutsideInteraction);
-        document.addEventListener('wheel', handleOutsideInteraction);
-        document.addEventListener('contextmenu', handleOutsideInteraction);
+        const events = ['click', 'mousedown', 'mouseup', 'scroll', 'wheel', 'contextmenu'];
+        events.forEach(event => {
+            document.addEventListener(event, handleOutsideInteraction);
+        });
+
+        // Для touch событий используем passive: false чтобы предотвращать скролл
+        document.addEventListener('touchstart', handleOutsideInteraction, { passive: false });
+        document.addEventListener('touchend', handleOutsideInteraction, { passive: false });
+
         document.addEventListener('keydown', function(e) {
             // Закрываем при нажатии Escape
             if (e.key === 'Escape') {
@@ -1013,8 +1051,20 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
         });
 
-        // ОСНОВНОЕ МЕНЮ закрывается только при клике на кнопку
-        // Не добавляем закрытие по клику вне области для emiiaMenu
+        // Закрываем основное меню при клике вне его области
+        document.addEventListener('click', function(e) {
+            if (!emiiaButton.contains(e.target) && !emiiaMenu.contains(e.target)) {
+                emiiaMenu.classList.remove('active');
+                emiiaButton.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('touchstart', function(e) {
+            if (!emiiaButton.contains(e.target) && !emiiaMenu.contains(e.target)) {
+                emiiaMenu.classList.remove('active');
+                emiiaButton.classList.remove('active');
+            }
+        }, { passive: false });
     });
 </script>
 
@@ -1030,6 +1080,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 <style>
+    /* Добавляем шрифт Montserrat */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
     .emiia-button-container {
         position: fixed;
         bottom: 70px;
@@ -1086,7 +1140,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         color: white;
         cursor: pointer;
         font-size: 14px;
-        font-weight: 600; /* Более толстый шрифт */
+        font-weight: 600;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -1146,9 +1200,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
         z-index: 1001;
         padding: 8px 0;
         color: #383838;
-        font-family: 'Montserrat', monospace;
+        /* Применяем Montserrat для меню точек */
+        font-family: 'Montserrat', sans-serif;
         font-size: 14px;
-        font-weight: 500; /* Более толстый шрифт для меню */
+        font-weight: 500;
         line-height: 1.4;
     }
 
@@ -1163,6 +1218,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
         cursor: pointer;
         transition: background-color 0.3s ease;
         border-bottom: none;
+        /* Применяем Montserrat для всех пунктов меню */
+        font-family: 'Montserrat', sans-serif;
     }
 
     .menu-item:hover {
@@ -1178,7 +1235,9 @@ font-size: 18px; /* Увеличьте значение по необходим�
         cursor: pointer;
         transition: background-color 0.3s ease;
         border-bottom: none;
-        font-weight: 500; /* Более толстый шрифт для пунктов меню */
+        font-weight: 500;
+        /* Применяем Montserrat для всех пунктов меню точек */
+        font-family: 'Montserrat', sans-serif;
     }
 
     .refresh-item:hover, .settings-item:hover, .install-item:hover, .terms-item:hover, .privacy-item:hover {
@@ -1216,7 +1275,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         
         .emiia-button {
             font-size: 12px;
-            font-weight: 600; /* Сохраняем толстый шрифт на мобильных */
+            font-weight: 600;
         }
         
         .emiia-menu {
@@ -1225,7 +1284,9 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         .dots-menu {
             min-width: 280px;
-            font-weight: 500; /* Сохраняем толстый шрифт на мобильных */
+            font-weight: 500;
+            /* Сохраняем Montserrat на мобильных */
+            font-family: 'Montserrat', sans-serif;
         }
     }
 
@@ -1236,9 +1297,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
         position: relative;
         top: -7px;
         color: #3d85c6;
-        font-family: 'Montserrat', monospace;
+        /* Применяем Montserrat для информационного текста */
+        font-family: 'Montserrat', sans-serif;
         font-size: 12px;
-        font-weight: 500; /* Более толстый шрифт для информации */
+        font-weight: 500;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-y: auto;
@@ -1452,12 +1514,28 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Добавляем компас
 const navControl = new mapboxgl.NavigationControl({
   visualizePitch: false,
   showZoom: false
 });
 map.addControl(navControl, 'top-left');
+
+// Переменная для хранения таймера
+let compassHideTimer;
 
 // Убираем фон и контур у компаса
 setTimeout(() => {
@@ -1479,19 +1557,38 @@ setTimeout(() => {
 map.on('rotatestart', function() {
   const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
   if (compassButton) {
+    // Отменяем предыдущий таймер скрытия (если был)
+    clearTimeout(compassHideTimer);
+    
     compassButton.style.opacity = '1';
     compassButton.style.visibility = 'visible';
   }
 });
 
-// Скрываем компас сразу после окончания поворота
+// Скрываем компас через 2 секунды после окончания поворота
 map.on('rotateend', function() {
   const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
   if (compassButton) {
-    compassButton.style.opacity = '0';
-    compassButton.style.visibility = 'hidden';
+    // Устанавливаем таймер на 2 секунды (2000 миллисекунд)
+    compassHideTimer = setTimeout(() => {
+      compassButton.style.opacity = '0';
+      compassButton.style.visibility = 'hidden';
+    }, 3000);
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
