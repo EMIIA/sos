@@ -10,6 +10,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -137,9 +138,10 @@ background: #383838;
 .header {
     padding: 0rem;
     position: fixed;
-    bottom: 65px;
+    bottom: 50px;
     z-index: 20000;
-    right: 3px;
+    right: 5%;
+
 
 
 }
@@ -147,7 +149,7 @@ background: #383838;
 
 @media (max-width: 768px) {
  .header {
-    bottom: 25px; /* Новое значение для мобильных */
+    bottom: 0px; /* Новое значение для мобильных */
     right: 1%;
 
   }
@@ -190,7 +192,141 @@ background: #383838;
 
 
 
+<style type="text/css">
+    
+    
+    
+    a.mapboxgl-ctrl-logo{
+    width: 0;
+    height: 0;
+    margin: 0 0 -4px-4px;
+    display: block;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    overflow: hidden;
+    background-image: url(data:image/svg+xml;charset=utf-8,%3Csvg width='88' height='23' viewBox='0 0 88 23' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill-rule='evenodd'%3E %3Cdefs%3E %3Cpath id='logo' d='M11.5 2.25c5.105 0 9.25 4.145 9.25 9.25s-4.145 9.25-9.25 9.25-9.25-4.145-9.25-9.25 4.145-9.25 9.25-9.25zM6.997 15.983c-.051-.338-.828-5.802 2.233-8.873a4.395 4.395 0 013.13-1.28c1.27 0 2.49.51 3.39 1.42.91.9 1.42 2.12 1.42 3.39 0 1.18-.449 2.301-1.28 3.13C12.72 16.93 7 16 7 16l-.003-.017zM15.3 10.5l-2 .8-.8 2-.8-2-2-.8 2-.8.8-2 .8 2 2 .8z'/%3E %3Cpath id='text' d='M50.63 8c.13 0 .23.1.23.23V9c.7-.76 1.7-1.18 2.73-1.18 2.17 0 3.95 1.85 3.95 4.17s-1.77 4.19-3.94 4.19c-1.04 0-2.03-.43-2.74-1.18v3.77c0 .13-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V8.23c0-.12.1-.23.23-.23h1.4zm-3.86.01c.01 0 .01 0 .01-.01.13 0 .22.1.22.22v7.55c0 .12-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V15c-.7.76-1.69 1.19-2.73 1.19-2.17 0-3.94-1.87-3.94-4.19 0-2.32 1.77-4.19 3.94-4.19 1.03 0 2.02.43 2.73 1.18v-.75c0-.12.1-.23.23-.23h1.4zm26.375-.19a4.24 4.24 0 00-4.16 3.29c-.13.59-.13 1.19 0 1.77a4.233 4.233 0 004.17 3.3c2.35 0 4.26-1.87 4.26-4.19 0-2.32-1.9-4.17-4.27-4.17zM60.63 5c.13 0 .23.1.23.23v3.76c.7-.76 1.7-1.18 2.73-1.18 1.88 0 3.45 1.4 3.84 3.28.13.59.13 1.2 0 1.8-.39 1.88-1.96 3.29-3.84 3.29-1.03 0-2.02-.43-2.73-1.18v.77c0 .12-.1.23-.23.23h-1.4c-.13 0-.23-.1-.23-.23V5.23c0-.12.1-.23.23-.23h1.4zm-34 11h-1.4c-.13 0-.23-.11-.23-.23V8.22c.01-.13.1-.22.23-.22h1.4c.13 0 .22.11.23.22v.68c.5-.68 1.3-1.09 2.16-1.1h.03c1.09 0 2.09.6 2.6 1.55.45-.95 1.4-1.55 2.44-1.56 1.62 0 2.93 1.25 2.9 2.78l.03 5.2c0 .13-.1.23-.23.23h-1.41c-.13 0-.23-.11-.23-.23v-4.59c0-.98-.74-1.71-1.62-1.71-.8 0-1.46.7-1.59 1.62l.01 4.68c0 .13-.11.23-.23.23h-1.41c-.13 0-.23-.11-.23-.23v-4.59c0-.98-.74-1.71-1.62-1.71-.85 0-1.54.79-1.6 1.8v4.5c0 .13-.1.23-.23.23zm53.615 0h-1.61c-.04 0-.08-.01-.12-.03-.09-.06-.13-.19-.06-.28l2.43-3.71-2.39-3.65a.213.213 0 01-.03-.12c0-.12.09-.21.21-.21h1.61c.13 0 .24.06.3.17l1.41 2.37 1.4-2.37a.34.34 0 01.3-.17h1.6c.04 0 .08.01.12.03.09.06.13.19.06.28l-2.37 3.65 2.43 3.7c0 .05.01.09.01.13 0 .12-.09.21-.21.21h-1.61c-.13 0-.24-.06-.3-.17l-1.44-2.42-1.44 2.42a.34.34 0 01-.3.17zm-7.12-1.49c-1.33 0-2.42-1.12-2.42-2.51 0-1.39 1.08-2.52 2.42-2.52 1.33 0 2.42 1.12 2.42 2.51 0 1.39-1.08 2.51-2.42 2.52zm-19.865 0c-1.32 0-2.39-1.11-2.42-2.48v-.07c.02-1.38 1.09-2.49 2.4-2.49 1.32 0 2.41 1.12 2.41 2.51 0 1.39-1.07 2.52-2.39 2.53zm-8.11-2.48c-.01 1.37-1.09 2.47-2.41 2.47s-2.42-1.12-2.42-2.51c0-1.39 1.08-2.52 2.4-2.52 1.33 0 2.39 1.11 2.41 2.48l.02.08zm18.12 2.47c-1.32 0-2.39-1.11-2.41-2.48v-.06c.02-1.38 1.09-2.48 2.41-2.48s2.42 1.12 2.42 2.51c0 1.39-1.09 2.51-2.42 2.51z'/%3E %3C/defs%3E %3Cmask id='clip'%3E %3Crect x='0' y='0' width='100%25' height='100%25' fill='white'/%3E %3Cuse xlink:href='%23logo'/%3E %3Cuse xlink:href='%23text'/%3E %3C/mask%3E %3Cg id='outline' opacity='0.3' stroke='%23000' stroke-width='3'%3E %3Ccircle mask='url(%23clip)' cx='11.5' cy='11.5' r='9.25'/%3E %3Cuse xlink:href='%23text' mask='url(%23clip)'/%3E %3C/g%3E %3Cg id='fill' opacity='0.9' fill='%23fff'%3E %3Cuse xlink:href='%23logo'/%3E %3Cuse xlink:href='%23text'/%3E %3C/g%3E %3C/svg%3E);
+}
 
+
+
+.mapboxgl-ctrl button.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuMCAoNDAzNWE0ZmI0OSwgMjAyMC0wNS0wMSkiCiAgIHNvZGlwb2RpOmRvY25hbWU9ImNvbXBhc3MzLjEuc3ZnIgogICBpZD0ic3ZnNCIKICAgdmVyc2lvbj0iMS4xIgogICBzdHlsZT0idHJhbnNmb3JtOiByb3RhdGUoMGRlZyk7IgogICBzdHJva2UtbGluZWpvaW49InJvdW5kIgogICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgIHN0cm9rZS13aWR0aD0iMS4zIgogICBzdHJva2U9IiM5MGZmYmYiCiAgIHZpZXdCb3g9IjAgMCAxNiAxNiIKICAgZmlsbD0iIzkwZmZiZiIKICAgaGVpZ2h0PSIxOCIKICAgd2lkdGg9IjE4Ij4KICA8bWV0YWRhdGEKICAgICBpZD0ibWV0YWRhdGExMCI+CiAgICA8cmRmOlJERj4KICAgICAgPGNjOldvcmsKICAgICAgICAgcmRmOmFib3V0PSIiPgogICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2Uvc3ZnK3htbDwvZGM6Zm9ybWF0PgogICAgICAgIDxkYzp0eXBlCiAgICAgICAgICAgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4KICAgICAgICA8ZGM6dGl0bGU+PC9kYzp0aXRsZT4KICAgICAgPC9jYzpXb3JrPgogICAgPC9yZGY6UkRGPgogIDwvbWV0YWRhdGE+CiAgPGRlZnMKICAgICBpZD0iZGVmczgiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzQiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTExIgogICAgIGlua3NjYXBlOndpbmRvdy14PSItMTEiCiAgICAgaW5rc2NhcGU6Y3k9IjE2LjQ5MzUxNyIKICAgICBpbmtzY2FwZTpjeD0iLTExLjc4NTUzOSIKICAgICBpbmtzY2FwZTp6b29tPSI1LjY1Njg1NDMiCiAgICAgc2hvd2dyaWQ9ImZhbHNlIgogICAgIGlkPSJuYW1lZHZpZXc2IgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjEwNDYiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAiCiAgICAgZ3VpZGV0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwIgogICAgIG9iamVjdHRvbGVyYW5jZT0iMTAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiIC8+CiAgPHBhdGgKICAgICBzdHlsZT0iZmlsbDpub25lO2ZpbGwtb3BhY2l0eToxO3N0cm9rZTojOTBmZmJmO3N0cm9rZS1vcGFjaXR5OjE7c3Ryb2tlLXdpZHRoOjEuMjk5NTU1NTY7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmUiCiAgICAgaWQ9InBhdGgyIgogICAgIGQ9Ik0gOC4wNTQxNTQ5LDIuNDkyMTQ5MiBBIDAuNSwwLjQwNjE5ODY3IDAgMCAxIDguNTIxNjA5LDIuNzUyMDQ1OSBsIDUuMDMwOTIsMTAuNTUxNTg0MSBhIDAuNSwwLjQwNjE5ODY3IDAgMCAxIC0wLjY1MTgzMiwwLjUyNDAxNSBMIDguMDgyODQzMywxMi4yNzE1ODggMy4yNzI3NTksMTMuODQ2Mjg1IEEgMC41LDAuNDA2MTk4NjcgMCAwIDEgMi42MTkyNzQ4LDEzLjMyNDc5OSBMIDcuNTg4MjMwNywyLjc1Mzg1MyBBIDAuNSwwLjQwNjE5ODY3IDAgMCAxIDguMDUzNDQ5NCwyLjQ5MjcyNDkgWiBNIDMuOTYxNzg3NSwxMi43NDQ4NzQgNy44OTQ0ODY4LDExLjQ1Nzk1MiBhIDAuNSwwLjQwNjE5ODY3IDAgMCAxIDAuMzcxMjMxNywtMS4zOGUtNCBMIDEyLjIwNTkyMywxMi43Mjk0ODcgOC4wNTc5NTksNC4wMjk5NTMyIFoiIC8+Cjwvc3ZnPgo=);
+    background-size: 25px 25px !important;
+    background-position: 7.5px 7.5px !important;
+    background-repeat: no-repeat !important;
+}
+
+.mapboxgl-ctrl-group button {
+    width: 44px;
+    height: 44px;
+    display: block;
+    padding: 0px;
+    outline: none;
+    border: 0;
+    box-sizing: border-box;
+    background-color: transparent;
+    cursor: pointer;
+    font: 13px / 20px Montserrat, montserrat;
+    color: #ffffff7c;
+}
+
+
+
+
+
+
+.mapboxgl-ctrl-group {
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.0) !important;
+}
+
+.mapboxgl-ctrl-group {
+    border-radius: 12px;
+    background: transparent;
+}
+
+
+
+
+
+.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+    margin: 1em !important;
+}
+
+/* Мобильные */
+@media (max-width: 767px) {
+    .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+        margin-left: 10px !important;
+        margin-top: 33em !important;
+    }
+}
+
+/* Ноутбуки и десктопы */
+@media (min-width: 768px) {
+    .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+        margin-left: 18.5px !important;
+        margin-top: 30em !important;
+    }
+
+
+
+
+
+
+
+#button778 {
+    width: 41px;
+    height: 43px;
+    display: block;
+    padding: 0px;
+    outline: none;
+    border: 0;
+    box-sizing: border-box;
+    background-color: transparent;
+    cursor: pointer;
+    font: 13px/20px Montserrat, montserrat;
+    color: #383838;
+    border-radius: 12px;
+    
+    
+   border-bottom:0px 0px 1px 2px rgba(0, 0, 0, 0.1) !important;
+   box-shadow: 0 0 10px 0.1px rgba(0, 0, 0, 0.1) !important;
+   
+
+.filter-blue {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS4wICg0MDM1YTRmYjQ5LCAyMDIwLTA1LTAxKSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iNzc4X3doaXRlLnN2ZyIKICAgdmVyc2lvbj0iMS4xIgogICB2aWV3Qm94PSIwIDAgMjUgMjUiCiAgIGhlaWdodD0iMjUiCiAgIHdpZHRoPSIyNSIKICAgZGF0YS1uYW1lPSJMYXllciAxIgogICBpZD0iTGF5ZXJfMSI+CiAgPG1ldGFkYXRhCiAgICAgaWQ9Im1ldGFkYXRhMTMiPgogICAgPHJkZjpSREY+CiAgICAgIDxjYzpXb3JrCiAgICAgICAgIHJkZjphYm91dD0iIj4KICAgICAgICA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4KICAgICAgICA8ZGM6dHlwZQogICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+CiAgICAgICAgPGRjOnRpdGxlPtCX0L3QsNGH0LrQuCDRgNCw0LTQsNGAINC4INGC0L88L2RjOnRpdGxlPgogICAgICA8L2NjOldvcms+CiAgICA8L3JkZjpSREY+CiAgPC9tZXRhZGF0YT4KICA8ZGVmcwogICAgIGlkPSJkZWZzMTEiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9IkxheWVyXzEiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTExIgogICAgIGlua3NjYXBlOndpbmRvdy14PSItMTEiCiAgICAgaW5rc2NhcGU6Y3k9IjE2LjUyNzY4NCIKICAgICBpbmtzY2FwZTpjeD0iMTUuOTk4OTY4IgogICAgIGlua3NjYXBlOnpvb209IjIyLjYyNzQxNyIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgaWQ9Im5hbWVkdmlldzkiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTA0NiIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE5MjAiCiAgICAgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBndWlkZXRvbGVyYW5jZT0iMTAiCiAgICAgZ3JpZHRvbGVyYW5jZT0iMTAiCiAgICAgb2JqZWN0dG9sZXJhbmNlPSIxMCIKICAgICBib3JkZXJvcGFjaXR5PSIxIgogICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2IgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUyIj7Ql9C90LDRh9C60Lgg0YDQsNC00LDRgCDQuCDRgtC/PC90aXRsZT4KICA8cGF0aAogICAgIGlkPSJwYXRoNCIKICAgICBzdHlsZT0iZmlsbDojMDA3OGZmO2ZpbGwtb3BhY2l0eToxIgogICAgIGQ9Ik0xOS4wNyw0LjA4QTEuMjQsMS4yNCwwLDAsMCwxNy44Niw0TDEwLjA3LDcuNzZhMS4yNSwxLjI1LDAsMCwwLS43MSwxLjEyVjExLjVMNCwxMy40YTEuMjQsMS4yNCwwLDAsMC0uODMsMS4xN1YyMGExLjI1LDEuMjUsMCwwLDAsMS4yNSwxLjI1SDE0LjY2bC0uMTItLjA4YTEuNzQsMS43NCwwLDAsMS0uNDgtMi4yLjQuNCwwLDAsMCwwLS4yMkgxMS44NlY5LjY3bDUuMjktMi41NXYzLjA2YTEuODIsMS44MiwwLDAsMSwuOTEuNzEuNDIuNDIsMCwwLDAsLjM0LjIuNC40LDAsMCwwLC4zMy0uMTgsMS42NiwxLjY2LDAsMCwxLC45Mi0uNzNWNS4xM0ExLjI1LDEuMjUsMCwwLDAsMTkuMDcsNC4wOFpNOS4zNiwxOC43OEg1LjY5VjE1LjQ1bDMuNjctMS4zMVoiIC8+CiAgPHBhdGgKICAgICBzb2RpcG9kaTpub2RldHlwZXM9ImNjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2Nzc2MiCiAgICAgaWQ9InBhdGg2IgogICAgIHN0eWxlPSJmaWxsOiMwMDc4ZmY7ZmlsbC1vcGFjaXR5OjEiCiAgICAgZD0ibSAyMC4yMSwxMS4yOCBjIDAuMDc1OTUsLTAuMDE0ODMgMC4xNTQwNTEsLTAuMDE0ODMgMC4yMywwIDAuMzg4NTYxLDAuMTY3MTIzIDAuNzU0NzI4LDAuMzgyMTIgMS4wOSwwLjY0IDAuMjEzODUzLDAuMTcwNjgzIDAuMjczMDU0LDAuNDcwOTEyIDAuMTQsMC43MSAtMC41NzE4MzksMS4wMzg3NjggMC4xNDU0MjUsMi4zMTY4OTkgMS4zMywyLjM3IDAuMjY5NzE0LDAuMDA2MSAwLjQ5NjcxMiwwLjIwMzcxMiAwLjU0LDAuNDcgMC4wNTQ0OSwwLjQyODI3MyAwLjU0NDQ5LDAuODYxNzI3IDAsMS4yOSAtMC4wNDM4NiwwLjI2NDQzNCAtMC4yNzE5NTYsMC40NTg3MzkgLTAuNTQsMC40NiAtMS4xNTA3OCwwLjA2NzA1IC0xLjg2MDI5OSwxLjI4NjM3MyAtMS4zNSwyLjMyIDAuMTM2MjEsMC4yMzUzMDUgMC4wNzYyMywwLjUzNTE4MyAtMC4xNCwwLjcgLTAuMzQxMDI0LDAuMjYyNzM1IC0wLjcxNDAwMSwwLjQ4MTE0NSAtMS4xMSwwLjY1IC0wLjA2NjAxLDAuMDEzMiAtMC4xMzM5ODcsMC4wMTMyIC0wLjIsMCAtMC4xOTU3NDgsLTAuMDAxNiAtMC4zNzY5NzgsLTAuMTAzNTQ4IC0wLjQ4LC0wLjI3IC0wLjYzNjA3MywtMC45NjY3OCAtMi4wNTM5MjcsLTAuOTY2NzggLTIuNjksMCAtMC4xMDE5NjUsMC4xNjg4OTUgLTAuMjgyNzkyLDAuMjc0Mzc4IC0wLjQ4LDAuMjggLTAuMDY2MDEsMC4wMTMyIC0wLjEzMzk4NywwLjAxMzIgLTAuMiwwIC0wLjM5NTk5OSwtMC4xNjg4NTUgLTAuNzY4OTc2LC0wLjM4NzI2NSAtMS4xMSwtMC42NSAtMC4yMTYyMzQsLTAuMTY0ODE3IC0wLjI3NjIxLC0wLjQ2NDY5NSAtMC4xNCwtMC43IDAuMjU0MjI2LC0wLjQ3NDc3NyAwLjI1NDIyNiwtMS4wNDUyMjMgMCwtMS41MiAtMC4yNjkwOTcsLTAuNDc1MTExIC0wLjc2NDQzNCwtMC43Nzc2MDYgLTEuMzEsLTAuOCAtMC4yNjgwNDQsLTAuMDAxMyAtMC40OTYxNDEsLTAuMTk1NTY2IC0wLjU0LC0wLjQ2IC0wLjA0NjM2LC0wLjQyODc1IC0wLjA0NjM2LC0wLjg2MTI1IDAsLTEuMjkgMC4wNDMyOSwtMC4yNjYyODggMC4yNzAyODYsLTAuNDYzODYgMC41NCwtMC40NyAxLjE2Mzk3NSwtMC4wNDUzNCAxLjg4NTY5MiwtMS4yODU2MjcgMS4zNSwtMi4zMiAtMC4xMzc1MywtMC4yMzgzNjMgLTAuMDc3NzIsLTAuNTQxNjg2IDAuMTQsLTAuNzEgMC4zNDA1ODQsLTAuMjYwNzExIDAuNzEzNzM1LC0wLjQ3NTg2IDEuMTEsLTAuNjQgMC4wNjYwNiwtMC4wMTI2OSAwLjEzMzkzNywtMC4wMTI2OSAwLjIsMCAwLjE5NTc0OCwwLjAwMTYgMC4zNzY5NzgsMC4xMDM1NDggMC40OCwwLjI3IDAuNjI1NjUxLDEuMDA5NTMgMi4wOTQzNDksMS4wMDk1MyAyLjcyLDAgMC4wOTQwOSwtMC4xNTA3OTYgMC4yNDI0NzMsLTAuMzM4ODEyIDAuNDIsLTAuMzMgbSAtMS43OSw3IGMgMS44NDQzMDEsMCAyLjc2NzU5NywtMi4yMjk2NzcgMS40NjM2MzcsLTMuNTMzNjM3IEMgMTguNTc5Njc3LDEzLjQ0MjQwMyAxNi4zNSwxNC4zNjU2OTkgMTYuMzUsMTYuMjEgYyAwLDEuMTQzMjI5IDAuOTI2NzcxLDIuMDcgMi4wNywyLjA3IiAvPgo8L3N2Zz4K);
+       
+    background-size: 23px 23px !important;
+    background-position: 8.5px 9px !important;
+    background-repeat: no-repeat !important;
+       
+    position: fixed; 
+    bottom: 2em; 
+    right: 1.5em; 
+    z-index: +200000;
+}
+
+
+
+
+
+
+
+.mapboxgl-ctrl-group button+button {
+    border-top: 0.0px solid #ffffff7f;
+    
+    box-shadow: 0 0 5px 0.5px rgba(0, 0, 0, 0.1) !important;
+}
+
+
+
+
+.mapboxgl-ctrl-bottom-right .mapboxgl-ctrl {
+    float: right;
+    margin: 0 18px 25px 0;
+}
+    
+    
+</style>
 
 
 
@@ -799,6 +935,68 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 
 
+
+// Добавляем компас
+const navControl = new mapboxgl.NavigationControl({
+  visualizePitch: false,
+  showZoom: false
+});
+map.addControl(navControl, 'top-left');
+
+// Переменная для хранения таймера
+let compassHideTimer;
+
+// Убираем фон и контур у компаса
+setTimeout(() => {
+  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+  if (compassButton) {
+    compassButton.style.background = 'none';
+    compassButton.style.backgroundColor = 'transparent';
+    compassButton.style.border = 'none';
+    compassButton.style.boxShadow = 'none';
+    
+    // Скрываем изначально
+    compassButton.style.opacity = '0';
+    compassButton.style.visibility = 'hidden';
+    compassButton.style.transition = 'opacity 0.3s ease, visibility 0.3s ease';
+  }
+}, 50);
+
+// Ограничиваем наклон иконки компаса
+map.on('pitch', function() {
+  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+  if (compassButton) {
+    const currentPitch = map.getPitch();
+    
+    // Ограничиваем максимальный наклон иконки (например, 30 градусов)
+    const maxCompassPitch = 30;
+    const limitedPitch = Math.min(currentPitch, maxCompassPitch);
+    
+    // Применяем ограниченный наклон к иконке
+    compassButton.style.transform = `rotate(0deg) perspective(500px) rotateX(${limitedPitch}deg)`;
+  }
+});
+
+// Показываем компас при начале поворота
+map.on('rotatestart', function() {
+  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+  if (compassButton) {
+    clearTimeout(compassHideTimer);
+    compassButton.style.opacity = '1';
+    compassButton.style.visibility = 'visible';
+  }
+});
+
+// Скрываем компас через 2 секунды после окончания поворота
+map.on('rotateend', function() {
+  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+  if (compassButton) {
+    compassHideTimer = setTimeout(() => {
+      compassButton.style.opacity = '0';
+      compassButton.style.visibility = 'hidden';
+    }, 3000);
+  }
+});
 
 
 
@@ -2418,5 +2616,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 </body>
 </html>
+
+
 
 
