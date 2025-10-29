@@ -891,8 +891,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
         const termsItem = document.getElementById('termsItem');
         const privacyItem = document.getElementById('privacyItem');
 
-        let dotsMenuActive = false;
-
         // Функция для переключения основного меню
         function toggleMainMenu() {
             const isActive = emiiaMenu.classList.contains('active');
@@ -914,72 +912,53 @@ font-size: 18px; /* Увеличьте значение по необходим�
             emiiaButton.classList.remove('active');
         }
 
-        // Функция для открытия меню точек
+        // Функция для переключения меню точек
+        function toggleDotsMenu() {
+            const isActive = dotsMenu.classList.contains('active');
+            
+            if (isActive) {
+                closeDotsMenu();
+            } else {
+                openDotsMenu();
+            }
+        }
+
         function openDotsMenu() {
             dotsMenu.classList.add('active');
             dotsButton.classList.add('active');
-            dotsMenuActive = true;
             
-            // ДОБАВЛЯЕМ КЛАСС К BODY ДЛЯ ПОЛНОЙ БЛОКИРОВКИ
-            document.body.classList.add('dots-menu-open');
-            
-            // ДОПОЛНИТЕЛЬНАЯ БЛОКИРОВКА ДЛЯ ТАЧЕЙ
-            emiiaButton.style.pointerEvents = 'none';
-            emiiaButton.style.touchAction = 'none';
+            // ПОЛНОСТЬЮ СКРЫВАЕМ основную кнопку
+            emiiaButton.style.visibility = 'hidden';
         }
 
         function closeDotsMenu() {
             dotsMenu.classList.remove('active');
             dotsButton.classList.remove('active');
-            dotsMenuActive = false;
             
-            // УБИРАЕМ КЛАСС БЛОКИРОВКИ
-            document.body.classList.remove('dots-menu-open');
-            
-            // ВОССТАНАВЛИВАЕМ ТАЧ-СОБЫТИЯ
-            emiiaButton.style.pointerEvents = 'auto';
-            emiiaButton.style.touchAction = 'auto';
+            // ПОКАЗЫВАЕМ основную кнопку обратно
+            emiiaButton.style.visibility = 'visible';
         }
 
         // Обработчики для основной кнопки
         emiiaButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            if (dotsMenuActive) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                return false;
-            }
             toggleMainMenu();
         });
 
-        // ДОПОЛНИТЕЛЬНЫЕ ОБРАБОТЧИКИ ДЛЯ ТАЧ-УСТРОЙСТВ
         emiiaButton.addEventListener('touchstart', function(e) {
-            if (dotsMenuActive) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                return false;
-            }
-        }, { passive: false });
-
-        emiiaButton.addEventListener('touchend', function(e) {
-            if (dotsMenuActive) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                return false;
-            }
-        }, { passive: false });
+            e.stopPropagation();
+            toggleMainMenu();
+        });
 
         // Обработчики для кнопки точек
         dotsButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            openDotsMenu();
+            toggleDotsMenu();
         });
 
         dotsButton.addEventListener('touchstart', function(e) {
             e.stopPropagation();
-            openDotsMenu();
+            toggleDotsMenu();
         });
 
         // Обработчики для пунктов меню точек
@@ -1013,87 +992,50 @@ font-size: 18px; /* Увеличьте значение по необходим�
             window.open('https://emiia.ai/privacy', '_blank');
         });
 
-        // ДОБАВЛЯЕМ CSS ДЛЯ ПОЛНОЙ БЛОКИРОВКИ ВСЕЙ СТРАНИЦЫ
-        const style = document.createElement('style');
-        style.textContent = `
-            .dots-menu-open *:not(#dotsMenu):not(#dotsMenu *):not(#dotsButton):not(#dotsButton *) {
-                pointer-events: none !important;
-                touch-action: none !important;
-            }
-            .dots-menu-open #emiiaButton {
-                opacity: 0.5 !important;
-                pointer-events: none !important;
-                touch-action: none !important;
-            }
-            #dotsMenu {
-                z-index: 10000 !important;
-                pointer-events: auto !important;
-                touch-action: auto !important;
-            }
-            #dotsButton {
-                z-index: 10001 !important;
-                pointer-events: auto !important;
-                touch-action: auto !important;
-            }
-        `;
-        document.head.appendChild(style);
-
-        // ФУНКЦИЯ ДЛЯ ЗАКРЫТИЯ МЕНЮ ТОЧЕК
-        function closeDotsMenuHandler(e) {
-            if (dotsMenuActive) {
-                // НЕ закрываем при простом движении
-                if (e.type === 'mousemove' || e.type === 'pointermove' || e.type === 'touchmove') {
-                    return;
-                }
-                
-                // НЕ закрываем при событиях внутри меню точек
+        // Закрываем меню точек при ЛЮБОМ событии на странице
+        function closeOnAnyInteraction(e) {
+            if (dotsMenu.classList.contains('active')) {
+                // НЕ закрываем если кликнули на само меню точек или его кнопку
                 if (e.target.closest('#dotsMenu') || e.target.closest('#dotsButton')) {
                     return;
                 }
-                
                 closeDotsMenu();
             }
         }
 
-        // ИНТЕНЦИОНАЛЬНЫЕ СОБЫТИЯ
-        const intentionalEvents = [
+        // ВСЕ события для закрытия меню точек
+        const events = [
             'click', 'mousedown', 'mouseup', 'contextmenu', 'dblclick',
-            'touchstart', 'touchend', 'touchcancel',
+            'touchstart', 'touchend', 'touchcancel', 'touchmove',
             'pointerdown', 'pointerup', 'pointercancel',
-            'keydown', 'keyup', 'scroll', 'resize', 'orientationchange',
-            'dragstart', 'dragend', 'drop', 'selectionchange', 'focus', 'blur'
+            'wheel', 'scroll', 'keydown', 'keyup',
+            'resize', 'orientationchange',
+            'dragstart', 'dragend', 'drop', 'selectionchange'
         ];
 
-        // ДОБАВЛЯЕМ ОБРАБОТЧИКИ
-        intentionalEvents.forEach(eventType => {
-            document.addEventListener(eventType, closeDotsMenuHandler, { 
-                passive: true,
-                capture: true
-            });
+        events.forEach(eventType => {
+            document.addEventListener(eventType, closeOnAnyInteraction);
         });
 
-        // ОСОБАЯ ОБРАБОТКА ДЛЯ MAPBOX
+        // Закрываем меню точек при событиях Mapbox
         if (window.map) {
-            const mapEvents = ['mousedown', 'mouseup', 'click', 'touchstart', 'touchend', 'movestart', 'zoomstart', 'rotatestart'];
+            const mapEvents = [
+                'mousedown', 'mouseup', 'click', 'touchstart', 'touchend',
+                'movestart', 'move', 'moveend', 'zoomstart', 'zoom', 'zoomend',
+                'rotatestart', 'rotate', 'rotateend', 'dragstart', 'drag', 'dragend',
+                'pitchend', 'pitchstart'
+            ];
+            
             mapEvents.forEach(eventType => {
-                map.on(eventType, closeDotsMenuHandler);
+                map.on(eventType, closeDotsMenu);
             });
         }
 
         // Закрываем по Escape
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && dotsMenuActive) {
+            if (e.key === 'Escape' && dotsMenu.classList.contains('active')) {
                 closeDotsMenu();
             }
-        });
-
-        // ПРЕДОТВРАЩАЕМ ЗАКРЫТИЕ ПРИ КЛИКЕ ВНУТРИ МЕНЮ ТОЧЕК
-        dotsMenu.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
-        dotsMenu.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
         });
     });
 </script>
@@ -5651,3 +5593,4 @@ textarea::placeholder {
 
 </body>
 </html>
+
