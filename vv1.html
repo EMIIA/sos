@@ -923,9 +923,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
             dotsButton.classList.add('active');
             dotsMenuActive = true;
             
-            // БЛОКИРУЕМ основную кнопку
+            // ПОЛНАЯ БЛОКИРОВКА основной кнопки
             emiiaButton.style.pointerEvents = 'none';
+            emiiaButton.style.touchAction = 'none';
             emiiaButton.style.opacity = '0.5';
+            emiiaButton.setAttribute('disabled', 'true');
         }
 
         function closeDotsMenu() {
@@ -933,16 +935,39 @@ font-size: 18px; /* Увеличьте значение по необходим�
             dotsButton.classList.remove('active');
             dotsMenuActive = false;
             
-            // РАЗБЛОКИРУЕМ основную кнопку
+            // РАЗБЛОКИРОВКА основной кнопки
             emiiaButton.style.pointerEvents = 'auto';
+            emiiaButton.style.touchAction = 'auto';
             emiiaButton.style.opacity = '1';
+            emiiaButton.removeAttribute('disabled');
         }
 
         // Обработчики для основной кнопки
         emiiaButton.addEventListener('click', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
             e.stopPropagation();
-            if (dotsMenuActive) return;
             toggleMainMenu();
+        });
+
+        // Дополнительная блокировка для тач-событий
+        emiiaButton.addEventListener('touchstart', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        });
+
+        emiiaButton.addEventListener('touchend', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
         });
 
         // Обработчики для кнопки точек
@@ -965,10 +990,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
         });
 
         installItem.addEventListener('click', function(e) {
-    e.stopPropagation();
-    closeDotsMenu();
-    window.location.href = 'https://sos.emiia.ai/vv3.html';
-});
+            e.stopPropagation();
+            closeDotsMenu();
+            window.open('https://emiia.ai/install', '_blank');
+        });
 
         termsItem.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -982,8 +1007,14 @@ font-size: 18px; /* Увеличьте значение по необходим�
             window.open('https://emiia.ai/privacy', '_blank');
         });
 
-        // Закрываем меню точек при ЛЮБОМ клике
+        // Закрываем меню точек при ЛЮБОМ клике/тапе
         document.addEventListener('click', function(e) {
+            if (dotsMenuActive) {
+                closeDotsMenu();
+            }
+        });
+
+        document.addEventListener('touchstart', function(e) {
             if (dotsMenuActive) {
                 closeDotsMenu();
             }
@@ -998,7 +1029,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         document.addEventListener('scroll', closeDotsMenuOnAnyInteraction);
         document.addEventListener('wheel', closeDotsMenuOnAnyInteraction);
-        document.addEventListener('touchstart', closeDotsMenuOnAnyInteraction);
         window.addEventListener('orientationchange', closeDotsMenuOnAnyInteraction);
         window.addEventListener('resize', closeDotsMenuOnAnyInteraction);
 
