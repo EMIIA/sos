@@ -917,7 +917,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
             margin: 0;
             padding: 0;
             width: 30px;
-            height: 30px;
+            height: 20px;
             line-height: 1;
         `;
 
@@ -969,7 +969,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
             backdrop-filter: blur(5px);
             z-index: 9998;
             pointer-events: auto;
-            touch-action: none; /* Блокируем все touch события */
+            touch-action: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
@@ -1015,6 +1015,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         function openMainMenu() {
             emiiaMenu.classList.add('active');
             mainButton.classList.add('active');
+            closeDotsMenu(); // Закрываем меню точек при открытии основного
         }
 
         function closeMainMenu() {
@@ -1028,6 +1029,9 @@ font-size: 18px; /* Увеличьте значение по необходим�
         });
 
         // ========== СИСТЕМА 2: МЕНЮ ТОЧЕК С ОВЕРЛЕЕМ ==========
+        let dotsMenuJustOpened = false;
+        let dotsMenuTimeout = null;
+
         function toggleDotsMenu() {
             const isVisible = dotsMenu.style.display === 'block';
             if (isVisible) {
@@ -1046,16 +1050,35 @@ font-size: 18px; /* Увеличьте значение по необходим�
             
             dotsMenu.style.display = 'block';
             dotsOverlay.style.display = 'block';
+            
+            // Защита от мгновенного закрытия
+            dotsMenuJustOpened = true;
+            if (dotsMenuTimeout) clearTimeout(dotsMenuTimeout);
+            dotsMenuTimeout = setTimeout(() => {
+                dotsMenuJustOpened = false;
+            }, 300);
         }
 
         function closeDotsMenu() {
             dotsMenu.style.display = 'none';
             dotsOverlay.style.display = 'none';
+            dotsMenuJustOpened = false;
+            if (dotsMenuTimeout) clearTimeout(dotsMenuTimeout);
         }
 
-        dotsButton.addEventListener('click', function(e) {
+        // Обработчик для кнопки точек - только touchstart
+        dotsButton.addEventListener('touchstart', function(e) {
             e.stopPropagation();
+            e.preventDefault();
             toggleDotsMenu();
+        });
+
+        // Для десктопа оставляем click
+        dotsButton.addEventListener('click', function(e) {
+            if (!isTouchDevice()) {
+                e.stopPropagation();
+                toggleDotsMenu();
+            }
         });
 
         dotsMenu.addEventListener('click', function(e) {
@@ -1073,52 +1096,88 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
         });
 
-        // ========== АГРЕССИВНАЯ БЛОКИРОВКА ДЛЯ МОБИЛЬНЫХ ==========
+        // ========== УЛУЧШЕННАЯ БЛОКИРОВКА ДЛЯ МОБИЛЬНЫХ ==========
         
+        function handleOverlayTouch(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            if (!dotsMenuJustOpened) {
+                closeDotsMenu();
+            }
+            return false;
+        }
+
         // Блокируем все события на оверлее
+        dotsOverlay.addEventListener('touchstart', handleOverlayTouch);
+        dotsOverlay.addEventListener('touchend', handleOverlayTouch);
+        dotsOverlay.addEventListener('touchmove', handleOverlayTouch);
+        dotsOverlay.addEventListener('touchcancel', handleOverlayTouch);
+
         dotsOverlay.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-            closeDotsMenu();
-            return false;
-        });
-
-        dotsOverlay.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            closeDotsMenu();
-            return false;
-        });
-
-        dotsOverlay.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
-        });
-
-        dotsOverlay.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
+            
+            if (!dotsMenuJustOpened) {
+                closeDotsMenu();
+            }
             return false;
         });
 
         dotsOverlay.addEventListener('mousedown', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            e.stopImmediatePropagation();
             return false;
         });
 
-        dotsOverlay.addEventListener('mouseup', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
-        });
+        // ========== УМНАЯ ОБРАБОТКА СОБЫТИЙ ДОКУМЕНТА ==========
+        let lastTapTime = 0;
+        const tapDelay = 300;
+
+        function handleDocumentTouch(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (dotsMenuJustOpened && tapLength < 500) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            
+            if (dotsMenu.style.display === 'block' && 
+                !dotsMenu.contains(e.target) && 
+                !dotsButton.contains(e.target) &&
+                e.target !== dotsOverlay) {
+                
+                closeDotsMenu();
+            }
+            
+            lastTapTime = currentTime;
+        }
+
+        function handleDocumentClick(e) {
+            if (dotsMenu.style.display === 'block' && 
+                !dotsMenu.contains(e.target) && 
+                !dotsButton.contains(e.target) &&
+                e.target !== dotsOverlay) {
+                
+                closeDotsMenu();
+            }
+        }
+
+        // Определяем тип устройства
+        function isTouchDevice() {
+            return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        }
+
+        // Добавляем обработчики в зависимости от устройства
+        if (isTouchDevice()) {
+            document.addEventListener('touchstart', handleDocumentTouch, { passive: false });
+        } else {
+            document.addEventListener('click', handleDocumentClick);
+        }
         
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && dotsMenu.style.display === 'block') {
@@ -1128,31 +1187,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         // ========== ВСЕ ВОЗМОЖНЫЕ СОБЫТИЯ ДЛЯ ЗАКРЫТИЯ МЕНЮ ==========
 
-        // Закрытие при клике в любом месте документа (кроме оверлея и кнопки)
-        document.addEventListener('click', function(e) {
-            if (dotsMenu.style.display === 'block' && 
-                !dotsMenu.contains(e.target) && 
-                !dotsButton.contains(e.target) &&
-                e.target !== dotsOverlay) {
-                closeDotsMenu();
-            }
-        });
-
         // Закрытие при скролле
         window.addEventListener('scroll', closeDotsMenu);
 
         // Закрытие при изменении размера окна
         window.addEventListener('resize', closeDotsMenu);
-
-        // Закрытие при касании на мобильных (кроме оверлея и кнопки)
-        document.addEventListener('touchstart', function(e) {
-            if (dotsMenu.style.display === 'block' && 
-                !dotsMenu.contains(e.target) && 
-                !dotsButton.contains(e.target) &&
-                e.target !== dotsOverlay) {
-                closeDotsMenu();
-            }
-        });
 
         // Закрытие при событиях карты
         if (window.map) {
@@ -1163,9 +1202,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 'zoomstart', 'zoom', 'zoomend', 'zooming',
                 'rotatestart', 'rotate', 'rotateend', 'rotating',
                 'dragstart', 'drag', 'dragend', 'dragging',
-                'boxzoomstart', 'boxzoomend', 'boxzoomcancel',
-                'mouseover', 'mouseout', 'mousemove',
-                'wheel', 'load', 'idle', 'error'
+                'boxzoomstart', 'boxzoomend', 'boxzoomcancel'
             ];
             
             mapEvents.forEach(eventType => {
