@@ -921,13 +921,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
             position: relative;
            top: -0.1px; /* Сдвигаем вниз */
            text-shadow: 0 0 1px white, 0 0 10px white, 0 0 1px white; /* Множественные тени для утолщения */
-
-
-
-
-font-family: 'Montserrat', sans-serif;
-        
-                font-weight: 700;
+           font-family: 'Montserrat', sans-serif;
+           font-weight: 700;
         `;
 
         // Кнопка 2: Основное меню (оригинальная) - СПРАВА
@@ -954,7 +949,10 @@ font-family: 'Montserrat', sans-serif;
             padding: 8px 0;
             z-index: 10000;
             max-width: 230px;
-
+            opacity: 0;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom left;
         `;
         dotsMenu.innerHTML = `
             <div class="menu-item-with-icon" data-action="settings">
@@ -1031,6 +1029,8 @@ font-family: 'Montserrat', sans-serif;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         `;
         document.body.appendChild(dotsOverlay);
 
@@ -1041,7 +1041,7 @@ font-family: 'Montserrat', sans-serif;
                 padding: 10px 16px;
                 cursor: pointer;
                 border-radius: 5px;
-                transition: background 0.2s;
+                transition: all 0.2s ease;
                 color: #383838;
                 display: flex;
                 align-items: center;
@@ -1049,20 +1049,36 @@ font-family: 'Montserrat', sans-serif;
                 font-family: 'Montserrat', sans-serif;
                 font-size: 14px;
                 font-weight: 400;
+                opacity: 0;
+                transform: translateX(-10px);
+                animation: menuItemAppear 0.4s ease forwards;
             }
+            .menu-item-with-icon:nth-child(1) { animation-delay: 0.05s; }
+            .menu-item-with-icon:nth-child(3) { animation-delay: 0.1s; }
+            .menu-item-with-icon:nth-child(5) { animation-delay: 0.15s; }
+            .menu-item-with-icon:nth-child(7) { animation-delay: 0.2s; }
+            .menu-item-with-icon:nth-child(9) { animation-delay: 0.25s; }
+            .menu-item-with-icon:nth-child(11) { animation-delay: 0.3s; }
+            .menu-item-with-icon:nth-child(13) { animation-delay: 0.35s; }
+            
             .menu-item-with-icon:hover {
                 background: #f8f9fa;
+                transform: translateX(0);
             }
+            
             .menu-divider {
                 height: 1px;
                 background-color: #e0e0e0;
                 margin: 4px 12px;
+                /* Все линии одинаковые без анимации */
             }
+            
             .menu-icon {
                 width: 16px;
                 height: 16px;
                 flex-shrink: 0;
             }
+            
             #dotsOverlay {
                 z-index: 9998;
             }
@@ -1071,6 +1087,17 @@ font-family: 'Montserrat', sans-serif;
             }
             #dotsButton {
                 z-index: 10001;
+            }
+            
+            @keyframes menuItemAppear {
+                from {
+                    opacity: 0;
+                    transform: translateX(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
             }
         `;
         document.head.appendChild(style);
@@ -1119,23 +1146,38 @@ font-family: 'Montserrat', sans-serif;
             
             // ВЫРАВНИВАЕМ ЛЕВЫЙ КРАЙ МЕНЮ С ЛЕВЫМ КРАЕМ КОНТЕЙНЕРА
             dotsMenu.style.bottom = (window.innerHeight - containerRect.top + 10) + 'px';
-            dotsMenu.style.left = (containerRect.left) + 'px'; // Убираем сдвиг -10px
+            dotsMenu.style.left = (containerRect.left) + 'px';
             dotsMenu.style.top = 'auto';
             
             dotsMenu.style.display = 'block';
             dotsOverlay.style.display = 'block';
+            
+            // Запускаем анимацию появления
+            setTimeout(() => {
+                dotsMenu.style.opacity = '1';
+                dotsMenu.style.transform = 'translateY(0) scale(1)';
+                dotsOverlay.style.opacity = '1';
+            }, 10);
             
             // Защита от мгновенного закрытия
             dotsMenuJustOpened = true;
             if (dotsMenuTimeout) clearTimeout(dotsMenuTimeout);
             dotsMenuTimeout = setTimeout(() => {
                 dotsMenuJustOpened = false;
-            }, 300);
+            }, 400);
         }
 
         function closeDotsMenu() {
-            dotsMenu.style.display = 'none';
-            dotsOverlay.style.display = 'none';
+            // Анимация исчезновения
+            dotsMenu.style.opacity = '0';
+            dotsMenu.style.transform = 'translateY(10px) scale(0.95)';
+            dotsOverlay.style.opacity = '0';
+            
+            setTimeout(() => {
+                dotsMenu.style.display = 'none';
+                dotsOverlay.style.display = 'none';
+            }, 300);
+            
             dotsMenuJustOpened = false;
             if (dotsMenuTimeout) clearTimeout(dotsMenuTimeout);
         }
@@ -1562,6 +1604,8 @@ font-family: 'Montserrat', sans-serif;
 #dotsOverlay {
     z-index: 9998 !important;
 }
+
+
 
 
 
