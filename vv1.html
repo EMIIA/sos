@@ -882,7 +882,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const emiiaButton = document.getElementById('emiiaButton');
@@ -892,8 +891,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
         const refreshItem = document.getElementById('refreshItem');
         const settingsItem = document.getElementById('settingsItem');
         const installItem = document.getElementById('installItem');
-        const navigationItem = document.getElementById('navigationItem');
-        const datasetsItem = document.getElementById('datasetsItem');
         const termsItem = document.getElementById('termsItem');
         const privacyItem = document.getElementById('privacyItem');
 
@@ -983,20 +980,14 @@ font-size: 18px; /* Увеличьте значение по необходим�
             handleMenuItemClick(() => window.open('https://emiia.ai', '_blank'));
         });
 
-        installItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => window.location.href = 'https://sos.emiia.ai/vv3.html');
-        });
+       
 
-        navigationItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => window.location.href = 'https://emiia.ai/navigation');
-        });
 
-        datasetsItem.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleMenuItemClick(() => window.location.href = 'https://emiia.ai/datasets');
-        });
+installItem.addEventListener('click', function(e) {
+    e.stopPropagation();
+    handleMenuItemClick(() => window.location.href = 'https://sos.emiia.ai/vv3.html');
+});
+
 
         termsItem.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1039,6 +1030,19 @@ font-size: 18px; /* Увеличьте значение по необходим�
         });
     });
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
 
