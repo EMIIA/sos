@@ -897,10 +897,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
         const privacyItem = document.getElementById('privacyItem');
 
         let dotsMenuActive = false;
+        let touchStartTime = 0;
+        let touchStartTarget = null;
 
         // Функция для переключения основного меню (EMIIA.AI SIP + стрелка)
         function toggleMainMenu() {
-            // Если меню точек активно, сначала закрываем его
+            // Если меню точек активно, сначала закрываем его и выходим
             if (dotsMenuActive) {
                 closeDotsMenu();
                 return;
@@ -909,16 +911,21 @@ font-size: 18px; /* Увеличьте значение по необходим�
             const isActive = emiiaMenu.classList.contains('active');
             
             if (isActive) {
-                // Закрываем меню
-                emiiaMenu.classList.remove('active');
-                emiiaButton.classList.remove('active');
+                closeMainMenu();
             } else {
-                // Открываем меню
-                emiiaMenu.classList.add('active');
-                emiiaButton.classList.add('active');
-                // Закрываем меню точек при открытии основного
-                closeDotsMenu();
+                openMainMenu();
             }
+        }
+
+        function openMainMenu() {
+            emiiaMenu.classList.add('active');
+            emiiaButton.classList.add('active');
+            closeDotsMenu();
+        }
+
+        function closeMainMenu() {
+            emiiaMenu.classList.remove('active');
+            emiiaButton.classList.remove('active');
         }
 
         // Функция для переключения меню точек
@@ -928,14 +935,16 @@ font-size: 18px; /* Увеличьте значение по необходим�
             if (isActive) {
                 closeDotsMenu();
             } else {
-                // Открываем меню
-                dotsMenu.classList.add('active');
-                dotsButton.classList.add('active');
-                dotsMenuActive = true;
-                // Делаем кнопку текста неактивной
-                emiiaButton.style.pointerEvents = 'none';
-                emiiaButton.style.opacity = '0.6';
+                openDotsMenu();
             }
+        }
+
+        function openDotsMenu() {
+            dotsMenu.classList.add('active');
+            dotsButton.classList.add('active');
+            dotsMenuActive = true;
+            emiiaButton.style.pointerEvents = 'none';
+            emiiaButton.style.opacity = '0.6';
         }
 
         // Функция для закрытия меню точек
@@ -943,48 +952,58 @@ font-size: 18px; /* Увеличьте значение по необходим�
             dotsMenu.classList.remove('active');
             dotsButton.classList.remove('active');
             dotsMenuActive = false;
-            // Восстанавливаем кнопку текста
             emiiaButton.style.pointerEvents = 'auto';
             emiiaButton.style.opacity = '1';
         }
 
-        // Обработчик для основной кнопки - используем touchstart для мобильных
-        function handleEmiiaButton(e) {
-            e.preventDefault();
+        // Обработчики для touch событий (мобильные)
+        emiiaButton.addEventListener('touchstart', function(e) {
+            touchStartTime = Date.now();
+            touchStartTarget = e.target;
+            e.stopPropagation();
+        }, { passive: true });
+
+        emiiaButton.addEventListener('touchend', function(e) {
             e.stopPropagation();
             
-            // На мобильных устройствах добавляем небольшую задержку
-            if ('ontouchstart' in window) {
-                setTimeout(() => {
-                    toggleMainMenu();
-                }, 50);
-            } else {
+            // Проверяем, что это был короткий тап (не долгое нажатие)
+            if (Date.now() - touchStartTime < 300 && 
+                touchStartTarget === e.target) {
+                e.preventDefault();
                 toggleMainMenu();
             }
-        }
+        }, { passive: false });
 
-        // Обработчик для кнопки точек
-        function handleDotsButton(e) {
-            e.preventDefault();
+        dotsButton.addEventListener('touchstart', function(e) {
+            touchStartTime = Date.now();
+            touchStartTarget = e.target;
+            e.stopPropagation();
+        }, { passive: true });
+
+        dotsButton.addEventListener('touchend', function(e) {
             e.stopPropagation();
             
-            if ('ontouchstart' in window) {
-                setTimeout(() => {
-                    toggleDotsMenu();
-                }, 50);
-            } else {
+            if (Date.now() - touchStartTime < 300 && 
+                touchStartTarget === e.target) {
+                e.preventDefault();
                 toggleDotsMenu();
             }
-        }
+        }, { passive: false });
 
-        // Добавляем обработчики для десктопа и мобильных
-        emiiaButton.addEventListener('click', handleEmiiaButton);
-        emiiaButton.addEventListener('touchstart', handleEmiiaButton, { passive: false });
+        // Обработчики для кликов (десктоп)
+        emiiaButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            toggleMainMenu();
+        });
 
-        dotsButton.addEventListener('click', handleDotsButton);
-        dotsButton.addEventListener('touchstart', handleDotsButton, { passive: false });
+        dotsButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            toggleDotsMenu();
+        });
 
-        // Обработчики для пунктов меню - теперь закрывают меню после клика
+        // Обработчики для пунктов меню
         function handleMenuItemClick(action) {
             closeDotsMenu();
             action();
@@ -998,7 +1017,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
             
             item.addEventListener('click', handler);
-            item.addEventListener('touchstart', handler, { passive: false });
+            item.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleMenuItemClick(action);
+            }, { passive: false });
         }
 
         createMenuItemHandler(refreshItem, () => location.reload());
@@ -1007,71 +1030,86 @@ font-size: 18px; /* Увеличьте значение по необходим�
         createMenuItemHandler(termsItem, () => window.open('https://emiia.ai/terms', '_blank'));
         createMenuItemHandler(privacyItem, () => window.open('https://emiia.ai/privacy', '_blank'));
 
-        // Предотвращаем закрытие при клике внутри основного меню
+        // Предотвращаем закрытие при клике внутри меню
         emiiaMenu.addEventListener('click', function(e) {
             e.stopPropagation();
         });
 
-        emiiaMenu.addEventListener('touchstart', function(e) {
+        emiiaMenu.addEventListener('touchend', function(e) {
             e.stopPropagation();
         }, { passive: false });
 
-        // Улучшенная функция для закрытия меню точек
-        function handleOutsideInteraction(e) {
-            // Проверяем, было ли взаимодействие с кнопкой точек или меню точек
-            const isInteractionWithDots = dotsButton.contains(e.target) || dotsMenu.contains(e.target);
-            const isInteractionWithEmiia = emiiaButton.contains(e.target) || emiiaMenu.contains(e.target);
+        dotsMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        dotsMenu.addEventListener('touchend', function(e) {
+            e.stopPropagation();
+        }, { passive: false });
+
+        // Функция для закрытия меню при клике вне области
+        function handleOutsideClick(e) {
+            const target = e.target;
             
-            // Если кликнули на основную кнопку при открытом меню точек - закрываем меню точек
-            if (dotsMenuActive && isInteractionWithEmiia) {
+            // Если кликнули вне обоих меню и обеих кнопок
+            if (!emiiaButton.contains(target) && 
+                !emiiaMenu.contains(target) && 
+                !dotsButton.contains(target) && 
+                !dotsMenu.contains(target)) {
                 closeDotsMenu();
-                return;
+                closeMainMenu();
             }
             
-            // Закрываем меню точек при любом другом взаимодействии
-            if (!isInteractionWithDots && !isInteractionWithEmiia) {
+            // Если кликнули на основную кнопку при открытом меню точек
+            if (dotsMenuActive && (emiiaButton.contains(target) || emiiaMenu.contains(target))) {
                 closeDotsMenu();
+                // НЕ открываем основное меню!
+                e.preventDefault();
+                e.stopPropagation();
             }
         }
 
-        // Добавляем обработчики для всех возможных событий
-        const events = ['click', 'mousedown', 'mouseup', 'scroll', 'wheel', 'contextmenu'];
-        events.forEach(event => {
-            document.addEventListener(event, handleOutsideInteraction);
-        });
+        // Обработчики для закрытия меню
+        document.addEventListener('click', handleOutsideClick);
+        document.addEventListener('touchend', handleOutsideClick, { passive: false });
 
-        // Для touch событий используем passive: false чтобы предотвращать скролл
-        document.addEventListener('touchstart', handleOutsideInteraction, { passive: false });
-        document.addEventListener('touchend', handleOutsideInteraction, { passive: false });
-
+        // Закрываем по Escape
         document.addEventListener('keydown', function(e) {
-            // Закрываем при нажатии Escape
             if (e.key === 'Escape') {
                 closeDotsMenu();
+                closeMainMenu();
             }
         });
 
-        // Закрываем основное меню при клике вне его области
-        document.addEventListener('click', function(e) {
-            if (!emiiaButton.contains(e.target) && !emiiaMenu.contains(e.target)) {
-                emiiaMenu.classList.remove('active');
-                emiiaButton.classList.remove('active');
+        // Предотвращаем скролл при взаимодействии с меню
+        dotsMenu.addEventListener('touchmove', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
             }
-        });
+        }, { passive: false });
 
-        document.addEventListener('touchstart', function(e) {
-            if (!emiiaButton.contains(e.target) && !emiiaMenu.contains(e.target)) {
-                emiiaMenu.classList.remove('active');
-                emiiaButton.classList.remove('active');
+        emiiaMenu.addEventListener('touchmove', function(e) {
+            if (emiiaMenu.classList.contains('active')) {
+                e.preventDefault();
             }
         }, { passive: false });
     });
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-
-
 
 
 
