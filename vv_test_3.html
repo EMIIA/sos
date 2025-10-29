@@ -893,15 +893,16 @@ font-size: 18px; /* Увеличьте значение по необходим�
         // Сохраняем оригинальные стили контейнера
         const originalStyles = window.getComputedStyle(originalContainer);
         
-        // Создаем новый контейнер для двух кнопок
+        // Создаем новый контейнер для двух кнопок с регулировками
         const newContainer = document.createElement('div');
         newContainer.style.cssText = originalContainer.style.cssText;
         newContainer.className = originalContainer.className;
         newContainer.style.display = 'flex';
         newContainer.style.alignItems = 'center';
-        newContainer.style.gap = '10px';
+        newContainer.style.gap = '15px'; /* Увеличиваем расстояние между кнопками */
+        newContainer.style.padding = '10px 20px'; /* Регулируем внутренние отступы контейнера */
 
-        // Кнопка 1: Точки (новая) - СЛЕВА - БЕЛЫЕ ВЕРТИКАЛЬНЫЕ ТОЧКИ БЕЗ КРУГА
+        // Кнопка 1: Точки (новая) - СЛЕВА - с регулировками отступов
         const dotsButton = document.createElement('button');
         dotsButton.id = 'dotsButton';
         dotsButton.innerHTML = '⋮';
@@ -909,16 +910,19 @@ font-size: 18px; /* Увеличьте значение по необходим�
             background: transparent;
             color: white;
             border: none;
-            font-size: 24px;
+            font-size: 25px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
-            padding: 0;
-            width: 30px;
-            height: 20px;
-            line-height: 1;
+            margin: 0px;
+            padding: 3px 3px; 3px; 3px;/* Горизонтальные отступы точек */
+            height: 18px;
+            line-height: 0;
+            position: relative;
+           top: 1px; /* Сдвигаем вниз */
+           text-shadow: 0 0 0.5px white, 0 0 5px white, 0 0 0px white; /* Множественные тени для утолщения */
+
         `;
 
         // Кнопка 2: Основное меню (оригинальная) - СПРАВА
@@ -940,7 +944,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
             display: none;
             position: fixed;
             background: white;
-            border-radius: 10px;
+            border-radius: 18px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             padding: 10px;
             z-index: 10000;
@@ -965,8 +969,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.00);
+            backdrop-filter: blur(0px);
             z-index: 9998;
             pointer-events: auto;
             touch-action: none;
@@ -984,11 +988,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 cursor: pointer;
                 border-radius: 5px;
                 transition: background 0.2s;
-                color: #333;
+                color: #383838;
                 font-family: sans-serif;
             }
             .menu-item:hover {
-                background: #f0f0f0;
+                background: #f8f9fa;
             }
             #dotsOverlay {
                 z-index: 9998;
@@ -1045,7 +1049,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
             const containerRect = newContainer.getBoundingClientRect();
             
             dotsMenu.style.bottom = (window.innerHeight - containerRect.top + 10) + 'px';
-            dotsMenu.style.left = (containerRect.left) + 'px';
+            dotsMenu.style.left = (containerRect.left - 10) + 'px'; /* Сдвигаем от левого края */
             dotsMenu.style.top = 'auto';
             
             dotsMenu.style.display = 'block';
