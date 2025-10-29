@@ -896,20 +896,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         let dotsMenuActive = false;
 
-        // Создаем оверлей который перекрывает ВСЕ
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            z-index: 9998;
-            display: none;
-        `;
-        document.body.appendChild(overlay);
-
         // Функция для переключения основного меню
         function toggleMainMenu() {
             const isActive = emiiaMenu.classList.contains('active');
@@ -937,11 +923,21 @@ font-size: 18px; /* Увеличьте значение по необходим�
             dotsButton.classList.add('active');
             dotsMenuActive = true;
             
-            // ПОКАЗЫВАЕМ ОВЕРЛЕЙ - он перекроет ВСЕ элементы
-            overlay.style.display = 'block';
+            // БЛОКИРУЕМ карту Mapbox
+            if (window.map) {
+                // Отключаем все взаимодействия с картой
+                map.boxZoom.disable();
+                map.doubleClickZoom.disable();
+                map.dragPan.disable();
+                map.dragRotate.disable();
+                map.keyboard.disable();
+                map.scrollZoom.disable();
+                map.touchZoomRotate.disable();
+            }
             
-            // ДОБАВЛЯЕМ КЛАСС ДЛЯ CSS БЛОКИРОВКИ
-            document.body.classList.add('dots-menu-active');
+            // БЛОКИРУЕМ основную кнопку
+            emiiaButton.style.pointerEvents = 'none';
+            emiiaButton.style.opacity = '0.5';
         }
 
         function closeDotsMenu() {
@@ -949,50 +945,31 @@ font-size: 18px; /* Увеличьте значение по необходим�
             dotsButton.classList.remove('active');
             dotsMenuActive = false;
             
-            // СКРЫВАЕМ ОВЕРЛЕЙ
-            overlay.style.display = 'none';
+            // ВКЛЮЧАЕМ карту Mapbox обратно
+            if (window.map) {
+                map.boxZoom.enable();
+                map.doubleClickZoom.enable();
+                map.dragPan.enable();
+                map.dragRotate.enable();
+                map.keyboard.enable();
+                map.scrollZoom.enable();
+                map.touchZoomRotate.enable();
+            }
             
-            // УБИРАЕМ КЛАСС БЛОКИРОВКИ
-            document.body.classList.remove('dots-menu-active');
+            // РАЗБЛОКИРУЕМ основную кнопку
+            emiiaButton.style.pointerEvents = 'auto';
+            emiiaButton.style.opacity = '1';
         }
-
-        // ЛЮБОЕ ДЕЙСТВИЕ НА ОВЕРЛЕЕ СВОРАЧИВАЕТ МЕНЮ
-        overlay.addEventListener('click', closeDotsMenu);
-        overlay.addEventListener('touchstart', closeDotsMenu);
-        overlay.addEventListener('mousedown', closeDotsMenu);
-        overlay.addEventListener('mouseup', closeDotsMenu);
-        overlay.addEventListener('pointerdown', closeDotsMenu);
-        overlay.addEventListener('pointerup', closeDotsMenu);
-        overlay.addEventListener('contextmenu', closeDotsMenu);
 
         // Обработчики для основной кнопки
         emiiaButton.addEventListener('click', function(e) {
-            if (dotsMenuActive) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
             e.stopPropagation();
+            if (dotsMenuActive) return;
             toggleMainMenu();
-        });
-
-        // ДОПОЛНИТЕЛЬНАЯ БЛОКИРОВКА ДЛЯ ТАЧЕЙ
-        emiiaButton.addEventListener('touchstart', function(e) {
-            if (dotsMenuActive) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                return false;
-            }
         });
 
         // Обработчики для кнопки точек
         dotsButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            openDotsMenu();
-        });
-
-        dotsButton.addEventListener('touchstart', function(e) {
             e.stopPropagation();
             openDotsMenu();
         });
@@ -1028,19 +1005,41 @@ font-size: 18px; /* Увеличьте значение по необходим�
             window.open('https://emiia.ai/privacy', '_blank');
         });
 
-        // ДОБАВЛЯЕМ CSS ДЛЯ ПОЛНОЙ БЛОКИРОВКИ
-        const style = document.createElement('style');
-        style.textContent = `
-            .dots-menu-active #emiiaButton {
-                pointer-events: none !important;
-                touch-action: none !important;
-                opacity: 0.5 !important;
+        // Закрываем меню точек при ЛЮБОМ клике на карту или вне меню
+        document.addEventListener('click', function(e) {
+            if (dotsMenuActive) {
+                closeDotsMenu();
             }
-            #dotsMenu {
-                z-index: 9999 !important;
+        });
+
+        // Закрываем меню точек при ЛЮБОМ таче
+        document.addEventListener('touchstart', function(e) {
+            if (dotsMenuActive) {
+                closeDotsMenu();
             }
-        `;
-        document.head.appendChild(style);
+        });
+
+        // Закрываем меню точек при событиях Mapbox
+        if (window.map) {
+            map.on('click', closeDotsMenu);
+            map.on('touchstart', closeDotsMenu);
+            map.on('mousedown', closeDotsMenu);
+            map.on('movestart', closeDotsMenu);
+            map.on('zoomstart', closeDotsMenu);
+            map.on('rotatestart', closeDotsMenu);
+        }
+
+        // Закрываем меню точек при других событиях
+        function closeDotsMenuOnAnyInteraction() {
+            if (dotsMenuActive) {
+                closeDotsMenu();
+            }
+        }
+
+        document.addEventListener('scroll', closeDotsMenuOnAnyInteraction);
+        document.addEventListener('wheel', closeDotsMenuOnAnyInteraction);
+        window.addEventListener('orientationchange', closeDotsMenuOnAnyInteraction);
+        window.addEventListener('resize', closeDotsMenuOnAnyInteraction);
 
         // Закрываем по Escape
         document.addEventListener('keydown', function(e) {
