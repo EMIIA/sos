@@ -900,7 +900,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         newContainer.style.display = 'flex';
         newContainer.style.alignItems = 'center';
         newContainer.style.gap = '15px'; /* Увеличиваем расстояние между кнопками */
-        newContainer.style.padding = '10px 20px'; /* Регулируем внутренние отступы контейнера */
+        newContainer.style.padding = '7.5px 10px'; /* Регулируем внутренние отступы контейнера */
 
         // Кнопка 1: Точки (новая) - СЛЕВА - с регулировками отступов
         const dotsButton = document.createElement('button');
@@ -910,18 +910,18 @@ font-size: 18px; /* Увеличьте значение по необходим�
             background: transparent;
             color: white;
             border: none;
-            font-size: 25px;
+            font-size: 30px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0px;
-            padding: 3px 3px; 3px; 3px;/* Горизонтальные отступы точек */
-            height: 18px;
+            margin: 0px;  
+            height: 19px;
             line-height: 0;
             position: relative;
-           top: 1px; /* Сдвигаем вниз */
-           text-shadow: 0 0 0.5px white, 0 0 5px white, 0 0 0px white; /* Множественные тени для утолщения */
+           top: -0.1px; /* Сдвигаем вниз */
+           text-shadow: 0 0 1px white, 0 0 10px white, 0 0 1px white; /* Множественные тени для утолщения */
+
 
         `;
 
@@ -937,7 +937,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         // Заменяем оригинальный контейнер
         originalContainer.parentNode.replaceChild(newContainer, originalContainer);
 
-        // Создаем меню точек
+        // Создаем меню точек с иконками для всех пунктов
         const dotsMenu = document.createElement('div');
         dotsMenu.id = 'dotsMenu';
         dotsMenu.style.cssText = `
@@ -946,16 +946,65 @@ font-size: 18px; /* Увеличьте значение по необходим�
             background: white;
             border-radius: 18px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            padding: 10px;
+            padding: 8px 0;
             z-index: 10000;
-            min-width: 150px;
+            max-width: 220px;
+
         `;
         dotsMenu.innerHTML = `
-            <div class="menu-item" data-action="refresh">Обновить</div>
-            <div class="menu-item" data-action="settings">Настройки</div>
-            <div class="menu-item" data-action="install">Установить</div>
-            <div class="menu-item" data-action="terms">Условия</div>
-            <div class="menu-item" data-action="privacy">Конфиденциальность</div>
+            <div class="menu-item-with-icon" data-action="settings">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                </svg>
+                Настройки
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="refresh">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+                Обновить данные
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="install">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+                ПО EMIIA.AI
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="navi">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999zm2.493 8.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.3 1.3 0 0 0-.37.265.3.3 0 0 0-.057.09V14l.002.008.016.033a.6.6 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.6.6 0 0 0 .146-.15l.015-.033L12 14v-.004a.3.3 0 0 0-.057-.09 1.3 1.3 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465s-2.462-.172-3.34-.465c-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411"/>
+                </svg>
+                Навигация
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="data">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M14 4.5V11h-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM4.151 15.29a1.2 1.2 0 0 1-.111-.449h.764a.58.58 0 0 0 .255.384q.105.073.25.114.142.041.319.041.245 0 .413-.07a.56.56 0 0 0 .255-.193.5.5 0 0 0 .084-.29.39.39 0 0 0-.152-.326q-.152-.12-.463-.193l-.618-.143a1.7 1.7 0 0 1-.539-.214 1 1 0 0 1-.352-.367 1.1 1.1 0 0 1-.123-.524q0-.366.19-.639.192-.272.528-.422.337-.15.777-.149.456 0 .779.152.326.153.5.41.18.255.2.566h-.75a.56.56 0 0 0-.12-.258.6.6 0 0 0-.246-.181.9.9 0 0 0-.37-.068q-.324 0-.512.152a.47.47 0 0 0-.185.384q0 .18.144.3a1 1 0 0 0 .404.175l.621.143q.326.075.566.211a1 1 0 0 1 .375.358q.135.222.135.56 0 .37-.188.656a1.2 1.2 0 0 1-.539.439q-.351.158-.858.158-.381 0-.665-.09a1.4 1.4 0 0 1-.478-.252 1.1 1.1 0 0 1-.29-.375m-3.104-.033a1.3 1.3 0 0 1-.082-.466h.764a.6.6 0 0 0 .074.27.5.5 0 0 0 .454.246q.285 0 .422-.164.137-.165.137-.466v-2.745h.791v2.725q0 .66-.357 1.005-.355.345-.985.345a1.6 1.6 0 0 1-.568-.094 1.15 1.15 0 0 1-.407-.266 1.1 1.1 0 0 1-.243-.39m9.091-1.585v.522q0 .384-.117.641a.86.86 0 0 1-.322.387.9.9 0 0 1-.47.126.9.9 0 0 1-.47-.126.87.87 0 0 1-.32-.387 1.55 1.55 0 0 1-.117-.641v-.522q0-.386.117-.641a.87.87 0 0 1 .32-.387.87.87 0 0 1 .47-.129q.265 0 .47.129a.86.86 0 0 1 .322.387q.117.255.117.641m.803.519v-.513q0-.565-.205-.973a1.46 1.46 0 0 0-.59-.63q-.38-.22-.916-.22-.534 0-.92.22a1.44 1.44 0 0 0-.589.628q-.205.407-.205.975v.513q0 .562.205.973.205.407.589.626.386.217.92.217.536 0 .917-.217.384-.22.589-.626.204-.41.205-.973m1.29-.935v2.675h-.746v-3.999h.662l1.752 2.66h.032v-2.66h.75v4h-.656l-1.761-2.676z"/>
+                </svg>
+                Датасеты
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="terms">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                </svg>
+                Условия использования
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="privacy">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M5.338 1.59a61 61 0 0 0-2.837.856.48.48 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.7 10.7 0 0 0 2.287 2.233c.346.244.652.42.893.533q.18.085.293.118a1 1 0 0 0 .101.025 1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56"/>
+                    <path stroke="#3d85c6" stroke-width="0.5" fill="#3d85c6" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+                </svg>
+                Политика конфиденциальности
+            </div>
         `;
         document.body.appendChild(dotsMenu);
 
@@ -980,19 +1029,40 @@ font-size: 18px; /* Увеличьте значение по необходим�
         `;
         document.body.appendChild(dotsOverlay);
 
-        // Стили для пунктов меню
+        // Стили для пунктов меню с разделителями и иконками
         const style = document.createElement('style');
         style.textContent = `
-            .menu-item {
-                padding: 10px 15px;
+            .menu-item-with-icon {
+                padding: 10px 16px;
                 cursor: pointer;
                 border-radius: 5px;
                 transition: background 0.2s;
                 color: #383838;
-                font-family: sans-serif;
+                
+                display: flex;
+                align-items: center;
+                gap: 10px;
+      
+
+       font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+
+
+
             }
-            .menu-item:hover {
+            .menu-item-with-icon:hover {
                 background: #f8f9fa;
+            }
+            .menu-divider {
+                height: 1px;
+                background-color: #e0e0e0;
+                margin: 4px 12px;
+            }
+            .menu-icon {
+                width: 16px;
+                height: 16px;
+                flex-shrink: 0;
             }
             #dotsOverlay {
                 z-index: 9998;
@@ -1086,16 +1156,18 @@ font-size: 18px; /* Увеличьте значение по необходим�
         });
 
         dotsMenu.addEventListener('click', function(e) {
-            if (e.target.classList.contains('menu-item')) {
-                const action = e.target.getAttribute('data-action');
+            const menuItem = e.target.closest('.menu-item-with-icon');
+            if (menuItem) {
+                const action = menuItem.getAttribute('data-action');
                 closeDotsMenu();
                 
-                switch(action) {
-                    case 'refresh': location.reload(); break;
+                switch(action) {       
                     case 'settings': window.open('https://emiia.ai', '_blank'); break;
                     case 'install': window.location.href = 'https://sos.emiia.ai/vv3.html'; break;
                     case 'terms': window.open('https://emiia.ai/terms', '_blank'); break;
                     case 'privacy': window.open('https://emiia.ai/privacy', '_blank'); break;
+                    case 'refresh': location.reload(); break;
+                    // Добавь обработчики для остальных пунктов по необходимости
                 }
             }
         });
