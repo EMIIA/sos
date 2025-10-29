@@ -955,7 +955,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         `;
         document.body.appendChild(dotsMenu);
 
-        // Создаем оверлей с pointer-events: auto (блокирует события)
+        // Создаем оверлей с полной блокировкой событий
         const dotsOverlay = document.createElement('div');
         dotsOverlay.id = 'dotsOverlay';
         dotsOverlay.style.cssText = `
@@ -968,7 +968,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(5px);
             z-index: 9998;
-            pointer-events: auto; /* Оверлей БЛОКИРУЕТ события */
+            pointer-events: auto;
+            touch-action: none; /* Блокируем все touch события */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         `;
         document.body.appendChild(dotsOverlay);
 
@@ -1069,15 +1073,51 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
         });
 
-        // ========== ПРАВИЛЬНАЯ ЛОГИКА ОВЕРЛЕЯ ==========
+        // ========== АГРЕССИВНАЯ БЛОКИРОВКА ДЛЯ МОБИЛЬНЫХ ==========
+        
+        // Блокируем все события на оверлее
         dotsOverlay.addEventListener('click', function(e) {
+            e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             closeDotsMenu();
+            return false;
         });
 
         dotsOverlay.addEventListener('touchstart', function(e) {
+            e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             closeDotsMenu();
+            return false;
+        });
+
+        dotsOverlay.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        });
+
+        dotsOverlay.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        });
+
+        dotsOverlay.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        });
+
+        dotsOverlay.addEventListener('mouseup', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
         });
         
         document.addEventListener('keydown', function(e) {
