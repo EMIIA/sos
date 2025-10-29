@@ -910,7 +910,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
             background: transparent;
             color: white;
             border: none;
-            font-size: 30px;
+            font-size: 25px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -923,6 +923,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
            text-shadow: 0 0 1px white, 0 0 10px white, 0 0 1px white; /* Множественные тени для утолщения */
 
 
+
+
+font-family: 'Montserrat', sans-serif;
+        
+                font-weight: 700;
         `;
 
         // Кнопка 2: Основное меню (оригинальная) - СПРАВА
@@ -1038,18 +1043,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 border-radius: 5px;
                 transition: background 0.2s;
                 color: #383838;
-                
                 display: flex;
                 align-items: center;
                 gap: 10px;
-      
-
-       font-family: 'Montserrat', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-
-
-
+                font-family: 'Montserrat', sans-serif;
+                font-size: 14px;
+                font-weight: 400;
             }
             .menu-item-with-icon:hover {
                 background: #f8f9fa;
@@ -1118,8 +1117,9 @@ font-size: 18px; /* Увеличьте значение по необходим�
         function openDotsMenu() {
             const containerRect = newContainer.getBoundingClientRect();
             
+            // ВЫРАВНИВАЕМ ЛЕВЫЙ КРАЙ МЕНЮ С ЛЕВЫМ КРАЕМ КОНТЕЙНЕРА
             dotsMenu.style.bottom = (window.innerHeight - containerRect.top + 10) + 'px';
-            dotsMenu.style.left = (containerRect.left - 10) + 'px'; /* Сдвигаем от левого края */
+            dotsMenu.style.left = (containerRect.left) + 'px'; // Убираем сдвиг -10px
             dotsMenu.style.top = 'auto';
             
             dotsMenu.style.display = 'block';
