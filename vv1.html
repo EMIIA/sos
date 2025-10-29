@@ -896,6 +896,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         let dotsMenuActive = false;
 
+        // Функция для определения мобильного устройства
+        function isMobile() {
+            return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        }
+
         // Функция для переключения основного меню
         function toggleMainMenu() {
             const isActive = emiiaMenu.classList.contains('active');
@@ -941,21 +946,40 @@ font-size: 18px; /* Увеличьте значение по необходим�
         // Обработчики для основной кнопки
         emiiaButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            // Если меню точек открыто - ИГНОРИРУЕМ клик полностью
             if (dotsMenuActive) {
                 return;
             }
             toggleMainMenu();
         });
 
-        // Обработчики для кнопки точек - открываем меню
+        // Дополнительный обработчик для мобильных - touchstart
+        if (isMobile()) {
+            emiiaButton.addEventListener('touchstart', function(e) {
+                e.stopPropagation();
+                if (dotsMenuActive) {
+                    e.preventDefault();
+                    return;
+                }
+            });
+        }
+
+        // Обработчики для кнопки точек
         dotsButton.addEventListener('click', function(e) {
             e.stopPropagation();
             e.preventDefault();
             openDotsMenu();
         });
 
-        // Обработчики для пунктов меню точек - закрываем меню при клике
+        // Дополнительный обработчик touch для мобильных
+        if (isMobile()) {
+            dotsButton.addEventListener('touchstart', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                openDotsMenu();
+            });
+        }
+
+        // Обработчики для пунктов меню точек
         refreshItem.addEventListener('click', function(e) {
             e.stopPropagation();
             closeDotsMenu();
@@ -968,15 +992,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
             window.open('https://emiia.ai', '_blank');
         });
 
-
-
-installItem.addEventListener('click', function(e) {
-    e.stopPropagation();
-    closeDotsMenu();
-    window.location.href = 'https://sos.emiia.ai/vv3.html';
-});
-
-
+        installItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeDotsMenu();
+            window.open('https://emiia.ai/install', '_blank');
+        });
 
         termsItem.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -990,12 +1010,31 @@ installItem.addEventListener('click', function(e) {
             window.open('https://emiia.ai/privacy', '_blank');
         });
 
-        // Закрываем меню точек при ЛЮБОМ клике в любом месте
+        // Мобильные обработчики для пунктов меню
+        if (isMobile()) {
+            [refreshItem, settingsItem, installItem, termsItem, privacyItem].forEach(item => {
+                item.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    closeDotsMenu();
+                });
+            });
+        }
+
+        // Закрываем меню точек при ЛЮБОМ клике/тапе
         document.addEventListener('click', function(e) {
             if (dotsMenuActive) {
                 closeDotsMenu();
             }
         });
+
+        // Для мобильных - закрываем при touchstart
+        if (isMobile()) {
+            document.addEventListener('touchstart', function(e) {
+                if (dotsMenuActive) {
+                    closeDotsMenu();
+                }
+            });
+        }
 
         // Закрываем меню точек при ЛЮБОМ другом событии
         function closeDotsMenuOnAnyInteraction() {
@@ -1006,7 +1045,6 @@ installItem.addEventListener('click', function(e) {
 
         document.addEventListener('scroll', closeDotsMenuOnAnyInteraction);
         document.addEventListener('wheel', closeDotsMenuOnAnyInteraction);
-        document.addEventListener('touchstart', closeDotsMenuOnAnyInteraction);
         document.addEventListener('touchend', closeDotsMenuOnAnyInteraction);
         document.addEventListener('mousedown', closeDotsMenuOnAnyInteraction);
         document.addEventListener('mouseup', closeDotsMenuOnAnyInteraction);
@@ -1021,7 +1059,6 @@ installItem.addEventListener('click', function(e) {
         });
     });
 </script>
-
 
 
 
