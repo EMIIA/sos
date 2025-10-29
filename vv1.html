@@ -922,6 +922,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
             
             // ДОБАВЛЯЕМ КЛАСС К BODY ДЛЯ ПОЛНОЙ БЛОКИРОВКИ
             document.body.classList.add('dots-menu-open');
+            
+            // ДОПОЛНИТЕЛЬНАЯ БЛОКИРОВКА ДЛЯ ТАЧЕЙ
+            emiiaButton.style.pointerEvents = 'none';
+            emiiaButton.style.touchAction = 'none';
         }
 
         function closeDotsMenu() {
@@ -931,17 +935,49 @@ font-size: 18px; /* Увеличьте значение по необходим�
             
             // УБИРАЕМ КЛАСС БЛОКИРОВКИ
             document.body.classList.remove('dots-menu-open');
+            
+            // ВОССТАНАВЛИВАЕМ ТАЧ-СОБЫТИЯ
+            emiiaButton.style.pointerEvents = 'auto';
+            emiiaButton.style.touchAction = 'auto';
         }
 
         // Обработчики для основной кнопки
         emiiaButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            if (dotsMenuActive) return;
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return false;
+            }
             toggleMainMenu();
         });
 
+        // ДОПОЛНИТЕЛЬНЫЕ ОБРАБОТЧИКИ ДЛЯ ТАЧ-УСТРОЙСТВ
+        emiiaButton.addEventListener('touchstart', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }
+        }, { passive: false });
+
+        emiiaButton.addEventListener('touchend', function(e) {
+            if (dotsMenuActive) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }
+        }, { passive: false });
+
         // Обработчики для кнопки точек
         dotsButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openDotsMenu();
+        });
+
+        dotsButton.addEventListener('touchstart', function(e) {
             e.stopPropagation();
             openDotsMenu();
         });
@@ -986,22 +1022,26 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
             .dots-menu-open #emiiaButton {
                 opacity: 0.5 !important;
+                pointer-events: none !important;
+                touch-action: none !important;
             }
             #dotsMenu {
                 z-index: 10000 !important;
                 pointer-events: auto !important;
+                touch-action: auto !important;
             }
             #dotsButton {
                 z-index: 10001 !important;
                 pointer-events: auto !important;
+                touch-action: auto !important;
             }
         `;
         document.head.appendChild(style);
 
-        // ФУНКЦИЯ ДЛЯ ЗАКРЫТИЯ МЕНЮ ТОЧЕК ТОЛЬКО ПРИ ИНТЕНЦИОНАЛЬНЫХ ДЕЙСТВИЯХ
+        // ФУНКЦИЯ ДЛЯ ЗАКРЫТИЯ МЕНЮ ТОЧЕК
         function closeDotsMenuHandler(e) {
             if (dotsMenuActive) {
-                // НЕ закрываем при простом движении курсора
+                // НЕ закрываем при простом движении
                 if (e.type === 'mousemove' || e.type === 'pointermove' || e.type === 'touchmove') {
                     return;
                 }
@@ -1015,37 +1055,16 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
         }
 
-        // ТОЛЬКО ИНТЕНЦИОНАЛЬНЫЕ СОБЫТИЯ (не движения)
+        // ИНТЕНЦИОНАЛЬНЫЕ СОБЫТИЯ
         const intentionalEvents = [
-            // Клики и нажатия
             'click', 'mousedown', 'mouseup', 'contextmenu', 'dblclick',
-            
-            // Тач события
             'touchstart', 'touchend', 'touchcancel',
-            
-            // Pointer нажатия
             'pointerdown', 'pointerup', 'pointercancel',
-            
-            // Клавиатура
-            'keydown', 'keyup',
-            
-            // Скролл и resize
-            'scroll', 'resize', 'orientationchange',
-            
-            // Drag and drop
-            'dragstart', 'dragend', 'drop',
-            
-            // Выделение
-            'selectionchange',
-            
-            // Фокус
-            'focus', 'blur',
-            
-            // Mapbox интерактивные события
-            'movestart', 'zoomstart', 'rotatestart', 'pitchstart'
+            'keydown', 'keyup', 'scroll', 'resize', 'orientationchange',
+            'dragstart', 'dragend', 'drop', 'selectionchange', 'focus', 'blur'
         ];
 
-        // ДОБАВЛЯЕМ ОБРАБОТЧИКИ ДЛЯ ИНТЕНЦИОНАЛЬНЫХ СОБЫТИЙ
+        // ДОБАВЛЯЕМ ОБРАБОТЧИКИ
         intentionalEvents.forEach(eventType => {
             document.addEventListener(eventType, closeDotsMenuHandler, { 
                 passive: true,
@@ -1055,11 +1074,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         // ОСОБАЯ ОБРАБОТКА ДЛЯ MAPBOX
         if (window.map) {
-            const mapEvents = [
-                'mousedown', 'mouseup', 'click', 'touchstart', 'touchend',
-                'movestart', 'zoomstart', 'rotatestart'
-            ];
-            
+            const mapEvents = ['mousedown', 'mouseup', 'click', 'touchstart', 'touchend', 'movestart', 'zoomstart', 'rotatestart'];
             mapEvents.forEach(eventType => {
                 map.on(eventType, closeDotsMenuHandler);
             });
