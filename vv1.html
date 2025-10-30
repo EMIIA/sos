@@ -2877,6 +2877,11 @@ map.addSource('point-2', {
     }
 });
 
+
+
+
+
+
 map.addSource('point-3', {
     'type': 'geojson',
     'data': {
@@ -2889,13 +2894,17 @@ map.addSource('point-3', {
                     'coordinates': [37.63572125,55.83852512]
                 },
                 'properties': {
-                    'title': 'ВКУСВИЛЛ <br>DARK STORE #33',
+                    'title': 'EMIIA.AI SIP: AI WMS<br>DARK STORE #33',
                     'description': 'EMIIA.AI API: ID R: [#3D4584]'
                 }
             }
         ]
     }
 });
+
+
+
+
 
 // Добавляем слои для всех трех знаков с SVG иконками
 map.addLayer({
@@ -2976,23 +2985,62 @@ const redLinesHTML2 = `
 </div>
 `;
 
+
+
+
+
 // HTML для третьего знака
 const redLinesHTML3 = `
+
 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-    <div style="color: #ff0000; font-size: 14px; margin-bottom: 8px;">
-        • Нарушен температурный режим<br>
-        • Нарушен микроклимат<br>
-        • Выявлены загрязнители воздуха
+<div style="font-family: 'Montserrat', sans-serif; font-size: 14px;">
+  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-thermometer-high" viewBox="0 0 16 16">
+      <path stroke="#dc3545" stroke-width="0.0" fill="#dc3545" d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V2.5a.5.5 0 0 1 1 0v8.585a1.5 1.5 0 0 1 1 1.415"/>
+      <path stroke="#dc3545" stroke-width="0.0" fill="#dc3545" d="M5.5 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM8 1a1.5 1.5 0 0 0-1.5 1.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0l-.166-.15V2.5A1.5 1.5 0 0 0 8 1"/>
+    </svg>
+    <div>
+      Нарушен температурный режим <br>26.0 °C
     </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-moisture" viewBox="0 0 16 16">
+      <path stroke="#dc3545" stroke-width="0.0" fill="#dc3545" d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267"/>
+    </svg>
+    Нарушен микроклимат <br>22.4 %, RH
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-virus2" viewBox="0 0 16 16">
+      <path stroke="#dc3545" stroke-width="0.0" fill="#dc3545" d="M8 0a1 1 0 0 0-1 1v1.143c0 .557-.407 1.025-.921 1.24-.514.214-1.12.162-1.513-.231l-.809-.809a1 1 0 1 0-1.414 1.414l.809.809c.394.394.445.999.23 1.513C3.169 6.593 2.7 7 2.144 7H1a1 1 0 0 0 0 2h1.143c.557 0 1.025.407 1.24.921.214.514.163 1.12-.231 1.513l-.809.809a1 1 0 0 0 1.414 1.414l.809-.809c.394-.394.999-.445 1.513-.23.514.214.921.682.921 1.24V15a1 1 0 1 0 2 0v-1.143c0-.557.407-1.025.921-1.24.514-.214 1.12-.162 1.513.231l.809.809a1 1 0 0 0 1.414-1.414l-.809-.809c-.393-.394-.445-.999-.23-1.513.214-.514.682-.921 1.24-.921H15a1 1 0 1 0 0-2h-1.143c-.557 0-1.025-.407-1.24-.921-.214-.514-.162-1.12.231-1.513l.809-.809a1 1 0 0 0-1.414-1.414l-.809.809c-.394.393-.999.445-1.513.23-.514-.214-.92-.682-.92-1.24V1a1 1 0 0 0-1-1Zm2 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 7a1 1 0 1 1-2 0 1 1 0 0 1 2 0m1 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2m4-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+    </svg>
+    <div>
+      Выявлены загрязнители воздуха <br> 
+      VOC: <span id="vocValue">257</span> ppm<br> 
+      CO2: <span id="co2Value">555</span> ppm
+    </div>
+  </div>
+
+  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
     <div style="color: #ff0000; font-size: 14px;">
-        <a href="https://www.emiia.ai/" 
-           target="_blank" 
-           style="color: #ff0000; text-decoration: none;">
-          ОТЧЁТ ❯
-        </a>
+      <a href="https://www.emiia.ai/" 
+         target="_blank" 
+         style="color: #3d85c6; text-decoration: none; display: flex; align-items: center; gap: 16px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16" style="flex-shrink: 0; display: block;">
+          <path stroke="#dc3545" stroke-width="0.0" fill="#dc3545" d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
+        </svg>
+        Отчет ❯
+      </a>
     </div>
+  </div>
 </div>
+</div>
+
 `;
+
+
+
 
 // Обработчики клика по знакам
 map.on('click', 'layer-1', function(e) {
@@ -5225,7 +5273,32 @@ map.on('load', () => {
 
 
 
+<script>
+// Функция для обновления значений
+function updateValues() {
+  // Обновляем VOC (случайное значение между 255 и 260)
+  const vocElement = document.getElementById('vocValue');
+  const currentVoc = parseInt(vocElement.textContent);
+  const newVoc = currentVoc + Math.floor(Math.random() * 5) - 2; // ±2 от текущего значения
+  vocElement.textContent = Math.max(255, Math.min(260, newVoc)); // Ограничиваем диапазон 255-260
+  
+  // Обновляем CO2 (случайное значение между 553 и 560)
+  const co2Element = document.getElementById('co2Value');
+  const currentCo2 = parseInt(co2Element.textContent);
+  const newCo2 = currentCo2 + Math.floor(Math.random() * 5) - 2; // ±2 от текущего значения
+  co2Element.textContent = Math.max(553, Math.min(560, newCo2)); // Ограничиваем диапазон 553-560
+  
+  // Обновляем температуру (небольшие колебания вокруг 26.0)
+  const tempElement = document.getElementById('temperatureValue');
+  const currentTemp = parseFloat(tempElement.textContent);
+  const variation = (Math.random() - 0.5) * 0.4; // ±0.2 градуса
+  const newTemp = Math.round((26.0 + variation) * 10) / 10;
+  tempElement.textContent = newTemp.toFixed(1);
+}
 
+// Обновляем значения каждые 3 секунды
+setInterval(updateValues, 3000);
+</script>
 
 
 
