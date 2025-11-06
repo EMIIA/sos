@@ -5,6 +5,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -320,7 +321,7 @@ const renderTable = (headers, rows) => {
             // Сохранение данных в localStorage после успешной авторизации
             localStorage.setItem('savedLogin', login);
             localStorage.setItem('savedPassword', password);
-            window.location.href = 'https://sos.emiia.ai/vv1.html';
+            window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
         } else {
             alert('Неверные учетные данные!');
         }
