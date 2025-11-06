@@ -1804,19 +1804,58 @@ background: rgba(204, 204, 204, 0.7);
 
 
 
-body { 
-    margin: 0; 
-    padding: 0; 
+
+
+
+
+/* Fix for viewport-fit=cover safe areas */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    height: -webkit-fill-available; /* для мобильных браузеров */
+}
+
+html {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* Убираем стандартные отступы safe area */
+#map {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: #f8f9fa;
 }
 
-#map { 
-    position: absolute; 
-    top: 0; 
-    bottom: 0; 
-    width: 100%; 
-    background: #f8f9fa;
+/* Фиксируем все абсолютно позиционированные элементы */
+.emiia-button-container,
+.header {
+    position: fixed;
+    z-index: 1000;
 }
+
+/* Альтернативно: можно явно сбросить safe area insets */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: min(0vmin, env(safe-area-inset-left));
+        padding-right: min(0vmin, env(safe-area-inset-right)); 
+        padding-top: min(0vmin, env(safe-area-inset-top));
+        padding-bottom: min(0vmin, env(safe-area-inset-bottom));
+    }
+
+
+
+
+
+
+
+
+
 
 
     }
