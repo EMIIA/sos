@@ -845,15 +845,14 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 
 <style>
-
-/* Принудительное перекрытие Home Indicator */
 body {
     margin: 0;
     padding: 0;
+    /* Растягиваем под ВСЕ безопасные зоны */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
     height: 100vh;
     overflow: hidden;
-    position: fixed;
-    width: 100%;
 }
 
 #map {
@@ -863,9 +862,9 @@ body {
     width: 100%;
     height: 100vh;
     background: #383838;
-    /* Растягиваем НА Home Indicator */
-    bottom: -env(safe-area-inset-bottom);
+    /* Растягиваем карту под Home Indicator */
     height: calc(100vh + env(safe-area-inset-bottom));
+    bottom: 0;
 }
 </style>
 
