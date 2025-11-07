@@ -2113,7 +2113,7 @@ function createCustomCompass() {
     
     compass.style.cssText = `
         position: absolute;
-        top: 10px;
+        top: 40%; /* Чуть выше середины экрана */
         left: 10px;
         width: 30px;
         height: 30px;
@@ -2129,6 +2129,7 @@ function createCustomCompass() {
         transition: all 0.3s ease;
         opacity: 0;
         visibility: hidden;
+        transform: translateY(-50%); /* Центрируем по вертикали относительно top */
     `;
 
     compass.addEventListener('click', handleCompassClick);
@@ -2299,7 +2300,7 @@ map.on('pitch', function() {
         const maxCompassPitch = 0;
         const limitedPitch = Math.min(currentPitch, maxCompassPitch);
         
-        compass.style.transform = `perspective(500px) rotateX(${limitedPitch}deg)`;
+        compass.style.transform = `translateY(-50%) perspective(500px) rotateX(${limitedPitch}deg)`;
     }
 });
 
@@ -2332,7 +2333,6 @@ map.on('click', function(e) {
 map.on('load', () => {
     console.log('Карта загружена');
 });
-
 
 
 
