@@ -846,30 +846,27 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 <style>
 
-/* Агрессивное решение для PWA */
+/* Принудительное перекрытие Home Indicator */
 body {
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-    position: fixed !important;
-    width: 100% !important;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
 }
 
 #map {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    height: 100vh !important;
-    background: #383838 !important;
-    /* Перекрываем Home Indicator */
-    bottom: env(safe-area-inset-bottom) !important;
-    margin-bottom: calc(-1 * env(safe-area-inset-bottom)) !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #383838;
+    /* Растягиваем НА Home Indicator */
+    bottom: -env(safe-area-inset-bottom);
+    height: calc(100vh + env(safe-area-inset-bottom));
 }
-
-
 </style>
 
 
