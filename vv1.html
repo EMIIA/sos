@@ -2019,7 +2019,6 @@ body {
 
 
 
-
 mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
 
 const map = new mapboxgl.Map({
@@ -2048,7 +2047,7 @@ map.addControl(navControl, 'top-left');
 let isLocationActive = false;
 let compassHideTimer;
 
-// Синяя точка с волнами #3d85c6
+// Синяя точка с волнами #3d85c6 - размер 110px
 const pulsingDotBlue = {
     width: 110,
     height: 110,
@@ -2275,7 +2274,6 @@ function setupCompassClickHandler() {
       if (isLocationActive) {
         // Если местоположение уже показано - скрываем
         removeUserLocation();
-        // Не скрываем компас сразу, он скроется через таймер как обычно
       } else {
         // Если местоположение не показано - определяем и показываем
         locateUser();
@@ -2299,42 +2297,43 @@ function setupCompassClickHandler() {
   }
 }
 
+// Добавляем CSS стили для SVG фона компаса сразу при загрузке
+function addCompassStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .mapboxgl-ctrl-compass.compass-active::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(0deg);
+      width: 26px;
+      height: 24px;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgaGVpZ2h0PSIxOCIgd2lkdGg9IjE4IiBmaWxsPSIjM2Q4NWM2IiBzdHJva2U9IiMzZDg1YzYiIHN0cm9rZS13aWR0aD0iMC44Ij48cGF0aCBkPSJNIDguMDU0MTU0OSwyLjQ5MjE0OTIgQSAwLjUsMC40MDYxOTg2NyAwIDAgMSA4LjUyMTYwOSwyLjc1MjA0NTkgbCA1LjAzMDkyLDEwLjU1MTU4NDEgYSAwLjUsMC40MDYxOTg2NyAwIDAgMSAtMC42NTE4MzIsMC41MjQwMTUgTCA4LjA4Mjg0MzMsMTIuMjcxNTg4IDMuMjcyNzU5LDEzLjg0NjI4NSBBIDAuNSwwLjQwNjE5ODY3IDAgMCAxIDIuNjE5Mjc0OCwxMy4zMjQ3OTkgTCA3LjU4ODIzMDcsMi43NTM4NTMgQSAwLjUsMC40MDYxOTg2NyAwIDAgMSA4LjA1MzQ0OTQsMi40OTI3MjQ5IFoiLz48L3N2Zz4=");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    .mapboxgl-ctrl-nav {
+      position: relative;
+    }
+    .mapboxgl-ctrl-compass {
+      position: relative;
+      z-index: 1;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 // Инициализация обработчика с задержкой и повторными попытками
 function initializeCompassHandler() {
   setTimeout(() => {
     const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
     if (compassButton) {
       setupCompassClickHandler();
-      
-      // Добавляем CSS стили для SVG фона компаса
-      const style = document.createElement('style');
-      style.textContent = `
-        .mapboxgl-ctrl-compass.compass-active::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%) rotate(0deg);
-          width: 26px;
-          height: 24px;
-          background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgaGVpZ2h0PSIxOCIgd2lkdGg9IjE4IiBmaWxsPSIjM2Q4NWM2IiBzdHJva2U9IiMzZDg1YzYiIHN0cm9rZS13aWR0aD0iMC44Ij48cGF0aCBkPSJNIDguMDU0MTU0OSwyLjQ5MjE0OTIgQSAwLjUsMC40MDYxOTg2NyAwIDAgMSA4LjUyMTYwOSwyLjc1MjA0NTkgbCA1LjAzMDkyLDEwLjU1MTU4NDEgYSAwLjUsMC40MDYxOTg2NyAwIDAgMSAtMC42NTE4MzIsMC41MjQwMTUgTCA4LjA4Mjg0MzMsMTIuMjcxNTg4IDMuMjcyNzU5LDEzLjg0NjI4NSBBIDAuNSwwLjQwNjE5ODY3IDAgMCAxIDIuNjE5Mjc0OCwxMy4zMjQ3OTkgTCA3LjU4ODIzMDcsMi43NTM4NTMgQSAwLjUsMC40MDYxOTg2NyAwIDAgMSA4LjA1MzQ0OTQsMi40OTI3MjQ5IFoiLz48L3N2Zz4=");
-          background-repeat: no-repeat;
-          background-position: center;
-          background-size: contain;
-          z-index: -1;
-          pointer-events: none;
-          opacity: 0.8;
-        }
-        .mapboxgl-ctrl-nav {
-          position: relative;
-        }
-        .mapboxgl-ctrl-compass {
-          position: relative;
-          z-index: 1;
-        }
-      `;
-      document.head.appendChild(style);
-      
     } else {
       // Если компас еще не загрузился, пробуем еще раз
       setTimeout(initializeCompassHandler, 100);
@@ -2343,6 +2342,7 @@ function initializeCompassHandler() {
 }
 
 // Запускаем инициализацию
+addCompassStyles(); // Добавляем стили сразу
 initializeCompassHandler();
 
 // Ограничиваем наклон иконки компаса и обновляем фон
@@ -2405,7 +2405,6 @@ map.on('click', function(e) {
 map.on('load', () => {
   console.log('Карта загружена');
 });
-
 
 
 
