@@ -833,14 +833,14 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 <style>
 
-/* Для PWA - полный экран без безопасных зон */
-body {
+/* Для PWA на iOS - убираем белую полосу (Home Indicator) */
+html, body {
     margin: 0;
     padding: 0;
-    height: 100vh;
-    /* Критически важно для PWA */
+    height: 100%;
     overflow: hidden;
-    -webkit-overflow-scrolling: touch;
+    /* Критически важно для PWA */
+    background-color: #383838;
 }
 
 #map {
@@ -849,12 +849,26 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
+    height: 100%;
     background: #383838;
-    /* Принудительно растягиваем на всю высоту PWA */
+    /* Растягиваем под Home Indicator */
     bottom: 0;
-    /* Для PWA на iOS */
-    height: -webkit-fill-available;
-    min-height: -webkit-fill-available;
+}
+
+/* Специально для iOS PWA */
+@supports (-webkit-touch-callout: none) {
+    body {
+        height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+    }
+    
+    #map {
+        height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+        /* Принудительно растягиваем под Home Indicator */
+        padding-bottom: env(safe-area-inset-bottom);
+        margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+    }
 }
 </style>
 
