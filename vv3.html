@@ -78,7 +78,11 @@
 <style>
 body { margin: 0; padding: 0; }
 #map { position: absolute; top: 0; bottom: 0; width: 100%; background: #383838; }
+
 </style>
+
+
+
 </head>
 <body>
 
@@ -823,7 +827,6 @@ z-index: 10000 !important; /* Очень высокий z-index */
 }
 
 
-</style>
 
 
 
@@ -831,16 +834,16 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 
 
-<style>
-
-/* Для PWA на iOS - убираем белую полосу (Home Indicator) */
-html, body {
+/* Полное игнорирование safe area снизу */
+body {
     margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    /* Критически важно для PWA */
-    background-color: #383838;
+    padding: 
+        env(safe-area-inset-top) 
+        env(safe-area-inset-right) 
+        0px /* NO bottom safe area */
+        env(safe-area-inset-left);
+    height: 100vh;
+    box-sizing: border-box;
 }
 
 #map {
@@ -850,27 +853,24 @@ html, body {
     width: 100%;
     height: 100vh;
     height: 100%;
-    background: #383838;
-    /* Растягиваем под Home Indicator */
-    bottom: 0;
+    background: #f8f9fa;
+    /* Принудительно игнорируем нижнюю безопасную зону */
+    bottom: 0 !important;
 }
 
-/* Специально для iOS PWA */
-@supports (-webkit-touch-callout: none) {
-    body {
-        height: -webkit-fill-available;
-        min-height: -webkit-fill-available;
+
+
     }
-    
-    #map {
-        height: -webkit-fill-available;
-        min-height: -webkit-fill-available;
-        /* Принудительно растягиваем под Home Indicator */
-        padding-bottom: env(safe-area-inset-bottom);
-        margin-bottom: calc(-1 * env(safe-area-inset-bottom));
-    }
-}
 </style>
+
+
+
+
+
+
+
+
+
 
 
 
