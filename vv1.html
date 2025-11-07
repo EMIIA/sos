@@ -2036,16 +2036,12 @@ const map = new mapboxgl.Map({
     antialias: true 
 });
 
-// Добавляем компас
-const navControl = new mapboxgl.NavigationControl({
-  visualizePitch: false,
-  showZoom: false
-});
-map.addControl(navControl, 'top-left');
-
 // Переменные для состояния
 let isLocationActive = false;
 let compassHideTimer;
+
+// Проверяем iOS
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 // Синяя точка с волнами #3d85c6 - размер 110px
 const pulsingDotBlue = {
@@ -2110,68 +2106,69 @@ function removeUserLocation() {
   updateCompassAppearance();
 }
 
-// Функция для обновления вращения фона
-function updateCompassBackgroundRotation() {
-  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
-  if (compassButton && isLocationActive) {
-    const bearing = map.getBearing();
-    const pitch = Math.min(map.getPitch(), 30);
-    
-    // Обновляем вращение через псевдоэлемент
-    const style = document.createElement('style');
-    style.id = 'compass-background-rotation';
-    style.textContent = `
-      .mapboxgl-ctrl-compass.compass-active::before {
-        transform: translate(-50%, -50%) rotate(${-bearing}deg) perspective(500px) rotateX(${pitch}deg);
-      }
-    `;
-    
-    // Удаляем старый стиль и добавляем новый
-    const oldStyle = document.getElementById('compass-background-rotation');
-    if (oldStyle) oldStyle.remove();
-    document.head.appendChild(style);
-  }
-}
-
-// Функция для обновления внешнего вида компаса
+// Функция для обновления внешнего вида компаса/кнопки
 function updateCompassAppearance() {
-  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
-  
-  if (compassButton) {
-    if (isLocationActive) {
-      // Активное состояние - добавляем SVG фон
-      compassButton.classList.add('compass-active');
-      compassButton.title = 'Скрыть мое местоположение';
-      // Сразу синхронизируем вращение
-      updateCompassBackgroundRotation();
-    } else {
-      // Неактивное состояние - убираем фон
-      compassButton.classList.remove('compass-active');
-      compassButton.title = 'Показать мое местоположение';
-      // Удаляем стиль вращения
-      const oldStyle = document.getElementById('compass-background-rotation');
-      if (oldStyle) oldStyle.remove();
+  if (isIOS) {
+    // Для iOS - обновляем кастомную кнопку
+    const button = document.getElementById('ios-location-button');
+    if (button) {
+      if (isLocationActive) {
+        button.style.backgroundColor = 'rgba(61, 133, 198, 0.2)';
+        button.title = 'Скрыть мое местоположение';
+      } else {
+        button.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+        button.title = 'Показать мое местоположение';
+      }
+    }
+  } else {
+    // Для десктопа - обновляем стандартный компас
+    const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+    if (compassButton) {
+      if (isLocationActive) {
+        compassButton.style.backgroundColor = 'rgba(61, 133, 198, 0.2)';
+        compassButton.title = 'Скрыть мое местоположение';
+      } else {
+        compassButton.style.backgroundColor = 'transparent';
+        compassButton.title = 'Показать мое местоположение';
+      }
     }
   }
 }
 
-// Функция для показа компаса
+// Функция для показа компаса/кнопки
 function showCompass() {
-  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
-  if (compassButton) {
-    clearTimeout(compassHideTimer);
-    compassButton.style.opacity = '1';
-    compassButton.style.visibility = 'visible';
+  if (isIOS) {
+    const button = document.getElementById('ios-location-button');
+    if (button) {
+      clearTimeout(compassHideTimer);
+      button.style.opacity = '1';
+      button.style.visibility = 'visible';
+    }
+  } else {
+    const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+    if (compassButton) {
+      clearTimeout(compassHideTimer);
+      compassButton.style.opacity = '1';
+      compassButton.style.visibility = 'visible';
+    }
   }
 }
 
-// Функция для скрытия компаса (только если не активно местоположение)
+// Функция для скрытия компаса/кнопки
 function hideCompass() {
   if (!isLocationActive) {
-    const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
-    if (compassButton) {
-      compassButton.style.opacity = '0';
-      compassButton.style.visibility = 'hidden';
+    if (isIOS) {
+      const button = document.getElementById('ios-location-button');
+      if (button) {
+        button.style.opacity = '0';
+        button.style.visibility = 'hidden';
+      }
+    } else {
+      const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+      if (compassButton) {
+        compassButton.style.opacity = '0';
+        compassButton.style.visibility = 'hidden';
+      }
     }
   }
 }
@@ -2187,7 +2184,6 @@ function locateUser() {
     (position) => {
       const { longitude, latitude } = position.coords;
       
-      // Анимируем перемещение карты к местоположению пользователя
       map.flyTo({
         center: [longitude, latitude],
         zoom: 17,
@@ -2195,10 +2191,8 @@ function locateUser() {
         essential: true
       });
 
-      // Удаляем старый источник и слой если они есть
       removeUserLocation();
 
-      // Добавляем синюю пульсирующую точку
       map.addImage('pulsing-dot-blue', pulsingDotBlue, { pixelRatio: 2 });
       
       map.addSource('user-location', {
@@ -2230,7 +2224,7 @@ function locateUser() {
 
       isLocationActive = true;
       updateCompassAppearance();
-      showCompass(); // Гарантируем что компас виден
+      showCompass();
 
     },
     (error) => {
@@ -2258,132 +2252,129 @@ function locateUser() {
   );
 }
 
-// Обработчик клика по компасу
-function setupCompassClickHandler() {
-  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+// Создаем кастомную кнопку для iOS
+function createIOSLocationButton() {
+  const button = document.createElement('button');
+  button.id = 'ios-location-button';
+  button.innerHTML = `
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path d="M10 4C7.8 4 6 5.8 6 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+      <path d="M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
+    </svg>
+  `;
   
-  if (compassButton) {
-    // Убираем стандартное поведение
-    compassButton.onclick = null;
-    
-    // Добавляем наш обработчик
-    compassButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      // Фикс для iOS: полностью блокируем стандартное поведение
-      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        e.stopImmediatePropagation();
-      }
-      
-      if (isLocationActive) {
-        // Если местоположение уже показано - скрываем
-        removeUserLocation();
-        // Не скрываем компас сразу, он скроется через таймер как обычно
-      } else {
-        // Если местоположение не показано - определяем и показываем
-        locateUser();
-      }
-    }, true); // Используем capture phase для iOS
+  button.style.cssText = `
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 30px;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+  `;
 
-    // Стилизация компаса
-    compassButton.style.background = 'none';
-    compassButton.style.backgroundColor = 'transparent';
-    compassButton.style.border = 'none';
-    compassButton.style.boxShadow = 'none';
-    compassButton.style.cursor = 'pointer';
-    compassButton.style.transition = 'opacity 0.3s ease, visibility 0.3s ease';
-    
-    // Скрываем изначально
-    compassButton.style.opacity = '0';
-    compassButton.style.visibility = 'hidden';
+  button.addEventListener('click', () => {
+    if (isLocationActive) {
+      removeUserLocation();
+    } else {
+      locateUser();
+    }
+  });
 
-    // Добавляем tooltip
-    compassButton.title = 'Показать мое местоположение';
-  }
+  button.title = 'Показать мое местоположение';
+  document.body.appendChild(button);
+  
+  return button;
 }
 
-// Инициализация обработчика с задержкой и повторными попытками
-function initializeCompassHandler() {
-  setTimeout(() => {
+// Для десктопа - настраиваем стандартный компас
+function setupDesktopCompass() {
+  const navControl = new mapboxgl.NavigationControl({
+    visualizePitch: false,
+    showZoom: false
+  });
+  map.addControl(navControl, 'top-left');
+
+  function setupCompassClickHandler() {
+    const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+    
+    if (compassButton) {
+      compassButton.onclick = null;
+      
+      compassButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (isLocationActive) {
+          removeUserLocation();
+        } else {
+          locateUser();
+        }
+      });
+
+      compassButton.style.background = 'none';
+      compassButton.style.border = 'none';
+      compassButton.style.boxShadow = 'none';
+      compassButton.style.cursor = 'pointer';
+      compassButton.style.transition = 'opacity 0.3s ease, visibility 0.3s ease, background-color 0.3s ease';
+      
+      compassButton.style.opacity = '0';
+      compassButton.style.visibility = 'hidden';
+
+      compassButton.title = 'Показать мое местоположение';
+    }
+  }
+
+  function initializeCompassHandler() {
+    setTimeout(() => {
+      const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
+      if (compassButton) {
+        setupCompassClickHandler();
+      } else {
+        setTimeout(initializeCompassHandler, 100);
+      }
+    }, 100);
+  }
+
+  initializeCompassHandler();
+}
+
+// Инициализация в зависимости от устройства
+if (isIOS) {
+  // Для iOS создаем кастомную кнопку
+  createIOSLocationButton();
+} else {
+  // Для десктопа используем стандартный компас
+  setupDesktopCompass();
+}
+
+// Общие обработчики для всех устройств
+map.on('pitch', function() {
+  if (!isIOS) {
     const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
     if (compassButton) {
-      setupCompassClickHandler();
+      const currentPitch = map.getPitch();
+      const maxCompassPitch = 0;
+      const limitedPitch = Math.min(currentPitch, maxCompassPitch);
       
-      // Добавляем CSS стили для SVG фона компаса
-      const style = document.createElement('style');
-      style.textContent = `
-        .mapboxgl-ctrl-compass.compass-active::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%) rotate(0deg);
-          width: 26px;
-          height: 24px;
-          background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgaGVpZ2h0PSIxOCIgd2lkdGg9IjE4IiBmaWxsPSIjM2Q4NWM2IiBzdHJva2U9IiMzZDg1YzYiIHN0cm9rZS13aWR0aD0iMC44Ij48cGF0aCBkPSJNIDguMDU0MTU0OSwyLjQ5MjE0OTIgQSAwLjUsMC40MDYxOTg2NyAwIDAgMSA4LjUyMTYwOSwyLjc1MjA0NTkgbCA1LjAzMDkyLDEwLjU1MTU4NDEgYSAwLjUsMC40MDYxOTg2NyAwIDAgMSAtMC42NTE4MzIsMC41MjQwMTUgTCA4LjA4Mjg0MzMsMTIuMjcxNTg4IDMuMjcyNzU5LDEzLjg0NjI4NSBBIDAuNSwwLjQwNjE5ODY3IDAgMCAxIDIuNjE5Mjc0OCwxMy4zMjQ3OTkgTCA3LjU4ODIzMDcsMi43NTM4NTMgQSAwLjUsMC40MDYxOTg2NyAwIDAgMSA4LjA1MzQ0OTQsMi40OTI3MjQ5IFoiLz48L3N2Zz4=");
-          background-repeat: no-repeat;
-          background-position: center;
-          background-size: contain;
-          z-index: -1;
-          pointer-events: none;
-          opacity: 0.8;
-        }
-        .mapboxgl-ctrl-nav {
-          position: relative;
-        }
-        .mapboxgl-ctrl-compass {
-          position: relative;
-          z-index: 1;
-        }
-      `;
-      document.head.appendChild(style);
-      
-    } else {
-      // Если компас еще не загрузился, пробуем еще раз
-      setTimeout(initializeCompassHandler, 100);
+      compassButton.style.transform = `rotate(0deg) perspective(500px) rotateX(${limitedPitch}deg)`;
     }
-  }, 100);
-}
-
-// Запускаем инициализацию
-initializeCompassHandler();
-
-// Ограничиваем наклон иконки компаса и обновляем фон
-map.on('pitch', function() {
-  const compassButton = document.querySelector('.mapboxgl-ctrl-compass');
-  if (compassButton) {
-    const currentPitch = map.getPitch();
-    
-    // Ограничиваем максимальный наклон иконки
-    const maxCompassPitch = 0;
-    const limitedPitch = Math.min(currentPitch, maxCompassPitch);
-    
-    // Применяем ограниченный наклон к иконке
-    compassButton.style.transform = `rotate(0deg) perspective(500px) rotateX(${limitedPitch}deg)`;
-  }
-  // Обновляем наклон фона
-  updateCompassBackgroundRotation();
-});
-
-// Обновляем вращение фона вместе с компасом
-map.on('rotate', function() {
-  updateCompassBackgroundRotation();
-});
-
-// Сразу синхронизируем при любом изменении bearing
-map.on('move', function() {
-  if (isLocationActive) {
-    updateCompassBackgroundRotation();
   }
 });
 
-// Показываем компас при начале поворота (всегда, независимо от состояния)
 map.on('rotatestart', function() {
   showCompass();
 });
 
-// Скрываем компас через 7 секунд после окончания поворота (только если не активно местоположение)
 map.on('rotateend', function() {
   if (!isLocationActive) {
     compassHideTimer = setTimeout(() => {
@@ -2392,11 +2383,9 @@ map.on('rotateend', function() {
   }
 });
 
-// Также показываем компас при клике на карту
 map.on('click', function(e) {
   showCompass();
   
-  // Скрываем через 7 секунд только если не активно местоположение
   if (!isLocationActive) {
     clearTimeout(compassHideTimer);
     compassHideTimer = setTimeout(() => {
@@ -2405,7 +2394,6 @@ map.on('click', function(e) {
   }
 });
 
-// Обработчик загрузки карты для корректного отображения пульсирующей точки
 map.on('load', () => {
   console.log('Карта загружена');
 });
