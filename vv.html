@@ -1,25 +1,8 @@
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-
-
-
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-
-
-
-
 <title>AI WMS</title>
 
 <!-- PWA -->
@@ -28,10 +11,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
-
-
-
-
 
 <!-- Эти теги для соцсетей, для PWA не важны, но должны быть корректны -->
 <meta property="og:type" content="website" />
@@ -43,106 +22,177 @@
 <!-- Критически важная ссылка для PWA -->
 <link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
 
-
-
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-
-
-
-    <style>
-        body { font-family: monospace; margin: 0px; min-height: 50px; display: flex; justify-content: center; align-items: center; background: #F8F9FA; margin-top: 30px;}
-        .auth-container { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); width: 100%; max-width: 400px; margin: 1rem; font-family: monospace; }
-        h2 { color: #da4216; margin: 0 0 1rem 0; text-align: center; font-size: 1.8rem; font-family: monospace; }
-        .input-group { margin-bottom: 1.0rem; font-family: monospace; }
-        input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; box-sizing: border-box; font-family: monospace; }
-        input:focus { outline: none; border-color: #b2b4b3; box-shadow: 0 0 0 3px rgba(52,152,219,0.1); }
-        button { width: 100%; padding: 14px; background: #2dbe64; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s ease; font-family: monospace; }
-        button:hover { background: #1ac95c; }
-        @media (max-width: 480px) { .auth-container { padding: 1.5rem; margin: 0.5rem; } h2 { font-size: 1.5rem; } }
-    </style>
-
-
-
-
-
-
-
-
-
-
-
 <style>
+    /* Основные стили */
+    body { 
+        font-family: monospace; 
+        margin: 0; 
+        padding: 0;
+        min-height: 100vh;
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        background: #F8F9FA; 
+        /* Отступ для iOS PWA */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 100vw;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    
+    .auth-container { 
+        background: white; 
+        padding: 2.5rem; 
+        border-radius: 16px; 
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12); 
+        width: 100%; 
+        max-width: 400px; 
+        margin: 0 auto;
+        font-family: monospace; 
+    }
+    
+    h2 { 
+        color: #da4216; 
+        margin: 0 0 1rem 0; 
+        text-align: center; 
+        font-size: 1.8rem; 
+        font-family: monospace; 
+    }
+    
+    .input-group { 
+        margin-bottom: 1.0rem; 
+        font-family: monospace; 
+    }
+    
+    input { 
+        width: 100%; 
+        padding: 14px; 
+        border: 2px solid #e0e0e0; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        transition: border-color 0.3s ease; 
+        box-sizing: border-box; 
+        font-family: monospace; 
+    }
+    
+    input:focus { 
+        outline: none; 
+        border-color: #b2b4b3; 
+        box-shadow: 0 0 0 3px rgba(52,152,219,0.1); 
+    }
+    
+    button { 
+        width: 100%; 
+        padding: 14px; 
+        background: #2dbe64; 
+        color: white; 
+        border: none; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: background 0.3s ease; 
+        font-family: monospace; 
+    }
+    
+    button:hover { 
+        background: #1ac95c; 
+    }
+    
+    /* Базовый стиль для десктопа */
+    input {
+        letter-spacing: 2px !important;
+    }
 
-/* Базовый стиль для десктопа */
-input {
-  letter-spacing: 2px !important;
-}
+    /* Стили для мобильных устройств */
+    @media (max-width: 768px) {
+        input {
+            letter-spacing: 4.5px !important;
+        }
+        
+        .auth-container { 
+            padding: 1.5rem; 
+            margin: 0.5rem; 
+        } 
+        
+        h2 { 
+            font-size: 1.5rem; 
+        }
+        
+        /* Дополнительный отступ для iOS при фокусе на инпуты */
+        body.keyboard-open {
+            padding-bottom: 300px;
+        }
+    }
 
-/* Стили для мобильных устройств */
-@media (max-width: 768px) {
-  input{
-    letter-spacing: 4.5px !important; /* Уменьшаем интервал на мобильных */
-  }
-}
+    /* Для очень маленьких экранов */
+    @media (max-height: 700px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .auth-container {
+            padding: 1.5rem;
+        }
+    }
 
+    /* Десктоп - гарантируем что все помещается */
+    @media (min-width: 1024px) {
+        body {
+            min-height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            min-height: calc(100vh - 40px);
+            max-height: calc(100vh - 40px);
+        }
+    }
 </style>
-
-
-
-
-
-
-
 
 <style>
 .beta {
-    font-size: 0.4em; /* Уменьшаем до 70% от размера h1 */
+    font-size: 0.4em;
 }
-</style>
 
-
-
-
-
-
-
-
-<style>
 .icons-container {
     display: flex;
-    justify-content: space-between; / Равномерное распределение /
+    justify-content: space-between;
     width: 100%;
-    max-width: 400px; / Совпадает с max-width .auth-container /
-    margin: 20px auto 0; / Центрирование и отступ сверху /
-    padding: 0 2.5rem; / Отступы по краям, как у .auth-container /
+    max-width: 400px;
+    margin: 20px auto 0;
+    padding: 0 2.5rem;
     box-sizing: border-box;
 }
+
+.text-primary1 {
+    text-decoration: none;
+    text-align: center;
+    display: block;
+}
+
+.text-primary {
+    color: #b2b4b3;
+}
+
+.parent-container {
+    line-height: normal;
+    font-size: 16px;
+}
 </style>
-
-
-
-
-
-<style>
-    .text-primary1 {
-        text-decoration: none;
-        text-align: center;
-        display: block; /* или inline-block */
-    }
-</style>
-
-<style>
-    .text-primary {
-color: #b2b4b3;
-    }
-</style>
-
-
-
-
-
 
 <script>
 const renderTable = (headers, rows) => {
@@ -160,32 +210,9 @@ const renderTable = (headers, rows) => {
     
     return html + '</table>';
 };
-
-
-
-
 </script>
 
-
-
-
-
-
-
-
-<style>
-.parent-container {
-    line-height: normal;
-    font-size: 16px; /* или ваш базовый размер */
-  }
-
-</style>
-
 </head>
-
-
-
-
 
 <script type="text/javascript">
     (function () {
@@ -199,105 +226,57 @@ const renderTable = (headers, rows) => {
       tele.enableClosingConfirmation()
       tele.disableVerticalSwipes()
     })()
-  </script>
-
-
-
-
+</script>
 
 <body>
-    <div class="auth-container">
-        <div class="header-wrapper">
-
-<div class="header-wrapper">
-  <h2>
-    <a class="text-primary1" style="color: #da4216; text-align: center; font-weight: 600;" href="https://www.emiia.ru/">
-
+    <div class="container">
+        <div class="auth-container">
+            <div class="header-wrapper">
+                <h2>
+                    <a class="text-primary1" style="color: #da4216; text-align: center; font-weight: 600;" href="https://www.emiia.ru/">
 
 
 
-
-
-
+                        <!-- Ваш SVG код здесь -->
+                       
+<svg version="1.1" viewBox="0.0 0.0 230.0 130.0" fill="none" stroke="none" stroke-linecap="square" stroke-miterlimit="10" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><clipPath id="p.0"><path d="m0 0l230.0 0l0 130.0l-230.0 0l0 -130.0z" clip-rule="nonzero"/></clipPath><g clip-path="url(#p.0)"><path fill="#000000" fill-opacity="0.0" d="m0 0l230.0 0l0 130.0l-230.0 0z" fill-rule="evenodd"/><path fill="#000000" fill-opacity="0.0" d="m-0.007874016 42.29085l230.01575 0l0 66.267715l-230.01575 0z" fill-rule="evenodd"/><path fill="#2dbe64" d="m10.5702505 77.530846l0 -19.671871l15.859376 0q1.03125 0 1.90625 0.515625q0.875 0.515625 1.390625 1.375q0.53125 0.859375 0.53125 1.90625l0 12.078121q0 1.03125 -0.53125 1.90625q-0.515625 0.859375 -1.390625 1.375q-0.875 0.515625 -1.90625 0.515625l-15.859376 0zm3.921875 -3.640625l11.765626 0q0.140625 0 0.25 -0.09375q0.109375 -0.09375 0.109375 -0.234375l0 -11.749996q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.765626 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 11.749996q0 0.140625 0.09375 0.234375q0.09375 0.09375 0.234375 0.09375zm18.86969 3.640625l0 -15.874996q0 -1.046875 0.515625 -1.90625q0.53125 -0.859375 1.390625 -1.375q0.859375 -0.515625 1.90625 -0.515625l12.046875 0q1.03125 0 1.90625 0.515625q0.875 0.515625 1.390625 1.375q0.53125 0.859375 0.53125 1.90625l0 15.874996l-3.640625 0l0 -6.609375l-12.4375 0l0 6.609375l-3.609375 0l0 0zm3.609375 -10.21875l12.4375 0l0 -5.499996q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.125 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 5.499996l0 0zm34.877472 10.21875l-5.9375 -7.078125l4.734375 0l5.140625 6.0625l0 1.015625l-3.9375 0zm-15.6875 0l0 -19.656246l15.84375 0q1.046875 0 1.921875 0.53125q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.90625l0 5.296871q0 1.03125 -0.515625 1.90625q-0.515625 0.875 -1.390625 1.390625q-0.875 0.5 -1.921875 0.5l-12.234375 0.03125l0 6.71875l-3.609375 0zm3.9375 -10.390625l11.75 0q0.140625 0 0.25 -0.078125q0.109375 -0.078125 0.109375 -0.21875l0 -5.031246q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 5.031246q0 0.140625 0.09375 0.21875q0.09375 0.078125 0.234375 0.078125zm18.639359 10.390625l0 -19.671871l3.625 0l0 7.999996l4.625 0l6.71875 -7.999996l3.9375 0l0 1.03125l-7.375 8.796871l7.40625 8.8125l0 1.03125l-3.96875 0l-6.71875 -8.0l-4.625 0l0 8.0l-3.625 0zm33.83029 0q-1.046875 0 -1.90625 -0.515625q-0.859375 -0.515625 -1.375 -1.375q-0.515625 -0.875 -0.515625 -1.90625l0 -1.5l3.609375 0l0 1.328125q0 0.140625 0.09375 0.234375q0.09375 0.09375 0.234375 0.09375l11.765625 0q0.140625 0 0.234375 -0.09375q0.09375 -0.09375 0.09375 -0.234375l0 -3.734375q0 -0.140625 -0.09375 -0.21875q-0.09375 -0.078125 -0.234375 -0.078125l-11.90625 0q-1.046875 0 -1.90625 -0.515625q-0.859375 -0.53125 -1.375 -1.390625q-0.515625 -0.859375 -0.515625 -1.921875l0 -4.046871q0 -1.046875 0.515625 -1.90625q0.515625 -0.859375 1.375 -1.375q0.859375 -0.515625 1.90625 -0.515625l12.078125 0q1.03125 0 1.890625 0.515625q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.90625l0 1.5l-3.640625 0l0 -1.34375q0 -0.125 -0.09375 -0.21875q-0.09375 -0.109375 -0.234375 -0.109375l-11.765625 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 3.7499962q0 0.140625 0.09375 0.21875q0.09375 0.078125 0.234375 0.078125l11.9375 0q1.03125 0 1.890625 0.53125q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.921875l0 4.046875q0 1.03125 -0.515625 1.90625q-0.515625 0.859375 -1.390625 1.375q-0.859375 0.515625 -1.890625 0.515625l-12.078125 0zm25.901062 0l0 0l0 -16.046871l-8.03125 0l0 -3.625l19.671875 0l0 3.625l-8.0 0l0 16.046871l-3.640625 0zm17.445084 0q-1.046875 0 -1.90625 -0.515625q-0.859375 -0.515625 -1.390625 -1.375q-0.515625 -0.875 -0.515625 -1.90625l0 -12.078121q0 -1.046875 0.515625 -1.90625q0.53125 -0.859375 1.390625 -1.375q0.859375 -0.515625 1.90625 -0.515625l12.078125 0q1.03125 0 1.890625 0.515625q0.859375 0.515625 1.375 1.375q0.53125 0.859375 0.53125 1.90625l0 12.078121q0 1.03125 -0.53125 1.90625q-0.515625 0.859375 -1.375 1.375q-0.859375 0.515625 -1.890625 0.515625l-12.078125 0zm0.125 -3.640625l11.75 0q0.140625 0 0.25 -0.09375q0.109375 -0.09375 0.109375 -0.234375l0 -11.749996q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.125 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 11.749996q0 0.140625 0.09375 0.234375q0.109375 0.09375 0.234375 0.09375zm34.440094 3.640625l-5.9375 -7.078125l4.734375 0l5.140625 6.0625l0 1.015625l-3.9375 0zm-15.6875 0l0 -19.656246l15.84375 0q1.046875 0 1.921875 0.53125q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.90625l0 5.296871q0 1.03125 -0.515625 1.90625q-0.515625 0.875 -1.390625 1.390625q-0.875 0.5 -1.921875 0.5l-12.234375 0.03125l0 6.71875l-3.609375 0zm3.9375 -10.390625l11.75 0q0.140625 0 0.25 -0.078125q0.109375 -0.078125 0.109375 -0.21875l0 -5.031246q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 5.031246q0 0.140625 0.09375 0.21875q0.09375 0.078125 0.234375 0.078125zm18.654984 10.390625l0 -19.671871l18.125 0l0 3.625l-14.484375 0l0 4.374996l11.640625 0l0 3.671875l-11.640625 0l0 4.359375l14.484375 0l0 3.640625l-18.125 0z" fill-rule="nonzero"/><path fill="#2dbe64" d="m132.04828 94.97084l0 -8.15625l7.515625 0l0 1.5l-6.015625 0l0 1.8125l4.828125 0l0 1.53125l-4.828125 0l0 1.8125l6.015625 0l0 1.5l-7.515625 0zm8.41246 0l0 -8.15625l1.640625 0l2.953125 3.515625l2.9375 -3.515625l1.65625 0l0 8.15625l-1.5 0l0 -5.984375l-3.09375 3.6875l-3.109375 -3.671875l0 5.96875l-1.484375 0zm10.3407135 0l0 -8.15625l1.484375 0l0 8.15625l-1.484375 0zm2.42424 0l0 -8.15625l1.484375 0l0 8.15625l-1.484375 0zm2.61174 0l0 -6.578125q0 -0.4375 0.21875 -0.78125q0.21875 -0.359375 0.5625 -0.578125q0.359375 -0.21875 0.796875 -0.21875l5.0 0q0.421875 0 0.78125 0.21875q0.375 0.21875 0.578125 0.578125q0.21875 0.34375 0.21875 0.78125l0 6.578125l-1.5 0l0 -2.734375l-5.15625 0l0 2.734375l-1.5 0l0 0zm1.5 -4.234375l5.15625 0l0 -2.28125q0 -0.0625 -0.046875 -0.09375q-0.046875 -0.046875 -0.109375 -0.046875l-4.875 0q-0.046875 0 -0.09375 0.046875q-0.03125 0.03125 -0.03125 0.09375l0 2.28125l0 0zm7.923523 4.234375l0 0l0 -1.484375l1.484375 0l0 1.484375l-1.484375 0zm2.6183777 0l0 -6.578125q0 -0.4375 0.21875 -0.78125q0.21875 -0.359375 0.5625 -0.578125q0.359375 -0.21875 0.796875 -0.21875l5.0 0q0.421875 0 0.78125 0.21875q0.375 0.21875 0.578125 0.578125q0.21875 0.34375 0.21875 0.78125l0 6.578125l-1.5 0l0 -2.734375l-5.15625 0l0 2.734375l-1.5 0l0 0zm1.5 -4.234375l5.15625 0l0 -2.28125q0 -0.0625 -0.046875 -0.09375q-0.046875 -0.046875 -0.109375 -0.046875l-4.875 0q-0.046875 0 -0.09375 0.046875q-0.03125 0.03125 -0.03125 0.09375l0 2.28125l0 0zm7.782898 4.234375l0 -8.15625l1.484375 0l0 8.15625l-1.484375 0zm8.781296 0l0 0l-2.96875 -8.15625l1.59375 0l1.96875 5.375l1.96875 -5.375l1.46875 0l1.96875 5.375l1.953125 -5.375l1.609375 0l-2.96875 8.15625l-1.1875 0l-2.109375 -5.78125l-2.109375 5.78125l-1.1875 0zm10.637222 0l0 -8.15625l1.640625 0l2.953125 3.515625l2.9375 -3.515625l1.65625 0l0 8.15625l-1.5 0l0 -5.984375l-3.09375 3.6875l-3.109375 -3.671875l0 5.96875l-1.484375 0zm12.0438385 0q-0.421875 0 -0.78125 -0.21875q-0.359375 -0.21875 -0.578125 -0.5625q-0.21875 -0.359375 -0.21875 -0.796875l0 -0.625l1.5 0l0 0.5625q0 0.046875 0.03125 0.09375q0.046875 0.046875 0.109375 0.046875l4.875 0q0.0625 0 0.09375 -0.046875q0.046875 -0.046875 0.046875 -0.09375l0 -1.546875q0 -0.0625 -0.046875 -0.09375q-0.03125 -0.03125 -0.09375 -0.03125l-4.9375 0q-0.421875 0 -0.78125 -0.21875q-0.359375 -0.21875 -0.578125 -0.578125q-0.21875 -0.359375 -0.21875 -0.796875l0 -1.671875q0 -0.4375 0.21875 -0.78125q0.21875 -0.359375 0.578125 -0.578125q0.359375 -0.21875 0.78125 -0.21875l5.015625 0q0.421875 0 0.78125 0.21875q0.359375 0.21875 0.5625 0.578125q0.21875 0.34375 0.21875 0.78125l0 0.625l-1.5 0l0 -0.5625q0 -0.0625 -0.046875 -0.09375q-0.03125 -0.046875 -0.09375 -0.046875l-4.875 0q-0.0625 0 -0.109375 0.046875q-0.03125 0.03125 -0.03125 0.09375l0 1.546875q0 0.0625 0.03125 0.09375q0.046875 0.03125 0.109375 0.03125l4.953125 0q0.421875 0 0.78125 0.21875q0.359375 0.21875 0.5625 0.578125q0.21875 0.359375 0.21875 0.796875l0 1.671875q0 0.4375 -0.21875 0.796875q-0.203125 0.34375 -0.5625 0.5625q-0.359375 0.21875 -0.78125 0.21875l-5.015625 0z" fill-rule="nonzero"/></g></svg>
 
 
 
 
-
-
-
-<svg version="1.1" viewBox="0.0 0.0 230.0 130.0" fill="none" stroke="none" stroke-linecap="square" stroke-miterlimit="10" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><clipPath id="p.0"><path d="m0 0l230.0 0l0 130.0l-230.0 0l0 -130.0z" clip-rule="nonzero"/></clipPath><g clip-path="url(#p.0)"><path fill="#000000" fill-opacity="0.0" d="m0 0l230.0 0l0 130.0l-230.0 0z" fill-rule="evenodd"/><path fill="#000000" fill-opacity="0.0" d="m-0.007874016 33.504242l230.01575 0l0 66.267715l-230.01575 0z" fill-rule="evenodd"/><path fill="#2dbe64" d="m10.5702505 68.74424l0 -19.671875l15.859376 0q1.03125 0 1.90625 0.515625q0.875 0.515625 1.390625 1.375q0.53125 0.859375 0.53125 1.90625l0 12.078125q0 1.03125 -0.53125 1.90625q-0.515625 0.859375 -1.390625 1.375q-0.875 0.515625 -1.90625 0.515625l-15.859376 0zm3.921875 -3.640625l11.765626 0q0.140625 0 0.25 -0.09375q0.109375 -0.09375 0.109375 -0.234375l0 -11.75q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.765626 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 11.75q0 0.140625 0.09375 0.234375q0.09375 0.09375 0.234375 0.09375zm18.86969 3.640625l0 -15.875q0 -1.046875 0.515625 -1.90625q0.53125 -0.859375 1.390625 -1.375q0.859375 -0.515625 1.90625 -0.515625l12.046875 0q1.03125 0 1.90625 0.515625q0.875 0.515625 1.390625 1.375q0.53125 0.859375 0.53125 1.90625l0 15.875l-3.640625 0l0 -6.609375l-12.4375 0l0 6.609375l-3.609375 0l0 0zm3.609375 -10.21875l12.4375 0l0 -5.5q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.125 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 5.5l0 0zm34.877472 10.21875l-5.9375 -7.078125l4.734375 0l5.140625 6.0625l0 1.015625l-3.9375 0zm-15.6875 0l0 -19.65625l15.84375 0q1.046875 0 1.921875 0.53125q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.90625l0 5.296875q0 1.03125 -0.515625 1.90625q-0.515625 0.875 -1.390625 1.390625q-0.875 0.5 -1.921875 0.5l-12.234375 0.03125l0 6.71875l-3.609375 0zm3.9375 -10.390625l11.75 0q0.140625 0 0.25 -0.078125q0.109375 -0.078125 0.109375 -0.21875l0 -5.03125q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 5.03125q0 0.140625 0.09375 0.21875q0.09375 0.078125 0.234375 0.078125zm18.639359 10.390625l0 -19.671875l3.625 0l0 8.0l4.625 0l6.71875 -8.0l3.9375 0l0 1.03125l-7.375 8.796875l7.40625 8.8125l0 1.03125l-3.96875 0l-6.71875 -8.0l-4.625 0l0 8.0l-3.625 0zm33.83029 0q-1.046875 0 -1.90625 -0.515625q-0.859375 -0.515625 -1.375 -1.375q-0.515625 -0.875 -0.515625 -1.90625l0 -1.5l3.609375 0l0 1.328125q0 0.140625 0.09375 0.234375q0.09375 0.09375 0.234375 0.09375l11.765625 0q0.140625 0 0.234375 -0.09375q0.09375 -0.09375 0.09375 -0.234375l0 -3.734375q0 -0.140625 -0.09375 -0.21875q-0.09375 -0.078125 -0.234375 -0.078125l-11.90625 0q-1.046875 0 -1.90625 -0.515625q-0.859375 -0.53125 -1.375 -1.390625q-0.515625 -0.859375 -0.515625 -1.921875l0 -4.046875q0 -1.046875 0.515625 -1.90625q0.515625 -0.859375 1.375 -1.375q0.859375 -0.515625 1.90625 -0.515625l12.078125 0q1.03125 0 1.890625 0.515625q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.90625l0 1.5l-3.640625 0l0 -1.34375q0 -0.125 -0.09375 -0.21875q-0.09375 -0.109375 -0.234375 -0.109375l-11.765625 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 3.75q0 0.140625 0.09375 0.21875q0.09375 0.078125 0.234375 0.078125l11.9375 0q1.03125 0 1.890625 0.53125q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.921875l0 4.046875q0 1.03125 -0.515625 1.90625q-0.515625 0.859375 -1.390625 1.375q-0.859375 0.515625 -1.890625 0.515625l-12.078125 0zm25.901062 0l0 0l0 -16.046875l-8.03125 0l0 -3.625l19.671875 0l0 3.625l-8.0 0l0 16.046875l-3.640625 0zm17.445084 0q-1.046875 0 -1.90625 -0.515625q-0.859375 -0.515625 -1.390625 -1.375q-0.515625 -0.875 -0.515625 -1.90625l0 -12.078125q0 -1.046875 0.515625 -1.90625q0.53125 -0.859375 1.390625 -1.375q0.859375 -0.515625 1.90625 -0.515625l12.078125 0q1.03125 0 1.890625 0.515625q0.859375 0.515625 1.375 1.375q0.53125 0.859375 0.53125 1.90625l0 12.078125q0 1.03125 -0.53125 1.90625q-0.515625 0.859375 -1.375 1.375q-0.859375 0.515625 -1.890625 0.515625l-12.078125 0zm0.125 -3.640625l11.75 0q0.140625 0 0.25 -0.09375q0.109375 -0.09375 0.109375 -0.234375l0 -11.75q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.125 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 11.75q0 0.140625 0.09375 0.234375q0.109375 0.09375 0.234375 0.09375zm34.440094 3.640625l-5.9375 -7.078125l4.734375 0l5.140625 6.0625l0 1.015625l-3.9375 0zm-15.6875 0l0 -19.65625l15.84375 0q1.046875 0 1.921875 0.53125q0.875 0.515625 1.390625 1.375q0.515625 0.859375 0.515625 1.90625l0 5.296875q0 1.03125 -0.515625 1.90625q-0.515625 0.875 -1.390625 1.390625q-0.875 0.5 -1.921875 0.5l-12.234375 0.03125l0 6.71875l-3.609375 0zm3.9375 -10.390625l11.75 0q0.140625 0 0.25 -0.078125q0.109375 -0.078125 0.109375 -0.21875l0 -5.03125q0 -0.125 -0.109375 -0.21875q-0.109375 -0.109375 -0.25 -0.109375l-11.75 0q-0.140625 0 -0.234375 0.109375q-0.09375 0.09375 -0.09375 0.21875l0 5.03125q0 0.140625 0.09375 0.21875q0.09375 0.078125 0.234375 0.078125zm18.654984 10.390625l0 -19.671875l18.125 0l0 3.625l-14.484375 0l0 4.375l11.640625 0l0 3.671875l-11.640625 0l0 4.359375l14.484375 0l0 3.640625l-18.125 0z" fill-rule="nonzero"/><path fill="#2dbe64" d="m168.76825 86.184235l0 -6.578125q0 -0.4375 0.21875 -0.78125q0.21875 -0.359375 0.5625 -0.578125q0.359375 -0.21875 0.796875 -0.21875l5.0 0q0.421875 0 0.78125 0.21875q0.375 0.21875 0.578125 0.578125q0.21875 0.34375 0.21875 0.78125l0 6.578125l-1.5 0l0 -2.734375l-5.15625 0l0 2.734375l-1.5 0l0 0zm1.5 -4.234375l5.15625 0l0 -2.28125q0 -0.0625 -0.046875 -0.09375q-0.046875 -0.046875 -0.109375 -0.046875l-4.875 0q-0.046875 0 -0.09375 0.046875q-0.03125 0.03125 -0.03125 0.09375l0 2.28125l0 0zm7.782898 4.234375l0 -8.15625l1.484375 0l0 8.15625l-1.484375 0zm8.781296 0l0 0l-2.96875 -8.15625l1.59375 0l1.96875 5.375l1.96875 -5.375l1.46875 0l1.96875 5.375l1.953125 -5.375l1.609375 0l-2.96875 8.15625l-1.1875 0l-2.109375 -5.78125l-2.109375 5.78125l-1.1875 0zm10.637222 0l0 -8.15625l1.640625 0l2.953125 3.515625l2.9375 -3.515625l1.65625 0l0 8.15625l-1.5 0l0 -5.984375l-3.09375 3.6875l-3.109375 -3.671875l0 5.96875l-1.484375 0zm12.0438385 0q-0.421875 0 -0.78125 -0.21875q-0.359375 -0.21875 -0.578125 -0.5625q-0.21875 -0.359375 -0.21875 -0.796875l0 -0.625l1.5 0l0 0.5625q0 0.046875 0.03125 0.09375q0.046875 0.046875 0.109375 0.046875l4.875 0q0.0625 0 0.09375 -0.046875q0.046875 -0.046875 0.046875 -0.09375l0 -1.546875q0 -0.0625 -0.046875 -0.09375q-0.03125 -0.03125 -0.09375 -0.03125l-4.9375 0q-0.421875 0 -0.78125 -0.21875q-0.359375 -0.21875 -0.578125 -0.578125q-0.21875 -0.359375 -0.21875 -0.796875l0 -1.671875q0 -0.4375 0.21875 -0.78125q0.21875 -0.359375 0.578125 -0.578125q0.359375 -0.21875 0.78125 -0.21875l5.015625 0q0.421875 0 0.78125 0.21875q0.359375 0.21875 0.5625 0.578125q0.21875 0.34375 0.21875 0.78125l0 0.625l-1.5 0l0 -0.5625q0 -0.0625 -0.046875 -0.09375q-0.03125 -0.046875 -0.09375 -0.046875l-4.875 0q-0.0625 0 -0.109375 0.046875q-0.03125 0.03125 -0.03125 0.09375l0 1.546875q0 0.0625 0.03125 0.09375q0.046875 0.03125 0.109375 0.03125l4.953125 0q0.421875 0 0.78125 0.21875q0.359375 0.21875 0.5625 0.578125q0.21875 0.359375 0.21875 0.796875l0 1.671875q0 0.4375 -0.21875 0.796875q-0.203125 0.34375 -0.5625 0.5625q-0.359375 0.21875 -0.78125 0.21875l-5.015625 0z" fill-rule="nonzero"/></g></svg>
-
-
-
-
-
-
-
-
-
-
-      
-
-
-</a>
-  </h2>
-</div>
-
-
+                    </a>
+                </h2>
+            </div>
 
             <div id="update-info"></div>
 
-        <form id="auth-form" onsubmit="auth(); return false;">
-            <div class="input-group">
-                <input type="text" id="login" name="username" placeholder="Email address" autocomplete="username" required>
-            </div>
-            <div class="input-group">
-                <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" required>
-            </div>
-            <p class="small"><a class="text-primary" href="mailto:emiia@emiia.ai">Забыли пароль?</a></p>
-            <button type="submit">ВХОД ❯</button>
-        </form>
-        <p>Нет аккаунта? <a class="text-primary" href="mailto:emiia@emiia.ai"> Зарегистрироваться </a></p>
-<br />
-        
-        
-        
-<p style="margin: 0; text-align: center;">
-
-
-
-
-
- <div class="header-wrapper">
-  <h2>
-    <a class="text-primary1" href="https://www.emiia.ru/" style="color: #da4216; font-weight: 600;">
-      <!-- SVG иконка -->
-      
-      <span class="nav-item">
-
-
-
-
-        <span class="beta" style="color: #b2b4b3; font-size: 1.0rem; font-weight: 500;">ЭВОЛЮЦИЯ ЛОГИСТИКИ</span>
-
-
-
-
-
-<span class="dot" style="font-size: 1.0rem; font-weight: 600; vertical-align: middle; margin: 0 -5px; display: inline-block; padding-top: -3px; line-height: 0; color: #1ac95c;">• ❯</span>
-  
-      
-
-
-
-
-
-
-
-
-
-
+            <form id="auth-form" onsubmit="auth(); return false;">
+                <div class="input-group">
+                    <input type="text" id="login" name="username" placeholder="Email address" autocomplete="username" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" required>
+                </div>
+                <p class="small"><a class="text-primary" href="mailto:emiia@emiia.ai">Забыли пароль?</a></p>
+                <button type="submit">ВХОД ❯</button>
+            </form>
+            <p>Нет аккаунта? <a class="text-primary" href="mailto:emiia@emiia.ai"> Зарегистрироваться </a></p>
+            <br />
+            
+            <p style="margin: 0; text-align: center;">
+                <div class="header-wrapper">
+                    <h2>
+                        <a class="text-primary1" href="https://www.emiia.ru/" style="color: #da4216; font-weight: 600;">
+                            <span class="nav-item">
+                                <span class="beta" style="color: #b2b4b3; font-size: 1.0rem; font-weight: 500;">ЭВОЛЮЦИЯ ЛОГИСТИКИ</span>
+                                <span class="dot" style="font-size: 1.0rem; font-weight: 600; vertical-align: middle; margin: 0 -5px; display: inline-block; padding-top: -3px; line-height: 0; color: #1ac95c;">• ❯</span>
+                            </span>
+                        </a>
+                    </h2>
+                </div>
+            </p>
+        </div>
+    </div>
 
     <script>
     // Загрузка сохранённых данных из localStorage
@@ -306,6 +285,22 @@ const renderTable = (headers, rows) => {
         const savedPassword = localStorage.getItem('savedPassword');
         if (savedLogin) document.getElementById('login').value = savedLogin;
         if (savedPassword) document.getElementById('password').value = savedPassword;
+        
+        // Обработка клавиатуры на iOS
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                document.body.classList.add('keyboard-open');
+                // Прокрутка к полю ввода с отступом
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+            
+            input.addEventListener('blur', function() {
+                document.body.classList.remove('keyboard-open');
+            });
+        });
     };
 
     async function auth() {
@@ -328,152 +323,6 @@ const renderTable = (headers, rows) => {
     }
     </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
-
-let rowHeights = {};
-
-const saveRowHeights = () => {
-    document.querySelectorAll('tr').forEach((tr, index) => {
-        rowHeights[index] = tr.offsetHeight;
-    });
-};
-
-const applySavedHeights = () => {
-    document.querySelectorAll('tr').forEach((tr, index) => {
-        if(rowHeights[index]) {
-            tr.style.height = `${rowHeights[index]}px`;
-        }
-    });
-};
-
-// Вызывать перед обновлением данных
-saveRowHeights();
-
-// Вызывать после рендеринга таблицы
-applySavedHeights();
-
-</script>
-
-
-
-<script type="text/javascript">
- 
-const data = JSON.stringify({
-  eventType: 'web_app_setup_back_button',
-  eventData: { is_visible: false },
-});
-
-window.external.notify(data);
- 
- 
-    (function () {
-      const tele = window.Telegram.WebApp;
-      tele.ready()
-      tele.expand();
-      tele.BackButton.show();
-      tele.SettingsButton.show();
-      tele.setHeaderColor("#f8f9fa")
-      tele.setBackgroundColor("#f8f9fa")
-      tele.enableClosingConfirmation()
-      tele.disableVerticalSwipes()
-    })()
-  </script>
-
-
-          
-
-
-
-  <script>
-
-document.getElementById('search-input').addEventListener('blur', function() {
-    this.blur(); // Снимает фокус с поля
-    window.scrollTo(0, 0); // Опционально: скролл вверх
-});
-
-document.getElementById('search-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        this.blur(); // Скрывает клавиатуру при нажатии Enter
-    }
-});
-
-  </script>
-
-
-
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-
-
-
-
-
-<script>
-Telegram.WebApp.ready(function() {
-    const input = document.getElementById('search-input');
-    
-    input.addEventListener('blur', function() {
-        Telegram.WebApp.MainButton.hide(); // Скрываем кнопку, если есть
-        document.activeElement.blur();
-        window.focus();
-    });
-
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            input.blur();
-            Telegram.WebApp.MainButton.hide();
-        }
-    });
-});
-
-</script>
-
-
-
-<script>
-
-Telegram.WebApp.ready(function() {
-    const input = document.getElementById('search-input');
-    
-    function hideKeyboard() {
-        input.blur();
-        document.activeElement.blur();
-        Telegram.WebApp.expand(); // Сворачивает клавиатуру
-        setTimeout(() => window.focus(), 50);
-    }
-
-    input.addEventListener('blur', hideKeyboard);
-    
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            hideKeyboard();
-        }
-    });
-});
-
-
-</script>
-
-
-
-
-
-
+    <!-- Остальные ваши скрипты -->
 </body>
 </html>
-
-
-
