@@ -2094,7 +2094,7 @@ function createCustomCompass() {
     const compass = document.createElement('button');
     compass.id = 'custom-compass';
     
-    // Твой SVG компас с увеличенным размером
+    // Твой SVG компас с прозрачным fill изначально
     compass.innerHTML = `
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -2106,8 +2106,8 @@ function createCustomCompass() {
             stroke-opacity="0.8"
             viewBox="0 0 15 15"
             fill="transparent"
-            height="20"
-            width="20">
+            height="18"
+            width="18">
             <path
                 fill="transparent"
                 stroke="#3d85c6"
@@ -2119,7 +2119,7 @@ function createCustomCompass() {
     
     compass.style.cssText = `
         position: absolute;
-        top: 40%;
+        top: 40%; /* Чуть выше середины экрана */
         left: 10px;
         width: 40px;
         height: 40px;
@@ -2131,24 +2131,11 @@ function createCustomCompass() {
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
+        transition: all 0.3s ease;
         opacity: 0;
         visibility: hidden;
         transform: translateY(-50%);
-        -webkit-tap-highlight-color: transparent;
-        outline: none;
     `;
-
-    // Убираем все возможные эффекты при клике
-    compass.addEventListener('mousedown', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    compass.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
 
     compass.addEventListener('click', handleCompassClick);
     compass.title = 'Показать мое местоположение';
@@ -2158,10 +2145,7 @@ function createCustomCompass() {
 }
 
 // Обработчик клика по кастомному компасу
-function handleCompassClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
+function handleCompassClick() {
     if (isLocationActive) {
         removeUserLocation();
     } else {
@@ -2190,13 +2174,13 @@ function updateCompassAppearance() {
             // Активное состояние - синий fill
             compassPath.setAttribute('fill', '#3d85c6');
             compassIcon.setAttribute('fill', '#3d85c6');
-            compass.style.backgroundColor = 'transparent';
+            compass.style.backgroundColor = 'rgba(61, 133, 198, 0.0)';
             compass.title = 'Скрыть мое местоположение';
         } else {
             // Неактивное состояние - прозрачный fill
             compassPath.setAttribute('fill', 'transparent');
             compassIcon.setAttribute('fill', 'transparent');
-            compass.style.backgroundColor = 'transparent';
+            compass.style.backgroundColor = 'rgba(255, 255, 255, 0.0)';
             compass.title = 'Показать мое местоположение';
         }
     }
