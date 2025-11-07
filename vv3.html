@@ -831,12 +831,34 @@ z-index: 10000 !important; /* Очень высокий z-index */
 
 
 
+<style>
+
+/* Полное игнорирование safe area снизу */
+body {
+    margin: 0;
+    padding: 
+        env(safe-area-inset-top) 
+        env(safe-area-inset-right) 
+        0px /* NO bottom safe area */
+        env(safe-area-inset-left);
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+#map {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100%;
+    background: #f8f9fa;
+    /* Принудительно игнорируем нижнюю безопасную зону */
+    bottom: 0 !important;
+}
 
 
-
-
-
-
+</style>
 
 
 
