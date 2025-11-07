@@ -2,22 +2,16 @@
   "name": "ВкусВилл • ❯",
   "short_name": "ВкусВилл • ❯",
   "description": "ВкусВилл • ❯",
-  "start_url": "/vv.html",
+  "start_url": "/vv3.html",
   "display": "standalone",
-  "background_color": "#383838",
-  "theme_color": "#383838",
-  "orientation": "portrait",
+ "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
   "scope": "/",
   "icons": [
     {
       "src": "https://sos.emiia.ai/192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://sos.emiia.ai/512x512.png", 
-      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
