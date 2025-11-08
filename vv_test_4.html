@@ -977,7 +977,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
             </div>
             <div class="menu-divider"></div>
             
-            <!-- ПУНКТ С ПОДМЕНЮ -->
+            <!-- ПУНКТ С ПОДМЕНЮ (PWA-версия) -->
             <div class="menu-item-with-icon submenu-parent" data-action="navi">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/>
@@ -989,10 +989,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 </svg>
             </div>
             <div class="submenu">
-                <div class="submenu-item" data-action="open-url" data-url="https://sos.emiia.ai/vv3.html" data-target="_blank">
+                <div class="submenu-item" data-action="open-url" data-url="https://sos.emiia.ai/vv3.html" data-target="_self">
                     <span>Веб-клиент v3.45</span>
                 </div>
-                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai" data-target="_blank">
+                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai" data-target="_self">
                     <span>Мобильное приложение</span>
                 </div>
             </div>
@@ -1052,7 +1052,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         `;
         document.body.appendChild(dotsOverlay);
 
-        // СТИЛИ CSS С ИЗМЕНЕНИЯМИ
+        // СТИЛИ
         const style = document.createElement('style');
         style.textContent = `
             .menu-item-with-icon {
@@ -1097,7 +1097,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 flex-shrink: 0;
             }
             
-            /* ИЗМЕНЕНО: Стрелка развёрнута вниз по умолчанию (для подменю) */
             .submenu-parent .arrow-icon {
                 width: 16px;
                 height: 16px;
@@ -1108,12 +1107,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
             
-            /* ИЗМЕНЕНО: При открытии стрелка поворачивается вверх */
             .submenu-parent.active .arrow-icon {
                 transform: rotate(0deg);
             }
             
-            /* ИСПРАВЛЕНО: Стрелка для главной кнопки */
             #mainButton .arrow-icon {
                 width: 16px;
                 height: 16px;
@@ -1146,7 +1143,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 padding: 6px 0;
             }
             
-            /* ИЗМЕНЕНО: Выравнивание и шрифт как в меню */
             .submenu-item {
                 padding: 8px 16px 8px 5px;
                 font-size: 16px;
@@ -1156,7 +1152,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 transition: all 0.3s ease;
                 cursor: pointer;
                 border-radius: 8px;
-                color: #f8f9fa; /* ИСПРАВЛЕНО: Добавлен цвет текста */
+                color: #f8f9fa;
             }
             
             .submenu.active .submenu-item {
@@ -1189,9 +1185,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
         `;
         document.head.appendChild(style);
 
-        // ========== ЛОГИКА МЕНЮ ==========
-        
-        // Универсальная функция обработки действий
+        // ЛОГИКА
         function handleAction(action, url = null, target = '_self') {
             switch(action) {
                 case 'settings':
@@ -1211,13 +1205,17 @@ font-size: 18px; /* Увеличьте значение по необходим�
                     break;
                 case 'open-url':
                     if (url) {
-                        window.open(url, target);
+                        // Для PWA: если target не _blank, открываем внутри приложения
+                        if (target === '_blank') {
+                            window.open(url, '_blank');
+                        } else {
+                            window.location.href = url;
+                        }
                     }
                     break;
             }
         }
 
-        // Основное меню
         function toggleMainMenu() {
             const isActive = emiiaMenu.classList.contains('active');
             if (isActive) {
@@ -1235,7 +1233,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
             toggleMainMenu();
         });
 
-        // Меню точек
         let dotsMenuJustOpened = false;
         let dotsMenuTimeout = null;
 
@@ -1300,7 +1297,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
             if (dotsMenuTimeout) clearTimeout(dotsMenuTimeout);
         }
 
-        // Обработчик кнопки точек
         function handleDotsButtonClick(e) {
             e.stopPropagation();
             e.preventDefault();
@@ -1313,12 +1309,10 @@ font-size: 18px; /* Увеличьте значение по необходим�
         dotsButton.addEventListener('touchstart', handleDotsButtonClick);
         dotsButton.addEventListener('click', handleDotsButtonClick);
 
-        // Обработка кликов меню
         dotsMenu.addEventListener('click', function(e) {
             const menuItem = e.target.closest('.menu-item-with-icon');
             const submenuItem = e.target.closest('.submenu-item');
             
-            // Обработка пунктов подменю
             if (submenuItem) {
                 const action = submenuItem.getAttribute('data-action');
                 const url = submenuItem.getAttribute('data-url');
@@ -1328,15 +1322,13 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 return;
             }
             
-            // Обработка пунктов основного меню (кроме подменю)
             if (menuItem && !menuItem.classList.contains('submenu-parent')) {
                 const action = menuItem.getAttribute('data-action');
                 handleAction(action);
-                closeDotsMenu(); // ИСПРАВЛЕНО: Закрываем меню при клике
+                closeDotsMenu();
             }
         });
 
-        // Логика подменю
         const submenuParent = dotsMenu.querySelector('.submenu-parent');
         const submenu = dotsMenu.querySelector('.submenu');
         
@@ -1355,7 +1347,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
             });
         }
 
-        // Оверлей
         dotsOverlay.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1366,7 +1357,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
             return false;
         });
 
-        // Закрытие при клике вне меню
         document.addEventListener('click', function(e) {
             if (dotsMenu.style.display === 'block' && 
                 !dotsMenu.contains(e.target) && 
@@ -1376,14 +1366,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
         });
 
-        // Закрытие при ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && dotsMenu.style.display === 'block') {
                 closeDotsMenu();
             }
         });
 
-        // Закрытие при скролле/ресайзе
         window.addEventListener('scroll', closeDotsMenu);
         window.addEventListener('resize', closeDotsMenu);
     });
