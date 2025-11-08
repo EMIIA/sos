@@ -1231,8 +1231,10 @@ background: rgba(204, 204, 204, 0.7);
                 closeDotsMenu();
                 
                 switch(action) {       
-                    case 'settings': window.open('https://emiia.ai', '_blank'); break;
+                    case 'settings': window.location.href = 'https://emiia.ai'; break;
+
                     case 'install': window.location.href = 'https://sos.emiia.ai/vv3.html'; break;
+
                     case 'terms': window.open('https://emiia.ai/terms', '_blank'); break;
                     case 'privacy': window.open('https://emiia.ai/privacy', '_blank'); break;
                     case 'refresh': location.reload(); break;
