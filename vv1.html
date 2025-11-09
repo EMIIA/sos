@@ -2035,7 +2035,7 @@ mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
 
 const map = new mapboxgl.Map({
     container: 'map', 
-    style: 'https://sos.emiia.ai/moscow_style_2.json',
+    style: 'https://sos.emiia.ai/moscow_style_2.json ',
     zoom: 18.3,
     minZoom: 9,
     maxZoom: 20.5,
@@ -2119,7 +2119,7 @@ function createCustomCompass() {
     // Твой SVG компас с прозрачным fill изначально
     compass.innerHTML = `
         <svg
-            xmlns="http://www.w3.org/2000/svg"
+            xmlns="http://www.w3.org/2000/svg "
             class="compass-icon"
             stroke-linejoin="round"
             stroke-linecap="round"
@@ -2349,17 +2349,8 @@ map.on('rotateend', function() {
     }
 });
 
-// Также показываем компас при клике на карту
-map.on('click', function(e) {
-    showCompass();
-    
-    if (!isLocationActive) {
-        clearTimeout(compassHideTimer);
-        compassHideTimer = setTimeout(() => {
-            hideCompass();
-        }, 7000);
-    }
-});
+// УДАЛЕНО: обработчик клика на карту, который вызывал показ компаса
+// map.on('click', function(e) { ... });
 
 map.on('load', () => {
     console.log('Карта загружена');
