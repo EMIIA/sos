@@ -9,6 +9,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -945,21 +946,25 @@ font-size: 18px; /* Увеличьте значение по необходим�
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             padding: 8px 0;
             z-index: 10000;
-            max-width: 260px;
+            max-width: 280px;
+            max-height: 70vh;
+            overflow-y: auto;
             opacity: 0;
             transform: translateY(10px) scale(0.95);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform-origin: bottom left;
+            -webkit-overflow-scrolling: touch;
         `;
         
         dotsMenu.innerHTML = `
             <div class="menu-item-with-icon" data-action="settings">
-                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
-                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 1 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-                </svg>
+<svg xmlns="http://www.w3.org/2000/svg " width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+  <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+  <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+</svg>
                 <span>Настройки</span>
             </div>
+
             <div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="refresh">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
@@ -969,50 +974,73 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 <span>Обновить данные</span>
             </div>
             <div class="menu-divider"></div>
-            <div class="menu-item-with-icon" data-action="install">
-                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
-                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
-                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
-                </svg>
-                <span>ПО EMIIA.AI</span>
-            </div>
-            <div class="menu-divider"></div>
             
-            <!-- ПУНКТ С ПОДМЕНЮ (PWA-версия) -->
+            <!-- ПУНКТ С ПОДМЕНЮ 1 -->
             <div class="menu-item-with-icon submenu-parent" data-action="navi">
-                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/>
-                    <path d="M12.096 6.223A5 5 0 0 0 13 5.698V7c0 .289-.213.654-.753 1.007a4.5 4.5 0 0 1 1.753.25V4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16c.536 0 1.058-.034 1.555-.097a4.5 4.5 0 0 1-.813-.927Q8.378 15 8 15c-1.464 0-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13h.027a4.6 4.6 0 0 1 0-1H8c-1.464 0-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10q.393 0 .774-.024a4.5 4.5 0 0 1 1.102-1.132C9.298 8.944 8.666 9 8 9c-1.464 0-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777M3 4c0-.374.356-.875 1.318-1.313C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4"/>
+                <svg xmlns="http://www.w3.org/2000/svg " width="28" height="28" fill="currentColor" class="bi bi-cloud" viewBox="0 0 16 16">
+                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383m.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z"/>
                 </svg>
-                <span>Модули EMIIA.AI</span>
+                <span>Программные модули EMIIA.AI SIP</span>
                 <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" fill="currentColor" viewBox="0 0 17 17">
                     <path stroke="currentColor" stroke-width="0.8" fill="currentColor" fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
                 </svg>
             </div>
             <div class="submenu">
-                <div class="submenu-item" data-action="open-url" data-url="https://sos.emiia.ai/vv3.html" data-target="_self">
-                    <span>Веб-клиент v3.45</span>
+                <div class="submenu-item" data-action="open-url" data-url="https://sos.emiia.ai/vv3.html " data-target="_self">
+                    <span><span> <span style="font-weight: bold;"> •</span> Технический ИИ-агент EMIIA.AI TAI</span>
                 </div>
-                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai" data-target="_self">
-                    <span>Мобильное приложение</span>
+                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai " data-target="_self">
+                    <span><span> <span style="font-weight: bold;"> •</span> Операционный ИИ-агент EMIIA.AI OAI</span>
                 </div>
             </div>
             <div class="menu-divider"></div>
             
-            <div class="menu-item-with-icon" data-action="navi">
-                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
-                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999zm2.493 8.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.3 1.3 0 0 0-.37.265.3.3 0 0 0-.057.09V14l.002.008.016.033a.6.6 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.6.6 0 0 0 .146-.15l.015-.033L12 14v-.004a.3.3 0 0 0-.057-.09 1.3 1.3 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465s-2.462-.172-3.34-.465c-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411"/>
+            <!-- ПУНКТ С ПОДМЕНЮ 2: ПАК EMIIA.AI LEM/IOT -->
+            <div class="menu-item-with-icon submenu-parent" data-action="lem-iot">
+
+<svg xmlns="http://www.w3.org/2000/svg " width="16" height="16" fill="currentColor" class="bi bi-cpu" viewBox="0 0 16 16">
+  <path d="M5 0a.5.5 0 0 1 .5.5V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2A2.5 2.5 0 0 1 14 4.5h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14a2.5 2.5 0 0 1-2.5 2.5v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14A2.5 2.5 0 0 1 2 11.5H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2A2.5 2.5 0 0 1 4.5 2V.5A.5.5 0 0 1 5 0m-.5 3A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13h7a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 11.5 3zM5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5zM6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
+</svg>
+
+
+                <span>ПАК <br>EMIIA.AI LEM/IOT</span>
+                <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" fill="currentColor" viewBox="0 0 17 17">
+                    <path stroke="currentColor" stroke-width="0.8" fill="currentColor" fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
                 </svg>
-                <span>Навигация</span>
+            </div>
+            <div class="submenu">
+                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai/lem " data-target="_self">
+                    <span><span> <span style="font-weight: bold;"> •</span> Кластеры EMIIA.AI LEM</span>
+                </div>
+                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai/iot " data-target="_self">
+                    <span><span> <span style="font-weight: bold;"> •</span> Шлюзы EMIIA.AI IOT</span>
+                </div>
             </div>
             <div class="menu-divider"></div>
-            <div class="menu-item-with-icon" data-action="data">
+            
+            <!-- ПУНКТ С ПОДМЕНЮ 3: Машинное обучение (датасеты) -->
+            <div class="menu-item-with-icon submenu-parent" data-action="ml-datasets">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
                     <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M14 4.5V11h-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM4.151 15.29a1.2 1.2 0 0 1-.111-.449h.764a.58.58 0 0 0 .255.384q.105.073.25.114.142.041.319.041.245 0 .413-.07a.56.56 0 0 0 .255-.193.5.5 0 0 0 .084-.29.39.39 0 0 0-.152-.326q-.152-.12-.463-.193l-.618-.143a1.7 1.7 0 0 1-.539-.214 1 1 0 0 1-.352-.367 1.1 1.3 0 0 1-.123-.524q0-.366.19-.639.192-.272.528-.422.337-.15.777-.149.456 0 .779.152.326.153.5.41.18.255.2.566h-.75a.56.56 0 0 0-.12-.258.6.6 0 0 0-.246-.181.9.9 0 0 0-.37-.068q-.324 0-.512.152a.47.47 0 0 0-.185.384q0 .18.144.3a1 1 0 0 0 .404.175l.621.143q.326.075.566.211a1 1 0 0 1 .375.358q.135.222.135.56 0 .37-.188.656a1.2 1.2 0 0 1-.539.439q-.351.158-.858.158-.381 0-.665-.09a1.4 1.4 0 0 1-.478-.252 1.1 1.1 0 0 1-.29-.375m-3.104-.033a1.3 1.3 0 0 1-.082-.466h.764a.6.6 0 0 0 .074.27.5.5 0 0 0 .454.246q.285 0 .422-.164.137-.165.137-.466v-2.745h.791v2.725q0 .66-.357 1.005-.355.345-.985.345a1.6 1.6 0 0 1-.568-.094 1.15 1.15 0 0 1-.407-.266 1.1 1.1 0 0 1-.243-.39m9.091-1.585v.522q0 .384-.117.641a.86.86 0 0 1-.322.387.9.9 0 0 1-.47.126.9.9 0 0 1-.47-.126.87.87 0 0 1-.32-.387 1.55 1.55 0 0 1-.117-.641v-.522q0-.386.117-.641a.87.87 0 0 1 .32-.387.87.87 0 0 1 .47-.129q.265 0 .47.129a.86.86 0 0 1 .322.387q.117.255.117.641m.803.519v-.513q0-.565-.205-.973a1.46 1.46 0 0 0-.59-.63q-.38-.22-.916-.22-.534 0-.92.22a1.44 1.44 0 0 0-.589.628q-.205.407-.205.975v.513q0 .562.205.973.205.407.589.626.386.217.92.217.536 0 .917-.217.384-.22.589-.626.204-.41.205-.973m1.29-.935v2.675h-.746v-3.999h.662l1.752 2.66h.032v-2.66h.75v4h-.656l-1.761-2.676z"/>
                 </svg>
-                <span>Датасеты</span>
+                <span>Машинное <br>обучение (датасеты)</span>
+                <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" fill="currentColor" viewBox="0 0 17 17">
+                    <path stroke="currentColor" stroke-width="0.8" fill="currentColor" fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+                </svg>
+            </div>
+            <div class="submenu">
+                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai/datasets " data-target="_self">
+                    <span> <span style="font-weight: bold;"> •</span> Гуманоидные роботы</span>
+                </div>
+                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai/models " data-target="_self">
+                    <span><span> <span style="font-weight: bold;"> •</span> Промышленные роботы</span>
+                </div>
+                <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai/service-robots " data-target="_self">
+                    <span><span> <span style="font-weight: bold;"> •</span> Сервисные роботы</span>
+                </div>
             </div>
             <div class="menu-divider"></div>
+            
             <div class="menu-item-with-icon" data-action="terms">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
                     <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
@@ -1076,10 +1104,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
             .menu-item-with-icon:nth-child(3) { animation-delay: 0.1s; }
             .menu-item-with-icon:nth-child(5) { animation-delay: 0.15s; }
             .menu-item-with-icon:nth-child(7) { animation-delay: 0.2s; }
-            .menu-item-with-icon:nth-child(11) { animation-delay: 0.25s; }
-            .menu-item-with-icon:nth-child(13) { animation-delay: 0.3s; }
-            .menu-item-with-icon:nth-child(15) { animation-delay: 0.35s; }
-            .menu-item-with-icon:nth-child(17) { animation-delay: 0.4s; }
+            .menu-item-with-icon:nth-child(9) { animation-delay: 0.25s; }
+            .menu-item-with-icon:nth-child(11) { animation-delay: 0.3s; }
+            .menu-item-with-icon:nth-child(13) { animation-delay: 0.35s; }
+            .menu-item-with-icon:nth-child(15) { animation-delay: 0.4s; }
+            .menu-item-with-icon:nth-child(17) { animation-delay: 0.45s; }
             
             .menu-item-with-icon:hover {
                 background: #cccccc69;
@@ -1139,7 +1168,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
             
             .submenu.active {
-                max-height: 100px;
+                max-height: 150px;
                 opacity: 1;
                 padding: 6px 0;
             }
@@ -1168,9 +1197,33 @@ font-size: 18px; /* Увеличьте значение по необходим�
             .submenu.active .submenu-item:nth-child(2) {
                 transition-delay: 0.15s;
             }
+
+            .submenu.active .submenu-item:nth-child(3) {
+                transition-delay: 0.2s;
+            }
             
             .submenu-item:hover {
                 background: #cccccc69;
+            }
+            
+            /* Стилизация скроллбара для WebKit браузеров */
+            #dotsMenu::-webkit-scrollbar {
+                width: 6px;
+            }
+            
+            #dotsMenu::-webkit-scrollbar-track {
+                background: rgba(204, 204, 204, 0.2);
+                border-radius: 10px;
+                margin: 8px 0;
+            }
+            
+            #dotsMenu::-webkit-scrollbar-thumb {
+                background: rgba(248, 249, 250, 0.5);
+                border-radius: 10px;
+            }
+            
+            #dotsMenu::-webkit-scrollbar-thumb:hover {
+                background: rgba(248, 249, 250, 0.7);
             }
             
             @keyframes menuItemAppear {
@@ -1190,23 +1243,23 @@ font-size: 18px; /* Увеличьте значение по необходим�
         function handleAction(action, url = null, target = '_self') {
             switch(action) {
                 case 'settings':
-                    window.location.href = 'https://emiia.ai';
-                    break;
-                case 'install':
-                    window.location.href = 'https://sos.emiia.ai/vv3.html';
+                    window.location.href = 'https://emiia.ai ';
                     break;
                 case 'terms':
-                    window.open('https://emiia.ai/terms', '_blank');
+                    window.open('https://emiia.ai/terms ', '_blank');
                     break;
                 case 'privacy':
-                    window.open('https://emiia.ai/privacy', '_blank');
+                    window.open('https://emiia.ai/privacy ', '_blank');
                     break;
                 case 'refresh':
                     location.reload();
                     break;
+                case 'lem-iot':
+                case 'ml-datasets':
+                    // Для пунктов с подменю действие обрабатывается отдельно
+                    break;
                 case 'open-url':
                     if (url) {
-                        // Для PWA: если target не _blank, открываем внутри приложения
                         if (target === '_blank') {
                             window.open(url, '_blank');
                         } else {
@@ -1248,9 +1301,25 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
         function openDotsMenu() {
             const containerRect = newContainer.getBoundingClientRect();
-            dotsMenu.style.bottom = (window.innerHeight - containerRect.top + 10) + 'px';
-            dotsMenu.style.left = (containerRect.left) + 'px';
-            dotsMenu.style.top = 'auto';
+            const scrollY = window.scrollY;
+            const viewportHeight = window.innerHeight;
+            const menuMaxHeight = viewportHeight * 0.7; // 70vh
+            
+            dotsMenu.style.maxHeight = menuMaxHeight + 'px';
+            
+            // Позиционирование снизу вверх (по умолчанию)
+            let bottom = viewportHeight - containerRect.top + 10;
+            let top = 'auto';
+            
+            // Если меню не помещается сверху, позиционируем сверху вниз
+            if (containerRect.top < menuMaxHeight + 20) {
+                bottom = 'auto';
+                top = containerRect.bottom + 10;
+            }
+            
+            dotsMenu.style.bottom = bottom === 'auto' ? 'auto' : bottom + 'px';
+            dotsMenu.style.top = top === 'auto' ? 'auto' : top + 'px';
+            dotsMenu.style.left = containerRect.left + 'px';
             dotsMenu.style.display = 'block';
             dotsOverlay.style.display = 'block';
             
@@ -1275,12 +1344,17 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 item.style.animation = 'none';
             });
             
-            const submenuParent = dotsMenu.querySelector('.submenu-parent');
-            const submenu = dotsMenu.querySelector('.submenu');
-            if (submenuParent && submenu) {
-                submenuParent.classList.remove('active');
+            // Закрыть все подменю
+            const allSubmenuParents = dotsMenu.querySelectorAll('.submenu-parent');
+            const allSubmenus = dotsMenu.querySelectorAll('.submenu');
+            
+            allSubmenuParents.forEach(parent => {
+                parent.classList.remove('active');
+            });
+            
+            allSubmenus.forEach(submenu => {
                 submenu.classList.remove('active');
-            }
+            });
             
             dotsMenu.style.opacity = '0';
             dotsMenu.style.transform = 'translateY(10px) scale(0.95)';
@@ -1330,23 +1404,39 @@ font-size: 18px; /* Увеличьте значение по необходим�
             }
         });
 
-        const submenuParent = dotsMenu.querySelector('.submenu-parent');
-        const submenu = dotsMenu.querySelector('.submenu');
+        // ОБРАБОТКА ВСЕХ ПОДМЕНЮ (закрытие других при открытии одного)
+        const submenuParents = dotsMenu.querySelectorAll('.submenu-parent');
         
-        if (submenuParent && submenu) {
-            submenuParent.addEventListener('click', function(e) {
+        submenuParents.forEach(parent => {
+            parent.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const isActive = submenuParent.classList.contains('active');
                 
+                // Найти связанное подменю (следующий элемент)
+                const submenu = this.nextElementSibling;
+                if (!submenu || !submenu.classList.contains('submenu')) return;
+                
+                // Закрыть все остальные подменю
+                submenuParents.forEach(otherParent => {
+                    if (otherParent !== this) {
+                        otherParent.classList.remove('active');
+                        const otherSubmenu = otherParent.nextElementSibling;
+                        if (otherSubmenu && otherSubmenu.classList.contains('submenu')) {
+                            otherSubmenu.classList.remove('active');
+                        }
+                    }
+                });
+                
+                // Переключить текущее подменю
+                const isActive = this.classList.contains('active');
                 if (isActive) {
-                    submenuParent.classList.remove('active');
+                    this.classList.remove('active');
                     submenu.classList.remove('active');
                 } else {
-                    submenuParent.classList.add('active');
+                    this.classList.add('active');
                     submenu.classList.add('active');
                 }
             });
-        }
+        });
 
         dotsOverlay.addEventListener('click', function(e) {
             e.preventDefault();
@@ -6278,6 +6368,8 @@ textarea::placeholder {
 
 </body>
 </html>
+
+
 
 
 
