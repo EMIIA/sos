@@ -10,6 +10,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -3269,6 +3270,31 @@ const redLinesHTML3 = `
 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
 
 
+
+
+
+
+
+
+<div style="font-family: 'Montserrat', sans-serif; font-size: 14px;">
+  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" fill="currentColor" class="bi bi-broadcast" viewBox="0 0 16 16">
+      <path d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0"/>
+    </svg>
+    <div>
+      Плотность энергии ЭМИ (ППЭ): <br><span style="color: #383838; font-weight: 500;" id="RadioWaves">0.035</span> W/m²<br> 
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 <div style="font-family: 'Montserrat', sans-serif; font-size: 14px;">
   <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-ear" viewBox="0 0 16 16">
@@ -5614,6 +5640,7 @@ setInterval(updateValues, 3000);
 // Обновляем Шум каждую секунду
 setInterval(function() {
   const noiseElement = document.getElementById('noiseValue');
+
   if (noiseElement) {
     const currentNoise = parseFloat(noiseElement.textContent);
     const noiseVariation = (Math.random() - 0.5) * 3; // ±1.5 единицы
@@ -5631,6 +5658,18 @@ setInterval(function() {
 
 
 
+
+<script>
+// Обновляем Плотность энергии ЭМИ каждую секунду
+setInterval(function() {
+  const radioWavesElement = document.getElementById('RadioWaves');
+  if (radioWavesElement) {
+    const values = [0.035, 0.033, 0.042, 0.055];
+    const randomIndex = Math.floor(Math.random() * values.length);
+    radioWavesElement.textContent = values[randomIndex].toFixed(3);
+  }
+}, 1000);
+</script>
 
 
 
@@ -6414,6 +6453,8 @@ textarea::placeholder {
 
 </body>
 </html>
+
+
 
 
 
