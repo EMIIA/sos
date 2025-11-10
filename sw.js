@@ -1,38 +1,52 @@
-// 📄 Файл: sw.js
-
-self.addEventListener('push', function(event) {
-  const data = event.data ? event.data.json() : {};
-  
-  const options = {
-    body: data.body || 'EMIIA.AI SIP',
-    icon: data.icon || 'https://sos.emiia.ai/192x192.png',
-    badge: 'https://sos.emiia.ai/192x192.png',
-    vibrate: [200, 100, 200],
-    data: {
-      click_action: data.click_action || 'https://sos.emiia.ai/vv1.html',
-      url: data.click_action || 'https://sos.emiia.ai/vv1.html'
-    },
-    actions: [
-      {
-        action: 'open',
-        title: 'Открыть'
-      }
-    ]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(
-      data.title || 'EMIIA.AI SIP',
-      options
-    )
-  );
+// Установка
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open('emiia-ai-v1').then(cache => {
+            return cache.addAll([
+                '/',
+                '/vv.html',
+                '/logo_wms.svg',
+                '/vv.jpg'
+            ]);
+        })
+    );
 });
 
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  const url = event.notification.data.url;
-  
-  event.waitUntil(
-    clients.openWindow(url)
-  );
+// Активация
+self.addEventListener('activate', event => {
+    event.waitUntil(self.clients.claim());
+});
+
+// Пуш-уведомление
+self.addEventListener('push', event => {
+    const options = {
+        body: event.data ? event.data.text() : 'Новое уведомление от EMIIA.AI',
+        icon: '/vv.jpg',
+        badge: '/vv.jpg',
+        vibrate: [200, 100, 200],
+        data: {
+            url: 'https://sos.emiia.ai/vv1.html'
+        },
+        actions: [
+            {
+                action: 'open',
+                title: 'Открыть'
+            }
+        ]
+    };
+    
+    event.waitUntil(
+        self.registration.showNotification('EMIIA.AI SIP', options)
+    );
+});
+
+// Клик по уведомлению
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+    
+    if (event.action === 'open') {
+        event.waitUntil(
+            clients.openWindow(event.notification.data.url)
+        );
+    }
 });
