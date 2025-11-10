@@ -12,18 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/vv.webmanifest">
 
-<!-- Соцсети -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content="/vv.html" />
-<meta property="og:title" content="AI WMS"/>
-<meta property="og:image" content="/vvjpg.jpg" />
-<meta name="twitter:card" content="summary_large_image" />
-
-<!-- ПРЕДЗАГРУЗКА -->
-<link rel="preload" href="/telegram-web-app.js" as="script">
-<link rel="preload" href="/logo.svg" as="image">
-
-<!-- ВСЕ СТИЛИ -->
+<!-- Стили -->
 <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:monospace;margin:0;padding:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:#F8F9FA;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
@@ -90,7 +79,7 @@
 </head>
 <body>
 
-    <!-- 🎭 МОДАЛЬНОЕ ОКНО (ВАЖНО: ДОЛЖНО БЫТЬ В ТЕЛЕ ДОКУМЕНТА) -->
+    <!-- 🎭 МОДАЛЬНОЕ ОКНО (ВАЖНО: В НАЧАЛЕ body) -->
     <div id="push-modal">
         <div>
             <h3>🔔 УВЕДОМЛЕНИЯ</h3>
@@ -196,21 +185,26 @@
       if (modal) modal.style.display = 'none';
     }
 
-    // 🔐 ОБРАБОТЧИК ФОРМЫ
+    // 🔐 ОБРАБОТЧИК ФОРМЫ (ОДИН РАЗ!)
     document.getElementById('auth-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const login = document.getElementById('login').value;
       const password = document.getElementById('password').value;
       
+      console.log('=== АВТОРИЗАЦИЯ ===');
+      
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec', {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxOGWk-UgU-UO-TByGvusunKeJmhGV--Wmstne1TKlDW1Oq7QZAeR3zEBHhwHAOuA0P/exec', {
           method: 'POST',
           body: new URLSearchParams({ login, password })
         });
         
-        if (await response.text() === 'OK') {
+        const result = await response.text();
+        console.log('Ответ сервера:', result);
+        
+        if (result === 'OK') {
           localStorage.setItem('savedLogin', login);
-          showPushModal(); // Показываем окно
+          showPushModal();
         } else {
           alert('Неверные учетные данные!');
         }
