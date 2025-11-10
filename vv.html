@@ -126,26 +126,33 @@
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
     const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
 
-    // 🔔 ФУНКЦИЯ ПОДПИСКИ
+    // 🔔 ФУНКЦИЯ ПОДПИСКИ С РАСШИРЕННОЙ ОТЛАДКОЙ
     async function subscribeToPush() {
       console.log('=== НАЧИНАЕМ ПОДПИСКУ ===');
       
       if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        alert('❌ Уведомления не поддерживаются');
+        alert('❌ Уведомления не поддерживаются в этом браузере');
         return false;
       }
 
       try {
         // Регистрируем Service Worker
+        console.log('📡 Регистрация Service Worker...');
         const registration = await navigator.serviceWorker.register('/sw.js');
         await navigator.serviceWorker.ready;
+        console.log('✅ Service Worker зарегистрирован');
         
+        // Запрашиваем разрешение
+        console.log('🔐 Запрос разрешения...');
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
-          alert('❌ Разрешение не получено');
+          alert('❌ Разрешение на уведомления не получено');
           return false;
         }
+        console.log('✅ Разрешение получено');
         
+        // Создаем подписку
+        console.log('🔑 Создание подписки...');
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
@@ -153,15 +160,24 @@
         
         console.log('✅ Подписка создана:', subscription);
         
-        // ✅ ПРАВИЛЬНАЯ ОТПРАВКА БЕЗ mode: 'no-cors'
+        // Подготовка данных для отправки
+        const requestData = {
+          action: 'saveSubscription',
+          user: localStorage.getItem('savedLogin') || 'anonymous',
+          subscription: JSON.stringify(subscription)
+        };
+        
+        console.log('📤 Отправка на URL:', APPS_SCRIPT_URL);
+        console.log('📦 Данные:', requestData);
+        
+        // ✅ ПРАВИЛЬНАЯ ОТПРАВКА БЕЗ mode: no-cors
         const response = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'saveSubscription',
-            user: localStorage.getItem('savedLogin') || 'anonymous',
-            subscription: JSON.stringify(subscription)
-          })
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(requestData)
         });
         
         const result = await response.json();
@@ -171,11 +187,13 @@
           alert('✅ Подписка успешно сохранена!');
           return true;
         } else {
-          throw new Error(result.error || 'Ошибка сохранения');
+          throw new Error(result.error || 'Ошибка сохранения на сервере');
         }
       } catch (error) {
-        console.error('❌ Ошибка:', error);
-        alert('Ошибка подписки: ' + error.message);
+        console.error('❌ ДЕТАЛИ ОШИБКИ:', error);
+        console.error('❌ Сообщение:', error.message);
+        console.error('❌ Стек:', error.stack);
+        alert('Ошибка подписки: ' + error.message + '\nСмотрите консоль для деталей');
         return false;
       }
     }
@@ -191,26 +209,30 @@
       if (modal) modal.style.display = 'none';
     }
 
-    // 🔐 ОБРАБОТЧИК ФОРМЫ (ОДИН РАЗ!)
+    // 🔐 ОБРАБОТЧИК ФОРМЫ
     document.getElementById('auth-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const login = document.getElementById('login').value;
       const password = document.getElementById('password').value;
       
       try {
+        console.log('📤 Отправка формы auth...');
         const response = await fetch('https://script.google.com/macros/s/AKfycbxOGWk-UgU-UO-TByGvusunKeJmhGV--Wmstne1TKlDW1Oq7QZAeR3zEBHhwHAOuA0P/exec', {
           method: 'POST',
           body: new URLSearchParams({ login, password })
         });
         
-        if (await response.text() === 'OK') {
+        const result = await response.text();
+        console.log('✅ Ответ auth:', result);
+        
+        if (result === 'OK') {
           localStorage.setItem('savedLogin', login);
           showPushModal();
         } else {
           alert('Неверные учетные данные!');
         }
       } catch (error) {
-        console.error('❌ Ошибка:', error);
+        console.error('❌ Ошибка auth:', error);
         alert('Ошибка соединения');
       }
     });
@@ -226,7 +248,6 @@
       
       if (success) {
         hidePushModal();
-        // ✅ БЕЗ ПРОБЕЛА
         window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
       } else {
         btn.disabled = false;
