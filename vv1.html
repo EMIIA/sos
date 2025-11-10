@@ -5918,12 +5918,13 @@ map.on('mousemove', (e) => {
   const info = document.getElementById('info');
   if (!info) return;
 
-  // 1. Координаты (ИСПРАВЛЕНО: x и y, не z и x)
+  // 1. Координаты
   const point = {Z: Math.round(e.point.x), Y: Math.round(e.point.y)};
-  const lngLat = {lng: e.lngLat.lng.toFixed(8), lat: e.lngLat.lat.toFixed(8)};
+  const lngLat = {Lng: e.lngLat.lng.toFixed(8), Lat: e.lngLat.lat.toFixed(8)};
 
-  // 2. Zoom и абсолютная высота (ИСПРАВЛЕНО: убрано хардкоженное 110 и тире)
+  // 2. Zoom, Pitch и абсолютная высота (НОВОЕ: питч добавлен)
   const zoom = map.getZoom().toFixed(2);
+  const pitch = map.getPitch().toFixed(1);  // ← Добавлено: Наклон карты
   const elevation = map.queryTerrainElevation(e.lngLat);
   const heightAboveSea = elevation !== null ? Math.round(elevation) : '—';
 
@@ -5942,7 +5943,7 @@ map.on('mousemove', (e) => {
   }
 
   // 4. Собираем в одну строку (ИСПРАВЛЕНО: убрано тире после H)
-  let mainLine = `Z: ${zoom}, H: 110 м.`;
+  let mainLine = `Z: ${zoom}, P: ${pitch}, H: 110 м.`;
   
   if (heightAboveGround > 0) {
     mainLine += `, E: ${heightAboveGround} м.`;
@@ -5955,10 +5956,6 @@ map.on('mousemove', (e) => {
                    JSON.stringify(lngLat) + '<br>' +
                    mainLine;
 });
-
-
-
-
 </script>
 
    
