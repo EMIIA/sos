@@ -1,16 +1,38 @@
-// /sw.js
-self.addEventListener('push', (event) => {
+// 📄 Файл: sw.js
+
+self.addEventListener('push', function(event) {
+  const data = event.data ? event.data.json() : {};
+  
   const options = {
-    body: event.data ? event.data.text() : 'EMIIA.AI SIP',
-    icon: '/192x192.png',
-    badge: '/192x192.png',
+    body: data.body || 'EMIIA.AI SIP',
+    icon: data.icon || 'https://sos.emiia.ai/192x192.png',
+    badge: 'https://sos.emiia.ai/192x192.png',
     vibrate: [200, 100, 200],
-    data: { url: 'https://sos.emiia.ai/vv1.html' }
+    data: {
+      click_action: data.click_action || 'https://sos.emiia.ai/vv1.html',
+      url: data.click_action || 'https://sos.emiia.ai/vv1.html'
+    },
+    actions: [
+      {
+        action: 'open',
+        title: 'Открыть'
+      }
+    ]
   };
-  event.waitUntil(self.registration.showNotification('EMIIA.AI SIP', options));
+
+  event.waitUntil(
+    self.registration.showNotification(
+      data.title || 'EMIIA.AI SIP',
+      options
+    )
+  );
 });
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  event.waitUntil(clients.openWindow(event.notification.data.url));
+  const url = event.notification.data.url;
+  
+  event.waitUntil(
+    clients.openWindow(url)
+  );
 });
