@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -164,8 +163,124 @@
         if (savedPassword) document.getElementById('password').value = savedPassword;
     });
     </script>
+
+
+
+
+
+
+ <script>
+
+<!-- В КОНЦЕ ВАШЕГО HTML ФАЙЛА, ВНУТРИ <script> -->
+
+// ⚙️ КОНФИГУРАЦИЯ (замените на ваши данные)
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
+const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
+
+// 🔔 РЕГИСТРАЦИЯ ПУШ-УВЕДОМЛЕНИЙ
+async function setupPushNotifications() {
+  // Проверяем поддержку
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.log('❌ Push уведомления не поддерживаются');
+    return false;
+  }
+
+  try {
+    // 1. Регистрируем Service Worker
+    const registration = await navigator.serviceWorker.register('/sw.js');
+    console.log('✅ SW зарегистрирован');
+    
+    // 2. Ждем готовности
+    await navigator.serviceWorker.ready;
+    
+    // 3. Запрашиваем разрешение
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.log('❌ Разрешение не получено');
+      return false;
+    }
+    
+    // 4. Подписываемся на push
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    
+    console.log('✅ Подписка создана:', subscription);
+    
+    // 5. Отправляем в Apps Script
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'saveSubscription',
+        user: localStorage.getItem('savedLogin') || 'anonymous',
+        subscription: JSON.stringify(subscription)
+      })
+    });
+    
+    console.log('✅ Подписка отправлена на сервер');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Ошибка подписки:', error);
+    return false;
+  }
+}
+
+// 🔐 ОБРАБОТЧИК ФОРМЫ АВТОРИЗАЦИИ
+document.getElementById('auth-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const login = document.getElementById('login').value;
+  const password = document.getElementById('password').value;
+  
+  try {
+    // Ваша существующая авторизация
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxOGWk-UgU-UO-TByGvusunKeJmhGV--Wmstne1TKlDW1Oq7QZAeR3zEBHhwHAOuA0P/exec', {
+      method: 'POST',
+      body: new URLSearchParams({ login, password })
+    });
+    
+    if (await response.text() === 'OK') {
+      // Сохраняем логин
+      localStorage.setItem('savedLogin', login);
+      
+      // ВАЖНО: Инициализируем push ПОСЛЕ успешного входа
+      await setupPushNotifications();
+      
+      // Переходим на главную
+      window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
+    } else {
+      alert('Неверные учетные данные!');
+    }
+  } catch (error) {
+    alert('Ошибка соединения');
+  }
+});
+
+// 🔄 ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ VAPID
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+// Автозаполнение формы (ваш существующий код)
+window.addEventListener('DOMContentLoaded', () => {
+  const savedLogin = localStorage.getItem('savedLogin');
+  if (savedLogin) {
+    document.getElementById('login').value = savedLogin;
+  }
+});
+
+ </script>
+
+
 </body>
 </html>
-
-
-
