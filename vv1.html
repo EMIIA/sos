@@ -12,6 +12,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,7 +26,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<title>AI WMS</title>
+
 
 <!-- PWA -->
 <link rel="shortcut icon" href="https://sos.emiia.ai/vv.ico" type="image/x-icon">
@@ -35,7 +36,7 @@
 <link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
 
 
-<title>AI WMS</title>
+<title>ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</title>
 
 
 <!-- Эти теги для соцсетей, для PWA не важны, но должны быть корректны -->
@@ -5918,7 +5919,7 @@ map.on('mousemove', (e) => {
   if (!info) return;
 
   // 1. Координаты (ИСПРАВЛЕНО: x и y, не z и x)
-  const point = {x: Math.round(e.point.x), y: Math.round(e.point.y)};
+  const point = {Z: Math.round(e.point.x), Y: Math.round(e.point.y)};
   const lngLat = {lng: e.lngLat.lng.toFixed(8), lat: e.lngLat.lat.toFixed(8)};
 
   // 2. Zoom и абсолютная высота (ИСПРАВЛЕНО: убрано хардкоженное 110 и тире)
@@ -6471,6 +6472,8 @@ textarea::placeholder {
 
 </body>
 </html>
+
+
 
 
 
