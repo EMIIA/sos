@@ -3,6 +3,7 @@
   "theme_color": "#000000",
   "description": "EMIIA.AI • ❯",
   "display": "standalone",
+"gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "/192x192.png",
