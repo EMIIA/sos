@@ -11,6 +11,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1870,7 +1871,6 @@ body {
 
 
 
-
 <!-- Кнопка EMIIA.AI -->
 <div class="emiia-button-container">
     <div class="emiia-button-wrapper">
@@ -1891,6 +1891,8 @@ body {
     <!-- Основное меню (EMIIA.AI SIP + стрелка) -->
     <div class="emiia-menu" id="emiiaMenu">
         <div class="menu-content">
+
+
             <div class="menu-item"></div>
             <pre id="info"></pre>
             <p>EMIIA.AI API: JSON DATASET OUTPUT ❯<br>EMIIA.AI SIP: [<strong><span </span>AI WMS</strong>] ID R: [#3D4581] 
@@ -5879,14 +5881,6 @@ map.addSource('geojson', {
 
 
 
-
-
-
-
-
-
-
-
 </script>
 
 
@@ -5915,25 +5909,58 @@ map.addSource('geojson', {
 
 
 <script>
+// Удаляем ВСЕ старые обработчики mousemove
+map.off('mousemove');
 
+// ЕДИНЫЙ обработчик
 map.on('mousemove', (e) => {
-    // Функция для округления чисел в JSON до 5 знаков
-    const roundToFive = (key, value) => {
-        if (typeof value === 'number') {
-            return parseFloat(value.toFixed(8));
-        }
-        return value;
-    };
+  const info = document.getElementById('info');
+  if (!info) return;
 
-    const pointStr = JSON.stringify(e.point, roundToFive);
-    const lngLatStr = JSON.stringify(e.lngLat.wrap(), roundToFive);
+  // 1. Координаты (ИСПРАВЛЕНО: x и y, не z и x)
+  const point = {x: Math.round(e.point.x), y: Math.round(e.point.y)};
+  const lngLat = {lng: e.lngLat.lng.toFixed(8), lat: e.lngLat.lat.toFixed(8)};
 
-    document.getElementById('info').innerHTML = 
-        `${pointStr}<br />${lngLatStr}`;
+  // 2. Zoom и абсолютная высота (ИСПРАВЛЕНО: убрано хардкоженное 110 и тире)
+  const zoom = map.getZoom().toFixed(2);
+  const elevation = map.queryTerrainElevation(e.lngLat);
+  const heightAboveSea = elevation !== null ? Math.round(elevation) : '—';
+
+  // 3. Высота над землёй (из 3D зданий)
+  let heightAboveGround = 0;
+  
+  const features = map.queryRenderedFeatures(e.point, {
+    layers: ['3d-buildings', 'building', 'extruded-layer', 'layer-with-pulsing-dot-1', 'layer-with-pulsing-dot-2']
+  });
+  
+  if (features.length > 0) {
+    const feature = features.find(f => f.properties.height || f.properties.render_height);
+    if (feature) {
+      heightAboveGround = feature.properties.height || feature.properties.render_height;
+    }
+  }
+
+  // 4. Собираем в одну строку (ИСПРАВЛЕНО: убрано тире после H)
+  let mainLine = `Z: ${zoom}, H: 110 м.`;
+  
+  if (heightAboveGround > 0) {
+    mainLine += `, E: ${heightAboveGround} м.`;
+  } else {
+    mainLine += `, E: 0 м.`;
+  }
+
+  // 5. Вставляем в DOM (без мерцания)
+  info.innerHTML = JSON.stringify(point) + '<br>' + 
+                   JSON.stringify(lngLat) + '<br>' +
+                   mainLine;
 });
-     
 
-    </script>
+
+
+
+</script>
+
+   
 
 
 
@@ -6444,6 +6471,8 @@ textarea::placeholder {
 
 </body>
 </html>
+
+
 
 
 
