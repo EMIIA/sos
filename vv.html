@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -77,6 +79,69 @@
 
 </head>
 <body>
+
+
+
+
+
+
+<!-- 🎭 HTML ВСПЛЫВАЮЩЕГО ОКНА (вставьте в <body>, после </form>) -->
+<div id="push-modal" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+">
+  <div style="
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 90%;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  ">
+    <h3 style="margin: 0 0 1rem 0; color: #da4216;">🔔 УВЕДОМЛЕНИЯ</h3>
+    <p style="margin: 0 0 1.5rem 0; color: #333; font-size: 1rem;">
+      Подпишитесь на уведомления от EMIIA.AI
+    </p>
+    <button id="subscribe-push-btn" style="
+      padding: 14px 32px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    ">ПОЛУЧАТЬ УВЕДОМЛЕНИЯ</button>
+    <button onclick="hidePushModal()" style="
+      margin-left: 1rem;
+      padding: 14px 24px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    ">ОТМЕНА</button>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
     <div class="main-container">
         <div class="auth-container">
             <div class="header-wrapper">
@@ -169,38 +234,40 @@
 
 
 
- <script>
 
-<!-- В КОНЦЕ ВАШЕГО HTML ФАЙЛА, ВНУТРИ <script> -->
 
-// ⚙️ КОНФИГУРАЦИЯ (замените на ваши данные)
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
-const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
 
-// 🔔 РЕГИСТРАЦИЯ ПУШ-УВЕДОМЛЕНИЙ
-async function setupPushNotifications() {
+
+
+
+
+
+
+<script>
+
+
+async function subscribeToPush() {
+  console.log('=== НАЧИНАЕМ ПОДПИСКУ ===');
+  
   // Проверяем поддержку
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.log('❌ Push уведомления не поддерживаются');
+    alert('Уведомления не поддерживаются вашим браузером');
     return false;
   }
 
   try {
-    // 1. Регистрируем Service Worker
+    // Регистрируем Service Worker
     const registration = await navigator.serviceWorker.register('/sw.js');
-    console.log('✅ SW зарегистрирован');
-    
-    // 2. Ждем готовности
     await navigator.serviceWorker.ready;
     
-    // 3. Запрашиваем разрешение
+    // Запрашиваем разрешение
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      console.log('❌ Разрешение не получено');
+      alert('Разрешение на уведомления не получено');
       return false;
     }
     
-    // 4. Подписываемся на push
+    // Подписываемся
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
@@ -208,7 +275,7 @@ async function setupPushNotifications() {
     
     console.log('✅ Подписка создана:', subscription);
     
-    // 5. Отправляем в Apps Script
+    // Отправляем в Apps Script
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
@@ -222,11 +289,22 @@ async function setupPushNotifications() {
     
     console.log('✅ Подписка отправлена на сервер');
     return true;
-    
   } catch (error) {
     console.error('❌ Ошибка подписки:', error);
+    alert('Ошибка подписки: ' + error.message);
     return false;
   }
+}
+
+// 🎭 ВСПЛЫВАЮЩЕЕ ОКНО
+function showPushModal() {
+  const modal = document.getElementById('push-modal');
+  modal.style.display = 'flex';
+}
+
+function hidePushModal() {
+  const modal = document.getElementById('push-modal');
+  modal.style.display = 'none';
 }
 
 // 🔐 ОБРАБОТЧИК ФОРМЫ АВТОРИЗАЦИИ
@@ -236,21 +314,16 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
   
   try {
-    // Ваша существующая авторизация
-    const response = await fetch('https://script.google.com/macros/s/AKfycbxOGWk-UgU-UO-TByGvusunKeJmhGV--Wmstne1TKlDW1Oq7QZAeR3zEBHhwHAOuA0P/exec', {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec', {
       method: 'POST',
       body: new URLSearchParams({ login, password })
     });
     
     if (await response.text() === 'OK') {
-      // Сохраняем логин
       localStorage.setItem('savedLogin', login);
       
-      // ВАЖНО: Инициализируем push ПОСЛЕ успешного входа
-      await setupPushNotifications();
-      
-      // Переходим на главную
-      window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
+      // ПОКАЗЫВАЕМ ОКНО ПОСЛЕ УСПЕШНОГО ВХОДА
+      showPushModal();
     } else {
       alert('Неверные учетные данные!');
     }
@@ -259,7 +332,28 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
   }
 });
 
-// 🔄 ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ VAPID
+// 🎯 ОБРАБОТЧИК КНОПКИ "ПОЛУЧАТЬ УВЕДОМЛЕНИЯ"
+document.getElementById('subscribe-push-btn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  
+  const btn = e.target;
+  btn.disabled = true;
+  btn.textContent = 'Ожидайте...';
+  
+  const success = await subscribeToPush();
+  
+  if (success) {
+    alert('✅ Вы подписаны на уведомления!');
+    hidePushModal();
+    // Переходим на главную
+    window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'ПОЛУЧАТЬ УВЕДОМЛЕНИЯ';
+  }
+});
+
+// 🔄 ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -271,7 +365,7 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-// Автозаполнение формы (ваш существующий код)
+// Автозаполнение формы
 window.addEventListener('DOMContentLoaded', () => {
   const savedLogin = localStorage.getItem('savedLogin');
   if (savedLogin) {
@@ -279,8 +373,17 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
- </script>
+
+</script>
+
+
+
 
 
 </body>
 </html>
+
+
+
+
+
