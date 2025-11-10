@@ -122,7 +122,7 @@
     </div>
 
     <script>
-    // ⚙️ КОНФИГУРАЦИЯ (ВНИМАНИЕ: ПРОБЕЛОВ НЕТ!)
+    // ⚙️ КОНФИГУРАЦИЯ (БЕЗ ПРОБЕЛОВ!)
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
     const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
 
@@ -136,6 +136,7 @@
       }
 
       try {
+        // Регистрируем Service Worker
         const registration = await navigator.serviceWorker.register('/sw.js');
         await navigator.serviceWorker.ready;
         
@@ -150,11 +151,11 @@
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
         
-        console.log('✅ Подписка создана');
+        console.log('✅ Подписка создана:', subscription);
         
-        await fetch(APPS_SCRIPT_URL, {
+        // ✅ ПРАВИЛЬНАЯ ОТПРАВКА БЕЗ mode: 'no-cors'
+        const response = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             action: 'saveSubscription',
@@ -163,8 +164,15 @@
           })
         });
         
-        console.log('✅ Подписка отправлена');
-        return true;
+        const result = await response.json();
+        console.log('✅ Ответ сервера:', result);
+        
+        if (result.status === 'SAVED') {
+          alert('✅ Подписка успешно сохранена!');
+          return true;
+        } else {
+          throw new Error(result.error || 'Ошибка сохранения');
+        }
       } catch (error) {
         console.error('❌ Ошибка:', error);
         alert('Ошибка подписки: ' + error.message);
@@ -217,8 +225,8 @@
       const success = await subscribeToPush();
       
       if (success) {
-        alert('✅ Подписка успешна!');
         hidePushModal();
+        // ✅ БЕЗ ПРОБЕЛА
         window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
       } else {
         btn.disabled = false;
