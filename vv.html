@@ -12,22 +12,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/vv.webmanifest">
 
-<!-- Соцсети -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content="/vv.html" />
-<meta property="og:title" content="AI WMS"/>
-<meta property="og:image" content="/vvjpg.jpg" />
-<meta name="twitter:card" content="summary_large_image" />
-
-<!-- ПРЕДЗАГРУЗКА -->
-<link rel="preload" href="/telegram-web-app.js" as="script">
-<link rel="preload" href="/logo.svg" as="image">
-
-<!-- ВСЕ СТИЛИ -->
+<!-- Стили -->
 <style>
-    /* ФИКС ЧЕРНОГО ФЛЭША */
     html, body { background-color: #F8F9FA; }
-    
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:monospace;margin:0;padding:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:#F8F9FA;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
     .main-container{width:100%;max-width:100%;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
@@ -43,31 +30,11 @@
     .beta{font-size:.4em}
     img{max-width:100%;height:auto}
     p.small{font-size:.8rem}
-    
-    /* СТАТУС УВЕДОМЛЕНИЙ */
     #push-status{margin-top:1rem;padding:10px;border-radius:8px;text-align:center;display:none;font-size:0.9rem}
     #push-status.success{background:#d4edda;color:#155724}
     #push-status.error{background:#f8d7da;color:#721c24}
-    
-    /* КНОПКА ВКЛЮЧЕНИЯ УВЕДОМЛЕНИЙ */
     #enable-push-btn{display:none;margin-top:1rem;background:#4CAF50;}
     #enable-push-btn:hover{background:#45a049}
-    
-    @media (max-width:768px){
-        .main-container{padding:15px;align-items:flex-start;padding-top:max(20px,env(safe-area-inset-top))}
-        .auth-container{padding:1.5rem;margin:0;max-width:100%;width:100%}
-        h2{font-size:1.5rem;margin-bottom:1.2rem}
-        input{letter-spacing:4.5px;font-size:16px}
-        .auth-container{transform:translateZ(0)}
-    }
-    @media (max-height:600px){
-        .main-container{align-items:flex-start;padding-top:10px}
-        .auth-container{padding:1.2rem}
-    }
-    @media (min-width:1024px){
-        body{min-height:100vh;overflow:hidden}
-        .main-container{min-height:100vh}
-    }
 </style>
 </head>
 <body>
@@ -96,7 +63,6 @@
                 <button type="submit">ВОЙТИ <span>❯</span></button>
             </form>
 
-            <!-- КНОПКА ДЛЯ ВКЛЮЧЕНИЯ УВЕДОМЛЕНИЙ (показывается после входа) -->
             <button id="enable-push-btn">🔔 Включить уведомления</button>
 
             <p style="margin-top:1rem">Нет аккаунта? <a class="text-primary" href="mailto:emiia@emiia.ai">Зарегистрироваться</a></p>
@@ -114,7 +80,7 @@
     <script>
     let pushRegistration = null;
     const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOGWk-UgU-UO-TByGvusunKeJmhGV--Wmstne1TKlDW1Oq7QZAeR3zEBHhwHAOuA0P/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/ВАШ_ТОЧНЫЙ_ID_ЗДЕСЬ/exec'; // ✅ ЗАМЕНИТЕ!
     </script>
 
     <!-- РЕГИСТРАЦИЯ SERVICE WORKER -->
@@ -133,41 +99,46 @@
 
     <!-- ЛОГИКА PUSH-УВЕДОМЛЕНИЙ -->
     <script>
-    // ПОДПИСКА НА PUSH
     async function subscribeToPush() {
         const statusDiv = document.getElementById('push-status');
+        statusDiv.style.display = 'block';
+        statusDiv.textContent = '⏳ Запрос разрешения...';
         
-        if (!pushRegistration) {
-            statusDiv.textContent = '❌ Ошибка: Service Worker не готов, обновите страницу';
-            statusDiv.className = 'error';
-            statusDiv.style.display = 'block';
-            return;
-        }
+        console.log('🚀 Начало подписки...');
 
-        if (!('PushManager' in window)) {
-            statusDiv.textContent = '❌ Push-уведомления не поддерживаются в этом браузере';
+        if (!pushRegistration) {
+            statusDiv.textContent = '❌ SW не готов, обновите страницу';
             statusDiv.className = 'error';
-            statusDiv.style.display = 'block';
+            console.error('pushRegistration = null');
             return;
         }
 
         try {
+            console.log('📋 Запрашиваю permission...');
             const permission = await Notification.requestPermission();
+            console.log('📋 Permission:', permission);
+
             if (permission !== 'granted') {
-                statusDiv.textContent = '❌ Уведомления запрещены. Разрешите их в настройках браузера.';
+                statusDiv.textContent = '❌ Запрещено! Разрешите в настройках браузера.';
                 statusDiv.className = 'error';
-                statusDiv.style.display = 'block';
                 return;
             }
 
+            console.log('📋 Подписываюсь на push...');
             const subscription = await pushRegistration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
             });
 
+            console.log('📋 Подписка получена:', subscription);
+
+            console.log('📋 Отправляю на сервер...');
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                mode: 'cors', // ✅ ВАЖНО!
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
                     action: 'saveSubscription',
                     subscription: JSON.stringify(subscription),
@@ -175,24 +146,24 @@
                 })
             });
 
+            console.log('📋 Статус ответа:', response.status);
             const result = await response.text();
-            if (result === '{"status":"SAVED"}') {
-                statusDiv.textContent = '✅ Уведомления успешно активированы!';
+            console.log('📋 Тело ответа:', result);
+
+            if (result.includes('SAVED')) {
+                statusDiv.textContent = '✅ Уведомления активированы!';
                 statusDiv.className = 'success';
-                statusDiv.style.display = 'block';
                 document.getElementById('enable-push-btn').style.display = 'none';
             } else {
-                throw new Error('Ошибка сохранения на сервере');
+                throw new Error('Сервер не сохранил: ' + result);
             }
         } catch (error) {
             console.error('❌ Ошибка подписки:', error);
             statusDiv.textContent = '❌ Ошибка: ' + error.message;
             statusDiv.className = 'error';
-            statusDiv.style.display = 'block';
         }
     }
 
-    // КОНВЕРТАЦИЯ VAPID КЛЮЧА
     function urlBase64ToUint8Array(base64String) {
         const padding = '='.repeat((4 - base64String.length % 4) % 4);
         const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -205,7 +176,7 @@
     }
     </script>
 
-    <!-- TELEGRAM WEBAPP -->
+    <!-- TELEGRAM -->
     <script src="/telegram-web-app.js" async></script>
     <script>
     window.addEventListener('load', () => {
@@ -222,56 +193,48 @@
     });
     </script>
 
-    <!-- АВТОРИЗАЦИЯ И УПРАВЛЕНИЕ UI -->
+    <!-- АВТОРИЗАЦИЯ -->
     <script>
-    // ОБРАБОТЧИК ФОРМЫ
     document.getElementById('auth-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const login = document.getElementById('login').value;
         const password = document.getElementById('password').value;
         
         try {
+            console.log('🔐 Отправляю авторизацию...');
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ login, password })
             });
             
-            if (await response.text() === 'OK') {
+            const result = await response.text();
+            console.log('📋 Ответ авторизации:', result);
+
+            if (result === 'OK') {
                 localStorage.setItem('savedLogin', login);
                 localStorage.setItem('savedPassword', password);
-                
-                // ПОКАЗЫВАЕМ КНОПКУ ДЛЯ ВКЛЮЧЕНИЯ УВЕДОМЛЕНИЙ
                 document.getElementById('enable-push-btn').style.display = 'block';
+                alert('✅ Вход успешен! Теперь включите уведомления.');
             } else {
                 alert('❌ Неверные учетные данные!');
             }
         } catch (error) {
-            console.error('Ошибка авторизации:', error);
-            alert('❌ Ошибка соединения с сервером');
+            console.error('❌ Ошибка авторизации:', error);
+            alert('❌ Ошибка соединения: ' + error.message);
         }
     });
 
-    // ОБРАБОТЧИК КНОПКИ УВЕДОМЛЕНИЙ
     document.getElementById('enable-push-btn').addEventListener('click', async () => {
         await subscribeToPush();
     });
 
-    // АВТОЗАПОЛНЕНИЕ СОХРАНЕННЫХ ДАННЫХ
     window.addEventListener('DOMContentLoaded', () => {
         const savedLogin = localStorage.getItem('savedLogin');
         const savedPassword = localStorage.getItem('savedPassword');
         if (savedLogin) document.getElementById('login').value = savedLogin;
         if (savedPassword) document.getElementById('password').value = savedPassword;
-    });
-
-    // ПРОВЕРКА ПОДДЕРЖКИ УВЕДОМЛЕНИЙ ПРИ ЗАГРУЗКЕ
-    window.addEventListener('load', () => {
-        if (!('PushManager' in window)) {
-            console.warn('⚠️ Push-уведомления не поддерживаются');
-            document.getElementById('push-status').textContent = 'Уведомления не поддерживаются в этом браузере';
-            document.getElementById('push-status').className = 'error';
-            document.getElementById('push-status').style.display = 'block';
-        }
     });
     </script>
 </body>
