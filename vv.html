@@ -85,14 +85,12 @@
 
 
 
-<!-- 🎭 HTML ВСПЛЫВАЮЩЕГО ОКНА (вставьте в <body>, после </form>) -->
+<!-- 🎭 ВСПЛЫВАЮЩЕЕ ОКНО -->
 <div id="push-modal" style="
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0,0,0,0.8);
   z-index: 9999;
   justify-content: center;
@@ -107,7 +105,7 @@
     box-shadow: 0 8px 30px rgba(0,0,0,0.3);
   ">
     <h3 style="margin: 0 0 1rem 0; color: #da4216;">🔔 УВЕДОМЛЕНИЯ</h3>
-    <p style="margin: 0 0 1.5rem 0; color: #333; font-size: 1rem;">
+    <p style="margin: 0 0 1.5rem 0; color: #333;">
       Подпишитесь на уведомления от EMIIA.AI
     </p>
     <button id="subscribe-push-btn" style="
@@ -119,7 +117,6 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
     ">ПОЛУЧАТЬ УВЕДОМЛЕНИЯ</button>
     <button onclick="hidePushModal()" style="
       margin-left: 1rem;
@@ -133,8 +130,6 @@
     ">ОТМЕНА</button>
   </div>
 </div>
-
-
 
 
 
@@ -244,39 +239,33 @@
 
 
 <script>
+// ⚙️ КОНФИГУРАЦИЯ
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
+const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
 
-
+// 🔔 ФУНКЦИЯ ПОДПИСКИ
 async function subscribeToPush() {
-  console.log('=== НАЧИНАЕМ ПОДПИСКУ ===');
-  
-  // Проверяем поддержку
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    alert('Уведомления не поддерживаются вашим браузером');
+    alert('❌ Уведомления не поддерживаются');
     return false;
   }
 
   try {
-    // Регистрируем Service Worker
     const registration = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
     
-    // Запрашиваем разрешение
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      alert('Разрешение на уведомления не получено');
+      alert('❌ Разрешение не получено');
       return false;
     }
     
-    // Подписываемся
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
     });
     
-    console.log('✅ Подписка создана:', subscription);
-    
-    // Отправляем в Apps Script
-    const response = await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
@@ -287,27 +276,26 @@ async function subscribeToPush() {
       })
     });
     
-    console.log('✅ Подписка отправлена на сервер');
     return true;
   } catch (error) {
-    console.error('❌ Ошибка подписки:', error);
+    console.error('❌ Ошибка:', error);
     alert('Ошибка подписки: ' + error.message);
     return false;
   }
 }
 
-// 🎭 ВСПЛЫВАЮЩЕЕ ОКНО
+// 🎭 ОКНО
 function showPushModal() {
   const modal = document.getElementById('push-modal');
-  modal.style.display = 'flex';
+  if (modal) modal.style.display = 'flex';
 }
 
 function hidePushModal() {
   const modal = document.getElementById('push-modal');
-  modal.style.display = 'none';
+  if (modal) modal.style.display = 'none';
 }
 
-// 🔐 ОБРАБОТЧИК ФОРМЫ АВТОРИЗАЦИИ
+// 🔐 АВТОРИЗАЦИЯ
 document.getElementById('auth-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const login = document.getElementById('login').value;
@@ -321,21 +309,19 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
     
     if (await response.text() === 'OK') {
       localStorage.setItem('savedLogin', login);
-      
-      // ПОКАЗЫВАЕМ ОКНО ПОСЛЕ УСПЕШНОГО ВХОДА
-      showPushModal();
+      showPushModal(); // Показываем окно
     } else {
       alert('Неверные учетные данные!');
     }
   } catch (error) {
+    console.error('❌ Ошибка авторизации:', error);
     alert('Ошибка соединения');
   }
 });
 
-// 🎯 ОБРАБОТЧИК КНОПКИ "ПОЛУЧАТЬ УВЕДОМЛЕНИЯ"
+// 🎯 КНОПКА ПОДПИСКИ
 document.getElementById('subscribe-push-btn').addEventListener('click', async (e) => {
   e.preventDefault();
-  
   const btn = e.target;
   btn.disabled = true;
   btn.textContent = 'Ожидайте...';
@@ -343,9 +329,8 @@ document.getElementById('subscribe-push-btn').addEventListener('click', async (e
   const success = await subscribeToPush();
   
   if (success) {
-    alert('✅ Вы подписаны на уведомления!');
+    alert('✅ Подписка успешна!');
     hidePushModal();
-    // Переходим на главную
     window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
   } else {
     btn.disabled = false;
@@ -365,15 +350,13 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-// Автозаполнение формы
+// Автозаполнение
 window.addEventListener('DOMContentLoaded', () => {
   const savedLogin = localStorage.getItem('savedLogin');
   if (savedLogin) {
     document.getElementById('login').value = savedLogin;
   }
 });
-
-
 </script>
 
 
