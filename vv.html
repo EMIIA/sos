@@ -79,7 +79,7 @@
 </head>
 <body>
 
-    <!-- 🎭 МОДАЛЬНОЕ ОКНО (ВАЖНО: В НАЧАЛЕ body) -->
+    <!-- 🎭 МОДАЛЬНОЕ ОКНО -->
     <div id="push-modal">
         <div>
             <h3>🔔 УВЕДОМЛЕНИЯ</h3>
@@ -98,8 +98,6 @@
                     </a>
                 </h2>
             </div>
-
-            <div id="update-info"></div>
 
             <form id="auth-form">
                 <div class="input-group">
@@ -124,7 +122,7 @@
     </div>
 
     <script>
-    // ⚙️ КОНФИГУРАЦИЯ
+    // ⚙️ КОНФИГУРАЦИЯ (ВНИМАНИЕ: ПРОБЕЛОВ НЕТ!)
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
     const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
 
@@ -191,18 +189,13 @@
       const login = document.getElementById('login').value;
       const password = document.getElementById('password').value;
       
-      console.log('=== АВТОРИЗАЦИЯ ===');
-      
       try {
         const response = await fetch('https://script.google.com/macros/s/AKfycbxOGWk-UgU-UO-TByGvusunKeJmhGV--Wmstne1TKlDW1Oq7QZAeR3zEBHhwHAOuA0P/exec', {
           method: 'POST',
           body: new URLSearchParams({ login, password })
         });
         
-        const result = await response.text();
-        console.log('Ответ сервера:', result);
-        
-        if (result === 'OK') {
+        if (await response.text() === 'OK') {
           localStorage.setItem('savedLogin', login);
           showPushModal();
         } else {
