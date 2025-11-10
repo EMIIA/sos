@@ -126,7 +126,7 @@
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
     const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
 
-    // 🔔 ФУНКЦИЯ ПОДПИСКИ С РАСШИРЕННОЙ ОТЛАДКОЙ
+    // 🔔 ФУНКЦИЯ ПОДПИСКИ С НАДЁЖНОЙ ОБРАБОТКОЙ
     async function subscribeToPush() {
       console.log('=== НАЧИНАЕМ ПОДПИСКУ ===');
       
@@ -136,13 +136,26 @@
       }
 
       try {
-        // Регистрируем Service Worker
+        // 1. Регистрируем Service Worker
         console.log('📡 Регистрация Service Worker...');
-        const registration = await navigator.serviceWorker.register('/sw.js');
-        await navigator.serviceWorker.ready;
-        console.log('✅ Service Worker зарегистрирован');
+        const registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/'
+        });
         
-        // Запрашиваем разрешение
+        // Ждём активации
+        if (registration.installing) {
+          console.log('⌛ Service Worker устанавливается...');
+          await new Promise(resolve => {
+            registration.installing.addEventListener('statechange', function() {
+              if (this.state === 'activated') resolve();
+            });
+          });
+        }
+        
+        await navigator.serviceWorker.ready;
+        console.log('✅ Service Worker активен');
+        
+        // 2. Запрашиваем разрешение
         console.log('🔐 Запрос разрешения...');
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
@@ -151,7 +164,7 @@
         }
         console.log('✅ Разрешение получено');
         
-        // Создаем подписку
+        // 3. Создаем подписку
         console.log('🔑 Создание подписки...');
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
@@ -160,7 +173,7 @@
         
         console.log('✅ Подписка создана:', subscription);
         
-        // Подготовка данных для отправки
+        // 4. Подготовка данных для отправки
         const requestData = {
           action: 'saveSubscription',
           user: localStorage.getItem('savedLogin') || 'anonymous',
@@ -170,15 +183,39 @@
         console.log('📤 Отправка на URL:', APPS_SCRIPT_URL);
         console.log('📦 Данные:', requestData);
         
-        // ✅ ПРАВИЛЬНАЯ ОТПРАВКА БЕЗ mode: no-cors
+        // Тестовый запрос (опционально)
+        try {
+          const testResponse = await fetch(APPS_SCRIPT_URL + '?test=1', { 
+            method: 'GET',
+            mode: 'cors'
+          });
+          console.log('✅ Тестовый запрос успешен, статус:', testResponse.status);
+        } catch (testError) {
+          console.warn('⚠️ Тестовый запрос не прошел:', testError.message);
+        }
+        
+        // 5. ✅ НАДЁЖНАЯ ОТПРАВКА
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 сек таймаут
+        
         const response = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify(requestData)
+          body: JSON.stringify(requestData),
+          mode: 'cors',
+          signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
+        
+        console.log('✅ Ответ получен, статус:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const result = await response.json();
         console.log('✅ Ответ сервера:', result);
@@ -190,10 +227,17 @@
           throw new Error(result.error || 'Ошибка сохранения на сервере');
         }
       } catch (error) {
-        console.error('❌ ДЕТАЛИ ОШИБКИ:', error);
-        console.error('❌ Сообщение:', error.message);
-        console.error('❌ Стек:', error.stack);
-        alert('Ошибка подписки: ' + error.message + '\nСмотрите консоль для деталей');
+        if (error.name === 'AbortError') {
+          console.error('❌ Запрос отменен (таймаут)');
+          alert('Ошибка: запрос превысил время ожидания');
+        } else if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+          console.error('❌ СЕТЕВАЯ ОШИБКА: возможно, CORS блокирует запрос');
+          logNetworkError();
+          alert('Ошибка сети. Проверьте консоль (F12) и убедитесь, что Apps Script доступен');
+        } else {
+          console.error('❌ ДЕТАЛИ ОШИБКИ:', error);
+          alert('Ошибка: ' + error.message);
+        }
         return false;
       }
     }
@@ -265,6 +309,18 @@
         outputArray[i] = rawData.charCodeAt(i);
       }
       return outputArray;
+    }
+
+    // 🆘 ФУНКЦИЯ ДЛЯ ОТЛАДКИ СЕТИ
+    function logNetworkError() {
+      console.error('╔═══════════════════════════════════════════════');
+      console.error('║ СЕТЕВАЯ ОШИБКА ДЕТЕКТИРОВАНА');
+      console.error('║ Возможные причины:');
+      console.error('║ 1. Apps Script не развернут как "Anyone"');
+      console.error('║ 2. URL Apps Script содержит ошибку');
+      console.error('║ 3. CORS политика блокирует запрос');
+      console.error('║ 4. Браузер в режиме "Strict" для cookies');
+      console.error('╚═══════════════════════════════════════════════');
     }
 
     // Автозаполнение
