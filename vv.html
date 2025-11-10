@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/vv.webmanifest">
 
-<!-- Стили -->
+<!-- СТИЛИ -->
 <style>
     html, body { background-color: #F8F9FA; }
     *{margin:0;padding:0;box-sizing:border-box}
@@ -35,6 +35,7 @@
     #push-status.error{background:#f8d7da;color:#721c24}
     #enable-push-btn{display:none;margin-top:1rem;background:#4CAF50;}
     #enable-push-btn:hover{background:#45a049}
+    .debug-info{display:none;margin-top:1rem;font-size:0.8rem;color:#666;font-family:monospace}
 </style>
 </head>
 <body>
@@ -80,7 +81,7 @@
     <script>
     let pushRegistration = null;
     const VAPID_PUBLIC_KEY = 'BD09P5I2226LhoIjSPu2uGD81R8lFyte0w6jE2EMUkCW1I0LZC9PYPSkPZxSp0zYyX5zUgUVkRMZHFyCaRYgTkQ';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/ВАШ_ТОЧНЫЙ_ID_ЗДЕСЬ/exec'; // ✅ ЗАМЕНИТЕ!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0wJrj3cyVhdLZrCtw3u0eO5nqklpEs-lc4vkvyz2hb2KdwfPilqyCYJLXH_sEAKVi/exec';
     </script>
 
     <!-- РЕГИСТРАЦИЯ SERVICE WORKER -->
@@ -135,14 +136,16 @@
             console.log('📋 Отправляю на сервер...');
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors', // ✅ ВАЖНО!
+                mode: 'cors',
+                credentials: 'omit', // ✅ ВАЖНО: не отправлять cookies
                 headers: { 
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     action: 'saveSubscription',
                     subscription: JSON.stringify(subscription),
-                    user: document.getElementById('login').value || 'anonymous'
+                    user: document.getElementById('login').value || 'anonymous',
+                    userAgent: navigator.userAgent
                 })
             });
 
@@ -151,11 +154,11 @@
             console.log('📋 Тело ответа:', result);
 
             if (result.includes('SAVED')) {
-                statusDiv.textContent = '✅ Уведомления активированы!';
+                statusDiv.textContent = '✅ Уведомления успешно активированы!';
                 statusDiv.className = 'success';
                 document.getElementById('enable-push-btn').style.display = 'none';
             } else {
-                throw new Error('Сервер не сохранил: ' + result);
+                throw new Error('Сервер ответил: ' + result);
             }
         } catch (error) {
             console.error('❌ Ошибка подписки:', error);
@@ -176,7 +179,7 @@
     }
     </script>
 
-    <!-- TELEGRAM -->
+    <!-- TELEGRAM WEBAPP -->
     <script src="/telegram-web-app.js" async></script>
     <script>
     window.addEventListener('load', () => {
@@ -193,7 +196,7 @@
     });
     </script>
 
-    <!-- АВТОРИЗАЦИЯ -->
+    <!-- АВТОРИЗАЦИЯ И УПРАВЛЕНИЕ UI -->
     <script>
     document.getElementById('auth-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -205,18 +208,31 @@
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ login, password })
+                credentials: 'omit', // ✅ ВАЖНО
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'auth',
+                    login: login,
+                    password: password
+                })
             });
             
             const result = await response.text();
             console.log('📋 Ответ авторизации:', result);
 
-            if (result === 'OK') {
+            if (result.includes('OK')) {
                 localStorage.setItem('savedLogin', login);
                 localStorage.setItem('savedPassword', password);
                 document.getElementById('enable-push-btn').style.display = 'block';
-                alert('✅ Вход успешен! Теперь включите уведомления.');
+                
+                // ОЧИЩАЕМ СТАТУС
+                document.getElementById('push-status').style.display = 'none';
+                document.getElementById('push-status').textContent = '';
+                
+                alert('✅ Вход успешен! Теперь нажмите "Включить уведомления"');
             } else {
                 alert('❌ Неверные учетные данные!');
             }
@@ -235,6 +251,14 @@
         const savedPassword = localStorage.getItem('savedPassword');
         if (savedLogin) document.getElementById('login').value = savedLogin;
         if (savedPassword) document.getElementById('password').value = savedPassword;
+    });
+
+    // ПРОВЕРКА ПОДДЕРЖКИ
+    window.addEventListener('load', () => {
+        console.log('🔍 Проверка поддержки...');
+        console.log('Service Worker:', 'serviceWorker' in navigator);
+        console.log('PushManager:', 'PushManager' in window);
+        console.log('Notifications:', 'Notification' in window);
     });
     </script>
 </body>
