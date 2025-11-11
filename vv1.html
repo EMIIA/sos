@@ -13,6 +13,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -968,7 +969,12 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 <span>Настройки</span>
             </div>
 
-            <div class="menu-divider"></div>
+
+
+
+
+
+<div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="refresh">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
                     <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
@@ -976,6 +982,30 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 </svg>
                 <span>Обновить данные</span>
             </div>
+
+
+
+
+
+
+
+
+
+
+            <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="z1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-dots" viewBox="0 0 16 16">
+  <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+  <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+</svg>
+                <span>Сообщения</span>
+            </div>
+
+
+
+
+
+
             <div class="menu-divider"></div>
             
             <!-- ПУНКТ С ПОДМЕНЮ 1 -->
@@ -1245,13 +1275,18 @@ font-size: 18px; /* Увеличьте значение по необходим�
         function handleAction(action, url = null, target = '_self') {
             switch(action) {
                 case 'settings':
-                    window.location.href = 'https://emiia.ai ';
+                    window.location.href = 'https://emiia.ai';
                     break;
                 case 'terms':
-                    window.open('https://emiia.ai/terms ', '_blank');
+                    window.open('https://emiia.ai/terms', '_blank');
                     break;
+
+              case 'z1':
+                    window.open('https://sos.emiia.ai/vv3#15.5/55.834102/37.631108/0/45', '_self');
+                    break;
+                   
                 case 'privacy':
-                    window.open('https://emiia.ai/privacy ', '_blank');
+                    window.open('https://emiia.ai/privacy', '_blank');
                     break;
                 case 'refresh':
                     location.reload();
@@ -3969,7 +4004,7 @@ async function updatePopupData1() {
         pointPopup1.setHTML(`
             <div class="popup-content">
                 <h3>EMIIA.AI SIP: API DATASET <br>Сотрудник: ID D [#353837]</h3>
-                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581]</p>
+                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#3D4581]</p>
                 ${formatISSData(issData)}
             </div>
         `);
@@ -3982,7 +4017,7 @@ async function updatePopupData2() {
         pointPopup2.setHTML(`
             <div class="popup-content">
                 <h3>EMIIA.AI SIP: API DATASET <br>Робот: ID D [#309945]</h3>
-                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#FFA500]</p>
+                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#FFA500]</p>
                 ${formatISSData(issData)}
             </div>
         `);
@@ -4269,7 +4304,7 @@ map.on('load', () => {
             .setHTML(`
                 <div class="popup-content">
                     <h3>EMIIA.AI SIP: API DATASET <br> Сотрудник:</h3>
-                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581]</p>
+                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#3D4581]</p>
                     <div class="loading">Загрузка данных EMIIA.AI SIP: API...</div>
                 </div>
             `)
@@ -4287,7 +4322,7 @@ map.on('load', () => {
             .setHTML(`
                 <div class="popup-content">
                     <h3>EMIIA.AI SIP: API DATASET <br> Робот:</h3>
-                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#FFA500]</p>
+                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#FFA500]</p>
                     <div class="loading">Загрузка данных EMIIA.AI SIP: API...</div>
                 </div>
             `)
