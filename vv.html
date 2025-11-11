@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,7 +6,7 @@
     <title>ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</title>
 
     <!-- PWA Meta -->
-    <meta name="theme-color" content="#f8f9fa">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="EMIIA.AI">
@@ -15,20 +14,8 @@
     <link rel="shortcut icon" href="/vv.ico" type="image/x-icon">
     <link rel="manifest" href="/vv.webmanifest">
 
-    <!-- Соцсети -->
-    <meta property="og:type" content="website"/>
-    <meta property="og:url" content="/vv.html"/>
-    <meta property="og:title" content="EMIIA.AI SIP"/>
-    <meta property="og:image" content="/vvjpg.jpg"/>
-    <meta name="twitter:card" content="summary_large_image"/>
-
-    <!-- ПРЕДЗАГРУЗКА -->
-    <link rel="preload" href="/telegram-web-app.js" as="script">
-    <link rel="preload" href="/logo_wms.svg" as="image">
-
     <!-- СТИЛИ -->
     <style>
-        /* БАЗОВЫЕ СТИЛИ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html { 
@@ -45,10 +32,7 @@
             justify-content: center;
             align-items: center;
             background: #F8F9FA;
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
         .main-container {
@@ -70,7 +54,6 @@
             max-width: 400px;
             margin: 0 auto;
             font-family: monospace;
-            position: relative;
         }
         
         h2 {
@@ -78,12 +61,10 @@
             margin: 0 0 1.5rem 0;
             text-align: center;
             font-size: 1.8rem;
-            font-family: monospace;
         }
         
         .input-group {
             margin-bottom: 1.2rem;
-            font-family: monospace;
         }
         
         input {
@@ -123,71 +104,6 @@
             background: #3c78d8;
         }
         
-        .text-primary {
-            color: #6d9eeb;
-            text-decoration: none;
-        }
-        
-        .text-primary1 {
-            text-decoration: none;
-            text-align: center;
-            display: block;
-        }
-        
-        .beta {
-            font-size: .4em;
-        }
-        
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        
-        p.small {
-            font-size: .8rem;
-        }
-        
-        /* УВЕДОМЛЕНИЯ */
-        .notification-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #da4216;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        
-        .notifications-panel {
-            display: none;
-            position: absolute;
-            top: 40px;
-            right: 0;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px;
-            min-width: 200px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        
-        .notification-item {
-            padding: 8px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 0.9rem;
-        }
-        
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-        
         .test-notification-btn {
             background: #27ae60;
             margin-top: 10px;
@@ -196,8 +112,32 @@
         .test-notification-btn:hover {
             background: #219a52;
         }
+        
+        .text-primary {
+            color: #6d9eeb;
+            text-decoration: none;
+        }
+        
+        .notification-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
 
-        /* МЕДИА-ЗАПРОСЫ */
         @media (max-width: 768px) {
             .main-container {
                 padding: 15px;
@@ -211,36 +151,12 @@
                 max-width: 100%;
                 width: 100%;
             }
-            
-            h2 {
-                font-size: 1.5rem;
-                margin-bottom: 1.2rem;
-            }
-            
-            input {
-                letter-spacing: 4.5px;
-                font-size: 16px;
-            }
-        }
-        
-        @media (max-height: 600px) {
-            .main-container {
-                align-items: flex-start;
-                padding-top: 10px;
-            }
-            
-            .auth-container {
-                padding: 1.2rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="main-container">
         <div class="auth-container">
-            <!-- Бейдж уведомлений -->
-            <div class="notification-badge" id="notificationBadge" style="display: none;">!</div>
-            
             <div class="header-wrapper">
                 <h2>
                     <a class="text-primary1" href="https://www.emiia.ru/">                    
@@ -249,7 +165,8 @@
                 </h2>
             </div>
 
-            <div id="update-info"></div>
+            <!-- Статус уведомлений -->
+            <div id="notificationStatus"></div>
 
             <form id="auth-form">
                 <div class="input-group">
@@ -264,13 +181,12 @@
                 
                 <!-- Кнопка теста уведомлений -->
                 <button type="button" class="test-notification-btn" id="testNotification">
-                    🔔 Тест уведомлений
+                    🔔 Протестировать уведомления
                 </button>
             </form>
 
             <p style="margin-top:1rem">Нет аккаунта? <a class="text-primary" href="mailto:emiia@emiia.ai">Зарегистрироваться</a></p>
             
-            <!-- ВЕРНУТАЯ ССЫЛКА -->
             <div style="text-align:center;margin-top:2rem">
                 <a class="text-primary1" href="https://www.emiia.ru/" style="color:#da4216;font-weight:600;text-decoration:none">
                     <span style="color:#b2b4b3;font-size:1rem;font-weight:500">ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</span>
@@ -280,21 +196,108 @@
         </div>
     </div>
 
-    <!-- СКРИПТЫ -->
-    <script src="/telegram-web-app.js" async></script>
-    
     <script>
+        // Функция для показа статуса
+        function showStatus(message, isSuccess = true) {
+            const statusEl = document.getElementById('notificationStatus');
+            statusEl.innerHTML = message;
+            statusEl.className = `notification-status ${isSuccess ? 'status-success' : 'status-error'}`;
+            
+            setTimeout(() => {
+                statusEl.innerHTML = '';
+                statusEl.className = 'notification-status';
+            }, 5000);
+        }
+
+        // Простая функция для показа уведомлений
+        function showSimpleNotification(title, body) {
+            if (!("Notification" in window)) {
+                showStatus("❌ Ваш браузер не поддерживает уведомления", false);
+                return;
+            }
+
+            if (Notification.permission === "granted") {
+                // Показываем уведомление
+                const notification = new Notification(title, {
+                    body: body,
+                    icon: '/logo_wms.svg',
+                    badge: '/vv.ico'
+                });
+
+                notification.onclick = function() {
+                    console.log('Уведомление кликнуто');
+                    window.focus();
+                    notification.close();
+                };
+
+                showStatus("✅ Уведомление отправлено!");
+
+            } else if (Notification.permission === "default") {
+                // Запрашиваем разрешение
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        showSimpleNotification(title, body);
+                    } else {
+                        showStatus("❌ Разрешение на уведомления отклонено", false);
+                    }
+                });
+            } else {
+                showStatus("❌ Разрешение на уведомления заблокировано. Разрешите в настройках браузера.", false);
+            }
+        }
+
+        // Обработчик кнопки тестирования
+        document.getElementById('testNotification').addEventListener('click', function() {
+            showSimpleNotification(
+                'EMIIA.AI - Тест', 
+                '✅ Уведомления работают! Пространственный интеллект активен.'
+            );
+        });
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем поддержку уведомлений
+            if (!("Notification" in window)) {
+                showStatus("❌ Этот браузер не поддерживает уведомления", false);
+                document.getElementById('testNotification').disabled = true;
+                document.getElementById('testNotification').textContent = '❌ Уведомления не поддерживаются';
+            } else if (Notification.permission === "granted") {
+                showStatus("🔔 Уведомления разрешены");
+            } else if (Notification.permission === "denied") {
+                showStatus("❌ Уведомления заблокированы. Разрешите в настройках браузера.", false);
+                document.getElementById('testNotification').disabled = true;
+            } else {
+                showStatus("ℹ️ Нажмите 'Тестировать уведомления' для запроса разрешения");
+            }
+
+            // Восстановление сохраненных данных
+            const savedLogin = localStorage.getItem('savedLogin');
+            const savedPassword = localStorage.getItem('savedPassword');
+            if (savedLogin) document.getElementById('login').value = savedLogin;
+            if (savedPassword) document.getElementById('password').value = savedPassword;
+        });
+
+        // Регистрация Service Worker (упрощенная)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw-simple.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker зарегистрирован');
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Ошибка Service Worker:', error);
+                    });
+            });
+        }
+
         // Telegram Web App Integration
         window.addEventListener('load', () => {
             if (window.Telegram?.WebApp) {
                 const tele = window.Telegram.WebApp;
                 tele.ready();
                 tele.expand();
-                tele.SettingsButton.show();
                 tele.setHeaderColor("#f8f9fa");
                 tele.setBackgroundColor("#f8f9fa");
-                tele.enableClosingConfirmation();
-                tele.disableVerticalSwipes();
             }
         });
 
@@ -314,12 +317,12 @@
                     localStorage.setItem('savedLogin', login);
                     localStorage.setItem('savedPassword', password);
                     
-                    // Отправляем уведомление об успешном входе
-                    if (Notification.permission === 'granted') {
-                        showNotification('Добро пожаловать!', 'Успешный вход в систему EMIIA.AI');
-                    }
+                    // Показываем уведомление об успешном входе
+                    showSimpleNotification('EMIIA.AI', 'Вход выполнен успешно!');
                     
-                    window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
+                    setTimeout(() => {
+                        window.location.href = 'https://sos.emiia.ai/vv1.html?pwa=true';
+                    }, 1000);
                 } else {
                     alert('Неверные учетные данные!');
                 }
@@ -327,168 +330,6 @@
                 alert('Ошибка соединения');
             }
         });
-
-        // Восстановление сохраненных данных
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedLogin = localStorage.getItem('savedLogin');
-            const savedPassword = localStorage.getItem('savedPassword');
-            if (savedLogin) document.getElementById('login').value = savedLogin;
-            if (savedPassword) document.getElementById('password').value = savedPassword;
-        });
-
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async function() {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    console.log('✅ Service Worker зарегистрирован:', registration);
-                    
-                    // Инициализация Push уведомлений после регистрации SW
-                    setTimeout(initializePushNotifications, 1000);
-                    
-                } catch (error) {
-                    console.log('❌ Ошибка регистрации Service Worker:', error);
-                }
-            });
-        }
-
-        // Push Notifications System
-        let isPushEnabled = false;
-
-        async function initializePushNotifications() {
-            // Проверяем поддержку
-            if (!('Notification' in window) || !('PushManager' in window)) {
-                console.log('❌ Push-уведомления не поддерживаются');
-                return;
-            }
-
-            // Запрашиваем разрешение
-            const permission = await Notification.requestPermission();
-            
-            if (permission === 'granted') {
-                console.log('✅ Разрешение на уведомления получено');
-                await subscribeToPush();
-            } else {
-                console.log('❌ Разрешение на уведомления отклонено');
-            }
-        }
-
-        async function subscribeToPush() {
-            try {
-                const registration = await navigator.serviceWorker.ready;
-                
-                // Подписываемся на Push-сообщения
-                const subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array('BEl62iUYgUivzhIh8B46w5X6a6gQk5VM8u3KZ8Q8nLf8bE7pBzH2vQ6sW9rT4uLm7aN1oX2wV5fP8hG3dY6jU')
-                });
-                
-                console.log('✅ Подписка на Push выполнена:', subscription);
-                isPushEnabled = true;
-                
-                // Сохраняем подписку (можно отправить на сервер)
-                localStorage.setItem('pushSubscription', JSON.stringify(subscription));
-                
-            } catch (error) {
-                console.log('❌ Ошибка подписки на Push:', error);
-            }
-        }
-
-        // Вспомогательная функция для конвертации ключа
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding)
-                .replace(/\-/g, '+')
-                .replace(/_/g, '/');
-
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-
-            for (let i = 0; i < rawData.length; ++i) {
-                outputArray[i] = rawData.charCodeAt(i);
-            }
-            return outputArray;
-        }
-
-        // Функция показа уведомления
-        function showNotification(title, body, icon = '/logo_wms.svg') {
-            if (Notification.permission === 'granted') {
-                const options = {
-                    body: body,
-                    icon: icon,
-                    badge: '/vv.ico',
-                    vibrate: [100, 50, 100],
-                    data: { url: window.location.href },
-                    actions: [
-                        {
-                            action: 'open',
-                            title: 'Открыть'
-                        },
-                        {
-                            action: 'close',
-                            title: 'Закрыть'
-                        }
-                    ]
-                };
-
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification(title, options);
-                });
-            }
-        }
-
-        // Тест уведомления
-        document.getElementById('testNotification').addEventListener('click', async () => {
-            if (Notification.permission === 'default') {
-                const permission = await Notification.requestPermission();
-                if (permission !== 'granted') {
-                    alert('Разрешите уведомления для тестирования');
-                    return;
-                }
-            }
-
-            if (Notification.permission === 'granted') {
-                showNotification(
-                    'EMIIA.AI Тест', 
-                    'Push-уведомления работают отлично! 🚀',
-                    '/logo_wms.svg'
-                );
-            } else {
-                alert('Разрешите уведомления в настройках браузера');
-            }
-        });
-
-        // Обработка кликов по уведомлениям
-        navigator.serviceWorker?.addEventListener('message', event => {
-            if (event.data && event.data.type === 'NOTIFICATION_CLICK') {
-                console.log('🔔 Уведомление было открыто:', event.data);
-            }
-        });
-
-        // Offline Detection
-        window.addEventListener('online', () => {
-            console.log('🟢 Онлайн');
-            showNotification('Соединение восстановлено', 'EMIIA.AI снова онлайн');
-        });
-
-        window.addEventListener('offline', () => {
-            console.log('🔴 Оффлайн');
-            showNotification('Нет соединения', 'Проверьте интернет-подключение');
-        });
-
-        // Периодические уведомления (для демо)
-        setInterval(() => {
-            if (Notification.permission === 'granted' && Math.random() > 0.8) {
-                const messages = [
-                    'Пространственный интеллект активен',
-                    'Новые данные доступны для анализа',
-                    'Система работает в штатном режиме',
-                    'Готов к пространственным вычислениям'
-                ];
-                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                showNotification('EMIIA.AI', randomMessage);
-            }
-        }, 60000); // Каждую минуту с вероятностью 20%
     </script>
 </body>
 </html>
