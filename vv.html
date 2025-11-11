@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -13,11 +14,6 @@
     <link rel="apple-touch-icon" href="/192x192.png">
     <link rel="shortcut icon" href="/vv.ico" type="image/x-icon">
     <link rel="manifest" href="/vv.webmanifest">
-
-    <!-- Apple Touch Icons для iOS бейджей -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/152x152.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="/167x167.png">
 
     <!-- Соцсети -->
     <meta property="og:type" content="website"/>
@@ -49,10 +45,7 @@
             justify-content: center;
             align-items: center;
             background: #F8F9FA;
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
         .main-container {
@@ -74,7 +67,6 @@
             max-width: 400px;
             margin: 0 auto;
             font-family: monospace;
-            position: relative;
         }
         
         h2 {
@@ -82,12 +74,10 @@
             margin: 0 0 1.5rem 0;
             text-align: center;
             font-size: 1.8rem;
-            font-family: monospace;
         }
         
         .input-group {
             margin-bottom: 1.2rem;
-            font-family: monospace;
         }
         
         input {
@@ -127,83 +117,38 @@
             background: #3c78d8;
         }
         
+        .notification-btn {
+            background: #27ae60 !important;
+            margin-top: 10px !important;
+        }
+        
+        .notification-btn:hover {
+            background: #219a52 !important;
+        }
+        
+        .badge-btn {
+            background: #ff3b30 !important;
+            margin-top: 5px !important;
+        }
+        
+        .badge-btn:hover {
+            background: #d70015 !important;
+        }
+        
         .text-primary {
             color: #6d9eeb;
             text-decoration: none;
         }
         
-        .text-primary1 {
-            text-decoration: none;
-            text-align: center;
-            display: block;
-        }
-        
-        .beta {
-            font-size: .4em;
-        }
-        
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        
-        p.small {
-            font-size: .8rem;
-        }
-        
-        /* PUSH УВЕДОМЛЕНИЯ */
-        .push-controls {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border: 1px solid #e9ecef;
-        }
-        
-        .push-btn {
-            background: #ff3b30 !important;
-            margin: 5px !important;
-            width: auto !important;
-            display: inline-block !important;
-            padding: 10px 15px !important;
-            font-size: 0.9rem !important;
-        }
-        
-        .push-btn:hover {
-            background: #d70015 !important;
-        }
-        
-        .test-notification-btn {
-            background: #27ae60 !important;
-            margin-top: 10px !important;
-        }
-        
-        .test-notification-btn:hover {
-            background: #219a52 !important;
-        }
-        
-        .badge-counter {
-            display: inline-block;
-            background: #ff3b30;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            text-align: center;
-            line-height: 24px;
-            margin-left: 10px;
-            font-size: 12px;
-        }
-        
-        .subscription-status {
+        .notification-status {
             padding: 10px;
             margin: 10px 0;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            border-radius: 8px;
             text-align: center;
+            font-size: 0.9rem;
         }
         
-        .status-subscribed {
+        .status-success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
@@ -214,8 +159,32 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
 
-        /* МЕДИА-ЗАПРОСЫ */
+        .badge-display {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        
+        .badge-counter {
+            display: inline-block;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .main-container {
                 padding: 15px;
@@ -228,33 +197,6 @@
                 margin: 0;
                 max-width: 100%;
                 width: 100%;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-                margin-bottom: 1.2rem;
-            }
-            
-            input {
-                letter-spacing: 4.5px;
-                font-size: 16px;
-            }
-            
-            .push-btn {
-                display: block !important;
-                width: 100% !important;
-                margin: 5px 0 !important;
-            }
-        }
-        
-        @media (max-height: 600px) {
-            .main-container {
-                align-items: flex-start;
-                padding-top: 10px;
-            }
-            
-            .auth-container {
-                padding: 1.2rem;
             }
         }
     </style>
@@ -270,25 +212,15 @@
                 </h2>
             </div>
 
-            <!-- Панель управления Push уведомлениями -->
-            <div class="push-controls">
-                <h3 style="margin-bottom: 15px; color: #333; text-align: center;">🔔 Push Уведомления</h3>
-                
-                <div id="pushStatus" class="subscription-status">
-                    Загрузка статуса...
-                </div>
-                
-                <div style="text-align: center;">
-                    <button class="push-btn" id="subscribeBtn">Подписаться на Push</button>
-                    <button class="push-btn" id="testPushBtn">Тест уведомления</button>
-                    <button class="push-btn" id="incrementBadgeBtn">+1 к бейджу</button>
-                    <button class="push-btn" id="clearBadgeBtn">Сбросить бейдж</button>
-                </div>
-                
-                <div style="text-align: center; margin-top: 10px;">
-                    <span>Текущий бейдж: </span>
-                    <span id="currentBadge" class="badge-counter">0</span>
-                </div>
+            <!-- Статус уведомлений -->
+            <div id="notificationStatus" class="notification-status status-info">
+                🔔 Проверка поддержки уведомлений...
+            </div>
+
+            <!-- Отображение бейджа -->
+            <div class="badge-display">
+                <span>Текущий бейдж: </span>
+                <span id="currentBadge" class="badge-counter">0</span>
             </div>
 
             <form id="auth-form">
@@ -301,11 +233,23 @@
                 <p class="small"><a class="text-primary" href="mailto:emiia@emiia.ai">Забыли пароль?</a></p>
 
                 <button type="submit">ВОЙТИ <span>❯</span></button>
+                
+                <!-- Кнопки управления уведомлениями -->
+                <button type="button" class="notification-btn" id="testNotification">
+                    🔔 Тест уведомления
+                </button>
+                
+                <button type="button" class="badge-btn" id="incrementBadge">
+                    🔴 +1 к бейджу
+                </button>
+                
+                <button type="button" class="badge-btn" id="clearBadge">
+                    🗑️ Сбросить бейдж
+                </button>
             </form>
 
             <p style="margin-top:1rem">Нет аккаунта? <a class="text-primary" href="mailto:emiia@emiia.ai">Зарегистрироваться</a></p>
             
-            <!-- ВЕРНУТАЯ ССЫЛКА -->
             <div style="text-align:center;margin-top:2rem">
                 <a class="text-primary1" href="https://www.emiia.ru/" style="color:#da4216;font-weight:600;text-decoration:none">
                     <span style="color:#b2b4b3;font-size:1rem;font-weight:500">ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</span>
@@ -315,262 +259,211 @@
         </div>
     </div>
 
-    <!-- СКРИПТЫ -->
-    <script src="/telegram-web-app.js" async></script>
-    
     <script>
-        class PushManager {
+        // Простой менеджер уведомлений без сложной push-подписки
+        class NotificationManager {
             constructor() {
-                this.subscription = null;
-                this.badgeCount = 0;
-                this.isSubscribed = false;
-                
+                this.badgeCount = parseInt(localStorage.getItem('badgeCount')) || 0;
+                this.isSupported = this.checkSupport();
                 this.initialize();
             }
 
-            async initialize() {
-                await this.checkSubscription();
-                this.updateUI();
+            checkSupport() {
+                const hasNotifications = 'Notification' in window;
+                const hasServiceWorker = 'serviceWorker' in navigator;
+                const hasBadge = 'setAppBadge' in navigator;
                 
-                // Периодическая проверка новых уведомлений
-                setInterval(() => this.checkForNewNotifications(), 30000);
+                console.log('📱 Поддержка:', {
+                    notifications: hasNotifications,
+                    serviceWorker: hasServiceWorker,
+                    badge: hasBadge
+                });
+                
+                return hasNotifications;
             }
 
-            // Проверяем подписку
-            async checkSubscription() {
-                if (!('serviceWorker' in navigator)) {
-                    this.showStatus('❌ Service Worker не поддерживается', false);
-                    return;
-                }
-
-                try {
-                    const registration = await navigator.serviceWorker.ready;
-                    this.subscription = await registration.pushManager.getSubscription();
-                    this.isSubscribed = !(this.subscription === null);
-                    
-                    if (this.isSubscribed) {
-                        console.log('✅ Уже подписаны на push');
-                        this.showStatus('✅ Подписка активна', true);
-                    } else {
-                        this.showStatus('ℹ️ Нажмите "Подписаться" для получения уведомлений', true);
+            async initialize() {
+                this.updateBadgeDisplay();
+                this.updateStatus();
+                
+                // Регистрируем Service Worker
+                if ('serviceWorker' in navigator) {
+                    try {
+                        await navigator.serviceWorker.register('/sw-simple.js');
+                        console.log('✅ Service Worker зарегистрирован');
+                    } catch (error) {
+                        console.log('❌ Ошибка Service Worker:', error);
                     }
-                } catch (error) {
-                    console.log('❌ Ошибка проверки подписки:', error);
-                    this.showStatus('❌ Ошибка проверки подписки', false);
                 }
             }
 
-            // Подписка на push
-            async subscribeToPush() {
-                if (!('serviceWorker' in navigator)) {
-                    this.showStatus('❌ Service Worker не поддерживается', false);
-                    return;
+            // Простая функция для показа уведомлений
+            async showNotification(title, body, options = {}) {
+                if (!this.isSupported) {
+                    this.showStatus('❌ Ваш браузер не поддерживает уведомления', false);
+                    return false;
                 }
 
-                try {
-                    // Запрашиваем разрешение
+                // Проверяем разрешение
+                if (Notification.permission === 'default') {
                     const permission = await Notification.requestPermission();
                     if (permission !== 'granted') {
                         this.showStatus('❌ Разрешение на уведомления отклонено', false);
-                        return;
+                        return false;
                     }
-
-                    const registration = await navigator.serviceWorker.ready;
-                    
-                    // Подписываемся
-                    this.subscription = await registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: this.urlBase64ToUint8Array(
-                            'BEl62iUYgUivzhIh8B46w5X6a6gQk5VM8u3KZ8Q8nLf8bE7pBzH2vQ6sW9rT4uLm7aN1oX2wV5fP8hG3dY6jU'
-                        )
-                    });
-
-                    this.isSubscribed = true;
-                    
-                    // Отправляем подписку на сервер
-                    await this.sendSubscriptionToServer(this.subscription);
-                    
-                    this.showStatus('✅ Успешно подписались на push!', true);
-                    console.log('🔔 Push подписка:', this.subscription);
-                    
-                } catch (error) {
-                    console.log('❌ Ошибка подписки:', error);
-                    this.showStatus('❌ Ошибка подписки на push', false);
-                }
-            }
-
-            // Отправка тестового уведомления
-            async sendTestNotification() {
-                if (!this.isSubscribed) {
-                    this.showStatus('❌ Сначала подпишитесь на push', false);
-                    return;
                 }
 
-                try {
-                    this.badgeCount++;
-                    
-                    // Показываем локальное уведомление
-                    const registration = await navigator.serviceWorker.ready;
-                    await registration.showNotification('EMIIA.AI Тест', {
-                        body: `Тестовое уведомление #${this.badgeCount}`,
-                        icon: '/192x192.png',
-                        badge: '/badge-72.png',
-                        tag: 'test',
-                        vibrate: [200, 100, 200],
-                        data: { 
-                            badgeCount: this.badgeCount,
-                            url: window.location.href
-                        },
-                        actions: [
-                            { action: 'open', title: 'Открыть' },
-                            { action: 'close', title: 'Закрыть' }
-                        ]
-                    });
-                    
-                    // Обновляем бейдж
-                    await this.setAppBadge(this.badgeCount);
-                    this.updateBadgeDisplay();
-                    
-                    this.showStatus('✅ Тестовое уведомление отправлено!', true);
-                    
-                } catch (error) {
-                    console.log('❌ Ошибка отправки теста:', error);
-                    this.showStatus('❌ Ошибка отправки уведомления', false);
+                if (Notification.permission === 'granted') {
+                    try {
+                        const notificationOptions = {
+                            body: body,
+                            icon: '/logo_wms.svg',
+                            badge: '/vv.ico',
+                            vibrate: [100, 50, 100],
+                            data: { url: window.location.href },
+                            ...options
+                        };
+
+                        // Пытаемся показать через Service Worker
+                        if ('serviceWorker' in navigator) {
+                            const registration = await navigator.serviceWorker.ready;
+                            await registration.showNotification(title, notificationOptions);
+                        } else {
+                            // Fallback на обычные уведомления
+                            const notification = new Notification(title, notificationOptions);
+                            
+                            notification.onclick = () => {
+                                window.focus();
+                                notification.close();
+                            };
+                        }
+
+                        this.showStatus('✅ Уведомление отправлено!', true);
+                        return true;
+                        
+                    } catch (error) {
+                        console.log('❌ Ошибка показа уведомления:', error);
+                        this.showStatus('❌ Ошибка отправки уведомления', false);
+                        return false;
+                    }
+                } else {
+                    this.showStatus('❌ Разрешите уведомления в настройках браузера', false);
+                    return false;
                 }
             }
 
             // Управление бейджами
-            async incrementBadge() {
-                this.badgeCount++;
-                await this.setAppBadge(this.badgeCount);
+            async setBadge(count) {
+                this.badgeCount = count;
+                localStorage.setItem('badgeCount', count.toString());
                 this.updateBadgeDisplay();
-                this.showStatus(`🔴 Бейдж: ${this.badgeCount}`, true);
                 
-                // Показываем уведомление об обновлении бейджа
-                if (Notification.permission === 'granted') {
-                    const registration = await navigator.serviceWorker.ready;
-                    registration.showNotification('EMIIA.AI', {
-                        body: `Новых уведомлений: ${this.badgeCount}`,
-                        badge: '/badge-72.png',
-                        tag: 'badge-update'
-                    });
-                }
-            }
-
-            async clearBadge() {
-                this.badgeCount = 0;
-                await this.setAppBadge(0);
-                this.updateBadgeDisplay();
-                this.showStatus('✅ Бейдж сброшен', true);
-            }
-
-            async setAppBadge(count) {
+                // Устанавливаем бейдж если поддерживается
                 if (navigator.setAppBadge) {
-                    await navigator.setAppBadge(count);
-                    console.log(`🔴 Бейдж установлен: ${count}`);
-                } else if (self.registration && self.registration.setAppBadge) {
-                    await self.registration.setAppBadge(count);
-                }
-            }
-
-            // Вспомогательные методы
-            urlBase64ToUint8Array(base64String) {
-                const padding = '='.repeat((4 - base64String.length % 4) % 4);
-                const base64 = (base64String + padding)
-                    .replace(/\-/g, '+')
-                    .replace(/_/g, '/');
-
-                const rawData = window.atob(base64);
-                const outputArray = new Uint8Array(rawData.length);
-
-                for (let i = 0; i < rawData.length; ++i) {
-                    outputArray[i] = rawData.charCodeAt(i);
-                }
-                return outputArray;
-            }
-
-            async sendSubscriptionToServer(subscription) {
-                // Сохраняем подписку в localStorage (в реальном приложении отправьте на сервер)
-                localStorage.setItem('pushSubscription', JSON.stringify(subscription));
-                console.log('📤 Подписка сохранена. Для реального использования отправьте на сервер:', JSON.stringify(subscription));
-            }
-
-            async checkForNewNotifications() {
-                if (!this.isSubscribed) return;
-                
-                // Имитация проверки новых уведомлений
-                if (Math.random() > 0.7) { // 30% chance
-                    this.badgeCount++;
-                    await this.setAppBadge(this.badgeCount);
-                    this.updateBadgeDisplay();
-                    
-                    if (Notification.permission === 'granted') {
-                        const registration = await navigator.serviceWorker.ready;
-                        registration.showNotification('EMIIA.AI', {
-                            body: 'Новые данные доступны для анализа',
-                            badge: '/badge-72.png',
-                            tag: 'auto-notification'
-                        });
+                    try {
+                        await navigator.setAppBadge(count);
+                        console.log(`🔴 Бейдж установлен: ${count}`);
+                    } catch (error) {
+                        console.log('❌ Ошибка установки бейджа:', error);
                     }
                 }
             }
 
-            // Обновление UI
-            updateUI() {
-                this.updateBadgeDisplay();
+            async incrementBadge() {
+                const newCount = this.badgeCount + 1;
+                await this.setBadge(newCount);
+                
+                // Показываем уведомление об обновлении
+                await this.showNotification(
+                    'EMIIA.AI', 
+                    `Новых уведомлений: ${newCount}`,
+                    { tag: 'badge-update' }
+                );
+                
+                this.showStatus(`🔴 Бейдж обновлен: ${newCount}`, true);
             }
 
+            async clearBadge() {
+                await this.setBadge(0);
+                
+                if (navigator.clearAppBadge) {
+                    try {
+                        await navigator.clearAppBadge();
+                    } catch (error) {
+                        console.log('❌ Ошибка очистки бейджа:', error);
+                    }
+                }
+                
+                this.showStatus('✅ Бейдж сброшен', true);
+            }
+
+            // Обновление UI
             updateBadgeDisplay() {
                 const badgeEl = document.getElementById('currentBadge');
                 if (badgeEl) {
                     badgeEl.textContent = this.badgeCount;
-                    badgeEl.style.display = this.badgeCount > 0 ? 'inline-block' : 'none';
+                }
+            }
+
+            updateStatus() {
+                if (!this.isSupported) {
+                    this.showStatus('❌ Ваш браузер не поддерживает уведомления', false);
+                    return;
+                }
+
+                switch (Notification.permission) {
+                    case 'granted':
+                        this.showStatus('✅ Уведомления разрешены', true);
+                        break;
+                    case 'denied':
+                        this.showStatus('❌ Уведомления заблокированы. Разрешите в настройках браузера.', false);
+                        break;
+                    default:
+                        this.showStatus('ℹ️ Нажмите "Тест уведомления" для запроса разрешения', true);
                 }
             }
 
             showStatus(message, isSuccess) {
-                const statusEl = document.getElementById('pushStatus');
+                const statusEl = document.getElementById('notificationStatus');
                 if (statusEl) {
                     statusEl.textContent = message;
-                    statusEl.className = `subscription-status ${isSuccess ? 'status-subscribed' : 'status-error'}`;
+                    statusEl.className = `notification-status ${
+                        isSuccess ? 'status-success' : 
+                        message.includes('ℹ️') ? 'status-info' : 'status-error'
+                    }`;
                 }
             }
         }
 
         // Инициализация при загрузке
-        let pushManager;
+        let notificationManager;
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Регистрируем Service Worker
-            if ('serviceWorker' in navigator) {
-                try {
-                    await navigator.serviceWorker.register('/sw-push.js');
-                    console.log('✅ Push Service Worker зарегистрирован');
-                } catch (error) {
-                    console.log('❌ Ошибка Push Service Worker:', error);
-                    return;
+        document.addEventListener('DOMContentLoaded', function() {
+            notificationManager = new NotificationManager();
+
+            // Назначаем обработчики
+            document.getElementById('testNotification').addEventListener('click', async () => {
+                const success = await notificationManager.showNotification(
+                    'EMIIA.AI Тест', 
+                    'Уведомления работают отлично! 🚀',
+                    { 
+                        icon: '/logo_wms.svg',
+                        badge: '/vv.ico'
+                    }
+                );
+                
+                if (success) {
+                    await notificationManager.incrementBadge();
                 }
+            });
 
-                // Инициализируем менеджер push
-                pushManager = new PushManager();
+            document.getElementById('incrementBadge').addEventListener('click', () => {
+                notificationManager.incrementBadge();
+            });
 
-                // Назначаем обработчики
-                document.getElementById('subscribeBtn').addEventListener('click', () => {
-                    pushManager.subscribeToPush();
-                });
-
-                document.getElementById('testPushBtn').addEventListener('click', () => {
-                    pushManager.sendTestNotification();
-                });
-
-                document.getElementById('incrementBadgeBtn').addEventListener('click', () => {
-                    pushManager.incrementBadge();
-                });
-
-                document.getElementById('clearBadgeBtn').addEventListener('click', () => {
-                    pushManager.clearBadge();
-                });
-            }
+            document.getElementById('clearBadge').addEventListener('click', () => {
+                notificationManager.clearBadge();
+            });
 
             // Восстановление сохраненных данных
             const savedLogin = localStorage.getItem('savedLogin');
@@ -585,11 +478,8 @@
                 const tele = window.Telegram.WebApp;
                 tele.ready();
                 tele.expand();
-                tele.SettingsButton.show();
                 tele.setHeaderColor("#f8f9fa");
                 tele.setBackgroundColor("#f8f9fa");
-                tele.enableClosingConfirmation();
-                tele.disableVerticalSwipes();
             }
         });
 
@@ -610,14 +500,12 @@
                     localStorage.setItem('savedPassword', password);
                     
                     // Показываем уведомление об успешном входе
-                    if (Notification.permission === 'granted' && pushManager) {
-                        pushManager.incrementBadge();
-                        const registration = await navigator.serviceWorker.ready;
-                        registration.showNotification('EMIIA.AI', {
-                            body: 'Успешный вход в систему!',
-                            icon: '/logo_wms.svg',
-                            badge: '/badge-72.png'
-                        });
+                    if (notificationManager) {
+                        await notificationManager.showNotification(
+                            'EMIIA.AI', 
+                            'Успешный вход в систему!'
+                        );
+                        await notificationManager.incrementBadge();
                     }
                     
                     setTimeout(() => {
@@ -631,22 +519,20 @@
             }
         });
 
-        // Offline Detection
-        window.addEventListener('online', () => {
-            console.log('🟢 Онлайн');
-            if (Notification.permission === 'granted') {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification('EMIIA.AI', {
-                        body: 'Соединение восстановлено',
-                        badge: '/badge-72.png'
-                    });
-                });
+        // Периодические уведомления (демо)
+        setInterval(() => {
+            if (notificationManager && Math.random() > 0.8) {
+                const messages = [
+                    'Пространственный интеллект активен',
+                    'Новые данные доступны для анализа',
+                    'Система работает в штатном режиме'
+                ];
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                
+                notificationManager.showNotification('EMIIA.AI', randomMessage);
+                notificationManager.incrementBadge();
             }
-        });
-
-        window.addEventListener('offline', () => {
-            console.log('🔴 Оффлайн');
-        });
+        }, 60000);
     </script>
 </body>
 </html>
