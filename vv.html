@@ -11,17 +11,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="EMIIA.AI">
     
-    <!-- Apple Touch Icons (ОБЯЗАТЕЛЬНО для iOS) -->
+    <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
-    
-    <!-- iOS Safari Meta -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-touch-fullscreen" content="yes">
     
     <link rel="shortcut icon" href="/vv.ico" type="image/x-icon">
     <link rel="manifest" href="/vv.webmanifest">
@@ -56,9 +50,6 @@
             align-items: center;
             background: #F8F9FA;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
         }
         
         .main-container {
@@ -103,7 +94,6 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             letter-spacing: 2px;
-            -webkit-appearance: none;
         }
         
         input:focus {
@@ -125,7 +115,6 @@
             transition: background .3s ease;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin-top: .5rem;
-            -webkit-appearance: none;
         }
         
         button:hover {
@@ -135,18 +124,6 @@
         .text-primary {
             color: #6d9eeb;
             text-decoration: none;
-        }
-        
-        .ios-permission-prompt {
-            display: none;
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            text-align: center;
-            font-size: 0.9rem;
         }
 
         @media (max-width: 768px) {
@@ -176,11 +153,6 @@
                 </h2>
             </div>
 
-            <!-- iOS Permission Prompt -->
-            <div id="iosPermissionPrompt" class="ios-permission-prompt">
-                🔔 Для уведомлений на iOS разрешите их в Настройки → Safari → Уведомления
-            </div>
-
             <form id="auth-form">
                 <div class="input-group">
                     <input type="text" id="login" name="username" placeholder="Email address" autocomplete="username" required>
@@ -205,141 +177,66 @@
     </div>
 
     <script>
-        // iOS-совместимый менеджер уведомлений
-        class IOSNotificationManager {
+        // Исправленный менеджер для iOS (множественные уведомления)
+        class FixedIOSNotificationManager {
             constructor() {
                 this.badgeCount = 0;
                 this.notificationInterval = null;
-                this.isIOS = this.detectIOS();
-                this.isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+                this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                this.notificationCounter = 0;
                 this.initialize();
             }
 
-            detectIOS() {
-                return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            }
-
             async initialize() {
-                console.log('📱 iOS Detection:', {
+                console.log('📱 iOS Fixed Manager:', {
                     isIOS: this.isIOS,
-                    isStandalone: this.isStandalone,
                     userAgent: navigator.userAgent
                 });
 
-                // Загружаем состояние
                 this.loadState();
 
-                // Для iOS используем специальный подход
-                if (this.isIOS) {
-                    await this.initializeIOS();
-                } else {
-                    await this.initializeOtherPlatforms();
-                }
-
-                // Запускаем автоматические уведомления
-                this.startAutoNotifications();
-            }
-
-            async initializeIOS() {
-                console.log('🍎 Инициализация для iOS');
-
-                // На iOS Service Worker может не работать надежно
-                try {
-                    if ('serviceWorker' in navigator) {
-                        await navigator.serviceWorker.register('/sw-ios-fixed.js');
-                        console.log('✅ iOS Service Worker зарегистрирован');
-                    }
-                } catch (error) {
-                    console.log('❌ iOS Service Worker ошибка:', error);
-                }
-
-                // На iOS запрашиваем разрешение только при взаимодействии
-                this.setupIOSPermissionRequest();
-            }
-
-            async initializeOtherPlatforms() {
-                console.log('🖥️ Инициализация для других платформ');
-
+                // Регистрируем Service Worker
                 if ('serviceWorker' in navigator) {
                     try {
-                        await navigator.serviceWorker.register('/sw-ios-fixed.js');
-                        console.log('✅ Service Worker зарегистрирован');
+                        await navigator.serviceWorker.register('/sw-ios-fixed-v2.js');
+                        console.log('✅ Fixed iOS Service Worker зарегистрирован');
                     } catch (error) {
-                        console.log('❌ Service Worker ошибка:', error);
+                        console.log('❌ Fixed iOS Service Worker ошибка:', error);
                     }
                 }
 
-                // Автоматически запрашиваем разрешение для не-iOS
-                await this.requestPermission();
-            }
-
-            setupIOSPermissionRequest() {
-                // На iOS запрашиваем разрешение только после клика пользователя
-                const form = document.getElementById('auth-form');
-                if (form) {
-                    form.addEventListener('submit', async (e) => {
-                        // Запрашиваем разрешение при отправке формы (пользовательское действие)
-                        await this.requestPermission();
-                    });
-                }
-
-                // Показываем подсказку для iOS
-                this.showIOSPermissionHint();
-            }
-
-            showIOSPermissionHint() {
-                const prompt = document.getElementById('iosPermissionPrompt');
-                if (prompt && Notification.permission === 'default') {
-                    prompt.style.display = 'block';
-                }
+                // Запускаем уведомления каждую минуту
+                this.startMinuteNotifications();
             }
 
             async requestPermission() {
-                if (!('Notification' in window)) {
-                    console.log('❌ Уведомления не поддерживаются');
-                    return false;
-                }
-
-                // На iOS в standalone режиме уведомления могут не работать
-                if (this.isIOS && this.isStandalone) {
-                    console.log('📱 iOS Standalone - ограниченная поддержка уведомлений');
-                }
+                if (!('Notification' in window)) return false;
 
                 if (Notification.permission === 'default') {
                     try {
-                        // На iOS это должно быть вызвано в ответ на пользовательское действие
                         const permission = await Notification.requestPermission();
-                        console.log('📱 iOS Permission:', permission);
-                        
-                        if (permission === 'granted') {
-                            this.hideIOSPermissionHint();
-                            return true;
-                        }
+                        console.log('📱 iOS Permission Result:', permission);
+                        return permission === 'granted';
                     } catch (error) {
                         console.log('❌ Ошибка запроса разрешения:', error);
+                        return false;
                     }
                 }
                 
                 return Notification.permission === 'granted';
             }
 
-            hideIOSPermissionHint() {
-                const prompt = document.getElementById('iosPermissionPrompt');
-                if (prompt) {
-                    prompt.style.display = 'none';
-                }
-            }
-
             loadState() {
                 try {
-                    const savedState = localStorage.getItem('iosNotificationState');
+                    const savedState = localStorage.getItem('fixedIOSNotificationState');
                     if (savedState) {
                         const state = JSON.parse(savedState);
                         this.badgeCount = state.badgeCount || 0;
-                        console.log('📁 Загружено состояние iOS:', state);
+                        this.notificationCounter = state.notificationCounter || 0;
+                        console.log('📁 Загружено исправленное состояние:', state);
                     }
                 } catch (error) {
-                    console.log('❌ Ошибка загрузки состояния iOS:', error);
+                    console.log('❌ Ошибка загрузки состояния:', error);
                 }
             }
 
@@ -347,117 +244,119 @@
                 try {
                     const state = {
                         badgeCount: this.badgeCount,
-                        lastUpdate: Date.now(),
-                        platform: this.isIOS ? 'ios' : 'other'
+                        notificationCounter: this.notificationCounter,
+                        lastUpdate: Date.now()
                     };
-                    localStorage.setItem('iosNotificationState', JSON.stringify(state));
+                    localStorage.setItem('fixedIOSNotificationState', JSON.stringify(state));
                 } catch (error) {
-                    console.log('❌ Ошибка сохранения состояния iOS:', error);
+                    console.log('❌ Ошибка сохранения состояния:', error);
                 }
             }
 
-            startAutoNotifications() {
-                // Первое уведомление с задержкой
-                setTimeout(() => {
-                    this.sendWelcomeNotification();
-                }, 15000); // 15 секунд для iOS
+            startMinuteNotifications() {
+                // Первое уведомление через 5 секунд
+                setTimeout(async () => {
+                    await this.requestPermission();
+                    this.sendNotification('Добро пожаловать в EMIIA.AI!', 'Пространственный интеллект активирован 🚀');
+                }, 5000);
 
-                // Периодические уведомления с разными интервалами для iOS
-                const interval = this.isIOS ? 180000 : 120000; // 3 мин для iOS, 2 мин для других
-                
+                // Уведомления каждую минуту
                 this.notificationInterval = setInterval(() => {
-                    if (Math.random() > 0.4) { // 60% chance
-                        this.sendRandomNotification();
-                    }
-                }, interval + Math.random() * 120000);
+                    this.sendRandomNotification();
+                }, 60000); // 60 секунд = 1 минута
 
-                console.log('🔄 Авто-уведомления запущены, iOS:', this.isIOS);
+                console.log('🔄 Уведомления каждую минуту запущены');
             }
 
-            async sendWelcomeNotification() {
-                if (Notification.permission !== 'granted') return;
+            async sendNotification(title, body) {
+                if (Notification.permission !== 'granted') return false;
 
-                const message = this.isIOS ? 
-                    'Пространственный интеллект активирован! 🍎' : 
-                    'Пространственный интеллект активирован! 🚀';
+                try {
+                    this.notificationCounter++;
+                    
+                    // УНИКАЛЬНЫЙ TAG для каждого уведомления - это решает проблему iOS!
+                    const uniqueTag = `emiia-notification-${Date.now()}-${this.notificationCounter}`;
+                    
+                    const options = {
+                        body: body,
+                        icon: this.isIOS ? '/icons/apple-touch-icon.png' : '/icons/icon-192x192.png',
+                        badge: '/icons/badge-72x72.png',
+                        tag: uniqueTag, // УНИКАЛЬНЫЙ TAG для каждого уведомления
+                        renotify: false, // Не переуведомлять
+                        requireInteraction: false,
+                        vibrate: [100, 50, 100],
+                        data: {
+                            url: window.location.href,
+                            timestamp: Date.now(),
+                            id: uniqueTag,
+                            counter: this.notificationCounter
+                        }
+                    };
 
-                await this.showNotification('EMIIA.AI', message);
-                await this.incrementBadge();
+                    console.log(`🔔 Отправка уведомления #${this.notificationCounter}`, { tag: uniqueTag });
+
+                    if ('serviceWorker' in navigator) {
+                        const registration = await navigator.serviceWorker.ready;
+                        
+                        // На iOS закрываем предыдущее уведомление перед показом нового
+                        if (this.isIOS) {
+                            try {
+                                const notifications = await registration.getNotifications();
+                                notifications.forEach(notification => {
+                                    notification.close();
+                                });
+                            } catch (e) {
+                                console.log('⚠️ Не удалось закрыть предыдущие уведомления:', e);
+                            }
+                        }
+                        
+                        await registration.showNotification(title, options);
+                    } else {
+                        const notification = new Notification(title, options);
+                        notification.onclick = () => {
+                            window.focus();
+                            notification.close();
+                        };
+                    }
+
+                    // Обновляем бейдж
+                    await this.incrementBadge();
+                    
+                    return true;
+                } catch (error) {
+                    console.log('❌ Ошибка отправки уведомления:', error);
+                    return false;
+                }
             }
 
             async sendRandomNotification() {
                 if (Notification.permission !== 'granted') return;
 
                 const messages = [
-                    'Пространственный интеллект анализирует данные...',
-                    'Новые паттерны обнаружены в системе',
-                    'Оптимизация алгоритмов завершена',
-                    'Готов к пространственным вычислениям',
-                    'Система работает в оптимальном режиме',
-                    'Доступны новые аналитические отчеты'
+                    '🔍 Пространственный интеллект анализирует данные...',
+                    '📊 Обнаружены новые паттерны в системе',
+                    '⚡ Оптимизация алгоритмов завершена',
+                    '🌐 Готов к пространственным вычислениям',
+                    '✅ Система работает в оптимальном режиме',
+                    '📈 Доступны новые аналитические отчеты',
+                    '🎯 Произведена калибровка сенсоров',
+                    '🚀 Запущены фоновые вычисления',
+                    '💡 Выявлены новые корреляции',
+                    '📱 Синхронизация данных завершена',
+                    '🎪 Система готова к работе',
+                    '🔮 Прогнозирование активировано'
                 ];
 
                 const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                const title = `EMIIA.AI #${this.notificationCounter + 1}`;
                 
-                const success = await this.showNotification('EMIIA.AI', randomMessage);
-                if (success) {
-                    await this.incrementBadge();
-                }
-            }
-
-            async showNotification(title, body) {
-                if (Notification.permission !== 'granted') return false;
-
-                try {
-                    // Разные настройки для iOS и других платформ
-                    const options = {
-                        body: body,
-                        icon: this.isIOS ? '/icons/apple-touch-icon.png' : '/icons/icon-192x192.png',
-                        badge: '/icons/badge-72x72.png',
-                        tag: 'auto-notification-' + Date.now(), // Уникальный tag для iOS
-                        requireInteraction: false,
-                        data: {
-                            url: window.location.href,
-                            timestamp: Date.now(),
-                            platform: this.isIOS ? 'ios' : 'other'
-                        }
-                    };
-
-                    // На iOS стараемся использовать Service Worker, но есть fallback
-                    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                        const registration = await navigator.serviceWorker.ready;
-                        await registration.showNotification(title, options);
-                        console.log('🔔 Уведомление через Service Worker');
-                    } else {
-                        // Fallback для iOS когда Service Worker не доступен
-                        const notification = new Notification(title, options);
-                        notification.onclick = () => {
-                            window.focus();
-                            notification.close();
-                        };
-                        console.log('🔔 Уведомление через Notification API');
-                    }
-
-                    return true;
-                } catch (error) {
-                    console.log('❌ Ошибка показа уведомления:', error);
-                    
-                    // Fallback для iOS
-                    try {
-                        const fallbackNotification = new Notification(title, { body: body });
-                        return true;
-                    } catch (fallbackError) {
-                        console.log('❌ Fallback также не сработал:', fallbackError);
-                        return false;
-                    }
-                }
+                await this.sendNotification(title, randomMessage);
             }
 
             async incrementBadge() {
                 this.badgeCount++;
                 this.saveState();
                 
-                // Badging API работает в Safari 16.4+
                 if ('setAppBadge' in navigator) {
                     try {
                         await navigator.setAppBadge(this.badgeCount);
@@ -465,31 +364,13 @@
                     } catch (error) {
                         console.log('❌ Ошибка обновления бейджа:', error);
                     }
-                } else if (this.isIOS) {
-                    console.log('📱 iOS: Badging API не поддерживается');
-                }
-            }
-
-            // Для iOS бейдж сбрасывается только при реальном закрытии
-            async handleAppClose() {
-                if (this.isIOS) {
-                    // На iOS сложно определить полное закрытие, поэтому сбрасываем реже
-                    this.badgeCount = 0;
-                    this.saveState();
-                    
-                    if ('clearAppBadge' in navigator) {
-                        try {
-                            await navigator.clearAppBadge();
-                        } catch (error) {
-                            console.log('❌ Ошибка очистки бейджа iOS:', error);
-                        }
-                    }
                 }
             }
 
             destroy() {
                 if (this.notificationInterval) {
                     clearInterval(this.notificationInterval);
+                    this.notificationInterval = null;
                 }
             }
         }
@@ -498,7 +379,7 @@
         let notificationManager;
 
         document.addEventListener('DOMContentLoaded', function() {
-            notificationManager = new IOSNotificationManager();
+            notificationManager = new FixedIOSNotificationManager();
 
             // Восстановление данных авторизации
             const savedLogin = localStorage.getItem('savedLogin');
@@ -507,39 +388,15 @@
             if (savedPassword) document.getElementById('password').value = savedPassword;
         });
 
-        // Обработка перехода между страницами
-        window.addEventListener('beforeunload', function() {
-            if (notificationManager) {
-                notificationManager.saveState();
-            }
-        });
-
-        // Для iOS пытаемся определить закрытие приложения
-        window.addEventListener('pagehide', function() {
-            if (notificationManager && notificationManager.isIOS) {
-                // На iOS сложно определить полное закрытие, поэтому используем таймаут
-                setTimeout(() => {
-                    if (document.visibilityState === 'hidden') {
-                        notificationManager.handleAppClose();
-                    }
-                }, 1000);
-            }
-        });
-
-        // Telegram Web App
-        window.addEventListener('load', () => {
-            if (window.Telegram?.WebApp) {
-                const tele = window.Telegram.WebApp;
-                tele.ready();
-                tele.expand();
-                tele.setHeaderColor("#f8f9fa");
-                tele.setBackgroundColor("#f8f9fa");
-            }
-        });
-
-        // Аутентификация
+        // Запрос разрешения при нажатии кнопки ВОЙТИ
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Запрашиваем разрешение на уведомления
+            if (notificationManager) {
+                await notificationManager.requestPermission();
+            }
+            
             const login = document.getElementById('login').value;
             const password = document.getElementById('password').value;
             
@@ -554,12 +411,15 @@
                     localStorage.setItem('savedPassword', password);
                     
                     // Уведомление при успешном входе
-                    if (notificationManager) {
-                        await notificationManager.showNotification(
-                            'EMIIA.AI',
-                            `Добро пожаловать, ${login}! Успешный вход в систему.`
+                    if (notificationManager && Notification.permission === 'granted') {
+                        await notificationManager.sendNotification(
+                            'Успешный вход!',
+                            `Добро пожаловать, ${login}! Система активирована.`
                         );
-                        await notificationManager.incrementBadge();
+                    }
+                    
+                    // Сохраняем состояние перед переходом
+                    if (notificationManager) {
                         notificationManager.saveState();
                     }
                     
@@ -572,14 +432,23 @@
             }
         });
 
-        // Дополнительный iOS fix: перезапрос разрешения при тапе
-        document.addEventListener('touchstart', function() {
-            if (notificationManager && notificationManager.isIOS && 
-                Notification.permission === 'default') {
-                // Не запрашиваем сразу, но можем показать подсказку
-                console.log('📱 iOS touch detected');
+        // Сохраняем состояние при переходе
+        window.addEventListener('beforeunload', function() {
+            if (notificationManager) {
+                notificationManager.saveState();
             }
-        }, { once: true });
+        });
+
+        // Telegram Web App
+        window.addEventListener('load', () => {
+            if (window.Telegram?.WebApp) {
+                const tele = window.Telegram.WebApp;
+                tele.ready();
+                tele.expand();
+                tele.setHeaderColor("#f8f9fa");
+                tele.setBackgroundColor("#f8f9fa");
+            }
+        });
     </script>
 </body>
 </html>
