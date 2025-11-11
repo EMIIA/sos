@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -11,7 +10,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="EMIIA.AI">
-    <link rel="apple-touch-icon" href="/192x192.png">
+    
+    <!-- Apple Touch Icons (ОБЯЗАТЕЛЬНО для iOS бейджей) -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+    
     <link rel="shortcut icon" href="/vv.ico" type="image/x-icon">
     <link rel="manifest" href="/vv.webmanifest">
 
@@ -28,7 +33,6 @@
 
     <!-- СТИЛИ -->
     <style>
-        /* БАЗОВЫЕ СТИЛИ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html { 
@@ -117,22 +121,20 @@
             background: #3c78d8;
         }
         
-        .notification-btn {
-            background: #27ae60 !important;
-            margin-top: 10px !important;
-        }
-        
-        .notification-btn:hover {
-            background: #219a52 !important;
-        }
-        
-        .badge-btn {
+        .ios-badge-btn {
             background: #ff3b30 !important;
-            margin-top: 5px !important;
         }
         
-        .badge-btn:hover {
+        .ios-badge-btn:hover {
             background: #d70015 !important;
+        }
+        
+        .test-btn {
+            background: #27ae60 !important;
+        }
+        
+        .test-btn:hover {
+            background: #219a52 !important;
         }
         
         .text-primary {
@@ -140,10 +142,37 @@
             text-decoration: none;
         }
         
-        .notification-status {
+        .ios-badge-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .badge-display {
+            margin: 10px 0;
+            padding: 10px;
+        }
+        
+        .badge-counter {
+            display: inline-block;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .status-message {
             padding: 10px;
             margin: 10px 0;
-            border-radius: 8px;
+            border-radius: 6px;
             text-align: center;
             font-size: 0.9rem;
         }
@@ -164,25 +193,6 @@
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
-        }
-
-        .badge-display {
-            text-align: center;
-            margin: 10px 0;
-            padding: 10px;
-        }
-        
-        .badge-counter {
-            display: inline-block;
-            background: #ff3b30;
-            color: white;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            font-size: 14px;
-            font-weight: bold;
         }
 
         @media (max-width: 768px) {
@@ -212,15 +222,30 @@
                 </h2>
             </div>
 
-            <!-- Статус уведомлений -->
-            <div id="notificationStatus" class="notification-status status-info">
-                🔔 Проверка поддержки уведомлений...
-            </div>
-
-            <!-- Отображение бейджа -->
-            <div class="badge-display">
-                <span>Текущий бейдж: </span>
-                <span id="currentBadge" class="badge-counter">0</span>
+            <!-- Панель iOS бейджей -->
+            <div class="ios-badge-panel">
+                <h3 style="margin-bottom: 15px; color: #333;">📱 iOS Бейджи на иконке</h3>
+                
+                <div id="iosStatus" class="status-message status-info">
+                    Проверка поддержки iOS бейджей...
+                </div>
+                
+                <div class="badge-display">
+                    <strong>Текущий бейдж: </strong>
+                    <span id="currentBadge" class="badge-counter">0</span>
+                </div>
+                
+                <button class="ios-badge-btn" id="addBadgeBtn">
+                    ➕ Добавить уведомление
+                </button>
+                
+                <button class="ios-badge-btn" id="clearBadgeBtn">
+                    🗑️ Сбросить бейдж
+                </button>
+                
+                <button class="test-btn" id="testNotificationBtn">
+                    🔔 Тест уведомления
+                </button>
             </div>
 
             <form id="auth-form">
@@ -233,19 +258,6 @@
                 <p class="small"><a class="text-primary" href="mailto:emiia@emiia.ai">Забыли пароль?</a></p>
 
                 <button type="submit">ВОЙТИ <span>❯</span></button>
-                
-                <!-- Кнопки управления уведомлениями -->
-                <button type="button" class="notification-btn" id="testNotification">
-                    🔔 Тест уведомления
-                </button>
-                
-                <button type="button" class="badge-btn" id="incrementBadge">
-                    🔴 +1 к бейджу
-                </button>
-                
-                <button type="button" class="badge-btn" id="clearBadge">
-                    🗑️ Сбросить бейдж
-                </button>
             </form>
 
             <p style="margin-top:1rem">Нет аккаунта? <a class="text-primary" href="mailto:emiia@emiia.ai">Зарегистрироваться</a></p>
@@ -260,51 +272,102 @@
     </div>
 
     <script>
-        // Простой менеджер уведомлений без сложной push-подписки
-        class NotificationManager {
+        // iOS Badge Manager для бейджей на иконке
+        class IOSBadgeManager {
             constructor() {
-                this.badgeCount = parseInt(localStorage.getItem('badgeCount')) || 0;
-                this.isSupported = this.checkSupport();
+                this.badgeCount = parseInt(localStorage.getItem('iosBadgeCount')) || 0;
+                this.supportsBadges = false;
                 this.initialize();
             }
 
-            checkSupport() {
-                const hasNotifications = 'Notification' in window;
-                const hasServiceWorker = 'serviceWorker' in navigator;
-                const hasBadge = 'setAppBadge' in navigator;
-                
-                console.log('📱 Поддержка:', {
-                    notifications: hasNotifications,
-                    serviceWorker: hasServiceWorker,
-                    badge: hasBadge
-                });
-                
-                return hasNotifications;
-            }
-
             async initialize() {
+                // Проверяем поддержку Badging API
+                this.supportsBadges = this.checkBadgeSupport();
                 this.updateBadgeDisplay();
                 this.updateStatus();
                 
-                // Регистрируем Service Worker
+                // Восстанавливаем бейдж при загрузке
+                if (this.supportsBadges && this.badgeCount > 0) {
+                    await this.setAppBadge(this.badgeCount);
+                }
+                
+                // Регистрируем Service Worker для фоновых уведомлений
                 if ('serviceWorker' in navigator) {
                     try {
-                        await navigator.serviceWorker.register('/sw-simple.js');
-                        console.log('✅ Service Worker зарегистрирован');
+                        await navigator.serviceWorker.register('/sw-ios-badge.js');
+                        console.log('✅ iOS Badge Service Worker зарегистрирован');
                     } catch (error) {
                         console.log('❌ Ошибка Service Worker:', error);
                     }
                 }
             }
 
-            // Простая функция для показа уведомлений
+            checkBadgeSupport() {
+                // Проверяем поддержку Badging API (работает в Safari 16.4+)
+                const supportsBadge = 'setAppBadge' in navigator && 'clearAppBadge' in navigator;
+                console.log('📱 Поддержка iOS бейджей:', supportsBadge);
+                return supportsBadge;
+            }
+
+            async setAppBadge(count) {
+                if (!this.supportsBadges) return false;
+                
+                try {
+                    this.badgeCount = count;
+                    localStorage.setItem('iosBadgeCount', count.toString());
+                    
+                    await navigator.setAppBadge(count);
+                    console.log(`🔴 iOS бейдж установлен: ${count}`);
+                    
+                    this.updateBadgeDisplay();
+                    return true;
+                } catch (error) {
+                    console.log('❌ Ошибка установки iOS бейджа:', error);
+                    this.showStatus('❌ Ошибка установки бейджа', false);
+                    return false;
+                }
+            }
+
+            async addBadge() {
+                const newCount = this.badgeCount + 1;
+                const success = await this.setAppBadge(newCount);
+                
+                if (success) {
+                    this.showStatus(`🔴 Бейдж обновлен: ${newCount}`, true);
+                    
+                    // Показываем уведомление о новом сообщении
+                    await this.showNotification(
+                        'EMIIA.AI',
+                        `У вас ${newCount} новых уведомлений`,
+                        { tag: 'badge-update' }
+                    );
+                }
+            }
+
+            async clearBadge() {
+                if (!this.supportsBadges) return;
+                
+                try {
+                    this.badgeCount = 0;
+                    localStorage.setItem('iosBadgeCount', '0');
+                    
+                    await navigator.clearAppBadge();
+                    console.log('✅ iOS бейдж сброшен');
+                    
+                    this.updateBadgeDisplay();
+                    this.showStatus('✅ Бейдж сброшен', true);
+                } catch (error) {
+                    console.log('❌ Ошибка очистки iOS бейджа:', error);
+                    this.showStatus('❌ Ошибка очистки бейджа', false);
+                }
+            }
+
             async showNotification(title, body, options = {}) {
-                if (!this.isSupported) {
-                    this.showStatus('❌ Ваш браузер не поддерживает уведомления', false);
+                if (!('Notification' in window)) {
+                    this.showStatus('❌ Уведомления не поддерживаются', false);
                     return false;
                 }
 
-                // Проверяем разрешение
                 if (Notification.permission === 'default') {
                     const permission = await Notification.requestPermission();
                     if (permission !== 'granted') {
@@ -317,87 +380,32 @@
                     try {
                         const notificationOptions = {
                             body: body,
-                            icon: '/logo_wms.svg',
-                            badge: '/vv.ico',
+                            icon: '/icons/icon-192x192.png',
+                            badge: '/icons/badge-72x72.png',
                             vibrate: [100, 50, 100],
-                            data: { url: window.location.href },
                             ...options
                         };
 
-                        // Пытаемся показать через Service Worker
                         if ('serviceWorker' in navigator) {
                             const registration = await navigator.serviceWorker.ready;
                             await registration.showNotification(title, notificationOptions);
                         } else {
-                            // Fallback на обычные уведомления
                             const notification = new Notification(title, notificationOptions);
-                            
                             notification.onclick = () => {
                                 window.focus();
                                 notification.close();
+                                this.clearBadge(); // Сбрасываем бейдж при открытии
                             };
                         }
-
-                        this.showStatus('✅ Уведомление отправлено!', true);
                         return true;
-                        
                     } catch (error) {
-                        console.log('❌ Ошибка показа уведомления:', error);
-                        this.showStatus('❌ Ошибка отправки уведомления', false);
+                        console.log('❌ Ошибка уведомления:', error);
                         return false;
                     }
-                } else {
-                    this.showStatus('❌ Разрешите уведомления в настройках браузера', false);
-                    return false;
                 }
+                return false;
             }
 
-            // Управление бейджами
-            async setBadge(count) {
-                this.badgeCount = count;
-                localStorage.setItem('badgeCount', count.toString());
-                this.updateBadgeDisplay();
-                
-                // Устанавливаем бейдж если поддерживается
-                if (navigator.setAppBadge) {
-                    try {
-                        await navigator.setAppBadge(count);
-                        console.log(`🔴 Бейдж установлен: ${count}`);
-                    } catch (error) {
-                        console.log('❌ Ошибка установки бейджа:', error);
-                    }
-                }
-            }
-
-            async incrementBadge() {
-                const newCount = this.badgeCount + 1;
-                await this.setBadge(newCount);
-                
-                // Показываем уведомление об обновлении
-                await this.showNotification(
-                    'EMIIA.AI', 
-                    `Новых уведомлений: ${newCount}`,
-                    { tag: 'badge-update' }
-                );
-                
-                this.showStatus(`🔴 Бейдж обновлен: ${newCount}`, true);
-            }
-
-            async clearBadge() {
-                await this.setBadge(0);
-                
-                if (navigator.clearAppBadge) {
-                    try {
-                        await navigator.clearAppBadge();
-                    } catch (error) {
-                        console.log('❌ Ошибка очистки бейджа:', error);
-                    }
-                }
-                
-                this.showStatus('✅ Бейдж сброшен', true);
-            }
-
-            // Обновление UI
             updateBadgeDisplay() {
                 const badgeEl = document.getElementById('currentBadge');
                 if (badgeEl) {
@@ -406,73 +414,67 @@
             }
 
             updateStatus() {
-                if (!this.isSupported) {
-                    this.showStatus('❌ Ваш браузер не поддерживает уведомления', false);
+                const statusEl = document.getElementById('iosStatus');
+                if (!statusEl) return;
+
+                if (!this.supportsBadges) {
+                    statusEl.textContent = '❌ iOS бейджи не поддерживаются вашим браузером';
+                    statusEl.className = 'status-message status-error';
                     return;
                 }
 
-                switch (Notification.permission) {
-                    case 'granted':
-                        this.showStatus('✅ Уведомления разрешены', true);
-                        break;
-                    case 'denied':
-                        this.showStatus('❌ Уведомления заблокированы. Разрешите в настройках браузера.', false);
-                        break;
-                    default:
-                        this.showStatus('ℹ️ Нажмите "Тест уведомления" для запроса разрешения', true);
-                }
+                statusEl.textContent = '✅ iOS бейджи поддерживаются! Добавьте PWA на домашний экран';
+                statusEl.className = 'status-message status-success';
             }
 
             showStatus(message, isSuccess) {
-                const statusEl = document.getElementById('notificationStatus');
+                const statusEl = document.getElementById('iosStatus');
                 if (statusEl) {
                     statusEl.textContent = message;
-                    statusEl.className = `notification-status ${
-                        isSuccess ? 'status-success' : 
-                        message.includes('ℹ️') ? 'status-info' : 'status-error'
-                    }`;
+                    statusEl.className = `status-message ${isSuccess ? 'status-success' : 'status-error'}`;
+                    
+                    // Автоочистка через 3 секунды
+                    setTimeout(() => {
+                        this.updateStatus();
+                    }, 3000);
                 }
             }
         }
 
-        // Инициализация при загрузке
-        let notificationManager;
+        // Инициализация
+        let iosBadgeManager;
 
         document.addEventListener('DOMContentLoaded', function() {
-            notificationManager = new NotificationManager();
+            iosBadgeManager = new IOSBadgeManager();
 
-            // Назначаем обработчики
-            document.getElementById('testNotification').addEventListener('click', async () => {
-                const success = await notificationManager.showNotification(
-                    'EMIIA.AI Тест', 
-                    'Уведомления работают отлично! 🚀',
-                    { 
-                        icon: '/logo_wms.svg',
-                        badge: '/vv.ico'
-                    }
+            // Обработчики кнопок
+            document.getElementById('addBadgeBtn').addEventListener('click', () => {
+                iosBadgeManager.addBadge();
+            });
+
+            document.getElementById('clearBadgeBtn').addEventListener('click', () => {
+                iosBadgeManager.clearBadge();
+            });
+
+            document.getElementById('testNotificationBtn').addEventListener('click', async () => {
+                const success = await iosBadgeManager.showNotification(
+                    'EMIIA.AI Тест',
+                    'Проверка уведомлений и бейджей!'
                 );
                 
                 if (success) {
-                    await notificationManager.incrementBadge();
+                    await iosBadgeManager.addBadge();
                 }
             });
 
-            document.getElementById('incrementBadge').addEventListener('click', () => {
-                notificationManager.incrementBadge();
-            });
-
-            document.getElementById('clearBadge').addEventListener('click', () => {
-                notificationManager.clearBadge();
-            });
-
-            // Восстановление сохраненных данных
+            // Восстановление данных авторизации
             const savedLogin = localStorage.getItem('savedLogin');
             const savedPassword = localStorage.getItem('savedPassword');
             if (savedLogin) document.getElementById('login').value = savedLogin;
             if (savedPassword) document.getElementById('password').value = savedPassword;
         });
 
-        // Telegram Web App Integration
+        // Telegram Web App
         window.addEventListener('load', () => {
             if (window.Telegram?.WebApp) {
                 const tele = window.Telegram.WebApp;
@@ -499,13 +501,13 @@
                     localStorage.setItem('savedLogin', login);
                     localStorage.setItem('savedPassword', password);
                     
-                    // Показываем уведомление об успешном входе
-                    if (notificationManager) {
-                        await notificationManager.showNotification(
-                            'EMIIA.AI', 
+                    // Добавляем бейдж при успешном входе
+                    if (iosBadgeManager) {
+                        await iosBadgeManager.addBadge();
+                        await iosBadgeManager.showNotification(
+                            'EMIIA.AI',
                             'Успешный вход в систему!'
                         );
-                        await notificationManager.incrementBadge();
                     }
                     
                     setTimeout(() => {
@@ -519,20 +521,12 @@
             }
         });
 
-        // Периодические уведомления (демо)
+        // Демо: периодическое добавление бейджей
         setInterval(() => {
-            if (notificationManager && Math.random() > 0.8) {
-                const messages = [
-                    'Пространственный интеллект активен',
-                    'Новые данные доступны для анализа',
-                    'Система работает в штатном режиме'
-                ];
-                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                
-                notificationManager.showNotification('EMIIA.AI', randomMessage);
-                notificationManager.incrementBadge();
+            if (iosBadgeManager && Math.random() > 0.7) {
+                iosBadgeManager.addBadge();
             }
-        }, 60000);
+        }, 45000); // Каждые 45 секунд
     </script>
 </body>
 </html>
