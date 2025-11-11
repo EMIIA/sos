@@ -1,5 +1,5 @@
-// sw.js - Service Worker для PWA
-const CACHE_NAME = 'pwa-spatial-v1';
+// sw.js - Enhanced Service Worker with Push Notifications
+const CACHE_NAME = 'pwa-spatial-push-v1';
 const urlsToCache = [
   '/',
   '/vv.html',
@@ -7,22 +7,19 @@ const urlsToCache = [
   '/logo_wms.svg',
   '/vv.ico',
   '/vvjpg.jpg',
-  '/vv.webmanifest'
+  '/vv.webmanifest',
+  '/192x192.png'
 ];
 
-// Установка и кэширование
+// Установка
 self.addEventListener('install', function(event) {
-  console.log('🛠️ Service Worker: Установка');
+  console.log('🛠️ Service Worker: Установка с Push');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('📦 Кэшируем файлы');
         return cache.addAll(urlsToCache);
       })
-      .then(() => {
-        console.log('✅ Все файлы закэшированы');
-        return self.skipWaiting();
-      })
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -34,68 +31,86 @@ self.addEventListener('activate', function(event) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
           if (cacheName !== CACHE_NAME) {
-            console.log('🗑️ Удаляем старый кэш:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => {
-      console.log('✅ Service Worker активирован');
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// Перехват запросов
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        // Возвращаем кэш или сетевой запрос
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
-});
-
-// Обработка push-уведомлений (для теста)
+// Push уведомления
 self.addEventListener('push', function(event) {
-  console.log('📨 Получено push-уведомление');
+  console.log('📨 Получено Push-сообщение', event);
   
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (e) {
+    data = {
+      title: 'EMIIA.AI',
+      body: 'Новое сообщение',
+      icon: '/logo_wms.svg'
+    };
+  }
+
   const options = {
-    body: 'Пространственный интеллект готов к работе!',
-    icon: '/logo_wms.svg',
+    body: data.body || 'Пространственный интеллект',
+    icon: data.icon || '/logo_wms.svg',
     badge: '/vv.ico',
     vibrate: [200, 100, 200],
     data: {
-      url: 'https://sos.emiia.ai/vv1.html?pwa=true'
-    }
+      url: data.url || 'https://sos.emiia.ai/vv1.html'
+    },
+    actions: [
+      {
+        action: 'open',
+        title: 'Открыть'
+      },
+      {
+        action: 'close',
+        title: 'Закрыть'
+      }
+    ]
   };
 
   event.waitUntil(
-    self.registration.showNotification('EMIIA.AI SIP', options)
+    self.registration.showNotification(data.title || 'EMIIA.AI', options)
   );
 });
 
 // Клик по уведомлению
 self.addEventListener('notificationclick', function(event) {
-  console.log('🔔 Клик по уведомлению');
+  console.log('🔔 Клик по уведомлению:', event.notification.tag);
   event.notification.close();
-  
+
   event.waitUntil(
     clients.matchAll({type: 'window'}).then(function(clientList) {
-      // Открываем/фокусируем окно
+      // Ищем открытое окно
       for (const client of clientList) {
-        if (client.url === event.notification.data.url && 'focus' in client) {
+        if (client.url.includes('emiia.ai') && 'focus' in client) {
           return client.focus();
         }
       }
+      // Открываем новое окно
       if (clients.openWindow) {
-        return clients.openWindow(event.notification.data.url);
+        return clients.openWindow(event.notification.data.url || '/');
       }
     })
+  );
+});
+
+// Закрытие уведомления
+self.addEventListener('notificationclose', function(event) {
+  console.log('❌ Уведомление закрыто:', event.notification.tag);
+});
+
+// Fetch events
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        return response || fetch(event.request);
+      })
   );
 });
