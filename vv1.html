@@ -14,6 +14,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5139,62 +5140,15 @@ map.addLayer({
 
 
 
-// Добавить источник GeoJSON с указанием модели ВКУСВИЛЛ товар
-map.addSource('model23', {
-    'type': 'geojson',
-    'data': {
-        'type': 'Feature',
-        'properties': {
-            'model-uri': 'https://sos.emiia.ai/VV_ZONE_GLB.glb'
-        },
-        'geometry': {
-            'coordinates': [37.63576835,55.83837975],
-            'type': 'Point'
-        }
-    }
-});
 
 
-// Добавить слой модели с плавным появлением
-map.addLayer({
-    'id': 'tower23',
-    'type': 'model',
-    'slot': 'middle',
-    'source': 'model23',
-    'minzoom': 18.3,
-    'maxzoom': 24,
-    'layout': {
-        'model-id': ['get', 'model-uri']
-    },
-    'paint': {
-        'model-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
 
 
-        18.3, 0,    // Полная прозрачность (0%) на зуме 17
-            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
-            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-20, 1,  // 90% прозрачности (90%) на зуме 18.5
-21, 1,  // 90% прозрачности (90%) на зуме 18.5
-22, 1,  // 90% прозрачности (90%) на зуме 18.5
-24, 1  // 90% прозрачности (90%) на зуме 18.5
 
 
 
-        ],
 
 
-       'model-rotation': [0, 0.0, -155.9],
-        'model-scale': [1170.5, 1090.0, 1170],
-        'model-color-mix-intensity': 0,
-        'model-cast-shadows': true,
-        'model-translation': [0, 0, 0.2],
-        'model-emissive-strength': 0.5
-    }
-});
 
 
 
@@ -5207,146 +5161,7 @@ map.addLayer({
 
 
 
-
-
-
-
-
-// Добавить источник GeoJSON с указанием модели ВКУСВИЛЛ
-map.addSource('model20', {
-    'type': 'geojson',
-    'data': {
-        'type': 'Feature',
-        'properties': {
-            'model-uri': 'https://sos.emiia.ai/VV_BASE_GLB.glb'
-        },
-        'geometry': {
-            'coordinates': [37.63576835,55.83837975],
-            'type': 'Point'
-        }
-    }
-});
-
-
-// Добавить слой модели с плавным появлением
-map.addLayer({
-    'id': 'tower20',
-    'type': 'model',
-    'slot': 'middle',
-    'source': 'model20',
-    'minzoom': 18.3,
-    'maxzoom': 24,
-    'layout': {
-        'model-id': ['get', 'model-uri']
-    },
-    'paint': {
-        'model-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-
-
-        18.3, 0,    // Полная прозрачность (0%) на зуме 17
-            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
-            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-20, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-21, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-22, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-24, 0.7  // 90% прозрачности (90%) на зуме 18.5
-
-
-
-        ],
-
-
-        'model-rotation': [0, 0.0, -155.9],
-        'model-scale': [1170.5, 1090.0, 1170],
-        'model-color-mix-intensity': 0,
-        'model-cast-shadows': true,
-        'model-translation': [0, 0, 0.2],
-        'model-emissive-strength': 0.99
-    }
-});
-
-
-
-
-
-
-
-
-
-
-
-// Добавляем второй источник для нового GLB-файла верхний ВкусВилл
-map.addSource('model21', {
-    'type': 'geojson',
-    'data': {
-        'type': 'Feature',
-        'properties': {
-            'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' // Замените на URL второго GLB
-        },
-        'geometry': {
-            'coordinates': [37.63576835,55.83837975], // Другие координаты
-            'type': 'Point'
-        }
-    }
-});
-
-
-
-
-
-
-map.addLayer({
-    'id': 'tower21',
-    'type': 'model',
-    'slot': 'middle',
-    'source': 'model21',
-    'minzoom': 15,
-    'maxzoom': 24,
-    'layout': {
-        'model-id': ['get', 'model-uri']
-    },
-
-
-
-    'paint': {
-        'model-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            17, 0,    // Полная прозрачность (0%) на зуме 17
-            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
-18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
-            19, 1,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 1  // 90% прозрачности (90%) на зуме 18.5
-        ],
-
-        'model-rotation': [0, 0.0, -155.9],
-        'model-scale': [1170.5, 1090.0, 1170],
-        'model-color-mix-intensity': 1,
-        'model-cast-shadows': true,
-        'model-translation': [0, 0, 7.3],
-        'model-emissive-strength': 0.9
-
-
-
-    }
-});
-
-
-
-
-
-
-
-
-
-
-
-// Добавляем четвертый источник для нового GLB-файла нижний ВкусВилл
+// Добавляем четвертый источник для нового GLB-файла нижний ВкусВилл нижний
 map.addSource('model22', {
     'type': 'geojson',
     'data': {
@@ -5355,7 +5170,7 @@ map.addSource('model22', {
             'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' // Замените на URL второго GLB
         },
         'geometry': {
-            'coordinates': [37.63576835,55.83837975], // Другие координаты
+           'coordinates': [37.6357745,55.8383770], // Другие координаты
             'type': 'Point'
         }
     }
@@ -5405,13 +5220,13 @@ map.addLayer({
 
 
 
-'model-rotation': [0, 0.0, -155.9],
-        'model-scale': [1170.5, 1090.0, 1170],
+'model-rotation': [0, 0.0, -155.8],
+        'model-scale': [1215.5, 1120.0, 1170],
 
 
 
 
-        'model-translation': [0, 0, 0.000], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-translation': [0, 0, -0.1], // ЗДЕСЬ: поднятие на 10 единиц по Z
         'model-color-mix-intensity': 1,
         'model-cast-shadows': true,
 
@@ -5422,6 +5237,238 @@ map.addLayer({
 
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавить источник GeoJSON с указанием модели ВКУСВИЛЛ товар
+map.addSource('model23', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_ZONE_GLB.glb'
+        },
+        'geometry': {
+            'coordinates': [37.6357745,55.8383770],
+            'type': 'Point'
+        }
+    }
+});
+
+
+// Добавить слой модели с плавным появлением
+map.addLayer({
+    'id': 'tower23',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model23',
+    'minzoom': 18.3,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+
+ 'model-color': '#ffffff', // Белый цвет модели
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+        18.3, 0,    // Полная прозрачность (0%) на зуме 17
+            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
+            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+20, 1,  // 90% прозрачности (90%) на зуме 18.5
+21, 1,  // 90% прозрачности (90%) на зуме 18.5
+22, 1,  // 90% прозрачности (90%) на зуме 18.5
+24, 1  // 90% прозрачности (90%) на зуме 18.5
+
+
+
+        ],
+
+
+        'model-rotation': [00, 0.0, -155.8],
+        'model-scale': [1215.5, 1120.0, 1170],
+        'model-color-mix-intensity': 0,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, -0.1],
+        'model-emissive-strength': 0.9
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавить источник GeoJSON с указанием модели ВКУСВИЛЛ
+map.addSource('model20', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_BASE_GLB.glb'
+        },
+        'geometry': {
+            'coordinates': [37.6357745,55.8383770],
+            'type': 'Point'
+        }
+    }
+});
+
+
+// Добавить слой модели с плавным появлением
+map.addLayer({
+    'id': 'tower20',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model20',
+    'minzoom': 18.3,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+        18.3, 0,    // Полная прозрачность (0%) на зуме 17
+            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
+            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+20, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+21, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+22, 0.7,  // 90% прозрачности (90%) на зуме 18.5
+24, 0.7  // 90% прозрачности (90%) на зуме 18.5
+
+
+
+        ],
+
+
+       'model-rotation': [0, 0.0, -155.8],
+        'model-scale': [1215.5, 1120.0, 1170],
+        'model-color-mix-intensity': 0,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 0.0],
+        'model-emissive-strength': 0.99
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+// Добавляем второй источник для нового GLB-файла верхний ВкусВилл
+map.addSource('model21', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+           'coordinates': [37.6357745,55.8383770], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower21',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model21',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+
+
+
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+        ],
+
+        'model-rotation': [0, 0.0, -155.8],
+        'model-scale': [1215.5, 1120.0, 1170],
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 7.3],
+        'model-emissive-strength': 0.9
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
 
 
 
