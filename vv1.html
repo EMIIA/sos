@@ -15,6 +15,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1926,6 +1927,32 @@ body {
 
 
 
+<style>
+
+/* Иконка раскрытия меню по-центру */
+.floating-icon {
+    position: fixed;
+    z-index: 1000;
+}
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+    .floating-icon {
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* Десктопная версия */
+@media (min-width: 769px) {
+ .floating-icon {
+        bottom: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+</style>
 
 
 
@@ -2062,7 +2089,13 @@ body {
 
 
 
-
+<div class="floating-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"  viewBox="0 0 16 16">
+        <path stroke="#dadada" 
+        stroke-width="0.5"
+        fill="#dadada" d="M7.776 5.553a.5.5 0 0 1 .448 0l6 3a.5.5 0 1 1-.448.894L8 6.56 2.224 9.447a.5.5 0 1 1-.448-.894z"/>
+    </svg>
+</div>
 
 
 
@@ -6575,6 +6608,8 @@ textarea::placeholder {
 
 </body>
 </html>
+
+
 
 
 
