@@ -940,56 +940,59 @@ font-size: 18px; /* Увеличьте значение по необходим�
         originalContainer.parentNode.replaceChild(newContainer, originalContainer);
 
         // Функция для сброса уведомлений (обнуления бейджа)
-        function resetNotifications() {
-            console.log('🔄 Сброс уведомлений...');
-            
-            // Сброс бейджа в PWA
-            if ('setAppBadge' in navigator) {
-                navigator.setAppBadge(0).then(() => {
-                    console.log('✅ Бейдж уведомлений обнулен');
-                }).catch(error => {
-                    console.log('❌ Ошибка сброса бейджа:', error);
-                });
-            }
-            
-            // Сброс счетчика в localStorage
-            try {
-                const savedState = localStorage.getItem('fixedIOSNotificationState');
-                if (savedState) {
-                    const state = JSON.parse(savedState);
-                    state.badgeCount = 0;
-                    state.notificationCounter = 0;
-                    localStorage.setItem('fixedIOSNotificationState', JSON.stringify(state));
-                    console.log('✅ Состояние уведомлений сброшено в localStorage');
-                }
-                
-                // Также сбрасываем общий счетчик
-                localStorage.setItem('notificationBadgeCount', '0');
-            } catch (error) {
-                console.log('❌ Ошибка сброса состояния:', error);
-            }
-            
-            // Закрыть все активные уведомления
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.getNotifications().then(notifications => {
-                        notifications.forEach(notification => {
-                            notification.close();
-                        });
-                        console.log(`✅ Закрыто ${notifications.length} активных уведомлений`);
-                    });
-                });
-            }
-            
-            // Очистка бейджа на iOS через Service Worker
-            if (navigator.serviceWorker) {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.active.postMessage({
-                        type: 'CLEAR_BADGE'
-                    });
-                });
-            }
+function resetNotifications() {
+    console.log('🔄 Сброс уведомлений...');
+    
+    // Сброс бейджа в PWA
+    if ('setAppBadge' in navigator) {
+        navigator.setAppBadge(0).then(() => {
+            console.log('✅ Бейдж уведомлений обнулен');
+        }).catch(error => {
+            console.log('❌ Ошибка сброса бейджа:', error);
+        });
+    }
+    
+    // Сброс счетчика в localStorage
+    try {
+        const savedState = localStorage.getItem('fixedIOSNotificationState');
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            state.badgeCount = 0;
+            state.notificationCounter = 0;
+            localStorage.setItem('fixedIOSNotificationState', JSON.stringify(state));
+            console.log('✅ Состояние уведомлений сброшено в localStorage');
         }
+        
+        // Также сбрасываем общий счетчик
+        localStorage.setItem('notificationBadgeCount', '0');
+    } catch (error) {
+        console.log('❌ Ошибка сброса состояния:', error);
+    }
+    
+    // Закрыть все активные уведомления
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.getNotifications().then(notifications => {
+                notifications.forEach(notification => {
+                    notification.close();
+                });
+                console.log(`✅ Закрыто ${notifications.length} активных уведомлений`);
+            });
+            
+            // Отправляем сообщение в Service Worker для сброса бейджа
+            registration.active.postMessage({
+                type: 'CLEAR_BADGE'
+            });
+        });
+    }
+    
+    // Дополнительная очистка через navigator.serviceWorker.controller
+    if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'CLEAR_BADGE'
+        });
+    }
+}
 
         // Создаем меню точек с иконками и подменю
         const dotsMenu = document.createElement('div');
