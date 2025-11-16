@@ -888,7 +888,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
 
 
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Находим оригинальную кнопку и её контейнер
@@ -940,6 +939,58 @@ font-size: 18px; /* Увеличьте значение по необходим�
         // Заменяем оригинальный контейнер
         originalContainer.parentNode.replaceChild(newContainer, originalContainer);
 
+        // Функция для сброса уведомлений (обнуления бейджа)
+        function resetNotifications() {
+            console.log('🔄 Сброс уведомлений...');
+            
+            // Сброс бейджа в PWA
+            if ('setAppBadge' in navigator) {
+                navigator.setAppBadge(0).then(() => {
+                    console.log('✅ Бейдж уведомлений обнулен');
+                }).catch(error => {
+                    console.log('❌ Ошибка сброса бейджа:', error);
+                });
+            }
+            
+            // Сброс счетчика в localStorage
+            try {
+                const savedState = localStorage.getItem('fixedIOSNotificationState');
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    state.badgeCount = 0;
+                    state.notificationCounter = 0;
+                    localStorage.setItem('fixedIOSNotificationState', JSON.stringify(state));
+                    console.log('✅ Состояние уведомлений сброшено в localStorage');
+                }
+                
+                // Также сбрасываем общий счетчик
+                localStorage.setItem('notificationBadgeCount', '0');
+            } catch (error) {
+                console.log('❌ Ошибка сброса состояния:', error);
+            }
+            
+            // Закрыть все активные уведомления
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.getNotifications().then(notifications => {
+                        notifications.forEach(notification => {
+                            notification.close();
+                        });
+                        console.log(`✅ Закрыто ${notifications.length} активных уведомлений`);
+                    });
+                });
+            }
+            
+            // Очистка бейджа на iOS через Service Worker
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.active.postMessage({
+                        type: 'CLEAR_BADGE'
+                    });
+                });
+            }
+        }
+
         // Создаем меню точек с иконками и подменю
         const dotsMenu = document.createElement('div');
         dotsMenu.id = 'dotsMenu';
@@ -972,12 +1023,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 <span>Настройки</span>
             </div>
 
-
-
-
-
-
-<div class="menu-divider"></div>
+            <div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="refresh">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
                     <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
@@ -986,17 +1032,8 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 <span>Обновить данные</span>
             </div>
 
-
-
-
-
-
-
-
-
-
             <div class="menu-divider"></div>
-            <div class="menu-item-with-icon" data-action="z1">
+            <div class="menu-item-with-icon" data-action="messages">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-dots" viewBox="0 0 16 16">
   <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
   <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
@@ -1004,11 +1041,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 <span>Сообщения</span>
             </div>
 
-
-
-
-
- <div class="menu-divider"></div>
+            <div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="z1">
                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-spreadsheet" viewBox="0 0 16 16">
   <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v4h10V2a1 1 0 0 0-1-1zm9 6h-3v2h3zm0 3h-3v2h3zm0 3h-3v2h2a1 1 0 0 0 1-1zm-4 2v-2H6v2zm-4 0v-2H3v1a1 1 0 0 0 1 1zm-2-3h2v-2H3zm0-3h2V7H3zm3-2v2h3V7zm3 3H6v2h3z"/>
@@ -1016,22 +1049,13 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 <span>ERP</span>
             </div>
 
-
-
-
-
- <div class="menu-divider"></div>
+            <div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="z1">
                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
   <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
 </svg>
                 <span>CRM, ЭДО...</span>
             </div>
-
-
-
-
-
 
             <div class="menu-divider"></div>
             
@@ -1109,6 +1133,9 @@ font-size: 18px; /* Увеличьте значение по необходим�
             <div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="privacy">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg " width="16" height="16" viewBox="0 0 16 16">
+
+
+
                     <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M5.338 1.59a61 61 0 0 0-2.837.856.48.48 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.7 10.7 0 0 0 2.287 2.233c.346.244.652.42.893.533q.18.085.293.118a1 1 0 0 0 .101.025 1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43A63 63 0 0 1 5.072.56"/>
                     <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
                 </svg>
@@ -1307,11 +1334,14 @@ font-size: 18px; /* Увеличьте значение по необходим�
                 case 'terms':
                     window.open('https://emiia.ai/terms', '_blank');
                     break;
-
-              case 'z1':
+                case 'messages':
+                    // ТОЛЬКО СБРОС УВЕДОМЛЕНИЙ БЕЗ ПЕРЕХОДА
+                    resetNotifications();
+                    console.log('✅ Уведомления очищены');
+                    break;
+                case 'z1':
                     window.open('https://sos.emiia.ai/vv3#15.5/55.834102/37.631108/0/45', '_self');
                     break;
-                   
                 case 'privacy':
                     window.open('https://emiia.ai/privacy', '_blank');
                     break;
@@ -1579,8 +1609,6 @@ font-size: 18px; /* Увеличьте значение по необходим�
         window.addEventListener('scroll', closeDotsMenu);
     });
 </script>
-
-
 
 
 
