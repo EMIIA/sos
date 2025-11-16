@@ -11,12 +11,39 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(self.clients.claim());
 });
 
+// Обработка сообщений от главного потока для сброса бейджа
+self.addEventListener('message', (event) => {
+    console.log('📨 Service Worker получил сообщение:', event.data);
+    
+    if (event.data && event.data.type === 'CLEAR_BADGE') {
+        console.log('🔄 Сброс бейджа из Service Worker');
+        
+        // Сброс бейджа
+        if (self.setAppBadge) {
+            self.setAppBadge(0).then(() => {
+                console.log('✅ Бейдж сброшен из Service Worker');
+            }).catch(error => {
+                console.log('❌ Ошибка сброса бейджа:', error);
+            });
+        }
+        
+        // Очистка всех уведомлений
+        event.waitUntil(
+            self.registration.getNotifications().then(notifications => {
+                console.log(`🗑️ Очистка ${notifications.length} уведомлений`);
+                notifications.forEach(notification => {
+                    notification.close();
+                });
+            })
+        );
+    }
+});
+
 // Исправленная обработка уведомлений для iOS
 self.addEventListener('notificationclick', (event) => {
     console.log('🔔 iOS Fixed: Уведомление кликнуто:', event.notification.tag);
     event.notification.close();
 
-    // НЕ сбрасываем бейдж при клике
     event.waitUntil(
         clients.matchAll({type: 'window'}).then((clientList) => {
             for (const client of clientList) {
@@ -31,7 +58,7 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-// Важно: очищаем старые уведомления при активации
+// Очистка старых уведомлений при активации
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         self.registration.getNotifications().then(notifications => {
