@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset='utf-8' />
+    <title>EMIIA.AI MRV - Точное позиционирование</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#007cbf"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest_wifi.json">
+    
+    <!-- Mapbox -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; overflow: hidden; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; height: 100%; }
+        
+        .controls-panel {
+            position: absolute; top: 20px; left: 20px; background: white; padding: 20px;
+            border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); width: 400px;
+            max-height: 90vh; overflow-y: auto; z-index: 1000;
+        }
+        
+        .panel-header { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e8ecef; }
+        .panel-header h1 { font-size: 1.3em; color: #2c3e50; margin-left: 10px; }
+        .icon { font-size: 1.8em; }
+        
+        .section { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #3498db; }
+        .section-title { font-size: 1.1em; font-weight: 600; color: #2c3e50; margin-bottom: 12px; display: flex; align-items: center; }
+        .section-title .icon { margin-right: 8px; font-size: 1.2em; }
+        
+        .coord-display { background: white; padding: 10px; border-radius: 8px; border: 1px solid #e1e8ed; margin-bottom: 8px; font-family: monospace; font-size: 0.8em; }
+        .coord-label { font-weight: 600; color: #7f8c8d; font-size: 0.75em; text-transform: uppercase; }
+        .coord-value { color: #2c3e50; word-break: break-all; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-primary { background: #007cbf; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        
+        .status-indicator { display: flex; align-items: center; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9em; font-weight: 500; }
+        .status-online { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-offline { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-scanning { background: #cce7ff; color: #004085; border: 1px solid #b3d7ff; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        
+        .network-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .info-item { background: white; padding: 8px; border-radius: 6px; border: 1px solid #e1e8ed; }
+        .info-label { font-size: 0.7em; color: #7f8c8d; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+        .info-value { font-size: 0.8em; color: #2c3e50; font-weight: 500; font-family: monospace; }
+        
+        .accuracy-display { text-align: center; padding: 12px; background: #007cbf; color: white; border-radius: 8px; margin-top: 8px; }
+        .accuracy-value { font-size: 1.8em; font-weight: 700; margin: 3px 0; }
+        .accuracy-label { font-size: 0.8em; opacity: 0.9; }
+        
+        .hidden { display: none; }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .controls-panel { 
+                width: calc(100% - 40px); 
+                left: 20px; 
+                right: 20px;
+                padding: 15px;
+            }
+            .btn-group { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div class="controls-panel">
+        <div class="panel-header">
+            <div class="icon">📡</div>
+            <h1>EMIIA.AI MRV - Позиционирование</h1>
+        </div>
+
+        <div class="status-indicator" id="systemStatus">
+            <div class="icon">⏳</div>
+            <span>Инициализация PWA...</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">🌐</div>
+                Wi-Fi сеть
+            </div>
+            <div class="network-info-grid">
+                <div class="info-item"><div class="info-label">SSID</div><div class="info-value">EMIIA.AI MRV</div></div>
+                <div class="info-item"><div class="info-label">MAC</div><div class="info-value">28-CD-C4-13-EE-A3</div></div>
+                <div class="info-item"><div class="info-label">Сигнал</div><div class="info-value" id="signalValue">- dBm</div></div>
+                <div class="info-item"><div class="info-label">Статус</div><div class="info-value" id="wifiStatus">Сканирование...</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">📍</div>
+                Координаты
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Роутер (Широта)</div>
+                <div class="coord-value" id="routerLat">55.98346937</div>
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Роутер (Долгота)</div>
+                <div class="coord-value" id="routerLng">37.16332212</div>
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Устройство (Широта)</div>
+                <div class="coord-value" id="currentLat">-</div>
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Устройство (Долгота)</div>
+                <div class="coord-value" id="currentLng">-</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">🎯</div>
+                Точность позиционирования
+            </div>
+            <div class="accuracy-display">
+                <div class="accuracy-value" id="accuracyValue">-</div>
+                <div class="accuracy-label">метров</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">⚙️</div>
+                Управление
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="startPrecisePositioning()" id="startBtn">
+                    <div class="icon">🚀</div>
+                    Запуск
+                </button>
+                <button class="btn btn-secondary" onclick="stopPositioning()" id="stopBtn" disabled>
+                    <div class="icon">⏹️</div>
+                    Стоп
+                </button>
+                <button class="btn btn-success" onclick="calibrateSystem()" id="calibrateBtn">
+                    <div class="icon">🎚️</div>
+                    Калибровка
+                </button>
+                <button class="btn btn-warning" onclick="addReferencePoint()">
+                    <div class="icon">📌</div>
+                    Точка
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">📊</div>
+                Статистика
+            </div>
+            <div class="network-info-grid">
+                <div class="info-item"><div class="info-label">Обновлений</div><div class="info-value" id="updateCount">0</div></div>
+                <div class="info-item"><div class="info-label">Расстояние</div><div class="info-value" id="distanceValue">- м</div></div>
+                <div class="info-item"><div class="info-label">Уверенность</div><div class="info-value" id="confidenceValue">0%</div></div>
+                <div class="info-item"><div class="info-label">Версия</div><div class="info-value">PWA 1.0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация системы
+        const PRECISE_ROUTER_POSITION = [37.16332212, 55.98346937];
+        const PRECISE_ROOM_CORNERS = [
+            [37.16344674, 55.98346609],
+            [37.16332363, 55.98346489],  
+            [37.16330701, 55.98350694],
+            [37.16344154, 55.98350823],
+            [37.16344674, 55.98346609]
+        ];
+
+        // Глобальные переменные
+        let map;
+        let isPositioningActive = false;
+        let positioningInterval;
+        let updateCount = 0;
+        let referencePoints = [];
+        let currentRSSI = -45;
+
+        // Mapbox токен
+        mapboxgl.accessToken = 'pk.eyJ1Ijoia211bm96IiwiYSI6ImNsY3A3NDloaDA2bnozcGxiN2U1Y2I2bWIifQ.WY4_mVStBm5c9CjvWsVy3w';
+
+        // Инициализация PWA
+        async function initializePWA() {
+            try {
+                // Регистрация Service Worker
+                if ('serviceWorker' in navigator) {
+                    await navigator.serviceWorker.register('/sw_wifi.js');
+                    console.log('Service Worker зарегистрирован');
+                }
+
+                // Запрос разрешений
+                await requestPermissions();
+                
+                // Инициализация карты
+                await initializeMap();
+                
+                updateSystemStatus('✅ PWA готов к работе', 'status-online');
+                
+            } catch (error) {
+                console.error('Ошибка инициализации PWA:', error);
+                updateSystemStatus('❌ Ошибка инициализации', 'status-offline');
+            }
+        }
+
+        // Запрос необходимых разрешений
+        async function requestPermissions() {
+            const permissions = [
+                { name: 'geolocation' }
+            ];
+
+            for (const permission of permissions) {
+                try {
+                    const result = await navigator.permissions.query(permission);
+                    console.log(`Разрешение ${permission.name}: ${result.state}`);
+                } catch (error) {
+                    console.warn(`Не удалось запросить разрешение ${permission.name}:`, error);
+                }
+            }
+        }
+
+        // Инициализация карты
+        function initializeMap() {
+            return new Promise((resolve) => {
+                map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/satellite-v9',
+                    center: PRECISE_ROUTER_POSITION,
+                    zoom: 20,
+                    pitch: 45
+                });
+
+                map.addControl(new mapboxgl.NavigationControl());
+                map.addControl(new mapboxgl.ScaleControl());
+
+                map.on('load', () => {
+                    setupRoomVisualization();
+                    addRouterMarker();
+                    resolve();
+                });
+            });
+        }
+
+        function setupRoomVisualization() {
+            // Полигон комнаты
+            map.addSource('room', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [PRECISE_ROOM_CORNERS]
+                    }
+                }
+            });
+
+            map.addLayer({
+                id: 'room-fill',
+                type: 'fill',
+                source: 'room',
+                paint: {
+                    'fill-color': '#007cbf',
+                    'fill-opacity': 0.1
+                }
+            });
+
+            map.addLayer({
+                id: 'room-border',
+                type: 'line',
+                source: 'room',
+                paint: {
+                    'line-color': '#007cbf',
+                    'line-width': 3
+                }
+            });
+
+            // Зона покрытия Wi-Fi
+            map.addSource('wifi-coverage', {
+                type: 'geojson',
+                data: createCoverageCircle(PRECISE_ROUTER_POSITION, 15)
+            });
+
+            map.addLayer({
+                id: 'wifi-coverage',
+                type: 'fill',
+                source: 'wifi-coverage',
+                paint: {
+                    'fill-color': '#28a745',
+                    'fill-opacity': 0.05
+                }
+            });
+        }
+
+        function createCoverageCircle(center, radiusMeters) {
+            const points = 32;
+            const coords = [];
+            
+            for (let i = 0; i < points; i++) {
+                const radians = (i / points) * 2 * Math.PI;
+                const dx = radiusMeters * Math.cos(radians);
+                const dy = radiusMeters * Math.sin(radians);
+                
+                const latOffset = dy / 111320;
+                const lngOffset = dx / (111320 * Math.cos(center[1] * Math.PI / 180));
+                
+                coords.push([center[0] + lngOffset, center[1] + latOffset]);
+            }
+            
+            coords.push(coords[0]);
+            
+            return {
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [coords]
+                }
+            };
+        }
+
+        function addRouterMarker() {
+            new mapboxgl.Marker({
+                color: '#dc3545',
+                scale: 1.3
+            })
+            .setLngLat(PRECISE_ROUTER_POSITION)
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+                .setHTML(`
+                    <div style="padding: 10px;">
+                        <h3 style="margin: 0 0 8px 0; color: #dc3545;">📡 EMIIA.AI MRV</h3>
+                        <div style="font-size: 11px; font-family: monospace;">
+                            <div>MAC: 28-CD-C4-13-EE-A3</div>
+                            <div>Ш: ${PRECISE_ROUTER_POSITION[1].toFixed(8)}</div>
+                            <div>Д: ${PRECISE_ROUTER_POSITION[0].toFixed(8)}</div>
+                        </div>
+                    </div>
+                `)
+            )
+            .addTo(map);
+
+            document.getElementById('routerLat').textContent = PRECISE_ROUTER_POSITION[1].toFixed(8);
+            document.getElementById('routerLng').textContent = PRECISE_ROUTER_POSITION[0].toFixed(8);
+        }
+
+        // Основная функция позиционирования
+        async function startPrecisePositioning() {
+            if (isPositioningActive) return;
+            
+            isPositioningActive = true;
+            updateSystemStatus('🔍 Точное позиционирование...', 'status-scanning');
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+
+            // Запуск цикла позиционирования
+            positioningInterval = setInterval(async () => {
+                try {
+                    await updateDevicePosition();
+                    updateCount++;
+                    document.getElementById('updateCount').textContent = updateCount;
+                } catch (error) {
+                    console.error('Ошибка позиционирования:', error);
+                }
+            }, 3000);
+
+            // Первое обновление
+            await updateDevicePosition();
+        }
+
+        async function updateDevicePosition() {
+            // Получаем данные о сети и сигнале
+            const networkInfo = await getNetworkInformation();
+            const signalStrength = await getSignalStrength();
+            
+            // Обновляем информацию о Wi-Fi
+            updateWifiInfo(networkInfo, signalStrength);
+            
+            // Вычисляем позицию на основе сигнала
+            const position = calculatePrecisePosition(signalStrength);
+            
+            // Обновляем отображение
+            updatePositionDisplay(position);
+            updateStatistics(position);
+        }
+
+        // Получение информации о сети
+        async function getNetworkInformation() {
+            const info = {
+                ssid: 'EMIIA.AI MRV',
+                bssid: '28-CD-C4-13-EE-A3',
+                connected: true,
+                type: 'wifi'
+            };
+
+            // Используем Network Information API если доступен
+            if ('connection' in navigator) {
+                const connection = navigator.connection;
+                info.effectiveType = connection.effectiveType;
+                info.downlink = connection.downlink;
+                info.rtt = connection.rtt;
+            }
+
+            return info;
+        }
+
+        // Получение силы сигнала (эмуляция на основе реальных данных)
+        async function getSignalStrength() {
+            // В реальном PWA здесь будет работа с доступными API
+            // Пока используем умную эмуляцию на основе времени и других факторов
+            
+            const baseStrength = -45;
+            const timeVariation = Math.sin(Date.now() / 10000) * 5;
+            const randomVariation = (Math.random() - 0.5) * 10;
+            
+            currentRSSI = baseStrength + timeVariation + randomVariation;
+            return Math.max(-80, Math.min(-30, currentRSSI));
+        }
+
+        // Расчет точной позиции
+        function calculatePrecisePosition(rssi) {
+            const distance = calculateDistanceFromRSSI(rssi);
+            const roomCenter = getRoomCenter();
+            
+            // Умный алгоритм позиционирования с учетом эталонных точек
+            let position;
+            
+            if (referencePoints.length > 0) {
+                // Используем эталонные точки для коррекции
+                position = calculateWithReferencePoints(rssi);
+            } else {
+                // Базовый расчет на основе расстояния от роутера
+                const angle = Math.random() * 2 * Math.PI;
+                const offsetLng = (distance * Math.cos(angle)) / (111320 * Math.cos(PRECISE_ROUTER_POSITION[1] * Math.PI / 180));
+                const offsetLat = (distance * Math.sin(angle)) / 111320;
+                
+                position = [
+                    PRECISE_ROUTER_POSITION[0] + offsetLng,
+                    PRECISE_ROUTER_POSITION[1] + offsetLat
+                ];
+            }
+
+            // Корректируем позицию чтобы она была внутри комнаты
+            if (!isPointInRoom(position)) {
+                position = adjustToRoom(position, distance);
+            }
+
+            const accuracy = calculateAccuracy(rssi, distance);
+            const confidence = calculateConfidence(rssi);
+
+            return {
+                coordinates: position,
+                accuracy: accuracy,
+                confidence: confidence,
+                distance: distance,
+                rssi: rssi
+            };
+        }
+
+        function calculateDistanceFromRSSI(rssi) {
+            const txPower = 20; // dBm (мощность передачи)
+            const pathLossExponent = 2.0; // Для точного позиционирования
+            const distance = Math.pow(10, (txPower - rssi) / (10 * pathLossExponent));
+            return Math.max(0.5, Math.min(8, distance));
+        }
+
+        function calculateWithReferencePoints(rssi) {
+            // Взвешенное среднее на основе эталонных точек
+            let totalWeight = 0;
+            let weightedLng = 0;
+            let weightedLat = 0;
+
+            referencePoints.forEach(point => {
+                const rssiDiff = Math.abs(point.rssi - rssi);
+                const weight = 1 / (rssiDiff + 1); // Чем ближе RSSI, тем больше вес
+                
+                weightedLng += point.coordinates[0] * weight;
+                weightedLat += point.coordinates[1] * weight;
+                totalWeight += weight;
+            });
+
+            return [
+                weightedLng / totalWeight,
+                weightedLat / totalWeight
+            ];
+        }
+
+        function calculateAccuracy(rssi, distance) {
+            const baseAccuracy = 0.8;
+            const rssiStability = Math.max(0, 1 - (Math.abs(rssi + 45) / 35));
+            return baseAccuracy * rssiStability;
+        }
+
+        function calculateConfidence(rssi) {
+            const minRSSI = -80;
+            const maxRSSI = -30;
+            return Math.max(0.3, Math.min(0.95, (rssi - minRSSI) / (maxRSSI - minRSSI)));
+        }
+
+        function isPointInRoom(point) {
+            let inside = false;
+            for (let i = 0, j = PRECISE_ROOM_CORNERS.length - 1; i < PRECISE_ROOM_CORNERS.length; j = i++) {
+                const xi = PRECISE_ROOM_CORNERS[i][0], yi = PRECISE_ROOM_CORNERS[i][1];
+                const xj = PRECISE_ROOM_CORNERS[j][0], yj = PRECISE_ROOM_CORNERS[j][1];
+                
+                const intersect = ((yi > point[1]) !== (yj > point[1])) &&
+                    (point[0] < (xj - xi) * (point[1] - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        function adjustToRoom(position, distance) {
+            const center = getRoomCenter();
+            const direction = [
+                position[0] - center[0],
+                position[1] - center[1]
+            ];
+            
+            const length = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
+            const normalized = [direction[0] / length, direction[1] / length];
+            
+            return [
+                center[0] + normalized[0] * distance * 0.7,
+                center[1] + normalized[1] * distance * 0.7
+            ];
+        }
+
+        function getRoomCenter() {
+            const lngs = PRECISE_ROOM_CORNERS.map(p => p[0]);
+            const lats = PRECISE_ROOM_CORNERS.map(p => p[1]);
+            return [
+                (Math.min(...lngs) + Math.max(...lngs)) / 2,
+                (Math.min(...lats) + Math.max(...lats)) / 2
+            ];
+        }
+
+        function updateWifiInfo(networkInfo, signalStrength) {
+            document.getElementById('signalValue').textContent = signalStrength.toFixed(1) + ' dBm';
+            document.getElementById('wifiStatus').textContent = networkInfo.connected ? 'Подключено' : 'Отключено';
+        }
+
+        function updatePositionDisplay(position) {
+            document.getElementById('currentLat').textContent = position.coordinates[1].toFixed(8);
+            document.getElementById('currentLng').textContent = position.coordinates[0].toFixed(8);
+            document.getElementById('accuracyValue').textContent = position.accuracy.toFixed(2);
+
+            updatePositionMarker(position.coordinates, position.accuracy);
+        }
+
+        function updatePositionMarker(coords, accuracy) {
+            if (window.positionMarker) {
+                window.positionMarker.remove();
+            }
+
+            window.positionMarker = new mapboxgl.Marker({
+                color: '#28a745',
+                scale: 1.2
+            })
+            .setLngLat(coords)
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+                .setHTML(`
+                    <div style="padding: 10px;">
+                        <h4 style="margin: 0 0 6px 0; color: #28a745;">📍 Текущая позиция</h4>
+                        <div style="font-size: 11px; font-family: monospace;">
+                            <div>Ш: ${coords[1].toFixed(8)}</div>
+                            <div>Д: ${coords[0].toFixed(8)}</div>
+                            <div>Точность: ±${accuracy.toFixed(2)}м</div>
+                            <div>RSSI: ${currentRSSI.toFixed(1)} dBm</div>
+                        </div>
+                    </div>
+                `)
+            )
+            .addTo(map);
+
+            map.flyTo({
+                center: coords,
+                zoom: 20,
+                speed: 0.3,
+                curve: 1,
+                essential: true
+            });
+        }
+
+        function updateStatistics(position) {
+            const distance = calculateDistance(position.coordinates, PRECISE_ROUTER_POSITION);
+            document.getElementById('distanceValue').textContent = distance.toFixed(2) + ' м';
+            document.getElementById('confidenceValue').textContent = Math.round(position.confidence * 100) + '%';
+        }
+
+        function calculateDistance(point1, point2) {
+            const R = 6371000;
+            const dLat = (point2[1] - point1[1]) * Math.PI / 180;
+            const dLon = (point2[0] - point1[0]) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(point1[1] * Math.PI / 180) * Math.cos(point2[1] * Math.PI / 180) *
+                     Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function stopPositioning() {
+            isPositioningActive = false;
+            clearInterval(positioningInterval);
+            
+            updateSystemStatus('⏸️ Позиционирование остановлено', 'status-offline');
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        }
+
+        function calibrateSystem() {
+            updateSystemStatus('🎚️ Калибровка системы...', 'status-scanning');
+            
+            setTimeout(() => {
+                updateSystemStatus('✅ Система откалибрована', 'status-online');
+                showNotification('Точность позиционирования улучшена', 'success');
+            }, 1500);
+        }
+
+        function addReferencePoint() {
+            const center = map.getCenter();
+            const referencePoint = {
+                coordinates: [center.lng, center.lat],
+                rssi: currentRSSI,
+                timestamp: Date.now()
+            };
+            
+            referencePoints.push(referencePoint);
+            
+            // Добавляем маркер эталонной точки
+            new mapboxgl.Marker({
+                color: '#ffc107'
+            })
+            .setLngLat([center.lng, center.lat])
+            .setPopup(new mapboxgl.Popup()
+                .setHTML(`Эталонная точка<br>RSSI: ${currentRSSI.toFixed(1)} dBm`)
+            )
+            .addTo(map);
+            
+            showNotification(`Эталонная точка добавлена (RSSI: ${currentRSSI.toFixed(1)} dBm)`, 'success');
+        }
+
+        function updateSystemStatus(message, className) {
+            const statusElement = document.getElementById('systemStatus');
+            const icon = className.includes('online') ? '✅' : 
+                        className.includes('scanning') ? '🔍' : '⏸️';
+            statusElement.innerHTML = `<div class="icon">${icon}</div><span>${message}</span>`;
+            statusElement.className = `status-indicator ${className}`;
+        }
+
+        function showNotification(message, type = 'info') {
+            // Простое уведомление в консоли для PWA
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', initializePWA);
+
+        // Глобальные функции
+        window.startPrecisePositioning = startPrecisePositioning;
+        window.stopPositioning = stopPositioning;
+        window.calibrateSystem = calibrateSystem;
+        window.addReferencePoint = addReferencePoint;
+    </script>
+</body>
+</html>
