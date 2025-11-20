@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Тест геолокации</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        button { padding: 15px; font-size: 16px; cursor: pointer; }
+        #result { margin-top: 20px; padding: 15px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Тест геолокации</h1>
+    <button onclick="getLocation()">📍 Получить местоположение</button>
+    <div id="result"></div>
+    
+    <script>
+        function getLocation() {
+            if (!navigator.geolocation) {
+                document.getElementById('result').innerHTML = '❌ Геолокация не поддерживается';
+                return;
+            }
+            
+            document.getElementById('result').innerHTML = '⏳ Запрос геолокации...';
+            
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const { latitude, longitude, accuracy } = pos.coords;
+                    document.getElementById('result').innerHTML = `
+                        ✅ <b>Успешно!</b><br>
+                        Широта: ${latitude}<br>
+                        Долгота: ${longitude}<br>
+                        Точность: ±${accuracy} метров<br>
+                        <small>Если точность >100м, включите Wi-Fi в Windows</small>
+                    `;
+                },
+                (err) => {
+                    document.getElementById('result').innerHTML = `
+                        ❌ <b>Ошибка:</b><br>
+                        ${err.message}<br>
+                        <small>Разрешите геолокацию в настройках браузера</small>
+                    `;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+    </script>
+</body>
+</html>
