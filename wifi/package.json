@@ -1,0 +1,15 @@
+{
+  "name": "emiia-mrv-wifi",
+  "version": "1.0.0",
+  "description": "Wi-Fi позиционирование с Mapbox",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --debug"
+  },
+  "keywords": ["wifi", "positioning", "mapbox", "electron"],
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "node-wifi": "^2.0.22"
+  }
+}
