@@ -1,0 +1,26 @@
+{
+  "name": "EMIIA.AI MRV Positioning",
+  "short_name": "WiFi Positioning",
+  "description": "Точное позиционирование по Wi-Fi сигналу",
+  "start_url": "/wifi",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007cbf",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "permissions": [
+    "geolocation"
+  ],
+  "categories": ["navigation", "utilities"]
+}
