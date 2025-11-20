@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EMIIA.AI MRV - Wi-Fi Positioning</title>
+    
+    <!-- Mapbox -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    
+    <style>
+        /* ====== MODERN DARK THEME ====== */
+        :root {
+            --primary: #00ff88;
+            --secondary: #1a1a2e;
+            --accent: #16213e;
+            --text: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --error: #ff4444;
+            --success: #00ff88;
+            --warning: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--secondary) 0%, #0f0f1e 100%);
+            overflow: hidden;
+            color: var(--text);
+        }
+
+        /* Карта на весь экран */
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Glassmorphism панель */
+        .controls-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .controls-panel:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Шапка */
+        .panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .panel-header h1 {
+            font-size: 1.4em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .icon {
+            font-size: 2em;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* Секции */
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(22, 33, 62, 0.6);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            background: rgba(22, 33, 62, 0.8);
+            transform: translateX(4px);
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+        }
+
+        .section-title .icon {
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+
+        /* Координаты */
+        .coord-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .coord-display:hover {
+            border-color: var(--primary);
+        }
+
+        .coord-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .coord-value {
+            color: var(--text);
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* Кнопки */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #007cbf, #00ff88); }
+        .btn-secondary { background: linear-gradient(135deg, #6c757d, #495057); }
+        .btn-success { background: linear-gradient(135deg, #28a745, #20c997); }
+        .btn-warning { background: linear-gradient(135deg, #ffc107, #ff9800); }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Статус */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-online { 
+            background: rgba(0, 255, 136, 0.15); 
+            color: var(--success); 
+            border: 1px solid rgba(0, 255, 136, 0.3); 
+        }
+        .status-offline { 
+            background: rgba(255, 68, 68, 0.15); 
+            color: var(--error); 
+            border: 1px solid rgba(255, 68, 68, 0.3); 
+        }
+        .status-scanning { 
+            background: rgba(0, 170, 255, 0.15); 
+            color: var(--warning); 
+            border: 1px solid rgba(0, 170, 255, 0.3); 
+            animation: pulse 1.5s infinite; 
+        }
+
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.6; } 
+        }
+
+        /* Сетка информации */
+        .network-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .info-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .info-item:hover {
+            transform: scale(1.02);
+            border-color: var(--primary);
+        }
+
+        .info-label {
+            font-size: 0.65em;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 0.85em;
+            color: var(--text);
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Точность */
+        .accuracy-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), #00ccff);
+            color: var(--secondary);
+            border-radius: 12px;
+            margin-top: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+        }
+
+        .accuracy-value {
+            font-size: 2.2em;
+            font-weight: 800;
+            margin: 5px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .accuracy-label {
+            font-size: 0.8em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Отладка */
+        .hidden { display: none; }
+
+        #debugInfo {
+            font-size: 0.7em;
+            font-family: 'Fira Code', monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            color: var(--primary);
+            border: 1px solid rgba(0,255,136,0.2);
+        }
+
+        /* Маркеры */
+        .router-marker, .position-marker {
+            font-size: 2em;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .router-marker:hover, .position-marker:hover {
+            transform: scale(1.2);
+        }
+
+        /* Попапы */
+        .popup-content {
+            background: var(--secondary);
+            color: var(--text);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .popup-content h3, .popup-content h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .popup-content p {
+            margin: 4px 0;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .controls-panel { 
+                width: calc(100% - 30px); 
+                left: 15px; 
+                right: 15px;
+                padding: 20px;
+            }
+            .btn-group { grid-template-columns: 1fr; }
+        }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div class="controls-panel">
+        <div class="panel-header">
+            <div class="icon">📡</div>
+            <h1>EMIIA.AI MRV</h1>
+        </div>
+
+        <div class="status-indicator status-online" id="systemStatus">
+            <div class="icon">✅</div>
+            <span>Система готова к работе</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">📡</div>
+                Wi-Fi Сканирование (Нативно)
+            </div>
+            <div class="network-info-grid">
+                <div class="info-item">
+                    <div class="info-label">Сигнал</div>
+                    <div class="info-value" id="signalValue">- dBm</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Расстояние</div>
+                    <div class="info-value" id="distanceValue">- м</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Сетей</div>
+                    <div class="info-value" id="networksCount">0</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Статус</div>
+                    <div class="info-value" id="wifiStatus">Ожидание</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">📍</div>
+                Координаты
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Роутер (Широта)</div>
+                <div class="coord-value" id="routerLat">55.98346937</div>
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Роутер (Долгота)</div>
+                <div class="coord-value" id="routerLng">37.16332212</div>
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Устройство (Широта)</div>
+                <div class="coord-value" id="currentLat">-</div>
+            </div>
+            <div class="coord-display">
+                <div class="coord-label">Устройство (Долгота)</div>
+                <div class="coord-value" id="currentLng">-</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">🎯</div>
+                Точность позиционирования
+            </div>
+            <div class="accuracy-display">
+                <div class="accuracy-value" id="accuracyValue">-</div>
+                <div class="accuracy-label">метров</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">⚙️</div>
+                Управление
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="scanWiFi()" id="wifiBtn">
+                    <div class="icon">📶</div>
+                    Сканировать Wi-Fi
+                </button>
+                <button class="btn btn-secondary" onclick="stopPositioning()" id="stopBtn">
+                    <div class="icon">⏹️</div>
+                    Остановить
+                </button>
+                <button class="btn btn-warning" onclick="showDebugInfo()">
+                    <div class="icon">🐛</div>
+                    Отладка
+                </button>
+                <button class="btn btn-success" onclick="testTriangulation()">
+                    <div class="icon">🎯</div>
+                    Тест Триангуляции
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">📊</div>
+                Статистика
+            </div>
+            <div class="network-info-grid">
+                <div class="info-item">
+                    <div class="info-label">Обновлений</div>
+                    <div class="info-value" id="updateCount">0</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Метод</div>
+                    <div class="info-value" id="methodValue">Wi-Fi</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Версия</div>
+                    <div class="info-value">Electron PWA</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Точность</div>
+                    <div class="info-value" id="wifiAccuracy">2-5 м</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section hidden" id="debugSection">
+            <div class="section-title">
+                <div class="icon">🐛</div>
+                Отладочная информация
+            </div>
+            <div id="debugInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // Запуск приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
