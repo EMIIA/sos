@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset='utf-8' />
-    <title>EMIIA.AI MRV - Точное позиционирование</title>
+    <title>EMIIA.AI MRV - Реальное позиционирование</title>
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     
     <!-- PWA Meta -->
@@ -83,12 +83,12 @@
     <div class="controls-panel">
         <div class="panel-header">
             <div class="icon">📡</div>
-            <h1>EMIIA.AI MRV - Позиционирование</h1>
+            <h1>EMIIA.AI MRV - Реальное позиционирование</h1>
         </div>
 
         <div class="status-indicator" id="systemStatus">
             <div class="icon">⏳</div>
-            <span>Инициализация PWA...</span>
+            <span>Инициализация системы...</span>
         </div>
 
         <div class="section">
@@ -100,7 +100,7 @@
                 <div class="info-item"><div class="info-label">SSID</div><div class="info-value">EMIIA.AI MRV</div></div>
                 <div class="info-item"><div class="info-label">MAC</div><div class="info-value">28-CD-C4-13-EE-A3</div></div>
                 <div class="info-item"><div class="info-label">Сигнал</div><div class="info-value" id="signalValue">- dBm</div></div>
-                <div class="info-item"><div class="info-label">Статус</div><div class="info-value" id="wifiStatus">Сканирование...</div></div>
+                <div class="info-item"><div class="info-label">Статус</div><div class="info-value" id="wifiStatus">Ожидание</div></div>
             </div>
         </div>
 
@@ -145,7 +145,7 @@
             </div>
             
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="startPrecisePositioning()" id="startBtn">
+                <button class="btn btn-primary" onclick="startRealGeolocation()" id="startBtn">
                     <div class="icon">🚀</div>
                     Запуск
                 </button>
@@ -153,13 +153,13 @@
                     <div class="icon">⏹️</div>
                     Стоп
                 </button>
-                <button class="btn btn-success" onclick="calibrateSystem()" id="calibrateBtn">
-                    <div class="icon">🎚️</div>
-                    Калибровка
+                <button class="btn btn-success" onclick="testWiFiAPI()" id="wifiBtn">
+                    <div class="icon">📶</div>
+                    Тест Wi-Fi API
                 </button>
-                <button class="btn btn-warning" onclick="addReferencePoint()">
-                    <div class="icon">📌</div>
-                    Точка
+                <button class="btn btn-warning" onclick="showDebugInfo()">
+                    <div class="icon">🐛</div>
+                    Отладка
                 </button>
             </div>
         </div>
@@ -172,8 +172,19 @@
             <div class="network-info-grid">
                 <div class="info-item"><div class="info-label">Обновлений</div><div class="info-value" id="updateCount">0</div></div>
                 <div class="info-item"><div class="info-label">Расстояние</div><div class="info-value" id="distanceValue">- м</div></div>
-                <div class="info-item"><div class="info-label">Уверенность</div><div class="info-value" id="confidenceValue">0%</div></div>
-                <div class="info-item"><div class="info-label">Версия</div><div class="info-value">PWA 1.0</div></div>
+                <div class="info-item"><div class="info-label">Метод</div><div class="info-value" id="methodValue">-</div></div>
+                <div class="info-item"><div class="info-label">Версия</div><div class="info-value">Chrome + флаги</div></div>
+            </div>
+        </div>
+
+        <!-- Секция отладки -->
+        <div class="section hidden" id="debugSection">
+            <div class="section-title">
+                <div class="icon">🐛</div>
+                Отладочная информация
+            </div>
+            <div id="debugInfo" style="font-size: 0.7em; font-family: monospace; max-height: 200px; overflow-y: auto;">
+                <!-- Отладочная информация будет здесь -->
             </div>
         </div>
     </div>
@@ -192,50 +203,67 @@
         // Глобальные переменные
         let map;
         let isPositioningActive = false;
-        let positioningInterval;
+        let watchId = null;
         let updateCount = 0;
-        let referencePoints = [];
-        let currentRSSI = -45;
 
         // Mapbox токен
         mapboxgl.accessToken = 'pk.eyJ1Ijoia211bm96IiwiYSI6ImNsY3A3NDloaDA2bnozcGxiN2U1Y2I2bWIifQ.WY4_mVStBm5c9CjvWsVy3w';
 
-        // Инициализация PWA
-        async function initializePWA() {
+        // Инициализация системы
+        async function initializeSystem() {
             try {
                 // Регистрация Service Worker
                 if ('serviceWorker' in navigator) {
                     await navigator.serviceWorker.register('/sw_wifi.js');
-                    console.log('Service Worker зарегистрирован');
+                    addDebugInfo('✅ Service Worker зарегистрирован');
                 }
 
-                // Запрос разрешений
-                await requestPermissions();
-                
                 // Инициализация карты
                 await initializeMap();
                 
-                updateSystemStatus('✅ PWA готов к работе', 'status-online');
+                // Проверка доступных API
+                await checkAvailableAPIs();
+                
+                updateSystemStatus('✅ Система готова к работе', 'status-online');
                 
             } catch (error) {
-                console.error('Ошибка инициализации PWA:', error);
+                console.error('Ошибка инициализации:', error);
                 updateSystemStatus('❌ Ошибка инициализации', 'status-offline');
             }
         }
 
-        // Запрос необходимых разрешений
-        async function requestPermissions() {
-            const permissions = [
-                { name: 'geolocation' }
-            ];
+        // Проверка доступных API
+        async function checkAvailableAPIs() {
+            addDebugInfo('=== ПРОВЕРКА ДОСТУПНЫХ API ===');
+            
+            // 1. Геолокация
+            if ('geolocation' in navigator) {
+                addDebugInfo('✅ navigator.geolocation - ДОСТУПЕН');
+            } else {
+                addDebugInfo('❌ navigator.geolocation - НЕДОСТУПЕН');
+            }
 
-            for (const permission of permissions) {
-                try {
-                    const result = await navigator.permissions.query(permission);
-                    console.log(`Разрешение ${permission.name}: ${result.state}`);
-                } catch (error) {
-                    console.warn(`Не удалось запросить разрешение ${permission.name}:`, error);
-                }
+            // 2. Wi-Fi API (экспериментальный)
+            if ('wifi' in navigator) {
+                addDebugInfo('✅ navigator.wifi - ДОСТУПЕН (экспериментальный)');
+            } else {
+                addDebugInfo('❌ navigator.wifi - НЕДОСТУПЕН');
+            }
+
+            // 3. Network Information API
+            if ('connection' in navigator) {
+                addDebugInfo('✅ navigator.connection - ДОСТУПЕН');
+                const conn = navigator.connection;
+                addDebugInfo(`   Тип: ${conn.effectiveType}, Скорость: ${conn.downlink} Mbps`);
+            } else {
+                addDebugInfo('❌ navigator.connection - НЕДОСТУПЕН');
+            }
+
+            // 4. Permissions API
+            if ('permissions' in navigator) {
+                addDebugInfo('✅ navigator.permissions - ДОСТУПЕН');
+            } else {
+                addDebugInfo('❌ navigator.permissions - НЕДОСТУПЕН');
             }
         }
 
@@ -293,48 +321,6 @@
                     'line-width': 3
                 }
             });
-
-            // Зона покрытия Wi-Fi
-            map.addSource('wifi-coverage', {
-                type: 'geojson',
-                data: createCoverageCircle(PRECISE_ROUTER_POSITION, 15)
-            });
-
-            map.addLayer({
-                id: 'wifi-coverage',
-                type: 'fill',
-                source: 'wifi-coverage',
-                paint: {
-                    'fill-color': '#28a745',
-                    'fill-opacity': 0.05
-                }
-            });
-        }
-
-        function createCoverageCircle(center, radiusMeters) {
-            const points = 32;
-            const coords = [];
-            
-            for (let i = 0; i < points; i++) {
-                const radians = (i / points) * 2 * Math.PI;
-                const dx = radiusMeters * Math.cos(radians);
-                const dy = radiusMeters * Math.sin(radians);
-                
-                const latOffset = dy / 111320;
-                const lngOffset = dx / (111320 * Math.cos(center[1] * Math.PI / 180));
-                
-                coords.push([center[0] + lngOffset, center[1] + latOffset]);
-            }
-            
-            coords.push(coords[0]);
-            
-            return {
-                type: 'Feature',
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [coords]
-                }
-            };
         }
 
         function addRouterMarker() {
@@ -361,216 +347,133 @@
             document.getElementById('routerLng').textContent = PRECISE_ROUTER_POSITION[0].toFixed(8);
         }
 
-        // Основная функция позиционирования
-        async function startPrecisePositioning() {
+        // РЕАЛЬНАЯ ГЕОЛОКАЦИЯ через navigator.geolocation
+        async function startRealGeolocation() {
             if (isPositioningActive) return;
             
+            if (!navigator.geolocation) {
+                alert('Геолокация не поддерживается вашим браузером');
+                return;
+            }
+
+            // Запрос разрешения
+            try {
+                const permission = await navigator.permissions.query({ name: 'geolocation' });
+                addDebugInfo(`Разрешение геолокации: ${permission.state}`);
+                
+                if (permission.state === 'denied') {
+                    alert('Разрешение на геолокацию отклонено. Разрешите доступ в настройках браузера.');
+                    return;
+                }
+            } catch (error) {
+                addDebugInfo('Permissions API не доступен, продолжаем...');
+            }
+
             isPositioningActive = true;
-            updateSystemStatus('🔍 Точное позиционирование...', 'status-scanning');
+            updateSystemStatus('📍 Запрос геолокации...', 'status-scanning');
             
             document.getElementById('startBtn').disabled = true;
             document.getElementById('stopBtn').disabled = false;
 
-            // Запуск цикла позиционирования
-            positioningInterval = setInterval(async () => {
-                try {
-                    await updateDevicePosition();
+            // Используем watchPosition для непрерывного отслеживания
+            watchId = navigator.geolocation.watchPosition(
+                // Успешный callback
+                (position) => {
+                    const coords = [position.coords.longitude, position.coords.latitude];
+                    const accuracy = position.coords.accuracy;
+                    
                     updateCount++;
-                    document.getElementById('updateCount').textContent = updateCount;
-                } catch (error) {
-                    console.error('Ошибка позиционирования:', error);
+                    
+                    // Определяем метод позиционирования
+                    let method = 'GPS';
+                    if (accuracy > 100) method = 'Сеть (Wi-Fi/Сотовая)';
+                    else if (accuracy <= 20) method = 'Высокая точность (GPS+Wi-Fi)';
+                    
+                    updatePositionDisplay(coords, accuracy, method);
+                    updateStatistics(coords, accuracy, method);
+                    
+                    updateSystemStatus('✅ Координаты получены', 'status-online');
+                    addDebugInfo(`Обновление ${updateCount}: ${coords[1].toFixed(6)}, ${coords[0].toFixed(6)} (точность: ${accuracy}m)`);
+                },
+                // Ошибка
+                (error) => {
+                    let errorMessage = 'Ошибка геолокации: ';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = '❌ Доступ к геолокации запрещен';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = '❌ Данные местоположения недоступны';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = '⏰ Таймаут запроса геолокации';
+                            break;
+                        default:
+                            errorMessage = '❌ Неизвестная ошибка геолокации';
+                    }
+                    updateSystemStatus(errorMessage, 'status-offline');
+                    addDebugInfo(`ОШИБКА: ${errorMessage}`);
+                },
+                // Опции (максимальная точность)
+                {
+                    enableHighAccuracy: true,  // Используем Wi-Fi и GPS
+                    timeout: 10000,           // 10 секунд таймаут
+                    maximumAge: 0             // Не использовать кешированные данные
                 }
-            }, 3000);
-
-            // Первое обновление
-            await updateDevicePosition();
+            );
         }
 
-        async function updateDevicePosition() {
-            // Получаем данные о сети и сигнале
-            const networkInfo = await getNetworkInformation();
-            const signalStrength = await getSignalStrength();
+        // Тестирование Wi-Fi API (если доступен)
+        async function testWiFiAPI() {
+            addDebugInfo('=== ТЕСТ WI-FI API ===');
             
-            // Обновляем информацию о Wi-Fi
-            updateWifiInfo(networkInfo, signalStrength);
-            
-            // Вычисляем позицию на основе сигнала
-            const position = calculatePrecisePosition(signalStrength);
-            
-            // Обновляем отображение
-            updatePositionDisplay(position);
-            updateStatistics(position);
-        }
-
-        // Получение информации о сети
-        async function getNetworkInformation() {
-            const info = {
-                ssid: 'EMIIA.AI MRV',
-                bssid: '28-CD-C4-13-EE-A3',
-                connected: true,
-                type: 'wifi'
-            };
-
-            // Используем Network Information API если доступен
-            if ('connection' in navigator) {
-                const connection = navigator.connection;
-                info.effectiveType = connection.effectiveType;
-                info.downlink = connection.downlink;
-                info.rtt = connection.rtt;
-            }
-
-            return info;
-        }
-
-        // Получение силы сигнала (эмуляция на основе реальных данных)
-        async function getSignalStrength() {
-            // В реальном PWA здесь будет работа с доступными API
-            // Пока используем умную эмуляцию на основе времени и других факторов
-            
-            const baseStrength = -45;
-            const timeVariation = Math.sin(Date.now() / 10000) * 5;
-            const randomVariation = (Math.random() - 0.5) * 10;
-            
-            currentRSSI = baseStrength + timeVariation + randomVariation;
-            return Math.max(-80, Math.min(-30, currentRSSI));
-        }
-
-        // Расчет точной позиции
-        function calculatePrecisePosition(rssi) {
-            const distance = calculateDistanceFromRSSI(rssi);
-            const roomCenter = getRoomCenter();
-            
-            // Умный алгоритм позиционирования с учетом эталонных точек
-            let position;
-            
-            if (referencePoints.length > 0) {
-                // Используем эталонные точки для коррекции
-                position = calculateWithReferencePoints(rssi);
+            if ('wifi' in navigator) {
+                try {
+                    updateSystemStatus('📶 Сканирование Wi-Fi...', 'status-scanning');
+                    
+                    const networks = await navigator.wifi.getNetworks();
+                    addDebugInfo(`✅ Найдено Wi-Fi сетей: ${networks.length}`);
+                    
+                    networks.forEach((network, index) => {
+                        addDebugInfo(`   Сеть ${index + 1}: ${network.ssid || 'Скрытая'} (${network.signalStrength || 'N/A'} dBm)`);
+                    });
+                    
+                    // Обновляем информацию о сигнале
+                    if (networks.length > 0) {
+                        const myNetwork = networks.find(n => n.ssid === 'EMIIA.AI MRV') || networks[0];
+                        document.getElementById('signalValue').textContent = 
+                            (myNetwork.signalStrength || -50) + ' dBm';
+                        document.getElementById('wifiStatus').textContent = 'Обнаружена';
+                    }
+                    
+                    updateSystemStatus('✅ Wi-Fi сканирование завершено', 'status-online');
+                    
+                } catch (error) {
+                    addDebugInfo(`❌ Ошибка Wi-Fi API: ${error.message}`);
+                    updateSystemStatus('❌ Ошибка Wi-Fi сканирования', 'status-offline');
+                }
             } else {
-                // Базовый расчет на основе расстояния от роутера
-                const angle = Math.random() * 2 * Math.PI;
-                const offsetLng = (distance * Math.cos(angle)) / (111320 * Math.cos(PRECISE_ROUTER_POSITION[1] * Math.PI / 180));
-                const offsetLat = (distance * Math.sin(angle)) / 111320;
-                
-                position = [
-                    PRECISE_ROUTER_POSITION[0] + offsetLng,
-                    PRECISE_ROUTER_POSITION[1] + offsetLat
-                ];
+                addDebugInfo('❌ Wi-Fi API не доступен');
+                updateSystemStatus('❌ Wi-Fi API не поддерживается', 'status-offline');
             }
-
-            // Корректируем позицию чтобы она была внутри комнаты
-            if (!isPointInRoom(position)) {
-                position = adjustToRoom(position, distance);
-            }
-
-            const accuracy = calculateAccuracy(rssi, distance);
-            const confidence = calculateConfidence(rssi);
-
-            return {
-                coordinates: position,
-                accuracy: accuracy,
-                confidence: confidence,
-                distance: distance,
-                rssi: rssi
-            };
         }
 
-        function calculateDistanceFromRSSI(rssi) {
-            const txPower = 20; // dBm (мощность передачи)
-            const pathLossExponent = 2.0; // Для точного позиционирования
-            const distance = Math.pow(10, (txPower - rssi) / (10 * pathLossExponent));
-            return Math.max(0.5, Math.min(8, distance));
-        }
+        function updatePositionDisplay(coords, accuracy, method) {
+            document.getElementById('currentLat').textContent = coords[1].toFixed(8);
+            document.getElementById('currentLng').textContent = coords[0].toFixed(8);
+            document.getElementById('accuracyValue').textContent = accuracy.toFixed(1);
+            document.getElementById('methodValue').textContent = method;
 
-        function calculateWithReferencePoints(rssi) {
-            // Взвешенное среднее на основе эталонных точек
-            let totalWeight = 0;
-            let weightedLng = 0;
-            let weightedLat = 0;
-
-            referencePoints.forEach(point => {
-                const rssiDiff = Math.abs(point.rssi - rssi);
-                const weight = 1 / (rssiDiff + 1); // Чем ближе RSSI, тем больше вес
-                
-                weightedLng += point.coordinates[0] * weight;
-                weightedLat += point.coordinates[1] * weight;
-                totalWeight += weight;
-            });
-
-            return [
-                weightedLng / totalWeight,
-                weightedLat / totalWeight
-            ];
-        }
-
-        function calculateAccuracy(rssi, distance) {
-            const baseAccuracy = 0.8;
-            const rssiStability = Math.max(0, 1 - (Math.abs(rssi + 45) / 35));
-            return baseAccuracy * rssiStability;
-        }
-
-        function calculateConfidence(rssi) {
-            const minRSSI = -80;
-            const maxRSSI = -30;
-            return Math.max(0.3, Math.min(0.95, (rssi - minRSSI) / (maxRSSI - minRSSI)));
-        }
-
-        function isPointInRoom(point) {
-            let inside = false;
-            for (let i = 0, j = PRECISE_ROOM_CORNERS.length - 1; i < PRECISE_ROOM_CORNERS.length; j = i++) {
-                const xi = PRECISE_ROOM_CORNERS[i][0], yi = PRECISE_ROOM_CORNERS[i][1];
-                const xj = PRECISE_ROOM_CORNERS[j][0], yj = PRECISE_ROOM_CORNERS[j][1];
-                
-                const intersect = ((yi > point[1]) !== (yj > point[1])) &&
-                    (point[0] < (xj - xi) * (point[1] - yi) / (yj - yi) + xi);
-                if (intersect) inside = !inside;
-            }
-            return inside;
-        }
-
-        function adjustToRoom(position, distance) {
-            const center = getRoomCenter();
-            const direction = [
-                position[0] - center[0],
-                position[1] - center[1]
-            ];
-            
-            const length = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
-            const normalized = [direction[0] / length, direction[1] / length];
-            
-            return [
-                center[0] + normalized[0] * distance * 0.7,
-                center[1] + normalized[1] * distance * 0.7
-            ];
-        }
-
-        function getRoomCenter() {
-            const lngs = PRECISE_ROOM_CORNERS.map(p => p[0]);
-            const lats = PRECISE_ROOM_CORNERS.map(p => p[1]);
-            return [
-                (Math.min(...lngs) + Math.max(...lngs)) / 2,
-                (Math.min(...lats) + Math.max(...lats)) / 2
-            ];
-        }
-
-        function updateWifiInfo(networkInfo, signalStrength) {
-            document.getElementById('signalValue').textContent = signalStrength.toFixed(1) + ' dBm';
-            document.getElementById('wifiStatus').textContent = networkInfo.connected ? 'Подключено' : 'Отключено';
-        }
-
-        function updatePositionDisplay(position) {
-            document.getElementById('currentLat').textContent = position.coordinates[1].toFixed(8);
-            document.getElementById('currentLng').textContent = position.coordinates[0].toFixed(8);
-            document.getElementById('accuracyValue').textContent = position.accuracy.toFixed(2);
-
-            updatePositionMarker(position.coordinates, position.accuracy);
+            updatePositionMarker(coords, accuracy);
         }
 
         function updatePositionMarker(coords, accuracy) {
+            // Удаляем старый маркер
             if (window.positionMarker) {
                 window.positionMarker.remove();
             }
 
+            // Создаем новый маркер
             window.positionMarker = new mapboxgl.Marker({
                 color: '#28a745',
                 scale: 1.2
@@ -583,27 +486,27 @@
                         <div style="font-size: 11px; font-family: monospace;">
                             <div>Ш: ${coords[1].toFixed(8)}</div>
                             <div>Д: ${coords[0].toFixed(8)}</div>
-                            <div>Точность: ±${accuracy.toFixed(2)}м</div>
-                            <div>RSSI: ${currentRSSI.toFixed(1)} dBm</div>
+                            <div>Точность: ±${accuracy.toFixed(1)}м</div>
+                            <div>Обновлений: ${updateCount}</div>
                         </div>
                     </div>
                 `)
             )
             .addTo(map);
 
+            // Плавное перемещение карты
             map.flyTo({
                 center: coords,
                 zoom: 20,
                 speed: 0.3,
-                curve: 1,
                 essential: true
             });
         }
 
-        function updateStatistics(position) {
-            const distance = calculateDistance(position.coordinates, PRECISE_ROUTER_POSITION);
+        function updateStatistics(coords, accuracy, method) {
+            const distance = calculateDistance(coords, PRECISE_ROUTER_POSITION);
             document.getElementById('distanceValue').textContent = distance.toFixed(2) + ' м';
-            document.getElementById('confidenceValue').textContent = Math.round(position.confidence * 100) + '%';
+            document.getElementById('updateCount').textContent = updateCount;
         }
 
         function calculateDistance(point1, point2) {
@@ -619,7 +522,11 @@
 
         function stopPositioning() {
             isPositioningActive = false;
-            clearInterval(positioningInterval);
+            
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
             
             updateSystemStatus('⏸️ Позиционирование остановлено', 'status-offline');
             
@@ -627,36 +534,16 @@
             document.getElementById('stopBtn').disabled = true;
         }
 
-        function calibrateSystem() {
-            updateSystemStatus('🎚️ Калибровка системы...', 'status-scanning');
-            
-            setTimeout(() => {
-                updateSystemStatus('✅ Система откалибрована', 'status-online');
-                showNotification('Точность позиционирования улучшена', 'success');
-            }, 1500);
+        function showDebugInfo() {
+            const debugSection = document.getElementById('debugSection');
+            debugSection.classList.toggle('hidden');
         }
 
-        function addReferencePoint() {
-            const center = map.getCenter();
-            const referencePoint = {
-                coordinates: [center.lng, center.lat],
-                rssi: currentRSSI,
-                timestamp: Date.now()
-            };
-            
-            referencePoints.push(referencePoint);
-            
-            // Добавляем маркер эталонной точки
-            new mapboxgl.Marker({
-                color: '#ffc107'
-            })
-            .setLngLat([center.lng, center.lat])
-            .setPopup(new mapboxgl.Popup()
-                .setHTML(`Эталонная точка<br>RSSI: ${currentRSSI.toFixed(1)} dBm`)
-            )
-            .addTo(map);
-            
-            showNotification(`Эталонная точка добавлена (RSSI: ${currentRSSI.toFixed(1)} dBm)`, 'success');
+        function addDebugInfo(message) {
+            const debugInfo = document.getElementById('debugInfo');
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.innerHTML += `[${timestamp}] ${message}<br>`;
+            debugInfo.scrollTop = debugInfo.scrollHeight;
         }
 
         function updateSystemStatus(message, className) {
@@ -667,19 +554,14 @@
             statusElement.className = `status-indicator ${className}`;
         }
 
-        function showNotification(message, type = 'info') {
-            // Простое уведомление в консоли для PWA
-            console.log(`${type.toUpperCase()}: ${message}`);
-        }
-
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', initializePWA);
+        document.addEventListener('DOMContentLoaded', initializeSystem);
 
         // Глобальные функции
-        window.startPrecisePositioning = startPrecisePositioning;
+        window.startRealGeolocation = startRealGeolocation;
         window.stopPositioning = stopPositioning;
-        window.calibrateSystem = calibrateSystem;
-        window.addReferencePoint = addReferencePoint;
+        window.testWiFiAPI = testWiFiAPI;
+        window.showDebugInfo = showDebugInfo;
     </script>
 </body>
 </html>
