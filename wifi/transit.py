@@ -1,3 +1,5 @@
+# ... [остальной код без изменений] ...
+
 @app.route('/')
 def index():
     return '''
@@ -29,83 +31,28 @@ def index():
                 --scroll-thumb-hover: rgba(0, 0, 0, 0.6);
             }
             
-            /* ========== СКРОЛЛ БЕЗ СТРЕЛОК ========== */
+            /* ========== ПОЛНОСТЬЮ СКРЫТЫЙ СКРОЛЛ ========== */
             ::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
+                width: 0px;
+                height: 0px;
             }
             
             ::-webkit-scrollbar-track {
-                background: var(--scroll-track);
-                border-radius: 4px;
+                background: transparent;
             }
             
             ::-webkit-scrollbar-thumb {
-                background: var(--scroll-thumb);
-                border-radius: 4px;
-            }
-            
-            ::-webkit-scrollbar-thumb:hover {
-                background: var(--scroll-thumb-hover);
+                background: transparent;
             }
             
             ::-webkit-scrollbar-button {
-                display: none !important;
-                width: 0 !important;
-                height: 0 !important;
+                display: none;
             }
             
             * {
-                scrollbar-width: thin;
-                scrollbar-color: var(--scroll-thumb) transparent;
+                scrollbar-width: none;
+                scrollbar-color: transparent transparent;
                 box-sizing: border-box;
-            }
-            
-            /* ========== СКРЫТИЕ ПРОКРУТКИ С !IMPORTANT ========== */
-            /* Скрытие основной прокрутки страницы */
-            body {
-                overflow-y: hidden !important;
-            }
-            
-            /* Скрытие прокрутки в меню и его элементах */
-            .controls {
-                overflow-y: auto !important;
-                scrollbar-width: none !important;
-            }
-            
-            .controls::-webkit-scrollbar {
-                width: 0 !important;
-                background: transparent !important;
-            }
-            
-            /* Скрытие прокрутки во внутренних блоках меню */
-            .network-list,
-            .switches-container {
-                overflow-y: auto !important;
-                scrollbar-width: none !important;
-            }
-            
-            .network-list::-webkit-scrollbar,
-            .switches-container::-webkit-scrollbar {
-                width: 0 !important;
-                background: transparent !important;
-            }
-            
-            /* Для временного показа прокрутки при необходимости */
-            .show-scrollbar {
-                overflow-y: auto !important;
-            }
-            
-            .show-scrollbar::-webkit-scrollbar {
-                width: 8px !important;
-            }
-            
-            .show-scrollbar::-webkit-scrollbar-track {
-                background: var(--scroll-track) !important;
-            }
-            
-            .show-scrollbar::-webkit-scrollbar-thumb {
-                background: var(--scroll-thumb) !important;
             }
             
             body { 
@@ -129,7 +76,7 @@ def index():
                 top: 20px; 
                 left: 20px; 
                 background: rgba(255, 255, 255, 0.95);
-                padding: 0; /* Убираем padding, так как он будет у sticky-header */
+                padding: 0;
                 border-radius: 18px; 
                 border: 0px solid var(--primary);
                 width: 320px;
@@ -139,6 +86,7 @@ def index():
                 z-index: 10;
                 display: flex;
                 flex-direction: column;
+                overflow: hidden; /* Скрываем скролл для всего блока */
             }
             
             /* Новый залипший блок */
@@ -150,6 +98,7 @@ def index():
                 border-radius: 18px 18px 0 0;
                 z-index: 20;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                flex-shrink: 0; /* Не сжимается при прокрутке */
             }
             
             .header-title {
@@ -176,8 +125,16 @@ def index():
                 padding: 20px;
                 overflow-y: auto;
                 flex: 1;
+                /* Полностью скрываем скроллбар */
+                scrollbar-width: none;
+                -ms-overflow-style: none;
             }
             
+            .controls-content::-webkit-scrollbar {
+                display: none;
+            }
+            
+            /* Остальные стили без изменений */
             .button-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -262,6 +219,13 @@ def index():
                 border-radius: 8px;
                 padding: 10px; 
                 background: rgba(0, 0, 0, 0.05);
+                /* Скрываем скроллбар */
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            
+            .network-list::-webkit-scrollbar {
+                display: none;
             }
             
             .network-item {
@@ -344,6 +308,13 @@ def index():
                 max-height: 80vh; 
                 overflow-y: auto; 
                 color: #333333;
+                /* Скрываем скроллбар в модальном окне */
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            
+            .modal-content::-webkit-scrollbar {
+                display: none;
             }
             
             .modal-header {
@@ -462,6 +433,15 @@ def index():
                 border-radius: 8px;
                 border: 1px solid rgba(0, 255, 136, 0.2);
                 max-height: 250px;
+                /* Скрываем скроллбар */
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            
+            .switches-container::-webkit-scrollbar,
+            .network-list::-webkit-scrollbar,
+            .modal-content::-webkit-scrollbar {
+                display: none;
             }
             
             .form-check.form-switch {
@@ -556,6 +536,13 @@ def index():
                 border-radius: 8px;
                 border: 1px solid #3c78d8;
                 max-height: 250px;
+                /* Скрываем скроллбар */
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            
+            .switches-container::-webkit-scrollbar {
+                display: none;
             }
             
             .network-list {
@@ -565,6 +552,13 @@ def index():
                 border-radius: 8px;
                 padding: 10px;
                 background: #fff;
+                /* Скрываем скроллбар */
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            
+            .network-list::-webkit-scrollbar {
+                display: none;
             }
             
             .network-item {
@@ -783,3 +777,5 @@ def index():
     </body>
     </html>
     '''
+
+# ... [остальной код без изменений] ...
