@@ -490,7 +490,7 @@ def index():
                 -webkit-appearance: none;
                 -moz-appearance: none;
                 appearance: none;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg ' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233c78d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233c78d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
                 background-repeat: no-repeat;
                 background-position: right 12px center;
                 background-size: 14px;
@@ -1799,7 +1799,7 @@ if __name__ == '__main__':
     print("СТАТИЧЕСКИЕ координаты - генерируются один раз и сохраняются")
     print("ВЫРАВНИВАНИЕ SELECT: левое выравнивание, отступы стрелки")
     print("БЛОК ФЛАГОВ В СКРОЛЛЕ: max-height 250px, overflow-y: auto")
-    print("ИСПРАВЛЕНЫ СТРЕЛКИ SELECT: корректный data-URL без пробелов")
+    print("ИСПРАВЛЕНЫ СТРЕЛКИ SELECT: корректный data-URL с правильной кодировкой")
     print("ИСПРАВЛЕН ЦВЕТ INPUT: #333333 для текста, rgba(255,255,255,0.9) для фона")
     print("ВЕРНУТЫ СТРЕЛКИ: отдельный стиль для .settings-block select")
     print("СВЕТЛАЯ ТЕМА: активирована для всего интерфейса")
