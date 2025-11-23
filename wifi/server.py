@@ -1278,7 +1278,9 @@ ease;
                         'icon-image': 'pulsing-dot-blue',
                         'icon-allow-overlap': true,
                         'icon-ignore-placement': true
-                    }
+                    },
+minzoom: 12,
+maxzoom: 24
                 });
 
                 // Слой для точки основного роутера (отдельный источник)
@@ -1308,7 +1310,10 @@ ease;
                         'icon-image': 'static-red-dot',
                         'icon-allow-overlap': true,
                         'icon-ignore-placement': true
-                    }
+                    },
+minzoom: 19,
+maxzoom: 24
+
                 });
 
                 // Слой для триангуляционных точек (отдельный источник)
@@ -1328,7 +1333,9 @@ ease;
                         'icon-image': 'static-gray-dot',
                         'icon-allow-overlap': true,
                         'icon-ignore-placement': true
-                    }
+                    },
+minzoom: 19,
+maxzoom: 24
                 });
 
                 // Переместить все слои под 3D-здания
