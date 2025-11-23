@@ -1,4 +1,3 @@
-python 
 import subprocess
 import json
 from flask import Flask, jsonify, request
@@ -1136,8 +1135,38 @@ def index():
                     }
                 });
 
-                // Слой для статичных точек (Роутер + Триангуляция)
-                map.addSource('static-points-source', {
+                // Слой для точки основного роутера (отдельный источник)
+                map.addSource('router-point-source', {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: ROUTER_CONFIG.position
+                            },
+                            properties: {
+                                icon: 'static-red-dot',
+                                type: 'router'
+                            }
+                        }]
+                    }
+                });
+
+                map.addLayer({
+                    id: 'router-point-layer',
+                    type: 'symbol',
+                    source: 'router-point-source',
+                    layout: {
+                        'icon-image': 'static-red-dot',
+                        'icon-allow-overlap': true,
+                        'icon-ignore-placement': true
+                    }
+                });
+
+                // Слой для триангуляционных точек (отдельный источник)
+                map.addSource('triangulation-points-source', {
                     type: 'geojson',
                     data: {
                         type: 'FeatureCollection',
@@ -1146,20 +1175,21 @@ def index():
                 });
 
                 map.addLayer({
-                    id: 'static-points-layer',
+                    id: 'triangulation-points-layer',
                     type: 'symbol',
-                    source: 'static-points-source',
+                    source: 'triangulation-points-source',
                     layout: {
-                        'icon-image': ['get', 'icon'],
+                        'icon-image': 'static-gray-dot',
                         'icon-allow-overlap': true,
                         'icon-ignore-placement': true
                     }
                 });
 
-                // Переместить ОБА слоя под 3D-здания
+                // Переместить все слои под 3D-здания
                 if (map.getLayer('3d-buildings')) {
-                    map.moveLayer('static-points-layer', '3d-buildings');
-                    map.moveLayer('pulsing-points-layer', 'static-points-layer');
+                    map.moveLayer('triangulation-points-layer', '3d-buildings');
+                    map.moveLayer('router-point-layer', 'triangulation-points-layer');
+                    map.moveLayer('pulsing-points-layer', 'router-point-layer');
                 }
 
                 // Установка светового режима и освещения
@@ -1208,36 +1238,19 @@ def index():
                     map.getCanvas().style.cursor = '';
                 });
 
-                // Обработчик клика для статичных точек
-                map.on('click', 'static-points-layer', (e) => {
+                // Обработчик клика для точки роутера
+                map.on('click', 'router-point-layer', (e) => {
                     const feature = e.features[0];
                     const props = feature.properties;
                     
-                    let popupContent = '';
-                    if (props.type === 'router') {
-                        popupContent = `
-                            <div style="padding: 10px; font-size: 12px;">
-                                <h4 style="margin: 0 0 8px 0; color: #dc3545;">${ROUTER_CONFIG.ssid}</h4>
-                                <p style="margin: 4px 0;"><b>MAC:</b> ${ROUTER_CONFIG.mac}</p>
-                                <p style="margin: 4px 0;"><b>IP:</b> ${ROUTER_CONFIG.ip || 'N/A'}</p>
-                                <p style="margin: 4px 0;"><b>Тип:</b> <span style="color: #dc3545; font-weight: bold;">Главный роутер</span></p>
-                            </div>
-                        `;
-                    } else if (props.type === 'triangulation') {
-                        popupContent = `
-                            <div style="padding: 10px; font-size: 12px; min-width: 220px;">
-                                <h4 style="margin: 0 0 8px 0; color: #6c757d;">${props.ssid}</h4>
-                                <p style="margin: 4px 0;"><b>MAC:</b> ${props.mac}</p>
-                                <p style="margin: 4px 0;"><b>Сигнал:</b> ${parseFloat(props.signal).toFixed(1)} dBm</p>
-                                <p style="margin: 4px 0;"><b>Расстояние:</b> ${props.distance} м</p>
-                                <p style="margin: 4px 0;"><b>RTT:</b> ${parseFloat(props.rtt_ms).toFixed(1)} мс</p>
-                                <p style="margin: 4px 0; color: #00ccff; font-weight: bold;">
-                                    Lng,Lat: ${feature.geometry.coordinates[0].toFixed(8)}, ${feature.geometry.coordinates[1].toFixed(8)}
-                                </p>
-                                <p style="margin: 4px 0;"><b>Тип:</b> <span style="color: #6c757d; font-weight: bold;">Триангуляция</span></p>
-                            </div>
-                        `;
-                    }
+                    const popupContent = `
+                        <div style="padding: 10px; font-size: 12px;">
+                            <h4 style="margin: 0 0 8px 0; color: #dc3545;">${ROUTER_CONFIG.ssid}</h4>
+                            <p style="margin: 4px 0;"><b>MAC:</b> ${ROUTER_CONFIG.mac}</p>
+                            <p style="margin: 4px 0;"><b>IP:</b> ${ROUTER_CONFIG.ip || 'N/A'}</p>
+                            <p style="margin: 4px 0;"><b>Тип:</b> <span style="color: #dc3545; font-weight: bold;">Главный роутер</span></p>
+                        </div>
+                    `;
                     
                     new mapboxgl.Popup()
                         .setLngLat(feature.geometry.coordinates)
@@ -1245,11 +1258,44 @@ def index():
                         .addTo(map);
                 });
 
-                map.on('mouseenter', 'static-points-layer', () => {
+                map.on('mouseenter', 'router-point-layer', () => {
                     map.getCanvas().style.cursor = 'pointer';
                 });
 
-                map.on('mouseleave', 'static-points-layer', () => {
+                map.on('mouseleave', 'router-point-layer', () => {
+                    map.getCanvas().style.cursor = '';
+                });
+
+                // Обработчик клика для триангуляционных точек
+                map.on('click', 'triangulation-points-layer', (e) => {
+                    const feature = e.features[0];
+                    const props = feature.properties;
+                    
+                    const popupContent = `
+                        <div style="padding: 10px; font-size: 12px; min-width: 220px;">
+                            <h4 style="margin: 0 0 8px 0; color: #6c757d;">${props.ssid}</h4>
+                            <p style="margin: 4px 0;"><b>MAC:</b> ${props.mac}</p>
+                            <p style="margin: 4px 0;"><b>Сигнал:</b> ${parseFloat(props.signal).toFixed(1)} dBm</p>
+                            <p style="margin: 4px 0;"><b>Расстояние:</b> ${props.distance} м</p>
+                            <p style="margin: 4px 0;"><b>RTT:</b> ${parseFloat(props.rtt_ms).toFixed(1)} мс</p>
+                            <p style="margin: 4px 0; color: #00ccff; font-weight: bold;">
+                                Lng,Lat: ${feature.geometry.coordinates[0].toFixed(8)}, ${feature.geometry.coordinates[1].toFixed(8)}
+                            </p>
+                            <p style="margin: 4px 0;"><b>Тип:</b> <span style="color: #6c757d; font-weight: bold;">Триангуляция</span></p>
+                        </div>
+                    `;
+                    
+                    new mapboxgl.Popup()
+                        .setLngLat(feature.geometry.coordinates)
+                        .setHTML(popupContent)
+                        .addTo(map);
+                });
+
+                map.on('mouseenter', 'triangulation-points-layer', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+
+                map.on('mouseleave', 'triangulation-points-layer', () => {
                     map.getCanvas().style.cursor = '';
                 });
             
@@ -1295,29 +1341,36 @@ def index():
                 }
             }
             
-            // ========== ОБНОВЛЕНИЕ СТАТИЧЕСКИХ ТОЧЕК (Роутер + Триангуляция) ==========
-            function updateStaticPointsLayer() {
-                if (!map.getSource('static-points-source')) {
-                    console.warn('static-points-source не найден');
+            // ========== ОБНОВЛЕНИЕ ТОЧКИ ОСНОВНОГО РОУТЕРА ==========
+            function updateRouterPointLayer() {
+                if (map.getSource('router-point-source')) {
+                    map.getSource('router-point-source').setData({
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: ROUTER_CONFIG.position
+                            },
+                            properties: {
+                                icon: 'static-red-dot',
+                                type: 'router'
+                            }
+                        }]
+                    });
+                }
+            }
+            
+            // ========== ОБНОВЛЕНИЕ ТРИАНГУЛЯЦИОННЫХ ТОЧЕК ==========
+            function updateTriangulationPointsLayer() {
+                if (!map.getSource('triangulation-points-source')) {
+                    console.warn('triangulation-points-source не найден');
                     return;
                 }
                 
                 const features = [];
                 
-                // Добавить роутер (всегда первым)
-                features.push({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: ROUTER_CONFIG.position
-                    },
-                    properties: {
-                        icon: 'static-red-dot',
-                        type: 'router'
-                    }
-                });
-                
-                // Добавить триангуляционные точки (с проверкой на дубликаты роутера)
+                // Добавить триангуляционные точки (без роутера)
                 selectedForTriangulation.forEach(network => {
                     if (network.mac === ROUTER_CONFIG.mac) return; // Защита от дубликатов
                     if (network.position) {
@@ -1341,16 +1394,13 @@ def index():
                     }
                 });
                 
-                // Обновить данные источника и принудительно перерисовать
-                map.getSource('static-points-source').setData({
+                // Обновить данные источника
+                map.getSource('triangulation-points-source').setData({
                     type: 'FeatureCollection',
                     features: features
                 });
                 
-                // Гарантировать перерисовку
-                map.triggerRepaint();
-                
-                console.log(`Обновлен слой статичных точек: роутер + ${selectedForTriangulation.length} триангуляционных точек`);
+                console.log(`Обновлен слой триангуляционных точек: ${features.length} точек`);
             }
             
             async function scanWiFi() {
@@ -1367,7 +1417,8 @@ def index():
                     wifiNetworks = result;
                     displayNetworks(wifiNetworks, scanTime);
                     updateTriangulationSection();
-                    updateStaticPointsLayer();
+                    updateRouterPointLayer(); // Обновляем точку роутера
+                    updateTriangulationPointsLayer(); // Обновляем триангуляционные точки
                     
                     // Обновить позицию если слой активен
                     if (myPositionShown && userPositionFallback) {
@@ -1675,7 +1726,7 @@ def index():
                 renderTriangulationSelection();
                 displayNetworks(wifiNetworks);
                 updateTriangulationSection();
-                updateStaticPointsLayer();
+                updateTriangulationPointsLayer(); // Обновляем только триангуляционные точки
             }
             
             function updateSelectedNetworks() {
@@ -1709,6 +1760,7 @@ def index():
                     document.getElementById('status').innerHTML = `
                         <span class="success">Триангуляция настроена (${res.networks_count} сетей)</span>
                     `;
+                    updateTriangulationPointsLayer(); // Обновляем триангуляционные точки после сохранения
                 })
                 .catch(err => {
                     console.error('Ошибка триангуляции:', err);
@@ -1760,8 +1812,7 @@ if __name__ == '__main__':
     print("РАБОТАЕТ: Mapbox слой с triggerRepaint, правильный z-index")
     print("ИСПРАВЛЕНО: Попап при клике на точку с координатами и точностью")
     print("ИСПРАВЛЕНО: Точка теперь внутри полупрозрачных 3D зданий")
-    print("НОВОЕ: Статичные точки роутера (красная) и триангуляции (серая) 110px")
-    print("ОБЩИЙ СЛОЙ: Все точки (пульсирующая + статичные) внутри 3D зданий")
+    print("НОВОЕ: Разделенные слои для роутера и триангуляции (независимые источники)")
     print("ИСПРАВЛЕНО: Красная точка роутера больше не исчезает при триангуляции")
     print("ДОБАВЛЕНО: map.triggerRepaint() и защита от дубликатов")
     print("УБРАНЫ: Все иконки и декоративные символы из попапов")
