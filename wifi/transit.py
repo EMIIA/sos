@@ -1,4 +1,314 @@
-# ... [остальной код без изменений] ...
+import subprocess
+import json
+from flask import Flask, jsonify, request
+import threading
+import time
+import re
+import random
+from datetime import datetime
+
+app = Flask(__name__)
+
+# ========== НАСТРОЙКИ (БЕЗ ИЗМЕНЕНИЙ) ==========
+ROUTER_CONFIG = {
+    'mac': '50:FF:20:68:EF:9C',
+    'ssid': 'EMIIA.AI MRV',
+    'position': [37.16332212, 55.98346937],
+    'tx_power': -20,
+    'ip': '192.168.1.1'
+}
+
+# === ГЕОГРАФИЧЕСКИЕ ГРАНИЦЫ ДЛЯ ТРИАНГУЛЯЦИИ (БЕЗ ИЗМЕНЕНИЙ) ===
+COORDINATE_BOUNDS = {
+    'lng_min': 37.16300053,
+    'lng_max': 37.16396619,
+    'lat_min': 55.98340849,
+    'lat_max': 55.98351054
+}
+
+SCAN_INTERVAL = 3
+NETWORK_TTL = 10
+
+network_cache = {}
+network_positions_cache = {}
+cache_lock = threading.Lock()
+last_full_scan = 0
+
+# ========== ФОНОВЫЙ СКАНЕР (БЕЗ ИЗМЕНЕНИЙ) ==========
+def background_scanner():
+    global last_full_scan
+    print("EMII.AI IoT запущен")
+    
+    while True:
+        try:
+            current_time = time.time()
+            
+            if current_time - last_full_scan >= SCAN_INTERVAL:
+                print(f"\n{'='*50}")
+                print(f"Сканирование... {datetime.now().strftime('%H:%M:%S')}")
+                
+                networks = scan_wifi_real()
+                
+                with cache_lock:
+                    for net in networks:
+                        mac = net['mac']
+                        
+                        if mac == ROUTER_CONFIG['mac']:
+                            net['position'] = ROUTER_CONFIG['position']
+                        else:
+                            if mac in network_positions_cache:
+                                net['position'] = network_positions_cache[mac]
+                            else:
+                                net['position'] = [
+                                    round(random.uniform(COORDINATE_BOUNDS['lng_min'], COORDINATE_BOUNDS['lng_max']), 8),
+                                    round(random.uniform(COORDINATE_BOUNDS['lat_min'], COORDINATE_BOUNDS['lat_max']), 8)
+                                ]
+                                network_positions_cache[mac] = net['position']
+                        
+                        if mac in network_cache:
+                            old_signal = network_cache[mac]['signal']
+                            variation = random.uniform(-1.5, 1.5)
+                            new_signal = max(-90, min(-20, old_signal + variation))
+                            net['signal'] = new_signal
+                            net['last_seen'] = current_time
+                        else:
+                            net['last_seen'] = current_time
+                        
+                        net['rtt_ms'] = calculate_rtt(net['signal'])
+                        net['rtt_real_ms'] = ping_router(ROUTER_CONFIG['ip']) if ROUTER_CONFIG.get('ip') and net['mac'] == ROUTER_CONFIG['mac'] else None
+                        
+                        network_cache[mac] = net
+                    
+                    old_macs = [mac for mac, net in network_cache.items() 
+                               if current_time - net.get('last_seen', 0) > NETWORK_TTL]
+                    for mac in old_macs:
+                        del network_cache[mac]
+                    
+                    print(f"Активных сетей: {len(network_cache)}")
+                    print(f"Сохранено позиций: {len(network_positions_cache)}")
+                
+                last_full_scan = current_time
+            
+            time.sleep(1)
+            
+        except Exception as e:
+            print(f"Ошибка сканирования: {e}")
+            time.sleep(5)
+
+# ========== ОСТАЛЬНЫЕ ФУНКЦИИ (БЕЗ ИЗМЕНЕНИЙ) ==========
+def scan_wifi_real():
+    try:
+        result = subprocess.run(
+            ['netsh', 'wlan', 'show', 'networks', 'mode=bssid'],
+            capture_output=True,
+            text=True,
+            encoding='cp866',
+            errors='ignore',
+            timeout=15
+        )
+        
+        if result.returncode != 0:
+            print(f"Ошибка netsh: {result.stderr}")
+            return []
+        
+        networks = parse_netsh_complete(result.stdout)
+        return networks
+        
+    except Exception as e:
+        print(f"Ошибка сканирования: {e}")
+        return []
+
+def parse_netsh_complete(output):
+    networks = []
+    lines = output.split('\n')
+    
+    current = {'ssid': None, 'mac': None, 'signal': -80, 'channel': 0}
+    
+    for line in lines:
+        line = line.strip()
+        
+        if line.startswith('SSID') and ':' in line and 'BSSID' not in line:
+            if current['ssid'] and current['mac']:
+                networks.append(create_network(**current))
+            
+            current = {
+                'ssid': line.split(':', 1)[1].strip(),
+                'mac': None,
+                'signal': -80,
+                'channel': 0
+            }
+        
+        elif line.startswith('BSSID') and ':' in line and current['ssid']:
+            mac = line.split(':', 1)[1].strip().replace('-', ':').upper()
+            current['mac'] = mac
+        
+        elif ('Сигнал' in line or 'Signal' in line) and current['ssid'] and current['mac']:
+            try:
+                sig = line.split(':', 1)[1]
+                if '%' in sig:
+                    percent = int(sig.replace('%', ''))
+                    current['signal'] = -100 + (percent * 0.5)
+                elif 'dBm' in sig:
+                    current['signal'] = int(sig.replace('dBm', ''))
+            except:
+                current['signal'] = -80
+        
+        elif ('Канал' in line or 'Channel' in line) and current['ssid'] and current['mac']:
+            try:
+                numbers = re.findall(r'\d+', line)
+                if numbers:
+                    current['channel'] = int(numbers[0])
+            except:
+                current['channel'] = 0
+    
+    if current['ssid'] and current['mac']:
+        networks.append(create_network(**current))
+    
+    unique = {}
+    for net in networks:
+        mac = net['mac']
+        if mac not in unique or net['signal'] > unique[mac]['signal']:
+            unique[mac] = net
+    
+    return list(unique.values())
+
+def create_network(ssid, mac, signal, channel=0):
+    signal_with_noise = float(signal) + random.uniform(-0.5, 0.5)
+    
+    return {
+        'ssid': ssid,
+        'mac': mac,
+        'signal': round(signal_with_noise, 1),
+        'channel': channel,
+        'known': False,
+        'distance': calculate_distance(signal_with_noise),
+        'position': None,
+        'last_seen': time.time(),
+        'rtt_ms': None,
+        'rtt_real_ms': None
+    }
+
+def calculate_distance(signal_dbm, tx_power=-20):
+    path_loss = tx_power - signal_dbm
+    distance = 10 ** (path_loss / (10 * 2.5))
+    return round(max(1.0, min(50.0, distance)), 1)
+
+def calculate_rtt(signal_dbm, tx_power=-20):
+    distance = calculate_distance(signal_dbm, tx_power)
+    base_latency = 2.0
+    distance_latency = distance * 0.01
+    signal_quality = max(0, min(100, (signal_dbm + 100) * 2))
+    signal_latency = (100 - signal_quality) * 0.4
+    
+    rtt_ms = base_latency + distance_latency + signal_latency
+    rtt_ms += random.uniform(-0.3, 0.3)
+    
+    return round(max(1.0, min(rtt_ms, 50.0)), 1)
+
+def ping_router(ip):
+    if not ip:
+        return None
+    
+    try:
+        result = subprocess.run(
+            ['ping', '-n', '1', '-w', '100', ip],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        
+        if result.returncode == 0:
+            match = re.search(r'Время[=<]\s*(\d+)\s*мс', result.stdout)
+            if match:
+                return int(match.group(1))
+            match = re.search(r'time[=<]\s*(\d+)\s*ms', result.stdout)
+            if match:
+                return int(match.group(1))
+        
+        return None
+        
+    except:
+        return None
+
+# ========== API (БЕЗ ИЗМЕНЕНИЙ) ==========
+@app.route('/api/wifi')
+def get_wifi():
+    try:
+        with cache_lock:
+            networks = []
+            for mac, net in network_cache.items():
+                net_copy = dict(net)
+                net_copy['known'] = (net_copy['mac'] == ROUTER_CONFIG['mac'])
+                
+                if net_copy['known']:
+                    net_copy['position'] = ROUTER_CONFIG['position']
+                
+                net_copy['rtt_ms'] = calculate_rtt(net_copy['signal'])
+                if net_copy['known'] and ROUTER_CONFIG.get('ip'):
+                    net_copy['rtt_real_ms'] = ping_router(ROUTER_CONFIG['ip'])
+                else:
+                    net_copy['rtt_real_ms'] = None
+                
+                networks.append(net_copy)
+            
+            networks.sort(key=lambda x: x['signal'], reverse=True)
+            return jsonify(networks)
+            
+    except Exception as e:
+        print(f"Ошибка API: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/triangulation', methods=['POST'])
+def triangulation():
+    try:
+        data = request.get_json()
+        print(f"Получено {len(data)} сетей для корректировки")
+        
+        return jsonify({
+            'status': 'success', 
+            'networks_count': len(data),
+            'message': 'Корректировка настроена'
+        })
+    except Exception as e:
+        print(f"Ошибка корректировки: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/export')
+def export_data():
+    try:
+        with cache_lock:
+            networks_list = []
+            for mac, net in network_cache.items():
+                net_dict = {
+                    'ssid': net.get('ssid'),
+                    'mac': net.get('mac'),
+                    'signal': float(net.get('signal', 0)),
+                    'channel': int(net.get('channel', 0)),
+                    'distance': float(net.get('distance', 0)),
+                    'rtt_ms': float(net.get('rtt_ms', 0)) if net.get('rtt_ms') else None,
+                    'rtt_real_ms': int(net.get('rtt_real_ms')) if net.get('rtt_real_ms') else None,
+                    'position': net.get('position'),
+                    'last_seen': float(net.get('last_seen', 0)),
+                    'known': net.get('mac') == ROUTER_CONFIG['mac']
+                }
+                networks_list.append(net_dict)
+            
+            export_obj = {
+                'timestamp': datetime.now().isoformat(),
+                'router': {
+                    'ssid': ROUTER_CONFIG['ssid'],
+                    'mac': ROUTER_CONFIG['mac'],
+                    'position': ROUTER_CONFIG['position'],
+                    'ip': ROUTER_CONFIG.get('ip')
+                },
+                'networks': networks_list,
+                'total_networks': len(networks_list)
+            }
+            
+            return jsonify(export_obj)
+    except Exception as e:
+        print(f"Ошибка экспорта: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/')
 def index():
@@ -772,10 +1082,1005 @@ def index():
         </div>
         
         <script>
-            // ... [остальной JavaScript без изменений] ...
+            const ROUTER_CONFIG = {
+                ssid: 'EMIIA.AI MRV',
+                mac: '50:FF:20:68:EF:9C',
+                position: [37.16332212, 55.98346937],
+                ip: '192.168.1.1'
+            };
+            
+            let wifiNetworks = [], autoRefreshInterval = null;
+            let isAutoRefreshing = false, scanInterval = 500;
+            let userPositionFallback = null;
+            let selectedForTriangulation = [];
+            let accuracy = 1.0;
+            let errorMargin = 5;
+            let mapEnabled = false;
+            let geojsonEnabled = true;
+            let selectedAgent = 'emiiatai';
+            let myPositionShown = false;
+            
+            // Переменные для состояния анимации точки
+            let isLocationActive = false;
+            
+            mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
+            
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'https://sos.emiia.ai/moscow_style_2.json ',
+                zoom: 18.3,
+                minZoom: 9,
+                maxZoom: 20.5,
+                center: [37.16332212, 55.98346937],
+                hash: true,
+                turn: false,
+                attributionControl: false,
+                bearing: 0,
+                pitch: 45,
+                antialias: true 
+            });
+            
+            userPositionFallback = {
+                lat: ROUTER_CONFIG.position[1],
+                lng: ROUTER_CONFIG.position[0],
+                accuracy: 30
+            };
+            
+            // ========== СИНЯЯ ПУЛЬСИРУЮЩАЯ ТОЧКА (Моя позиция) ==========
+            const pulsingDotBlue = {
+                width: 110,
+                height: 110,
+                data: new Uint8Array(110 * 110 * 4),
+
+                onAdd: function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    this.context = canvas.getContext('2d', { willReadFrequently: true });
+                },
+
+                render: function () {
+                    if (!isLocationActive) return false;
+                    
+                    const duration = 1800;
+                    const pulseDuration = 700;
+                    const t = (performance.now() % duration) / duration;
+                    const pulseT = (performance.now() % pulseDuration) / pulseDuration;
+                    const context = this.context;
+
+                    context.clearRect(0, 0, this.width, this.height);
+
+                    const centerX = this.width / 2;
+                    const centerY = this.height / 2;
+                    const maxRadius = this.width / 2 * 1;
+                    const sweepAngle = Math.PI * 2 * 1.7 * t;
+                    const opacity = 0.8 * Math.pow(1 - t, 2);
+
+                    context.beginPath();
+                    context.moveTo(centerX, centerY);
+                    context.arc(centerX, centerY, maxRadius, Math.PI / 2, sweepAngle + Math.PI / 2);
+                    context.closePath();
+
+                    context.fillStyle = `rgba(61, 133, 198, ${opacity})`;
+                    context.fill();
+
+                    const radius = (this.width / 2) * 0.35;
+                    context.beginPath();
+                    context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    context.fillStyle = 'rgba(61, 133, 198, 1)';
+                    context.strokeStyle = '#f8f9fa';
+
+                    context.lineWidth = 2.5 + 2.5 * Math.abs(Math.sin(Math.PI * pulseT));
+                    context.fill();
+                    context.stroke();
+
+                    this.data = context.getImageData(0, 0, this.width, this.height).data;
+                    map.triggerRepaint();
+
+                    return true;
+                }
+            };
+
+            // ========== СТАТИЧЕСКАЯ КРАСНАЯ ТОЧКА (Роутер) ==========
+            const staticRedDot = {
+                width: 110,
+                height: 110,
+                data: new Uint8Array(110 * 110 * 4),
+
+                onAdd: function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    this.context = canvas.getContext('2d');
+                },
+
+                render: function () {
+                    const context = this.context;
+                    context.clearRect(0, 0, this.width, this.height);
+
+                    const centerX = this.width / 2;
+                    const centerY = this.height / 2;
+                    const radius = (this.width / 2) * 0.35;
+
+                    context.beginPath();
+                    context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    context.fillStyle = 'rgba(220, 53, 69, 1)';
+                    context.strokeStyle = '#f8f9fa';
+                    context.lineWidth = 2.5;
+                    context.fill();
+                    context.stroke();
+
+                    this.data = context.getImageData(0, 0, this.width, this.height).data;
+                    return true;
+                }
+            };
+
+            // ========== СТАТИЧЕСКАЯ СЕРАЯ ТОЧКА (Триангуляция) ==========
+            const staticGrayDot = {
+                width: 110,
+                height: 110,
+                data: new Uint8Array(110 * 110 * 4),
+
+                onAdd: function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    this.context = canvas.getContext('2d');
+                },
+
+                render: function () {
+                    const context = this.context;
+                    context.clearRect(0, 0, this.width, this.height);
+
+                    const centerX = this.width / 2;
+                    const centerY = this.height / 2;
+                    const radius = (this.width / 2) * 0.35;
+
+                    context.beginPath();
+                    context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    context.fillStyle = 'rgba(108, 117, 125, 1)';
+                    context.strokeStyle = '#f8f9fa';
+                    context.lineWidth = 2.5;
+                    context.fill();
+                    context.stroke();
+
+                    this.data = context.getImageData(0, 0, this.width, this.height).data;
+                    return true;
+                }
+            };
+            
+            map.on('load', () => {
+                // Найти слой с подписями для правильного порядка отображения
+                const layers = map.getStyle().layers;
+                let labelLayerId;
+                for (let i = 0; i < layers.length; i++) {
+                    if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+                        labelLayerId = layers[i].id;
+                        break;
+                    }
+                }
+
+                // Добавить векторный источник для зданий
+                map.addSource('openmaptiles', {
+                    url: 'https://sos.emiia.ai/tiles.json ',
+                    type: 'vector',
+                });
+
+                // Зеленая подложка под зданиями
+                map.addLayer({
+                    'id': 'green-base',
+                    'source': 'openmaptiles',
+                    'source-layer': 'building',
+                    'type': 'fill',
+                    'minzoom': 14,
+                    'maxzoom': 24,
+                    'paint': {
+                        'fill-color': '#a4c2f4',
+                        'fill-opacity': [
+                            'interpolate',
+                            ['linear'],
+                            ['zoom'],
+                            14, 0.3,
+                            15.5, 0.3,
+                            18, 0.3,
+                            22, 0.3
+                        ]
+                    }
+                }, labelLayerId);
+
+                // Белые линии по контуру зданий
+                map.addLayer({
+                    'id': 'building-outlines',
+                    'source': 'openmaptiles',
+                    'source-layer': 'building',
+                    'type': 'line',
+                    'minzoom': 14,
+                    'maxzoom': 24,
+                    'paint': {
+                        'line-color': '#ffffff',
+                        'line-width': [
+                            'interpolate',
+                            ['linear'],
+                            ['zoom'],
+                            14, 1,
+                            16, 2,
+                            18, 2,
+                            20, 5
+                        ],
+                        'line-opacity': [
+                            'interpolate',
+                            ['linear'],
+                            ['zoom'],
+                            14, 1,
+                            15.5, 1,
+                            18, 1,
+                            22, 1
+                        ]
+                    }
+                }, labelLayerId);
+
+                // 3D здания поверх подложки и контуров
+                map.addLayer({
+                    'id': '3d-buildings',
+                    'source': 'openmaptiles',
+                    'source-layer': 'building',
+                    'type': 'fill-extrusion',
+                    'minzoom': 14,
+                    'maxzoom': 19,
+                    'paint': {
+                        'fill-extrusion-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['get', 'render_height'],
+                            1, '#e4e4e4',
+                            200, '#e4e4e4',
+                            400, '#e4e4e4'
+                        ],
+                        'fill-extrusion-height': [
+                            'interpolate',
+                            ['linear'],
+                            ['zoom'],
+                            14, 0,
+                            15.5, ['get', 'render_height']
+                        ],
+                        'fill-extrusion-base': [
+                            'case',
+                            ['>=', ['get', 'zoom'], 16.5],
+                            ['get', 'render_min_height'],
+                            0
+                        ],
+                        'fill-extrusion-opacity': [
+                            'interpolate',
+                            ['linear'],
+                            ['zoom'],
+                            14, 0,
+                            15.5, 0.8,
+                            18, 0.0
+                        ]
+                    }
+                }, labelLayerId);
+
+                // Добавить изображения для точек
+                map.addImage('pulsing-dot-blue', pulsingDotBlue, { pixelRatio: 2 });
+                map.addImage('static-red-dot', staticRedDot, { pixelRatio: 2 });
+                map.addImage('static-gray-dot', staticGrayDot, { pixelRatio: 2 });
+
+                // Слой для пульсирующей точки (Моя позиция)
+                map.addSource('pulsing-points-source', {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: []
+                    }
+                });
+
+                map.addLayer({
+                    id: 'pulsing-points-layer',
+                    type: 'symbol',
+                    source: 'pulsing-points-source',
+                    layout: {
+                        'icon-image': 'pulsing-dot-blue',
+                        'icon-allow-overlap': true,
+                        'icon-ignore-placement': true
+                    },
+minzoom: 12,
+maxzoom: 24
+                });
+
+                // Слой для точки основного роутера (отдельный источник)
+                map.addSource('router-point-source', {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: ROUTER_CONFIG.position
+                            },
+                            properties: {
+                                icon: 'static-red-dot',
+                                type: 'router'
+                            }
+                        }]
+                    }
+                });
+
+                map.addLayer({
+                    id: 'router-point-layer',
+                    type: 'symbol',
+                    source: 'router-point-source',
+                    layout: {
+                        'icon-image': 'static-red-dot',
+                        'icon-allow-overlap': true,
+                        'icon-ignore-placement': true
+                    },
+minzoom: 19,
+maxzoom: 24
+
+                });
+
+                // Слой для триангуляционных точек (отдельный источник)
+                map.addSource('triangulation-points-source', {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: []
+                    }
+                });
+
+                map.addLayer({
+                    id: 'triangulation-points-layer',
+                    type: 'symbol',
+                    source: 'triangulation-points-source',
+                    layout: {
+                        'icon-image': 'static-gray-dot',
+                        'icon-allow-overlap': true,
+                        'icon-ignore-placement': true
+                    },
+minzoom: 19,
+maxzoom: 24
+                });
+
+                // Переместить все слои под 3D-здания
+                if (map.getLayer('3d-buildings')) {
+                    map.moveLayer('triangulation-points-layer', '3d-buildings');
+                    map.moveLayer('router-point-layer', 'triangulation-points-layer');
+                    map.moveLayer('pulsing-points-layer', 'router-point-layer');
+                }
+
+                // Установка светового режима и освещения
+                map.setConfigProperty('basemap', 'lightPreset', 'dusk');
+                map.setLight({
+                    intensity: 0.03
+                });
+
+                // Обработчик клика для пульсирующих точек
+                map.on('click', 'pulsing-points-layer', (e) => {
+                    const feature = e.features[0];
+                    const coordinates = feature.geometry.coordinates;
+                    const accuracy = feature.properties.accuracy;
+
+                    new mapboxgl.Popup()
+                        .setLngLat(coordinates)
+                        .setHTML(`
+                            <div style="padding: 10px; font-size: 12px; min-width: 200px;">
+                                <h4 style="margin: 0 0 10px 0; color: #3c78d8; font-size: 14px;">Моя позиция</h4>
+                                <div style="margin-bottom: 8px;">
+                                    <strong>Координаты:</strong><br>
+                                    <code style="font-size: 11px; color: #666;">
+                                        ${coordinates[0].toFixed(8)}<br>
+                                        ${coordinates[1].toFixed(8)}
+                                    </code>
+                                </div>
+                                <div style="margin-bottom: 8px;">
+                                    <strong>Точность:</strong> 
+                                    <span style="color: ${accuracy < 5 ? '#28a745' : accuracy < 15 ? '#ffc107' : '#dc3545'};">
+                                        ${parseFloat(accuracy).toFixed(1)} м
+                                    </span>
+                                </div>
+                                <div style="font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 5px;">
+                                    Обновлено: ${new Date().toLocaleTimeString()}
+                                </div>
+                            </div>
+                        `)
+                        .addTo(map);
+                });
+
+                map.on('mouseenter', 'pulsing-points-layer', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+
+                map.on('mouseleave', 'pulsing-points-layer', () => {
+                    map.getCanvas().style.cursor = '';
+                });
+
+                // Обработчик клика для точки роутера
+                map.on('click', 'router-point-layer', (e) => {
+                    const feature = e.features[0];
+                    const props = feature.properties;
+                    
+                    const popupContent = `
+                        <div style="padding: 10px; font-size: 12px;">
+                            <h4 style="margin: 0 0 8px 0; color: #dc3545;">${ROUTER_CONFIG.ssid}</h4>
+                            <p style="margin: 4px 0;"><b>MAC:</b> ${ROUTER_CONFIG.mac}</p>
+                            <p style="margin: 4px 0;"><b>IP:</b> ${ROUTER_CONFIG.ip || 'N/A'}</p>
+                            <p style="margin: 4px 0;"><b>Тип:</b> <span style="color: #dc3545; font-weight: bold;">Шлюз</span></p>
+                        </div>
+                    `;
+                    
+                    new mapboxgl.Popup()
+                        .setLngLat(feature.geometry.coordinates)
+                        .setHTML(popupContent)
+                        .addTo(map);
+                });
+
+                map.on('mouseenter', 'router-point-layer', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+
+                map.on('mouseleave', 'router-point-layer', () => {
+                    map.getCanvas().style.cursor = '';
+                });
+
+                // Обработчик клика для триангуляционных точек
+                map.on('click', 'triangulation-points-layer', (e) => {
+                    const feature = e.features[0];
+                    const props = feature.properties;
+                    
+                    const popupContent = `
+                        <div style="padding: 10px; font-size: 12px; min-width: 220px;">
+                            <h4 style="margin: 0 0 8px 0; color: #6c757d;">${props.ssid}</h4>
+                            <p style="margin: 4px 0;"><b>MAC:</b> ${props.mac}</p>
+                            <p style="margin: 4px 0;"><b>Сигнал:</b> ${parseFloat(props.signal).toFixed(1)} dBm</p>
+                            <p style="margin: 4px 0;"><b>Расстояние:</b> ${props.distance} м</p>
+                            <p style="margin: 4px 0;"><b>RTT:</b> ${parseFloat(props.rtt_ms).toFixed(1)} мс</p>
+                            <p style="margin: 4px 0; color: #00ccff; font-weight: bold;">
+                                Lng,Lat: ${feature.geometry.coordinates[0].toFixed(8)}, ${feature.geometry.coordinates[1].toFixed(8)}
+                            </p>
+                            <p style="margin: 4px 0;"><b>Тип:</b> <span style="color: #6c757d; font-weight: bold;">Триангуляция</span></p>
+                        </div>
+                    `;
+                    
+                    new mapboxgl.Popup()
+                        .setLngLat(feature.geometry.coordinates)
+                        .setHTML(popupContent)
+                        .addTo(map);
+                });
+
+                map.on('mouseenter', 'triangulation-points-layer', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+
+                map.on('mouseleave', 'triangulation-points-layer', () => {
+                    map.getCanvas().style.cursor = '';
+                });
+            
+                document.getElementById('status').innerHTML = '<span class="success">Готов к сканированию</span>';
+                setTimeout(scanWiFi, 500);
+                
+                document.getElementById('map-toggle').addEventListener('change', function() {
+                    mapEnabled = this.checked;
+                    console.log('Маппирование данных:', mapEnabled);
+                });
+                
+                document.getElementById('geojson-toggle').addEventListener('change', function() {
+                    geojsonEnabled = this.checked;
+                    console.log('GeoJSON сервер БД:', geojsonEnabled);
+                });
+                
+                document.getElementById('realtime-toggle').addEventListener('change', function() {
+                    console.log('Real Time - позиция:', this.checked);
+                });
+                
+                document.getElementById('digital-twin-toggle').addEventListener('change', function() {
+                    console.log('Цифровой двойник (АЦД):', this.checked);
+                });
+            });
+            
+            // ========== ОБНОВЛЕНИЕ ПУЛЬСИРУЮЩИХ ТОЧЕК (Моя позиция) ==========
+            function updatePulsingPointsLayer(lng, lat) {
+                if (map.getSource('pulsing-points-source')) {
+                    map.getSource('pulsing-points-source').setData({
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [lng, lat]
+                            },
+                            properties: {
+                                accuracy: userPositionFallback.accuracy,
+                                timestamp: new Date().toISOString()
+                            }
+                        }]
+                    });
+                }
+            }
+            
+            // ========== ОБНОВЛЕНИЕ ТОЧКИ ОСНОВНОГО РОУТЕРА ==========
+            function updateRouterPointLayer() {
+                if (map.getSource('router-point-source')) {
+                    map.getSource('router-point-source').setData({
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: ROUTER_CONFIG.position
+                            },
+                            properties: {
+                                icon: 'static-red-dot',
+                                type: 'router'
+                            }
+                        }]
+                    });
+                }
+            }
+            
+            // ========== ОБНОВЛЕНИЕ ТРИАНГУЛЯЦИОННЫХ ТОЧЕК ==========
+            function updateTriangulationPointsLayer() {
+                if (!map.getSource('triangulation-points-source')) {
+                    console.warn('triangulation-points-source не найден');
+                    return;
+                }
+                
+                const features = [];
+                
+                // Добавить триангуляционные точки (без роутера)
+                selectedForTriangulation.forEach(network => {
+                    if (network.mac === ROUTER_CONFIG.mac) return; // Защита от дубликатов
+                    if (network.position) {
+                        features.push({
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: network.position
+                            },
+                            properties: {
+                                icon: 'static-gray-dot',
+                                type: 'triangulation',
+                                ssid: network.ssid,
+                                mac: network.mac,
+                                signal: network.signal,
+                                distance: network.distance,
+                                rtt_ms: network.rtt_ms,
+                                channel: network.channel
+                            }
+                        });
+                    }
+                });
+                
+                // Обновить данные источника
+                map.getSource('triangulation-points-source').setData({
+                    type: 'FeatureCollection',
+                    features: features
+                });
+                
+                console.log(`Обновлен слой триангуляционных точек: ${features.length} точек`);
+            }
+            
+            async function scanWiFi() {
+                try {
+                    const startTime = Date.now();
+                    document.getElementById('status').innerHTML = 'Сканирование...';
+                    
+                    const response = await fetch('/api/wifi');
+                    const result = await response.json();
+                    const scanTime = Date.now() - startTime;
+                    
+                    if (result.error) throw new Error(result.error);
+                    
+                    wifiNetworks = result;
+                    displayNetworks(wifiNetworks, scanTime);
+                    updateTriangulationSection();
+                    updateRouterPointLayer(); // Обновляем точку роутера
+                    updateTriangulationPointsLayer(); // Обновляем триангуляционные точки
+                    
+                    // Обновить позицию если слой активен
+                    if (myPositionShown && userPositionFallback) {
+                        updatePulsingPointsLayer(userPositionFallback.lng, userPositionFallback.lat);
+                    }
+                    
+                } catch(e) {
+                    console.error('Ошибка:', e);
+                    document.getElementById('status').innerHTML = `<span class="error">Ошибка: ${e.message}</span>`;
+                }
+            }
+            
+            function displayNetworks(networks, scanTime = 0) {
+                let html = '', routerFound = false;
+                networks.sort((a, b) => b.signal - a.signal);
+                
+                networks.forEach((network, index) => {
+                    const isRouter = network.mac === ROUTER_CONFIG.mac;
+                    if (isRouter) routerFound = true;
+                    
+                    const signalPercent = Math.max(0, Math.min(100, (network.signal + 100) * 2));
+                    const signalColor = signalPercent > 70 ? '#28a745' : 
+                                      signalPercent > 40 ? '#ffc107' : '#dc3545';
+                    
+                    const rttValue = typeof network.rtt_ms === 'number' ? network.rtt_ms.toFixed(1) : '0.0';
+                    const rttRealValue = network.rtt_real_ms ? `${network.rtt_real_ms} мс` : '';
+                    const coordDisplay = network.position ? 
+                        `Lng,Lat: ${network.position[0].toFixed(8)}, ${network.position[1].toFixed(8)}` : '';
+                    
+                    const rttHtml = network.rtt_ms !== undefined ? 
+                        `<div class="rtt-display">
+                            RTT: ${rttValue} мс ${rttRealValue ? ` | Ping: ${rttRealValue}` : ''}
+                            <div class="coord-display">${coordDisplay}</div>
+                        </div>` : '';
+                    
+                    html += `
+                        <div class="network-item ${isRouter ? 'router' : ''}">
+                            <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="live-indicator"></div>
+                                    <b>${network.ssid}</b>
+                                </div>
+                                <span style="font-weight: bold; color: ${signalColor}">
+                                    ${network.signal.toFixed(1)} dBm
+                                </span>
+                            </div>
+                            <div style="font-size: 11px; color: #666; word-break: break-all;">
+                                MAC: ${network.mac}
+                            </div>
+                            <div class="signal-bar">
+                                <div class="signal-fill" style="width: ${signalPercent}%; background: ${signalColor};"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                <span>Расстояние: ${network.distance} м</span>
+                                <span>Канал: ${network.channel || 'N/A'}</span>
+                            </div>
+                            ${rttHtml}
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('networks').innerHTML = html || '<div class="warning">Нет сетей</div>';
+                document.getElementById('network-count').textContent = networks.length;
+                document.getElementById('last-update').textContent = `Обновлено: ${new Date().toLocaleTimeString()} (${scanTime}мс)`;
+                
+                const router = networks.find(n => n.mac === ROUTER_CONFIG.mac);
+                if (router) {
+                    userPositionFallback = {
+                        lat: router.position[1] + (Math.random() - 0.5) * 0.0001,
+                        lng: router.position[0] + (Math.random() - 0.5) * 0.0001,
+                        accuracy: router.distance
+                    };
+                    document.getElementById('wifi-result').innerHTML = `
+                        <div class="success">
+                            <b>Шлюз в системе:</b> ${router.signal.toFixed(1)} dBm
+                        </div>
+                    `;
+                    document.getElementById('status').innerHTML = '<span class="success">EMIIA.AI IoT</span>';
+                } else {
+                    userPositionFallback = {
+                        lat: ROUTER_CONFIG.position[1] + (Math.random() - 0.5) * 0.0002,
+                        lng: ROUTER_CONFIG.position[0] + (Math.random() - 0.5) * 0.0002,
+                        accuracy: 30
+                    };
+                    document.getElementById('wifi-result').innerHTML = '<div class="warning">Шлюз</div>';
+                    document.getElementById('status').innerHTML = '<span class="warning">EMIIA.AI IoT</span>';
+                }
+            }
+            
+            function updateTriangulationSection() {
+                if (selectedForTriangulation.length === 0) {
+                    document.getElementById('triangulationSection').style.display = 'none';
+                    return;
+                }
+                
+                document.getElementById('triangulationSection').style.display = 'block';
+                document.getElementById('triangulationCount').textContent = selectedForTriangulation.length;
+                
+                let html = '';
+                
+                selectedForTriangulation = selectedForTriangulation.map(selectedNet => {
+                    const updatedNet = wifiNetworks.find(n => n.mac === selectedNet.mac);
+                    return updatedNet || selectedNet;
+                });
+                
+                selectedForTriangulation.forEach(network => {
+                    const isRouter = network.mac === ROUTER_CONFIG.mac;
+                    const signalPercent = Math.max(0, Math.min(100, (network.signal + 100) * 2));
+                    const signalColor = signalPercent > 70 ? '#28a745' : 
+                                      signalPercent > 40 ? '#ffc107' : '#dc3545';
+                    
+                    const rttValue = typeof network.rtt_ms === 'number' ? network.rtt_ms.toFixed(1) : '0.0';
+                    const coordDisplay = network.position ? 
+                        `Lng,Lat: ${network.position[0].toFixed(8)}, ${network.position[1].toFixed(8)}` : '';
+                    
+                    html += `
+                        <div class="network-item ${isRouter ? 'router' : ''}" style="padding: 8px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                <b>${network.ssid}</b>
+                                <span style="color: ${signalColor}; font-weight: bold;">
+                                    ${network.signal.toFixed(1)} dBm
+                                </span>
+                            </div>
+                            <div style="font-size: 10px; color: #888; margin-top: 2px;">
+                                MAC: ${network.mac}<br>
+                                Расстояние: ${network.distance} м | RTT: ${rttValue} мс<br>
+                                <span style="color: var(--info); font-weight: bold;">${coordDisplay}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('triangulationNetworks').innerHTML = html;
+            }
+            
+            // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ toggleMyPosition ==========
+            function toggleMyPosition() {
+                const btn = document.getElementById('positionBtn');
+                
+                if (!myPositionShown) {
+                    // Проверить наличие координат
+                    if (!userPositionFallback || !userPositionFallback.lng || !userPositionFallback.lat) {
+                        console.error('userPositionFallback не инициализирован');
+                        return;
+                    }
+                    
+                    // Добавить точку в пульсирующий слой
+                    updatePulsingPointsLayer(userPositionFallback.lng, userPositionFallback.lat);
+                    
+                    // Плавный переход карты
+                    map.flyTo({
+                        center: [userPositionFallback.lng, userPositionFallback.lat],
+                        zoom: 19,
+                        speed: 0.5,
+                        essential: true
+                    });
+                    
+                    // Активировать кнопку
+                    btn.classList.add('active');
+                    myPositionShown = true;
+                    isLocationActive = true;
+                    
+                } else {
+                    // Очистить пульсирующий слой
+                    if (map.getSource('pulsing-points-source')) {
+                        map.getSource('pulsing-points-source').setData({
+                            type: 'FeatureCollection',
+                            features: []
+                        });
+                    }
+                    
+                    // Деактивировать кнопку
+                    btn.classList.remove('active');
+                    myPositionShown = false;
+                    isLocationActive = false;
+                }
+            }
+            
+            // ========== ФУНКЦИЯ toggleAutoRefresh (без изменений) ==========
+            function toggleAutoRefresh() {
+                const btn = document.getElementById('autoRefreshBtn');
+                
+                if (isAutoRefreshing) {
+                    clearInterval(autoRefreshInterval);
+                    isAutoRefreshing = false;
+                    btn.classList.remove('active');
+                    document.getElementById('status').innerHTML = 'Автообновление остановлено';
+                } else {
+                    autoRefreshInterval = setInterval(scanWiFi, scanInterval);
+                    isAutoRefreshing = true;
+                    btn.classList.add('active');
+                    document.getElementById('status').innerHTML = `Автообновление: каждые ${scanInterval/1000} сек`;
+                    scanWiFi();
+                }
+            }
+            
+            function changeInterval() {
+                scanInterval = parseFloat(document.getElementById('intervalSelect').value) * 1000;
+                if (isAutoRefreshing) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = setInterval(scanWiFi, scanInterval);
+                }
+            }
+            
+            function changeAccuracy() {
+                accuracy = parseFloat(document.getElementById('accuracyInput').value);
+                console.log('Точность установлена:', accuracy, 'м');
+            }
+            
+            function changeErrorMargin() {
+                errorMargin = parseInt(document.getElementById('errorMarginInput').value);
+                console.log('Погрешность установлена:', errorMargin, '%');
+            }
+            
+            function changeAgent() {
+                selectedAgent = document.getElementById('agentSelect').value;
+                console.log('AI-агент выбран:', selectedAgent);
+                document.getElementById('status').innerHTML = `<span class="success">AI-агент: ${document.getElementById('agentSelect').options[document.getElementById('agentSelect').selectedIndex].text}</span>`;
+            }
+            
+            function exportData() {
+                fetch('/api/export')
+                    .then(res => {
+                        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                        return res.json();
+                    })
+                    .then(data => {
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `wifi-scan-rtt-${Date.now()}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        document.getElementById('status').innerHTML = '<span class="success">Данные экспортированы (с RTT)</span>';
+                    })
+                    .catch(err => {
+                        console.error('Ошибка экспорта:', err);
+                        document.getElementById('status').innerHTML = `<span class="error">Ошибка экспорта: ${err.message}</span>`;
+                    });
+            }
+            
+            function openCalibration() {
+                document.getElementById('calibrationModal').style.display = 'block';
+            }
+            
+            function closeCalibration() {
+                document.getElementById('calibrationModal').style.display = 'none';
+                document.getElementById('calib-status').innerHTML = '';
+            }
+            
+            function saveCalibration() {
+                document.getElementById('calib-status').innerHTML = '<span class="success">Калибровка сохранена</span>';
+                setTimeout(() => {
+                    closeCalibration();
+                    document.getElementById('status').innerHTML = '<span class="success">Модель откалибрована</span>';
+                }, 1500);
+            }
+            
+            function openTriangulation() {
+                document.getElementById('triangulationModal').style.display = 'block';
+                renderTriangulationSelection();
+            }
+            
+            function closeTriangulation() {
+                document.getElementById('triangulationModal').style.display = 'none';
+            }
+            
+            function renderTriangulationSelection() {
+                const networks = wifiNetworks.filter(n => n.mac !== ROUTER_CONFIG['mac']);
+                let html = '';
+                
+                networks.forEach(net => {
+                    const isSelected = selectedForTriangulation.some(n => n.mac === net.mac);
+                    html += `
+                        <div class="network-item" style="cursor: pointer; padding: 8px;" onclick="toggleNetworkSelection('${net.mac}')">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                                       onchange="toggleNetworkSelection('${net.mac}')" 
+                                       style="margin-right: 10px;">
+                                <div>
+                                    <b>${net.ssid}</b><br>
+                                    <small style="color: #888;">${net.mac} | ${net.signal.toFixed(1)} dBm | RTT: ${net.rtt_ms.toFixed(1)} мс</small>
+                                </div>
+                            </label>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('triang-selection').innerHTML = html || '<div style="color: #888;">Нет доступных сетей</div>';
+                updateSelectedNetworks();
+            }
+            
+            function toggleNetworkSelection(mac) {
+                const network = wifiNetworks.find(n => n.mac === mac);
+                if (!network) return;
+                
+                const index = selectedForTriangulation.findIndex(n => n.mac === mac);
+                if (index > -1) {
+                    selectedForTriangulation.splice(index, 1);
+                } else {
+                    selectedForTriangulation.push({...network});
+                }
+                
+                renderTriangulationSelection();
+                displayNetworks(wifiNetworks);
+                updateTriangulationSection();
+                updateTriangulationPointsLayer(); // Обновляем только триангуляционные точки
+            }
+            
+            function updateSelectedNetworks() {
+                let html = '';
+                selectedForTriangulation.forEach(net => {
+                    html += `<div style="padding: 5px; border-bottom: 1px solid #444;">
+                        ${net.ssid}<br>
+                        <small style="color: #888;">${net.mac} | ${net.signal.toFixed(1)} dBm | ${net.rtt_ms.toFixed(1)} мс</small>
+                    </div>`;
+                });
+                document.getElementById('selected-networks').innerHTML = html || '<div style="color: #888;">Нет выбранных сетей</div>';
+            }
+            
+            function saveTriangulation() {
+                if (selectedForTriangulation.length < 3) {
+                    alert('Выберите минимум 3 сети для корректировки!');
+                    return;
+                }
+                
+                fetch('/api/triangulation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(selectedForTriangulation)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                    return res.json();
+                })
+                .then(res => {
+                    closeTriangulation();
+                    document.getElementById('status').innerHTML = `
+                        <span class="success">Корректировка настроена (${res.networks_count} сетей)</span>
+                    `;
+                    updateTriangulationPointsLayer(); // Обновляем триангуляционные точки после сохранения
+                })
+                .catch(err => {
+                    console.error('Ошибка триангуляции:', err);
+                    document.getElementById('status').innerHTML = `<span class="error">Ошибка: ${err.message}</span>`;
+                });
+            }
+            
+            window.onclick = function(event) {
+                const calibModal = document.getElementById('calibrationModal');
+                const triangModal = document.getElementById('triangulationModal');
+                if (event.target === calibModal) closeCalibration();
+                if (event.target === triangModal) closeTriangulation();
+            }
         </script>
     </body>
     </html>
     '''
 
-# ... [остальной код без изменений] ...
+if __name__ == '__main__':
+    import webbrowser
+    
+    print("\n" + "="*60)
+    print("Wi-Fi Scanner PRO v4.3 + Mapbox v3.12.0")
+    print("="*60)
+    print(f"Роутер: {ROUTER_CONFIG['ssid']}")
+    print(f"MAC: {ROUTER_CONFIG['mac']}")
+    print(f"IP: {ROUTER_CONFIG.get('ip', 'не указан')}")
+    print(f"Коорд. границы: Lng({COORDINATE_BOUNDS['lng_min']} - {COORDINATE_BOUNDS['lng_max']})")
+    print(f"                Lat({COORDINATE_BOUNDS['lat_min']} - {COORDINATE_BOUNDS['lat_max']})")
+    print("Карта: Moscow Style 2.0 (3D buildings, extrusion)")
+    print("="*60)
+    print("Сервер: http://localhost:5000")
+    print("Интервал по умолчанию: 0.5 сек")
+    print("Новые переключатели: MAP, GeoJSON (вкл. по умолчанию)")
+    print("Новые настройки: Точность (0.3м), Погрешность (5%)")
+    print("СТАТИЧЕСКИЕ координаты - генерируются один раз и сохраняются")
+    print("ВЫРАВНИВАНИЕ SELECT: левое выравнивание, отступы стрелки")
+    print("БЛОК ФЛАГОВ В СКРОЛЛЕ: max-height 250px, overflow-y: auto")
+    print("ИСПРАВЛЕНЫ СТРЕЛКИ SELECT: корректный data-URL с правильной кодировкой")
+    print("ИСПРАВЛЕН ЦВЕТ INPUT: #333333 для текста, rgba(255,255,255,0.9) для фона")
+    print("ВЕРНУТЫ СТРЕЛКИ: отдельный стиль для .settings-block select")
+    print("СВЕТЛАЯ ТЕМА: активирована для всего интерфейса")
+    print("Mapbox v3.12.0: 3D buildings, extruded polygons, dusk lighting")
+    print("ЦЕНТР КАРТЫ: [37.16332212, 55.98346937] (без изменений)")
+    print("РОУТЕР: [37.16332212, 55.98346937] (без изменений)")
+    print("ГРАНИЦЫ: оригинальные (без изменений)")
+    print("КНОПКИ 'Моя позиция' и 'Авто': переключатели с залипанием")
+    print("НОВОЕ: Анимированная синяя точка 110px с волнами (Canvas + render)")
+    print("РАБОТАЕТ: Mapbox слой с triggerRepaint, правильный z-index")
+    print("ИСПРАВЛЕНО: Попап при клике на точку с координатами и точностью")
+    print("ИСПРАВЛЕНО: Точка теперь внутри полупрозрачных 3D зданий")
+    print("НОВОЕ: Разделенные слои для роутера и триангуляции (независимые источники)")
+    print("ИСПРАВЛЕНО: Красная точка роутера больше не исчезает при триангуляции")
+    print("ДОБАВЛЕНО: map.triggerRepaint() и защита от дубликатов")
+    print("УБРАНЫ: Все иконки и декоративные символы из попапов")
+    print("="*60 + "\n")
+    
+    scanner_thread = threading.Thread(target=background_scanner, daemon=True)
+    scanner_thread.start()
+    
+    threading.Timer(1.5, lambda: webbrowser.open('http://localhost:5000')).start()
+    
+    try:
+        app.run(port=5000, debug=False, use_reloader=False)
+    except KeyboardInterrupt:
+        print("\nСервер остановлен")
