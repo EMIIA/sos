@@ -364,13 +364,60 @@ def index():
                 box-sizing: border-box;
             }
 
+            /* ========== СКРЫТИЕ ПРОКРУТКИ С !IMPORTANT ========== */
+            /* Скрытие основной прокрутки страницы */
+            body {
+                overflow-y: hidden !important;
+            }
+
+            /* Скрытие прокрутки в меню и его элементах */
+            .controls {
+                overflow-y: auto !important; /* ВАЖНО: auto, а не hidden для функциональности */
+                scrollbar-width: none !important; /* Для Firefox */
+            }
+
+            .controls::-webkit-scrollbar {
+                width: 0 !important;
+                background: transparent !important;
+            }
+
+            /* Скрытие прокрутки во внутренних блоках меню */
+            .network-list,
+            .switches-container {
+                overflow-y: auto !important; /* ВАЖНО: auto, а не hidden для функциональности */
+                scrollbar-width: none !important; /* Для Firefox */
+            }
+
+            .network-list::-webkit-scrollbar,
+            .switches-container::-webkit-scrollbar {
+                width: 0 !important;
+                background: transparent !important;
+            }
+
+            /* Для временного показа прокрутки при необходимости */
+            .show-scrollbar {
+                overflow-y: auto !important;
+            }
+
+            .show-scrollbar::-webkit-scrollbar {
+                width: 8px !important;
+            }
+
+            .show-scrollbar::-webkit-scrollbar-track {
+                background: var(--scroll-track) !important;
+            }
+
+            .show-scrollbar::-webkit-scrollbar-thumb {
+                background: var(--scroll-thumb) !important;
+            }
+
             body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--secondary); color: #333333; overflow: hidden; }
             #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
             .controls {
                 position: absolute; top: 20px; left: 20px; background: rgba(255, 255, 255, 0.95);
                 padding: 20px; border-radius: 18px; border: 0px solid var(--primary);
                 width: 320px;
-                max-height: 85vh; overflow-y: auto;
+                max-height: 85vh;
                 backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
                 z-index: 10;
             }
@@ -417,7 +464,8 @@ def index():
             .warning { color: var(--warning); }
             
             .network-list {
-                max-height: 300px; overflow-y: auto; font-size: 0.8em;
+                max-height: 300px;
+                font-size: 0.8em;
                 border: 1px solid rgba(0, 255, 136, 0.2); border-radius: 8px;
                 padding: 10px; background: rgba(0, 0, 0, 0.05);
             }
@@ -555,7 +603,6 @@ def index():
                 border-radius: 8px;
                 border: 1px solid rgba(0, 255, 136, 0.2);
                 max-height: 250px;
-                overflow-y: auto;
             }
             
             .form-check.form-switch {
