@@ -1,20 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WiFi Portal</title>
+    <title>EMIIA.AI MRV/SDK</title>
+    
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#f8f9fa">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EMIIA.AI WiFi">
+    
+    <!-- Используем манифест с sos.emiia.ai -->
+    <link rel="shortcut icon" href="https://emiia.ai/vv.ico" type="image/x-icon">
+    <link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
+    
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; }
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            background: #F8F9FA;
+            font-family: Arial, sans-serif;
+        }
         iframe { 
             width: 100%; 
             height: 100vh; 
             border: none; 
         }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #000000;
+        }
     </style>
 </head>
 <body>
+    <div id="loading" class="loading">Загрузка WiFi портала...</div>
+    
     <iframe src="https://wifi.emiia.keenetic.pro/" 
             sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-            allow="camera; microphone">
+            allow="camera; microphone"
+            onload="document.getElementById('loading').style.display = 'none';"
+            style="display: none;">
     </iframe>
+
+    <script>
+        document.querySelector('iframe').onload = function() {
+            document.getElementById('loading').style.display = 'none';
+            this.style.display = 'block';
+        };
+    </script>
 </body>
 </html>
