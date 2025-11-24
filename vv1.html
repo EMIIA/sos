@@ -1339,33 +1339,30 @@ function resetNotifications() {
 function handleAction(action, url = null, target = '_self') {
     switch(action) {
         case 'settings':
-            window.open('https://emiia.ai', '_self'); // Исправлено на window.open
+            window.location.href = 'https://emiia.ai';
             break;
         case 'terms':
-            window.open('https://emiia.ai/terms', '_self'); // '_blank' → '_self'
+            window.location.href = 'https://emiia.ai/terms';
             break;
         case 'messages':
-            // ТОЛЬКО СБРОС УВЕДОМЛЕНИЙ БЕЗ ПЕРЕХОДА
             resetNotifications();
             console.log('✅ Уведомления очищены');
             break;
         case 'z1':
-            window.open('https://wifi.emiia.keenetic.pro/', '_self'); // Уже правильно
+            window.location.href = 'https://wifi.emiia.keenetic.pro/';
             break;
         case 'privacy':
-            window.open('https://emiia.ai/privacy', '_self'); // '_blank' → '_self'
+            window.location.href = 'https://emiia.ai/privacy';
             break;
         case 'refresh':
             location.reload();
             break;
         case 'lem-iot':
         case 'ml-datasets':
-            // Для пунктов с подменю действие обрабатывается отдельно
             break;
         case 'open-url':
             if (url) {
-                // ВСЕГДА открываем в том же окне PWA
-                window.open(url, '_self');
+                window.location.href = url;
             }
             break;
     }
