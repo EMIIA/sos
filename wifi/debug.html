@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Vector Tiles</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial; }
+        #map { width: 100%; height: 80vh; border: 2px solid red; }
+        #log { background: #f0f0f0; padding: 10px; margin-top: 10px; height: 100px; overflow-y: scroll; }
+    </style>
+</head>
+<body>
+    <h3>Отладка векторных тайлов</h3>
+    <div id="log"></div>
+    <div id='map'></div>
+
+    <script>
+        function log(msg) {
+            document.getElementById('log').innerHTML += msg + '<br>';
+            console.log(msg);
+        }
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: {
+                "version": 8,
+                "sources": {
+                    "osm": {
+                        "type": "raster",
+                        "tiles": ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                        "tileSize": 256
+                    }
+                },
+                "layers": [{
+                    "id": "osm",
+                    "type": "raster",
+                    "source": "osm"
+                }]
+            },
+            center: [37.6176, 55.7558],
+            zoom: 13
+        });
+
+        map.on('load', () => {
+            log('Карта загружена, добавляем векторные тайлы...');
+            
+            // Пробуем добавить источник
+            try {
+                map.addSource('moscow-tiles', {
+                    type: 'vector',
+                    url: '/tiles.json'
+                });
+                log('✓ Источник добавлен');
+            } catch (e) {
+                log('✗ Ошибка добавления источника: ' + e.message);
+                return;
+            }
+
+            // Ждем загрузки источника
+            map.on('sourcedata', (e) => {
+                if (e.sourceId === 'moscow-tiles') {
+                    if (e.isSourceLoaded) {
+                        log('✓ Векторные тайлы загружены');
+                        log('Доступные слои: ' + JSON.stringify(e.source.vectorLayerIds));
+                        
+                        // Пробуем добавить слой дорог
+                        try {
+                            map.addLayer({
+                                id: 'roads-debug',
+                                source: 'moscow-tiles',
+                                'source-layer': 'transportation',
+                                type: 'line',
+                                paint: {
+                                    'line-color': '#ff0000',
+                                    'line-width': 4
+                                }
+                            });
+                            log('✓ Слой дорог добавлен');
+                        } catch (e) {
+                            log('✗ Ошибка добавления дорог: ' + e.message);
+                        }
+                    } else if (e.error) {
+                        log('✗ Ошибка загрузки тайлов: ' + e.error.message);
+                    }
+                }
+            });
+        });
+
+        map.on('error', (e) => {
+            log('Ошибка карты: ' + e.error.message);
+        });
+    </script>
+</body>
+</html>
