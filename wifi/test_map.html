@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Москва - Тест векторных данных</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .info { position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border-radius: 5px; }
+        .coordinates { position: absolute; bottom: 10px; right: 10px; background: white; padding: 5px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h3>Москва - Векторные данные</h3>
+        <div id="status">Загрузка...</div>
+    </div>
+    <div class="coordinates" id="coords"></div>
+    <div id='map'></div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: {
+                "version": 8,
+                "sources": {
+                    "osm": {
+                        "type": "raster",
+                        "tiles": ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                        "tileSize": 256
+                    }
+                },
+                "layers": [{
+                    "id": "osm",
+                    "type": "raster",
+                    "source": "osm"
+                }]
+            },
+            center: [37.6176, 55.7558],
+            zoom: 13
+        });
+
+        map.on('load', () => {
+            // Добавляем векторные тайлы Москвы
+            map.addSource('moscow-tiles', {
+                type: 'vector',
+                url: 'http://localhost:5000/static/tiles.json'
+            });
+
+            // ДОРОГИ - сначала проверим этот слой
+            map.addLayer({
+                id: 'roads-test',
+                source: 'moscow-tiles',
+                'source-layer': 'transportation',
+                type: 'line',
+                minzoom: 10,
+                paint: {
+                    'line-color': '#ff0000',
+                    'line-width': 3,
+                    'line-opacity': 0.8
+                }
+            });
+
+            // ЗДАНИЯ - простые полигоны
+            map.addLayer({
+                id: 'buildings-test',
+                source: 'moscow-tiles',
+                'source-layer': 'building',
+                type: 'fill',
+                minzoom: 13,
+                paint: {
+                    'fill-color': '#e0e0e0',
+                    'fill-opacity': 0.6,
+                    'fill-outline-color': '#ffffff'
+                }
+            });
+
+            document.getElementById('status').innerHTML = 'Данные загружены!<br>Кликайте на карту';
+
+            // Отображение координат
+            map.on('mousemove', (e) => {
+                document.getElementById('coords').innerHTML = 
+                    `${e.lngLat.lat.toFixed(6)}, ${e.lngLat.lng.toFixed(6)}`;
+            });
+
+            // Информация при клике
+            map.on('click', (e) => {
+                const features = map.queryRenderedFeatures(e.point);
+                let info = `Координаты:<br>${e.lngLat.lat.toFixed(6)}, ${e.lngLat.lng.toFixed(6)}<br><br>`;
+                
+                features.forEach(feature => {
+                    info += `<strong>${feature.layer.id}</strong><br>`;
+                    if (feature.properties.name) {
+                        info += `Название: ${feature.properties.name}<br>`;
+                    }
+                    if (feature.properties.class) {
+                        info += `Тип: ${feature.properties.class}<br>`;
+                    }
+                    info += '<br>';
+                });
+
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(info)
+                    .addTo(map);
+            });
+        });
+
+        // Отладка - посмотрим какие слои доступны
+        map.on('sourcedata', (e) => {
+            if (e.sourceId === 'moscow-tiles' && e.isSourceLoaded) {
+                console.log('Доступные векторные слои:', e.source.vectorLayerIds);
+            }
+        });
+    </script>
+</body>
+</html>
