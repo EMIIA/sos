@@ -1,0 +1,39 @@
+# Создаем tiles.json
+@'
+{
+  "tilejson": "2.0.0",
+  "tiles": [
+    "/tiles/{z}/{x}/{y}.pbf"
+  ],
+  "minzoom": 10,
+  "maxzoom": 15,
+  "bounds": [37.1, 55.5, 37.9, 56.0],
+  "center": [37.6176, 55.7558, 12],
+  "name": "Москва векторные тайлы",
+  "attribution": "© MapTiler © OpenStreetMap contributors",
+  "vector_layers": [
+    {
+      "id": "building",
+      "minzoom": 10,
+      "maxzoom": 15,
+      "fields": {
+        "render_height": "Number",
+        "render_min_height": "Number",
+        "height": "Number"
+      }
+    },
+    {
+      "id": "transportation",
+      "minzoom": 10,
+      "maxzoom": 15
+    },
+    {
+      "id": "water",
+      "minzoom": 10,
+      "maxzoom": 15
+    }
+  ]
+}
+'@ | Out-File -FilePath "static\tiles.json" -Encoding UTF8
+
+Write-Host "tiles.json создан"
