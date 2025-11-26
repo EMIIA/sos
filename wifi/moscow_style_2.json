@@ -1,0 +1,44 @@
+{
+    "version": 8,
+    "name": "Moscow Offline",
+    "sources": {
+        "moscow-buildings": {
+            "type": "vector",
+            "tiles": ["http://localhost:8000/tiles/{z}/{x}/{y}.pbf"],
+            "minzoom": 12,
+            "maxzoom": 14
+        }
+    },
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "paint": {"background-color": "#1a1a1a"}
+        },
+        {
+            "id": "buildings-3d",
+            "source": "moscow-buildings",
+            "source-layer": "building",
+            "type": "fill-extrusion",
+            "minzoom": 12,
+            "paint": {
+                "fill-extrusion-color": "#3388ff",
+                "fill-extrusion-height": ["get", "height"],
+                "fill-extrusion-base": 0,
+                "fill-extrusion-opacity": 0.9
+            }
+        },
+        {
+            "id": "buildings-outline",
+            "source": "moscow-buildings",
+            "source-layer": "building",
+            "type": "line",
+            "minzoom": 12,
+            "paint": {
+                "line-color": "#ffffff",
+                "line-width": 1,
+                "line-opacity": 0.6
+            }
+        }
+    ]
+}
