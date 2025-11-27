@@ -28,7 +28,7 @@ def convert_to_tile(lon, lat, zoom):
 
 def download_tile(zoom, x, y):
     """Скачивание одного тайла"""
-    url = f"https://api.maptiler.com/tiles/v3-openmaptiles/{z}/{x}/{y}.pbf?key={API_KEY}"
+    url = f"https://api.maptiler.com/tiles/v3-openmaptiles/{zoom}/{x}/{y}.pbf?key={API_KEY}"
     file_path = os.path.join(OUTPUT_DIR, str(zoom), str(x), f"{y}.pbf")
     
     # Создаем папку если нужно
