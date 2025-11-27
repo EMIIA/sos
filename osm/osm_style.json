@@ -1,0 +1,136 @@
+{
+    "version": 8,
+    "name": "Central District - All Data",
+    "center": [37.617, 55.755],
+    "zoom": 10,
+    "sources": {
+        "central-data": {
+            "type": "vector",
+            "tiles": ["http://localhost:8001/tiles/{z}/{x}/{y}.pbf"],
+            "minzoom": 10,
+            "maxzoom": 14
+        }
+    },
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "paint": {"background-color": "#0f1c2d"}
+        },
+        {
+            "id": "roads-motorway",
+            "type": "line",
+            "source": "central-data",
+            "source-layer": "roads",
+            "filter": ["==", "highway", "motorway"],
+            "paint": {
+                "line-color": "#ff6b6b",
+                "line-width": 12,
+                "line-opacity": 0.9
+            }
+        },
+        {
+            "id": "roads-trunk",
+            "type": "line",
+            "source": "central-data",
+            "source-layer": "roads",
+            "filter": ["==", "highway", "trunk"],
+            "paint": {
+                "line-color": "#ff8e8e",
+                "line-width": 10,
+                "line-opacity": 0.9
+            }
+        },
+        {
+            "id": "roads-primary",
+            "type": "line",
+            "source": "central-data",
+            "source-layer": "roads",
+            "filter": ["==", "highway", "primary"],
+            "paint": {
+                "line-color": "#ffaaaa",
+                "line-width": 8,
+                "line-opacity": 0.8
+            }
+        },
+        {
+            "id": "roads-secondary",
+            "type": "line",
+            "source": "central-data",
+            "source-layer": "roads",
+            "filter": ["==", "highway", "secondary"],
+            "paint": {
+                "line-color": "#ffcccc",
+                "line-width": 6,
+                "line-opacity": 0.7
+            }
+        },
+        {
+            "id": "roads-tertiary",
+            "type": "line",
+            "source": "central-data",
+            "source-layer": "roads",
+            "filter": ["==", "highway", "tertiary"],
+            "paint": {
+                "line-color": "#ffe0e0",
+                "line-width": 4,
+                "line-opacity": 0.6
+            }
+        },
+        {
+            "id": "roads-residential",
+            "type": "line",
+            "source": "central-data",
+            "source-layer": "roads",
+            "filter": ["==", "highway", "residential"],
+            "paint": {
+                "line-color": "#ffffff",
+                "line-width": 2,
+                "line-opacity": 0.4
+            }
+        },
+        {
+            "id": "buildings-fill",
+            "type": "fill",
+            "source": "central-data",
+            "source-layer": "buildings",
+            "paint": {
+                "fill-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", "height"],
+                    5, "#444444",
+                    10, "#555555", 
+                    20, "#666666",
+                    30, "#777777",
+                    50, "#888888",
+                    100, "#999999"
+                ],
+                "fill-opacity": 0.7,
+                "fill-outline-color": "#333333"
+            }
+        },
+        {
+            "id": "buildings-3d",
+            "type": "fill-extrusion",
+            "source": "central-data",
+            "source-layer": "buildings",
+            "paint": {
+                "fill-extrusion-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", "height"],
+                    5, "#444444",
+                    10, "#555555",
+                    20, "#666666",
+                    30, "#777777", 
+                    50, "#888888",
+                    100, "#999999"
+                ],
+                "fill-extrusion-height": ["get", "height"],
+                "fill-extrusion-base": 0,
+                "fill-extrusion-opacity": 0.6
+            }
+        }
+    ]
+}
