@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Параметры
 API_KEY = "QN6ALYSRnAohNK6Y8BiB"
-OUTPUT_DIR = r"D:\moscow_buildings"
+OUTPUT_DIR = r"D:\road"
 MIN_ZOOM = 10
 MAX_ZOOM = 14
 
