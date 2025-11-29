@@ -1,90 +1,29 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import http.server
 import socketserver
 import os
 import gzip
 import re
 import socket
-import json
+from functools import lru_cache
 
-# === НАСТРОЙКИ ===
-PORT = 8001
+# === SETTINGS ===
+PORT = 8002
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Указываем прямую путь к вашей папке static
-STATIC_DIR = r"C:\Users\vstar\Desktop\osm\static"
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# === ФУНКЦИЯ ДЛЯ СОЗДАНИЯ ТЕСТОВЫХ ТАЙЛОВ ===
-def create_test_tile(z, x, y):
-    """Создает тестовый тайл на лету"""
-    # Простые тестовые данные Москвы
-    features = []
-    
-    # Основные дороги Москвы
-    roads = [
-        {"type": "motorway", "name": "МКАД", "coords": [
-            [37.368, 55.895], [37.842, 55.895], [37.842, 55.615], [37.368, 55.615]
-        ]},
-        {"type": "primary", "name": "Ленинградский пр-т", "coords": [
-            [37.4, 55.8], [37.7, 55.8]
-        ]},
-        {"type": "secondary", "name": "Тверская ул", "coords": [
-            [37.6, 55.76], [37.6, 55.75]
-        ]}
-    ]
-    
-    for road in roads:
-        features.append({
-            "type": "Feature",
-            "properties": {"highway": road["type"], "name": road["name"]},
-            "geometry": {
-                "type": "LineString", 
-                "coordinates": road["coords"]
-            }
-        })
-    
-    # Здания в центре Москвы
-    buildings = [
-        {"height": 50, "coords": [[37.617, 55.755], [37.618, 55.755], [37.618, 55.756], [37.617, 55.756], [37.617, 55.755]]},
-        {"height": 30, "coords": [[37.615, 55.754], [37.616, 55.754], [37.616, 55.755], [37.615, 55.755], [37.615, 55.754]]}
-    ]
-    
-    for building in buildings:
-        features.append({
-            "type": "Feature",
-            "properties": {"building": "yes", "height": building["height"]},
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [building["coords"]]
-            }
-        })
-    
-    tile_data = {
-        "roads": {
-            "type": "FeatureCollection",
-            "features": [f for f in features if f["geometry"]["type"] == "LineString"]
-        },
-        "buildings": {
-            "type": "FeatureCollection", 
-            "features": [f for f in features if f["geometry"]["type"] == "Polygon"]
-        }
-    }
-    
-    return json.dumps(tile_data).encode('utf-8')
-
-# === HTML СТРАНИЦА ===
+# === HTML (SOURCE CODE) ===
 HTML_CONTENT = '''<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карта Москвы</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SPATIAL INTELLIGENCE</title>
     <script src="/static/mapbox-gl.js"></script>
     <link href="/static/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css.css">
     <style>
         body { margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; background: #1a1a1a; }
         #info {
             position: absolute;
             top: 10px;
@@ -93,7 +32,7 @@ HTML_CONTENT = '''<!DOCTYPE html>
             color: white;
             padding: 10px;
             border-radius: 5px;
-            font-family: Arial;
+            font-family: system-ui;
             font-size: 12px;
             z-index: 1000;
         }
@@ -101,51 +40,81 @@ HTML_CONTENT = '''<!DOCTYPE html>
 </head>
 <body>
     <div id="map"></div>
-    <div id="info">Загрузка карты...</div>
-
     <script>
-        // Обход проверки токена
         const originalError = console.error;
         console.error = function(...args) {
             if (args[0] && args[0].includes('access token')) {
-                console.log('Офлайн режим активирован');
+                console.log('Offline mode activated');
                 return;
             }
             originalError.apply(console, args);
         };
 
-        // Создаем карту
         const map = new mapboxgl.Map({
-            container: 'map',
-            style: '/static/osm_style.json',
+            container: 'map', 
+            style: '/static/moscow_style_2.json',
+            zoom: 13,
             center: [37.617, 55.755],
-            zoom: 11,
             pitch: 45,
             bearing: 0,
             antialias: true,
-            accessToken: 'offline'
+            accessToken: 'EMIIA_AI_API_KEY',
+            localFontFamily: 'Montserrat, Arial, sans-serif'
         });
 
         map.on('load', () => {
-            document.getElementById('info').textContent = 'Карта Москвы загружена!';
-            console.log('Карта загружена');
+            console.log('Map loaded');
+            document.getElementById('status').textContent = 'Map loaded';
+        });
+
+        map.on('sourcedata', (e) => {
+            if (e.sourceId === 'moscow-buildings') {
+                if (e.isSourceLoaded) {
+                    console.log('Buildings loaded');
+                    document.getElementById('status').textContent = 'Buildings loaded';
+                }
+                if (e.tile) {
+                    console.log(`Tile: ${e.tile.tileID.z}/${e.tile.tileID.x}/${e.tile.tileID.y}`);
+                }
+            }
+        });
+
+        map.on('data', (e) => {
+            if (e.dataType === 'source' && e.tile) {
+                document.getElementById('status').textContent = 
+                    `Tile: ${e.tile.tileID.z}/${e.tile.tileID.x}/${e.tile.tileID.y}`;
+            }
         });
 
         map.on('error', (e) => {
             if (e.error && e.error.message && e.error.message.includes('access token')) {
-                console.log('Работаем в офлайн режиме');
+                console.log('Working in offline mode');
                 return;
             }
-            console.error('Ошибка:', e.error);
+            console.error('Error:', e.error);
         });
 
-        // Добавляем элементы управления
-        map.addControl(new mapboxgl.NavigationControl());
+        setInterval(() => {
+            const layers = map.getStyle().layers || [];
+            const buildingLayer = layers.find(layer => layer.id === 'buildings-3d');
+            if (buildingLayer && buildingLayer.visibility !== 'visible') {
+                console.log('Restoring building visibility');
+                map.setLayoutProperty('buildings-3d', 'visibility', 'visible');
+                map.setLayoutProperty('buildings-outline', 'visibility', 'visible');
+            }
+        }, 1000);
     </script>
 </body>
 </html>'''.encode('utf-8')
 
-# === MIME ТИПЫ ===
+# === TILE PATH CACHE ===
+@lru_cache(maxsize=2048)
+def get_tile_path(z, x, y):
+    """Returns tile path if exists, else None"""
+    path = os.path.join(STATIC_DIR, z, x, f"{y}.pbf")
+    return path if os.path.isfile(path) else None
+
+# === MIME TYPES ===
 MIME_TYPES = {
     ".js": "application/javascript",
     ".css": "text/css",
@@ -154,14 +123,14 @@ MIME_TYPES = {
     ".html": "text/html",
 }
 
-# === ОБРАБОТЧИК ЗАПРОСОВ ===
+# === REQUEST HANDLER ===
 class MapboxHandler(http.server.SimpleHTTPRequestHandler):
-    def log_message(self, format, *args):
-        """Минимальное логирование"""
-        print(f"{self.client_address[0]} - {format % args}")
+    def log_message(self, *args):
+        """Disable request logging"""
+        pass
 
     def send_compressed(self, data, content_type, ext):
-        """Отправка с gzip-сжатием"""
+        """Send with gzip compression (except PBF)"""
         accept_encoding = self.headers.get("Accept-Encoding", "")
         
         if ext != ".pbf" and "gzip" in accept_encoding and len(data) > 512:
@@ -177,7 +146,7 @@ class MapboxHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            # Статические файлы
+            # Static files
             if self.path.startswith("/static/"):
                 file_path = os.path.join(STATIC_DIR, self.path[8:])
                 
@@ -193,44 +162,28 @@ class MapboxHandler(http.server.SimpleHTTPRequestHandler):
                     with open(file_path, "rb") as f:
                         self.send_compressed(f.read(), content_type, ext)
                     return
-                
                 self.send_error(404)
                 return
 
-            # Векторные тайлы
+            # Vector tiles
             match = re.match(r"^/tiles/(\d+)/(\d+)/(\d+)\.pbf$", self.path)
             if match:
                 z, x, y = match.groups()
+                tile_path = get_tile_path(z, x, y)
                 
-                # Ищем тайл в разных возможных папках
-                possible_paths = [
-                    os.path.join(STATIC_DIR, "moscow_tiles", z, x, f"{y}.pbf"),
-                    os.path.join(STATIC_DIR, "tiles", z, x, f"{y}.pbf"),
-                    os.path.join(STATIC_DIR, "vector_tiles", z, x, f"{y}.pbf")
-                ]
-                
-                for tile_path in possible_paths:
-                    if os.path.isfile(tile_path):
-                        self.send_response(200)
-                        self.send_header("Content-Type", "application/x-protobuf")
-                        self.send_header("Cache-Control", "public, max-age=86400")
-                        self.send_header("Access-Control-Allow-Origin", "*")
-                        
-                        with open(tile_path, "rb") as f:
-                            self.send_compressed(f.read(), "application/x-protobuf", ".pbf")
-                        return
-                
-                # Если тайл не найден, создаем тестовый
-                self.send_response(200)
-                self.send_header("Content-Type", "application/x-protobuf")
-                self.send_header("Cache-Control", "public, max-age=3600")
-                self.send_header("Access-Control-Allow-Origin", "*")
-                
-                test_data = create_test_tile(int(z), int(x), int(y))
-                self.send_compressed(test_data, "application/x-protobuf", ".pbf")
+                if tile_path:
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/x-protobuf")
+                    self.send_header("Cache-Control", "public, max-age=86400")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    
+                    with open(tile_path, "rb") as f:
+                        self.send_compressed(f.read(), "application/x-protobuf", ".pbf")
+                    return
+                self.send_error(404)
                 return
 
-            # Главная страница
+            # Main page
             if self.path == "/":
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -251,7 +204,7 @@ class MapboxHandler(http.server.SimpleHTTPRequestHandler):
             except:
                 pass
 
-# === СЕРВЕР ===
+# === MULTITHREADED SERVER ===
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
     request_queue_size = 100
@@ -259,22 +212,20 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1024 * 1024)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 
-# === ЗАПУСК ===
+# === STARTUP ===
 if __name__ == "__main__":
-    # Проверяем существование папки static
     if not os.path.isdir(STATIC_DIR):
         print(f"ERROR: Directory {STATIC_DIR} not found")
-        print("Please check the path to your static folder")
         exit(1)
         
-    print(f"=== Сервер карты Москвы ===")
-    print(f"URL: http://localhost:{PORT}")
-    print(f"Static folder: {STATIC_DIR}")
-    print("=" * 50)
+    print(f"Server: http://localhost:{PORT}")
+    print(f"Static: {STATIC_DIR}")
     
     with ThreadedHTTPServer(("", PORT), MapboxHandler) as server:
         try:
             server.serve_forever()
         except KeyboardInterrupt:
-            print("\nСервер остановлен")
+            print("\nServer stopped")
