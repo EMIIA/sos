@@ -32,7 +32,7 @@
       "source": "moscow",
       "source-layer": "water",
       "type": "fill",
-      "paint": {"fill-color": "#1a4d66"}
+      "paint": {"fill-color": "red"}
     },
     {
       "id": "roads-base",
@@ -56,19 +56,7 @@
         "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 4]
       }
     },
-    {
-      "id": "building-3d",
-      "source": "moscow",
-      "source-layer": "building",
-      "type": "fill-extrusion",
-      "minzoom": 13,
-      "paint": {
-        "fill-extrusion-color": "transparent",
-        "fill-extrusion-height": ["get", "render_height"],
-        "fill-extrusion-base": ["get", "render_min_height"],
-        "fill-extrusion-opacity": 0.8
-      }
-    },
+    
     {
       "id": "housenumber",
       "source": "moscow",
