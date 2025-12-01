@@ -58,19 +58,7 @@
         "line-opacity": 0.9
       }
     },
-    {
-      "id": "building-3d",
-      "source": "moscow",
-      "source-layer": "building",
-      "type": "fill-extrusion",
-      "minzoom": 13,
-      "paint": {
-        "fill-extrusion-color": "#f0f2f4",
-        "fill-extrusion-height": ["get", "render_height"],
-        "fill-extrusion-base": ["get", "render_min_height"],
-        "fill-extrusion-opacity": 0.6
-      }
-    },
+    
     {
       "id": "housenumber",
       "source": "moscow",
