@@ -63,7 +63,7 @@
       "type": "fill-extrusion",
       "minzoom": 13,
       "paint": {
-        "fill-extrusion-color": "#3388ff",
+        "fill-extrusion-color": "transparent",
         "fill-extrusion-height": ["get", "render_height"],
         "fill-extrusion-base": ["get", "render_min_height"],
         "fill-extrusion-opacity": 0.8
