@@ -1,6 +1,6 @@
 {
   "version": 8,
-  "name": "Moscow Full Offline",
+  "name": "Moscow Light Theory",
   "sources": {
     "moscow": {
       "type": "vector",
@@ -17,14 +17,26 @@
       "paint": {"background-color": "#f8f9fa"}
     },
     {
-      "id": "landcover",
+      "id": "landcover-wood",
       "source": "moscow",
       "source-layer": "landcover",
       "type": "fill",
-      "filter": ["in", "class", "wood", "grass"],
+      "filter": ["==", "class", "wood"],
       "paint": {
-        "fill-color": ["match", ["get", "class"], "wood", "#1a3a1a", "grass", "#2d4a2d", "#2a2a2a"],
-        "fill-opacity": 0.7
+        "fill-color": "#e0e3e0",  // Лес - среднесерый (плотная растительность задерживает свет)
+        "fill-opacity": 0.6,
+        "fill-outline-color": "#d8dbd8"
+      }
+    },
+    {
+      "id": "landcover-grass",
+      "source": "moscow",
+      "source-layer": "landcover",
+      "type": "fill",
+      "filter": ["==", "class", "grass"],
+      "paint": {
+        "fill-color": "#f0f2f0",  // Газон - почти белый (трава отражает больше света)
+        "fill-opacity": 0.4
       }
     },
     {
@@ -32,65 +44,208 @@
       "source": "moscow",
       "source-layer": "water",
       "type": "fill",
-      "paint": {"fill-color": "red"}
-    },
-    {
-      "id": "roads-base",
-      "source": "moscow",
-      "source-layer": "transportation",
-      "type": "line",
-      "minzoom": 4,
       "paint": {
-        "line-color": "#222222",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 6]
+        "fill-color": "#dde1e4",  // Вода - холодный серый (глубина поглощает свет)
+        "fill-opacity": 0.7,
+        "fill-antialias": true
       }
     },
     {
-      "id": "roads-class",
+      "id": "water-pattern",
+      "source": "moscow",
+      "source-layer": "water",
+      "type": "line",
+      "paint": {
+        "line-color": "#e8ebee",  // Светлые волны/блики на воде
+        "line-width": 0.3,
+        "line-dasharray": [1, 2],
+        "line-opacity": 0.4
+      }
+    },
+    {
+      "id": "transportation-path",
       "source": "moscow",
       "source-layer": "transportation",
       "type": "line",
-      "minzoom": 4,
+      "filter": ["==", "class", "path"],
+      "minzoom": 12,
       "paint": {
-        "line-color": ["match", ["get", "class"], "motorway", "#ff5555", "primary", "#ffaa00", "secondary", "#ffff55", "#444444"],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 4]
+        "line-color": "#ffffff",  // Пешеходные пути - белые (максимальное отражение)
+        "line-width": ["interpolate", ["linear"], ["zoom"], 12, 1, 14, 2],
+        "line-opacity": 0.9,
+        "line-dasharray": [2, 1]
       }
     },
-    
+    {
+      "id": "transportation-minor",
+      "source": "moscow",
+      "source-layer": "transportation",
+      "type": "line",
+      "filter": ["==", "class", "service"],
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#f5f6f7",  // Сервисные дороги - почти белые
+        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 1, 14, 2],
+        "line-opacity": 0.8
+      }
+    },
+    {
+      "id": "transportation-residential",
+      "source": "moscow",
+      "source-layer": "transportation",
+      "type": "line",
+      "filter": ["==", "class", "residential"],
+      "minzoom": 11,
+      "paint": {
+        "line-color": "#edeeef",  // Жилые улицы - очень светлый серый
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 1, 14, 4],
+        "line-opacity": 0.85
+      }
+    },
+    {
+      "id": "transportation-tertiary",
+      "source": "moscow",
+      "source-layer": "transportation",
+      "type": "line",
+      "filter": ["==", "class", "tertiary"],
+      "minzoom": 10,
+      "paint": {
+        "line-color": "#e2e4e6",  // Третичные дороги
+        "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.2, 14, 6],
+        "line-opacity": 0.9
+      }
+    },
+    {
+      "id": "transportation-secondary",
+      "source": "moscow",
+      "source-layer": "transportation",
+      "type": "line",
+      "filter": ["==", "class", "secondary"],
+      "minzoom": 9,
+      "paint": {
+        "line-color": "#d5d8db",  // Вторичные дороги
+        "line-width": ["interpolate", ["linear"], ["zoom"], 9, 1.5, 14, 8],
+        "line-opacity": 0.95
+      }
+    },
+    {
+      "id": "transportation-primary",
+      "source": "moscow",
+      "source-layer": "transportation",
+      "type": "line",
+      "filter": ["==", "class", "primary"],
+      "minzoom": 8,
+      "paint": {
+        "line-color": "#c8ccd0",  // Первичные дороги
+        "line-width": ["interpolate", ["linear"], ["zoom"], 8, 2, 14, 10],
+        "line-opacity": 1
+      }
+    },
+    {
+      "id": "transportation-motorway",
+      "source": "moscow",
+      "source-layer": "transportation",
+      "type": "line",
+      "filter": ["==", "class", "motorway"],
+      "minzoom": 6,
+      "paint": {
+        "line-color": "#b8bdc2",  // Магистрали - самый темный серый (интенсивное движение = "загрязнение")
+        "line-width": ["interpolate", ["linear"], ["zoom"], 6, 2.5, 14, 12],
+        "line-opacity": 1,
+        "line-gap-width": 1
+      }
+    },
+    {
+      "id": "transportation-rail",
+      "source": "moscow",
+      "source-layer": "transportation",
+      "type": "line",
+      "filter": ["==", "class", "rail"],
+      "minzoom": 9,
+      "paint": {
+        "line-color": "#d1d1d1",  // Железная дорога - особый серый
+        "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.8, 14, 3],
+        "line-dasharray": [3, 2],
+        "line-opacity": 0.7
+      }
+    },
+    {
+      "id": "building-3d",
+      "source": "moscow",
+      "source-layer": "building",
+      "type": "fill-extrusion",
+      "minzoom": 13,
+      "paint": {
+        "fill-extrusion-color": [
+          "interpolate",
+          ["linear"],
+          ["get", "render_height"],
+          0, "#f5f6f7",    // Низкие здания светлее
+          50, "#e8eaed",   // Средние
+          100, "#dce0e4",  // Высокие
+          200, "#cfd4d9"   // Очень высокие (больше тени)
+        ],
+        "fill-extrusion-height": ["get", "render_height"],
+        "fill-extrusion-base": ["get", "render_min_height"],
+        "fill-extrusion-opacity": 0.7,
+        "fill-extrusion-vertical-gradient": true
+      }
+    },
     {
       "id": "housenumber",
       "source": "moscow",
       "source-layer": "housenumber",
       "type": "symbol",
-      "minzoom": 14,
+      "minzoom": 15,
       "layout": {
         "text-field": ["get", "housenumber"],
         "text-font": ["Open Sans Regular"],
-        "text-size": 10,
+        "text-size": 9,
         "text-anchor": "center"
       },
       "paint": {
-        "text-color": "#ffffff",
-        "text-halo-color": "#000000",
-        "text-halo-width": 1
+        "text-color": "#8c9196",  // Номера домов - нейтральный серый
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 2,
+        "text-halo-blur": 0.5
       }
     },
     {
-      "id": "road-labels",
+      "id": "road-labels-minor",
       "source": "moscow",
       "source-layer": "transportation_name",
       "type": "symbol",
-      "minzoom": 10,
+      "minzoom": 13,
+      "filter": ["==", "class", "minor"],
       "layout": {
         "text-field": ["get", "name"],
         "text-font": ["Open Sans Regular"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 10, 9, 14, 12],
+        "text-size": 10,
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "#cccccc",
-        "text-halo-color": "#1a1a1a",
-        "text-halo-width": 1
+        "text-color": "#a8adb2",  // Светло-серый для мелких улиц
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 2
+      }
+    },
+    {
+      "id": "road-labels-major",
+      "source": "moscow",
+      "source-layer": "transportation_name",
+      "type": "symbol",
+      "minzoom": 11,
+      "filter": ["in", "class", "primary", "secondary", "tertiary"],
+      "layout": {
+        "text-field": ["get", "name"],
+        "text-font": ["Open Sans Medium"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 11, 10, 14, 13],
+        "symbol-placement": "line"
+      },
+      "paint": {
+        "text-color": "#7d838a",  // Темнее для важных улиц
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 3
       }
     },
     {
@@ -106,9 +261,46 @@
         "text-anchor": "center"
       },
       "paint": {
-        "text-color": "#ffffff",
-        "text-halo-color": "#000000",
-        "text-halo-width": 1
+        "text-color": "#5d636b",  // Самый темный серый для важных надписей
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 3,
+        "text-halo-blur": 1
+      }
+    },
+    {
+      "id": "water-labels",
+      "source": "moscow",
+      "source-layer": "water_name",
+      "type": "symbol",
+      "minzoom": 8,
+      "layout": {
+        "text-field": ["get", "name"],
+        "text-font": ["Open Sans Italic"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 8, 10, 14, 14]
+      },
+      "paint": {
+        "text-color": "#9ca4ab",  // Водоемы - голубовато-серый
+        "text-halo-color": "#f8f9fa",
+        "text-halo-width": 2
+      }
+    },
+    {
+      "id": "landcover-park-labels",
+      "source": "moscow",
+      "source-layer": "landcover",
+      "type": "symbol",
+      "filter": ["==", "class", "grass"],
+      "minzoom": 13,
+      "layout": {
+        "text-field": ["get", "name"],
+        "text-font": ["Open Sans Regular"],
+        "text-size": 11,
+        "text-justify": "center"
+      },
+      "paint": {
+        "text-color": "#8a968a",  // Зеленовато-серый для парков
+        "text-halo-color": "#f8f9fa",
+        "text-halo-width": 2
       }
     }
   ]
