@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>3D Точка по линии</title>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; background: #f8f9fa; }
+    </style>
+    <script src="https://sos.emiia.ai/mapbox-gl.js"></script>
+    <link href="https://sos.emiia.ai/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://sos.emiia.ai/css.css">
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://sos.emiia.ai/wifi/tiles_emiia.json',
+            minZoom: 17,
+            center: [37.630507, 55.833692],
+            zoom: 18,
+            pitch: 60,
+            bearing: 30,
+            antialias: true
+        });
+
+        map.on('style.load', () => {
+            map.addSource('mapbox-dem', {
+                'type': 'raster-dem',
+                'url': 'https://sos.emiia.ai/3d/3d_tiles.json',
+                'tileSize': 512,
+                'maxzoom': 24
+            });
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
+
+            const lineCoordinates = [
+                [37.630507, 55.833692],
+                [37.630877, 55.834026], 
+                [37.631323, 55.834250],
+                [37.631735, 55.834216]
+            ];
+
+            // ЦЕНТРАЛЬНАЯ ТОЧКА (поднимается по основной высоте)
+            const elevationsMain = [15, 25, 30, 35];
+            
+            // ВОЛНЫ: три уровня под точкой (как в вашем примере)
+            const elevationsWave1 = [14.98, 24.98, 29.98, 34.98]; // Первая волна
+            const elevationsWave2 = [14.95, 24.95, 29.95, 34.95]; // Вторая волна
+            const elevationsWave3 = [14.90, 24.90, 29.90, 34.90]; // Третья волна
+
+            const objectSettings = {
+                // ЦЕНТРАЛЬНАЯ ТОЧКА
+                object1: {
+                    pointColor: '#ff0000',
+                    lineColor: '#ff0000',
+                    size: 110,
+                    visible: true,
+                    animationSpeed: 0.0007,
+                    coordinates: lineCoordinates,
+                    elevations: elevationsMain,
+                    modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
+                    baseOpacity: 1.0,
+                    verticalOffset: 0
+                },
+                // ВОЛНЫ (используют ту же модель, но пульсируют)
+                wave1: {
+                    pointColor: '#6fa8dc',
+                    size: 120,
+                    visible: true,
+                    elevations: elevationsWave1,
+                    modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
+                    baseOpacity: 0.8,
+                    fadeOpacity: 0,
+                    pulseMin: 100,
+                    pulseMax: 120,
+                    verticalOffset: -0.02
+                },
+                wave2: {
+                    pointColor: '#3d85c6',
+                    size: 130,
+                    visible: true,
+                    elevations: elevationsWave2,
+                    modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
+                    baseOpacity: 0.6,
+                    fadeOpacity: 0,
+                    pulseMin: 110,
+                    pulseMax: 130,
+                    verticalOffset: -0.05
+                },
+                wave3: {
+                    pointColor: '#1f4e79',
+                    size: 140,
+                    visible: true,
+                    elevations: elevationsWave3,
+                    modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
+                    baseOpacity: 0.4,
+                    fadeOpacity: 0,
+                    pulseMin: 120,
+                    pulseMax: 140,
+                    verticalOffset: -0.08
+                }
+            };
+
+            // Линия траектории
+            map.addSource('trajectory-line', {
+                'type': 'geojson',
+                'lineMetrics': true,
+                'data': createLineData(lineCoordinates, elevationsMain)
+            });
+
+            map.addLayer({
+                'id': 'trajectory-layer',
+                'type': 'line',
+                'source': 'trajectory-line',
+                'layout': {
+                    'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, elevationsMain[0], 1, elevationsMain[elevationsMain.length-1]],
+                    'line-elevation-reference': 'sea'
+                },
+                'paint': {
+                    'line-width': 4.0,
+                    'line-color': '#3d85c6',
+                    'line-emissive-strength': 1.0
+                }
+            });
+
+            // Создаем источники для всех объектов
+            const sources = {};
+            Object.keys(objectSettings).forEach(key => {
+                const settings = objectSettings[key];
+                sources[key] = createObjectSource(lineCoordinates[0], settings.modelUri);
+                map.addSource(`source-${key}`, sources[key]);
+                addWaveLayer(key, `source-${key}`, settings);
+            });
+
+            // АНИМАЦИЯ
+            let progress = 0;
+            const pulse = new ExpandAndFadePulse();
+            
+            function animate() {
+                progress += objectSettings.object1.animationSpeed;
+                if (progress > 1) progress = 0;
+
+                const segmentIndex = Math.floor(progress * (lineCoordinates.length - 1));
+                const segmentProgress = (progress * (lineCoordinates.length - 1)) - segmentIndex;
+                
+                const startCoord = lineCoordinates[segmentIndex];
+                const endCoord = lineCoordinates[segmentIndex + 1];
+                
+                const currentLng = startCoord[0] + (endCoord[0] - startCoord[0]) * segmentProgress;
+                const currentLat = startCoord[1] + (endCoord[1] - startCoord[1]) * segmentProgress;
+
+                // Обновляем все объекты (точка + волны)
+                Object.keys(objectSettings).forEach(key => {
+                    const settings = objectSettings[key];
+                    const elevations = settings.elevations;
+                    const startElevation = elevations[segmentIndex];
+                    const endElevation = elevations[segmentIndex + 1];
+                    const currentElevation = startElevation + (endElevation - startElevation) * segmentProgress;
+
+                    sources[key].data.geometry.coordinates = [currentLng, currentLat];
+                    map.getSource(`source-${key}`).setData(sources[key].data);
+                    
+                    let finalScale = settings.size;
+                    let finalOpacity = settings.baseOpacity;
+
+                    // Пульсация только для волн
+                    if (key !== 'object1') {
+                        const state = pulse.getCurrentState(settings);
+                        finalOpacity = state.opacity;
+                        finalScale = settings.size + (state.scale - 1) * 20; // Амплитуда пульсации
+                    }
+
+                    map.setPaintProperty(`layer-${key}`, 'model-translation', [0, 0, currentElevation + settings.verticalOffset]);
+                    map.setPaintProperty(`layer-${key}`, 'model-opacity', finalOpacity);
+                    map.setPaintProperty(`layer-${key}`, 'model-scale', [finalScale, finalScale, finalScale]);
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            map.once('idle', () => {
+                setTimeout(animate, 1000);
+            });
+        });
+
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+
+        function createLineData(coordinates, elevations) {
+            return {
+                'type': 'Feature',
+                'properties': { 'elevation': elevations },
+                'geometry': { 'coordinates': coordinates, 'type': 'LineString' }
+            };
+        }
+
+        function createObjectSource(coord, modelUri) {
+            return {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'properties': { 'model-uri': modelUri },
+                    'geometry': { 'coordinates': coord, 'type': 'Point' }
+                }
+            };
+        }
+
+        function addWaveLayer(objectId, sourceId, settings) {
+            map.addLayer({
+                'id': `layer-${objectId}`,
+                'type': 'model',
+                'slot': 'middle',
+                'source': sourceId,
+                'minzoom': 10,
+                'maxzoom': 24,
+                'layout': {
+                    'model-id': ['get', 'model-uri'],
+                    'visibility': settings.visible ? 'visible' : 'none'
+                },
+                'paint': {
+                    'model-opacity': settings.baseOpacity,
+                    'model-scale': [settings.size, settings.size, settings.size],
+                    'model-color': settings.pointColor,
+                    'model-translation': [0, 0, settings.elevations[0] + settings.verticalOffset],
+                    'model-emissive-strength': 1.0
+                }
+            });
+        }
+
+        // ПУЛЬСАЦИЯ (как в вашем образце)
+        class ExpandAndFadePulse {
+            constructor() {
+                this.startTime = performance.now();
+                this.cycleDuration = 1500;
+                this.totalCycle = 1800;
+            }
+            
+            getCurrentState(settings) {
+                const currentTime = performance.now();
+                const elapsed = currentTime - this.startTime;
+                const cycleProgress = (elapsed % this.totalCycle) / this.totalCycle;
+                
+                let opacity, scale;
+                
+                if (cycleProgress < (this.cycleDuration / this.totalCycle)) {
+                    const animProgress = cycleProgress / (this.cycleDuration / this.totalCycle);
+                    
+                    // Расширяем и исчезаем
+                    scale = 1 + (animProgress * 2);
+                    opacity = settings.baseOpacity + (settings.fadeOpacity - settings.baseOpacity) * animProgress;
+                } else {
+                    scale = 1;
+                    opacity = 0;
+                }
+                
+                return { opacity, scale };
+            }
+        }
+    </script>
+</body>
+</html>
