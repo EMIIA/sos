@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>3D & CIRCLE</title>
+   
+
+
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; background: #f8f9fa; }
+    </style>
+
+
+
+<script src="https://sos.emiia.ai/mapbox-gl.js"></script>
+    <link href="https://sos.emiia.ai/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://sos.emiia.ai/css.css">
+
+
+</head>
+<body>
+    
+
+    <div id="map"></div>
+
+    <script>
+        mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
+
+        const map = new mapboxgl.Map({
+            container: 'map', 
+            style: 'https://sos.emiia.ai/wifi/tiles_emiia.json',
+           minZoom: 17,
+        
+            center: [37.630507, 55.833692],
+            hash: true,
+            turn: false,
+            attributionControl: false,
+            bearing: 0,
+            pitch: 45,
+            antialias: true 
+        });
+
+       
+    </script>
+
+
+
+
+ <script>
+
+    map.on('style.load', () => {
+        map.addSource('mapbox-dem', {
+            'type': 'vector',
+            'url': 'https://sos.emiia.ai/3d/3d_tiles.json',
+            'tileSize': 512,
+            'maxzoom': 0
+        });
+        // add the DEM source as a terrain laye
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.0 });
+
+        map.addSource('geojson', {
+            'type': 'geojson',
+            'lineMetrics': true,
+            'data': {
+                'type': 'Feature',
+                'properties': {
+                    // add an array of elevation values.
+                    // the number of values doesn't need to match the number of coordinates.
+                    'elevation': [
+                        15, 25, 30, 35
+                    ]
+                },
+                'geometry': {
+                    'coordinates': [
+                        [37.630507, 55.833692],
+        [37.630877, 55.834026], 
+        [37.631323, 55.834250],
+        [37.631735, 55.834216]
+                        
+                    ],
+                    'type': 'LineString'
+                }
+            }
+        });
+
+        // add the elevated line layer
+        map.addLayer({
+            'id': 'elevated-line',
+            'type': 'line',
+            'source': 'geojson',
+            'layout': {
+                'line-z-offset': [
+                    'at-interpolated',
+                    [
+                        '*',
+                        ['line-progress'],
+                        ['-', ['length', ['get', 'elevation']], 1]
+                    ],
+                    ['get', 'elevation']
+                ],
+                'line-elevation-reference': 'sea'
+            },
+            'paint': {
+                'line-emissive-strength': 1.0,
+                'line-width': 10,
+                'line-color': 'royalblue'
+            }
+        });
+    });
+
+ </script>
+
+
+</body>
+</html>
