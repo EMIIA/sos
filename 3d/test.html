@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>3D Radar Point по линии</title>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; background: #f8f9fa; }
+    </style>
+    <script src="https://sos.emiia.ai/mapbox-gl.js "></script>
+    <link href="https://sos.emiia.ai/mapbox-gl.css " rel="stylesheet">
+    <link rel="stylesheet" href="https://sos.emiia.ai/css.css ">
+    
+    <!-- Подключаем Three.js для кастомного слоя -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js "></script>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://sos.emiia.ai/wifi/tiles_emiia.json ',
+            minZoom: 17,
+            center: [37.630507, 55.833692],
+            zoom: 18,
+            pitch: 60,
+            bearing: 30,
+            antialias: true
+        });
+
+        // КЛАСС КАСТОМНОГО СЛОЯ Three.js
+        class ThreeJSRadarLayer {
+            constructor(id, lineCoordinates) {
+                this.id = id;
+                this.type = 'custom';
+                this.renderingMode = '3d';
+                this.lineCoordinates = lineCoordinates;
+                
+                // Параметры анимации движения
+                this.progress = 0;
+                this.direction = 1;
+                this.isMoving = true;
+                this.currentSegment = 0;
+                this.animationSpeed = 0.0007;
+                this.elevations = [15, 25, 30, 35]; // Высоты для точки
+                
+                // Параметры радара
+                this.startTime = performance.now();
+                this.arcDuration = 2.5 / 1.5;
+            }
+
+            onAdd(map, gl) {
+                this.map = map;
+                this.gl = gl;
+                
+                // Создаем Three.js рендерер поверх контекста Mapbox
+                this.renderer = new THREE.WebGLRenderer({
+                    canvas: map.getCanvas(),
+                    context: gl,
+                    antialias: true
+                });
+                this.renderer.autoClear = false;
+                
+                // Сцена
+                this.scene = new THREE.Scene();
+                this.scene.background = null; // Прозрачный фон
+                
+                // Камера
+                this.camera = new THREE.PerspectiveCamera();
+                
+                // Освещение
+                const light = new THREE.AmbientLight(0xffffff, 0.5);
+                this.scene.add(light);
+                
+                // Создаем радарный объект
+                this.createRadarObject();
+            }
+
+            createRadarObject() {
+                const DISC_RADIUS = 5;
+                const OUTLINE_BASE_WIDTH = DISC_RADIUS * 0.25;
+
+                // === ДИСК ===
+                this.disc = new THREE.Mesh(
+                    new THREE.CircleGeometry(DISC_RADIUS, 64),
+                    new THREE.MeshBasicMaterial({ 
+                        color: 0x3d85c6,
+                        side: THREE.DoubleSide
+                    })
+                );
+                this.disc.rotation.x = -Math.PI / 2;
+                this.disc.position.y = 0;
+                this.scene.add(this.disc);
+
+                // === ОБВОДКА ===
+                this.outline = new THREE.Mesh(
+                    new THREE.RingGeometry(DISC_RADIUS, DISC_RADIUS + OUTLINE_BASE_WIDTH, 64),
+                    new THREE.MeshBasicMaterial({ 
+                        color: 0xF8F9FA,
+                        transparent: false,
+                        opacity: 1.0,
+                        side: THREE.DoubleSide
+                    })
+                );
+                this.outline.rotation.x = -Math.PI / 2;
+                this.outline.position.y = 0.1;
+                this.scene.add(this.outline);
+
+                // === ДУГА С ГРАДИЕНТОМ ===
+                this.createArc(DISC_RADIUS, OUTLINE_BASE_WIDTH);
+            }
+
+            createArc(DISC_RADIUS, OUTLINE_BASE_WIDTH) {
+                const innerRadius = DISC_RADIUS + OUTLINE_BASE_WIDTH * 0.5;
+                const outerRadius = DISC_RADIUS + OUTLINE_BASE_WIDTH * 15;
+                const arcSegments = 550;
+                const arcAngle = Math.PI * 2.0;
+
+                const arcGeometry = new THREE.BufferGeometry();
+                const vertices = [];
+                const indices = [];
+                const alphas = [];
+
+                for (let i = 0; i <= arcSegments; i++) {
+                    const t = i / arcSegments;
+                    const angle = t * arcAngle;
+                    
+                    vertices.push(
+                        Math.cos(angle) * innerRadius,
+                        Math.sin(angle) * innerRadius,
+                        0
+                    );
+                    alphas.push(0);
+                    
+                    vertices.push(
+                        Math.cos(angle) * outerRadius,
+                        Math.sin(angle) * outerRadius,
+                        0
+                    );
+                    alphas.push(0);
+                }
+
+                for (let i = 0; i < arcSegments; i++) {
+                    const base = i * 2;
+                    indices.push(base, base + 1, base + 2);
+                    indices.push(base + 1, base + 3, base + 2);
+                }
+
+                arcGeometry.setIndex(indices);
+                arcGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                this.alphaAttribute = new THREE.Float32BufferAttribute(alphas, 1);
+                arcGeometry.setAttribute('alpha', this.alphaAttribute);
+
+                this.arcMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        color: { value: new THREE.Color(0x3d85c6) },
+                        globalAlpha: { value: 0.0 }
+                    },
+                    vertexShader: `
+                        attribute float alpha;
+                        varying float vAlpha;
+                        void main() {
+                            vAlpha = alpha;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 color;
+                        uniform float globalAlpha;
+                        varying float vAlpha;
+                        void main() {
+                            gl_FragColor = vec4(color, vAlpha * globalAlpha);
+                        }
+                    `,
+                    transparent: true,
+                    side: THREE.DoubleSide
+                });
+
+                this.arc = new THREE.Mesh(arcGeometry, this.arcMaterial);
+                this.arc.rotation.x = -Math.PI / 2;
+                this.arc.position.y = 0.05;
+                this.scene.add(this.arc);
+            }
+
+            render(gl, matrix) {
+                // Обновляем позицию и анимацию
+                this.updateAnimation();
+                
+                // Преобразуем матрицу Mapbox в Three.js
+                this.camera.projectionMatrix = new THREE.Matrix4().fromArray(matrix);
+                
+                // Рендерим сцену
+                this.renderer.state.reset();
+                this.renderer.render(this.scene, this.camera);
+                
+                // Запрашиваем перерисовку для плавной анимации
+                this.map.triggerRepaint();
+            }
+
+            updateAnimation() {
+                // === АНИМАЦИЯ ДВИЖЕНИЯ ===
+                if (this.isMoving) {
+                    this.progress += this.animationSpeed * this.direction;
+                    
+                    const newSegment = Math.floor(this.progress * (this.lineCoordinates.length - 1));
+                    
+                    if (newSegment !== this.currentSegment) {
+                        this.currentSegment = newSegment;
+                        if (this.currentSegment > 0 && this.currentSegment < this.lineCoordinates.length - 1) {
+                            this.isMoving = false;
+                            setTimeout(() => { this.isMoving = true; }, 2000);
+                        }
+                    }
+
+                    if (this.progress >= 1 && this.direction === 1) {
+                        this.progress = 0.99;
+                        this.isMoving = false;
+                        setTimeout(() => {
+                            this.direction = -1;
+                            this.isMoving = true;
+                        }, 2000);
+                    }
+                    
+                    if (this.progress <= 0 && this.direction === -1) {
+                        this.progress = 0.01;
+                        this.isMoving = false;
+                        setTimeout(() => {
+                            this.direction = 1;
+                            this.isMoving = true;
+                        }, 2000);
+                    }
+                    
+                    this.progress = Math.max(0, Math.min(1, this.progress));
+                    
+                    // Интерполяция координат
+                    const segmentIndex = Math.floor(this.progress * (this.lineCoordinates.length - 1));
+                    const segmentProgress = (this.progress * (this.lineCoordinates.length - 1)) - segmentIndex;
+                    
+                    const startCoord = this.lineCoordinates[segmentIndex];
+                    const endCoord = this.lineCoordinates[segmentIndex + 1];
+                    
+                    const currentLng = startCoord[0] + (endCoord[0] - startCoord[0]) * segmentProgress;
+                    const currentLat = startCoord[1] + (endCoord[1] - startCoord[1]) * segmentProgress;
+                    
+                    // Интерполяция высоты
+                    const startElevation = this.elevations[segmentIndex];
+                    const endElevation = this.elevations[segmentIndex + 1];
+                    const currentElevation = startElevation + (endElevation - startElevation) * segmentProgress;
+                    
+                    // Преобразуем в мировые координаты Three.js
+                    const mercator = mapboxgl.MercatorCoordinate.fromLngLat(
+                        [currentLng, currentLat], 
+                        currentElevation
+                    );
+                    
+                    const scale = mercator.meterInMercatorCoordinateUnits();
+                    this.scene.position.set(mercator.x, mercator.y, mercator.z);
+                    this.scene.scale.set(scale, -scale, scale); // Y инвертирован
+                }
+
+                // === АНИМАЦИЯ РАДАРА ===
+                const currentTime = (performance.now() - this.startTime) / 1000;
+                const DISC_RADIUS = 5;
+                const OUTLINE_BASE_WIDTH = DISC_RADIUS * 0.25;
+
+                // Вращение дуги
+                const t = (currentTime % this.arcDuration) / this.arcDuration;
+                this.arc.rotation.z = -t * Math.PI * 2;
+
+                // Градиент прозрачности дуги
+                const alphaArray = this.alphaAttribute.array;
+                for (let i = 0; i <= 550; i++) {
+                    const segmentT = i / 550;
+                    const alphaValue = 0.6 * (1.0 - Math.pow(segmentT, 0.2));
+                    const baseIndex = i * 2;
+                    alphaArray[baseIndex] = alphaValue;
+                    alphaArray[baseIndex + 1] = alphaValue;
+                }
+                this.alphaAttribute.needsUpdate = true;
+
+                // Появление/исчезание дуги
+                let globalAlpha = 0.0;
+                if (t < 0.08) {
+                    globalAlpha = t / 0.08;
+                } else if (t < 0.65) {
+                    globalAlpha = 1.0;
+                } else if (t < 0.88) {
+                    globalAlpha = 1.0 - ((t - 0.65) / 0.23);
+                }
+                this.arcMaterial.uniforms.globalAlpha.value = globalAlpha;
+
+                // Пульсация обводки
+                const pulseDuration = 0.7 / 1.5;
+                const pulseT = (currentTime % pulseDuration) / pulseDuration;
+                const pulseFactor = Math.abs(Math.sin(Math.PI * pulseT));
+                const currentWidth = OUTLINE_BASE_WIDTH * (1 + pulseFactor * 0.5);
+
+                this.outline.geometry.dispose();
+                this.outline.geometry = new THREE.RingGeometry(
+                    DISC_RADIUS,
+                    DISC_RADIUS + currentWidth,
+                    64
+                );
+            }
+        }
+
+        map.on('style.load', () => {
+            map.addSource('mapbox-dem', {
+                'type': 'raster-dem',
+                'url': 'https://sos.emiia.ai/3d/3d_tiles.json ',
+                'tileSize': 512,
+                'maxzoom': 24
+            });
+
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
+
+            // Координаты линии
+            const lineCoordinates = [
+                [37.630507, 55.833692],
+                [37.630877, 55.834026], 
+                [37.631323, 55.834250],
+                [37.631735, 55.834216]
+            ];
+
+            // ЛИНИЯ ТРАЕКТОРИИ
+            map.addSource('elevated-line', {
+                'type': 'geojson',
+                'lineMetrics': true,
+                'data': {
+                    'type': 'Feature',
+                    'properties': {'elevation': [15, 25, 30, 35]},
+                    'geometry': {
+                        'coordinates': lineCoordinates,
+                        'type': 'LineString'
+                    }
+                }
+            });
+
+            map.addLayer({
+                'id': 'elevated-line',
+                'type': 'line',
+                'source': 'elevated-line',
+                'layout': {
+                    'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, 15, 1, 35],
+                    'line-elevation-reference': 'sea'
+                },
+                'paint': {
+                    'line-emissive-strength': 1.0,
+                    'line-width': 4.0,
+                    'line-color': '#3d85c6'
+                }
+            });
+
+            // ДОБАВЛЯЕМ КАСТОМНЫЙ СЛОЙ С РАДАРОМ
+            const radarLayer = new ThreeJSRadarLayer('radar-point', lineCoordinates);
+            map.addLayer(radarLayer);
+
+            console.log('Радарная точка движется по линии с остановками!');
+            console.log('Управление: через консоль - map.getLayer("radar-point").implementation');
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+    map.once('style.load', () => {
+        map.setConfigProperty('basemap', 'showPointOfInterestLabels', false);
+        map.setConfigProperty('basemap', 'showPlaceLabels', false);
+        map.setConfigProperty('basemap', 'showRoadLabels', false);
+        map.setConfigProperty('basemap', 'showTransitLabels', false);
+    });
+
+    map.once('load', () => {
+        map.loadImage(
+            'https://docs.mapbox.com/mapbox-gl-js/assets/cat.png ',
+            (error, image) => {
+                map.addImage('cat', image);
+                map.addSource('buildings', {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: [
+                            {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Point',
+                                    coordinates: [
+                                        37.630507, 55.833692
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                });
+                map.addLayer({
+                    id: 'cat-on-building',
+                    source: 'buildings',
+                    slot: 'top',
+                    type: 'symbol',
+                    'layout': {
+                        'icon-image': 'cat',
+                        'icon-size': 0.1,
+                        'symbol-placement': 'point',
+                        'symbol-z-elevate': true
+                    }
+                });
+            }
+        );
+    });
+</script>
+
+</body>
+</html>
+
