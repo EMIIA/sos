@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>3D Точка по линии</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+        }
+        #map { 
+            position: absolute; 
+            top: 0; 
+            bottom: 0; 
+            width: 100%; 
+            background: #f8f9fa; 
+        }
+    </style>
+    <script src="https://sos.emiia.ai/mapbox-gl.js"></script>
+    <link href="https://sos.emiia.ai/mapbox-gl.css" rel="stylesheet">
+</head>
+<body>
+<div id="map"></div>
+<script>
+mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
+
+// Простая предзагрузка модели
+const modelUrl = 'https://sos.emiia.ai/circle_2_glb.glb';
+console.log('Начинаем предзагрузку модели...');
+
+function preloadModel(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => {
+            console.log('Модель предзагружена через Image:', url);
+            resolve();
+        };
+        img.onerror = () => {
+            console.warn('Не удалось предзагрузить модель через Image:', url);
+            resolve(); // Все равно разрешаем, чтобы не блокировать
+        };
+    });
+}
+
+// Запускаем предзагрузку
+preloadModel(modelUrl);
+
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'https://sos.emiia.ai/wifi/tiles_emiia.json',
+    minZoom: 17,
+    center: [37.630507, 55.833692],
+    zoom: 18,
+    pitch: 60,
+    bearing: 30,
+    antialias: true
+});
+
+// Переменные для фиксации состояния синей точки
+let bluePointFixed = false;
+let bluePointLastState = {
+    position: null,
+    elevation: null,
+    opacity: null,
+    scale: null
+};
+
+map.on('style.load', () => {
+    console.log('Стиль карты загружен, добавляем terrain...');
+    
+    map.addSource('mapbox-dem', {
+        'type': 'raster-dem',
+        'url': 'https://sos.emiia.ai/3d/3d_tiles.json',
+        'tileSize': 512,
+        'maxzoom': 24
+    });
+    map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
+
+    // ОДИНАКОВЫЕ КООРДИНАТЫ ДЛЯ ВСЕХ ТОЧЕК
+    const lineCoordinates = [
+        [37.630507, 55.833692],
+        [37.630877, 55.834026],
+        [37.631323, 55.834250],
+        [37.631735, 55.834216]
+    ];
+
+    // РАЗНЫЕ ВЫСОТЫ ДЛЯ ТРЕХ ТОЧЕК
+    const elevations1 = [15, 25, 30, 35]; // Синяя точка - САМАЯ ВЫСОКАЯ
+    const elevations2 = [14.98, 24.98, 29.98, 34.98]; // Светло-серая - ПОСЕРЕДИНЕ
+    const elevations3 = [14.9, 24.9, 29.9, 34.9]; // Синяя волна - САМАЯ НИЗКАЯ
+
+    // НАСТРОЙКИ ДЛЯ ТРЕХ ОБЪЕКТОВ С ДОПОЛНИТЕЛЬНЫМИ СМЕЩЕНИЯМИ
+    const objectSettings = {
+        object1: {
+            pointColor: '#6fa8dc',
+            lineColor: '#3d85c6',
+            size: 140,
+            visible: true,
+            animationSpeed: 0.0007,
+            coordinates: lineCoordinates,
+            elevations: elevations1,
+            modelUri: modelUrl,
+            baseOpacity: 1.0,
+            fadeOpacity: 1.0,
+            verticalOffset: 0.02,
+            layerId: 'object-layer-1'
+        },
+        object2: {
+            pointColor: '#f6f6f6',
+            lineColor: '#d3d3d3',
+            baseSize: 190,
+            visible: true,
+            animationSpeed: 0.0007,
+            coordinates: lineCoordinates,
+            elevations: elevations2,
+            modelUri: modelUrl,
+            baseOpacity: 1.0,
+            fadeOpacity: 1,
+            pulseMin: 0.92,
+            pulseMax: 1.08,
+            verticalOffset: 0.01,
+            layerId: 'object-layer-2'
+        },
+        object3: {
+            pointColor: '#3d85c6',
+            lineColor: '#3d85c6',
+            baseSize: 180,
+            visible: true,
+            animationSpeed: 0.0007,
+            coordinates: lineCoordinates,
+            elevations: elevations3,
+            modelUri: modelUrl,
+            baseOpacity: 0.6,
+            fadeOpacity: 0.0,
+            verticalOffset: 0.00,
+            layerId: 'object-layer-3'
+        }
+    };
+
+    // НАСТРОЙКИ КОМПЕНСАЦИИ ЗУМА
+    const zoomSettings = {
+        baseZoom: 20,
+        minZoom: 15,
+        maxZoom: 22
+    };
+
+    // СОЗДАЕМ ЛИНИИ ТРАЕКТОРИЙ ДЛЯ КАЖДОЙ ТОЧКИ
+    console.log('Добавляем линии траекторий...');
+    
+    map.addSource('elevated-line-1', {
+        'type': 'geojson',
+        'lineMetrics': true,
+        'data': createLineData(lineCoordinates, elevations1)
+    });
+
+    map.addSource('elevated-line-2', {
+        'type': 'geojson',
+        'lineMetrics': true,
+        'data': createLineData(lineCoordinates, elevations2)
+    });
+
+    map.addSource('elevated-line-3', {
+        'type': 'geojson',
+        'lineMetrics': true,
+        'data': createLineData(lineCoordinates, elevations3)
+    });
+
+    map.addLayer({
+        'id': 'elevated-line-1',
+        'type': 'line',
+        'source': 'elevated-line-1',
+        'layout': {
+            'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, elevations1[0], 1, elevations1[elevations1.length-1]],
+            'line-elevation-reference': 'sea'
+        },
+        'paint': {
+            'line-emissive-strength': 1.0,
+            'line-width': 4.0,
+            'line-color': objectSettings.object1.lineColor
+        }
+    });
+
+    map.addLayer({
+        'id': 'elevated-line-2',
+        'type': 'line',
+        'source': 'elevated-line-2',
+        'layout': {
+            'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, elevations2[0], 1, elevations2[elevations2.length-1]],
+            'line-elevation-reference': 'sea'
+        },
+        'paint': {
+            'line-emissive-strength': 1.0,
+            'line-width': 4.0,
+            'line-color': objectSettings.object2.lineColor
+        }
+    });
+
+    map.addLayer({
+        'id': 'elevated-line-3',
+        'type': 'line',
+        'source': 'elevated-line-3',
+        'layout': {
+            'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, elevations3[0], 1, elevations3[elevations3.length-1]],
+            'line-elevation-reference': 'sea'
+        },
+        'paint': {
+            'line-emissive-strength': 1.0,
+            'line-width': 4.0,
+            'line-color': objectSettings.object3.lineColor
+        }
+    });
+
+    // СОЗДАЕМ ИСТОЧНИКИ ДЛЯ ТРЕХ ОБЪЕКТОВ
+    console.log('Создаем источники для объектов...');
+    
+    const objectSource1 = createObjectSource(lineCoordinates[0], objectSettings.object1.modelUri);
+    const objectSource2 = createObjectSource(lineCoordinates[0], objectSettings.object2.modelUri);
+    const objectSource3 = createObjectSource(lineCoordinates[0], objectSettings.object3.modelUri);
+
+    map.addSource('object-model-1', objectSource1);
+    map.addSource('object-model-2', objectSource2);
+    map.addSource('object-model-3', objectSource3);
+
+    // ДОБАВЛЯЕМ СЛОИ ДЛЯ ОБЪЕКТОВ С ФИКСИРОВАННЫМ РАЗМЕРОМ
+    console.log('Добавляем слои объектов...');
+    
+    addObjectLayer('object-1', 'object-model-1', objectSettings.object1);
+    addObjectLayer('object-2', 'object-model-2', objectSettings.object2);
+    addObjectLayer('object-3', 'object-model-3', objectSettings.object3);
+
+    // СИСТЕМА УПРАВЛЕНИЯ РАЗМЕРОМ ПРИ ЗУМЕ
+    let currentBaseSize = 1.0;
+    let currentWaveScale = 1.0;
+    let currentWaveOpacity = 0.6;
+    let currentMiddleScale = 1.0;
+    let currentMiddleOpacity = 1.0;
+
+    function updateModelScaleForZoom() {
+        const zoom = map.getZoom();
+        
+        if (zoom <= zoomSettings.minZoom) {
+            currentBaseSize = 1.0;
+        } else if (zoom >= zoomSettings.maxZoom) {
+            currentBaseSize = 0.3;
+        } else {
+            const normalizedZoom = (zoom - zoomSettings.minZoom) / (zoomSettings.maxZoom - zoomSettings.minZoom);
+            currentBaseSize = 1.0 - (normalizedZoom * 0.7);
+        }
+
+        updateAllBaseSizes();
+    }
+
+    function updateAllBaseSizes() {
+        // Функция для безопасной установки свойств синей точки
+        function safelySetBluePointProperties() {
+            try {
+                if (objectSettings.object1.visible && map.getLayer('object-layer-1')) {
+                    const finalSize = objectSettings.object1.size * currentBaseSize;
+                    
+                    // Сохраняем текущее состояние
+                    bluePointLastState.scale = finalSize;
+                    
+                    map.setPaintProperty('object-layer-1', 'model-scale', [finalSize, finalSize, finalSize]);
+                    return true;
+                }
+            } catch (error) {
+                console.warn('Ошибка при установке свойств синей точки:', error);
+            }
+            return false;
+        }
+
+        // Пытаемся установить свойства синей точки
+        if (!safelySetBluePointProperties()) {
+            // Если не удалось, пробуем через setTimeout
+            setTimeout(safelySetBluePointProperties, 100);
+        }
+
+        if (objectSettings.object2.visible) {
+            const baseSize = objectSettings.object2.baseSize * currentBaseSize;
+            const animatedSize = baseSize * currentMiddleScale;
+            map.setPaintProperty('object-layer-2', 'model-scale', [animatedSize, animatedSize, animatedSize]);
+            map.setPaintProperty('object-layer-2', 'model-opacity', currentMiddleOpacity);
+        }
+
+        if (objectSettings.object3.visible) {
+            const baseSize = objectSettings.object3.baseSize * currentBaseSize;
+            const animatedSize = baseSize * currentWaveScale;
+            map.setPaintProperty('object-layer-3', 'model-scale', [animatedSize, animatedSize, animatedSize]);
+            map.setPaintProperty('object-layer-3', 'model-opacity', currentWaveOpacity);
+        }
+    }
+
+    // ПУЛЬСАЦИЯ ДЛЯ ВТОРОЙ И ТРЕТЬЕЙ ТОЧЕК
+    class ExpandAndFadePulse {
+        constructor() {
+            this.startTime = performance.now();
+            this.cycleDuration = 1500;
+            this.totalCycle = 1800;
+        }
+
+        getCurrentState(settings) {
+            const currentTime = performance.now();
+            const elapsed = currentTime - this.startTime;
+            const cycleProgress = (elapsed % this.totalCycle) / this.totalCycle;
+
+            let opacity, scale;
+
+            if (cycleProgress < (this.cycleDuration / this.totalCycle)) {
+                const animProgress = cycleProgress / (this.cycleDuration / this.totalCycle);
+
+                if (settings === objectSettings.object3) {
+                    scale = 1 + (animProgress * 2.0);
+                    opacity = Math.max(0.1, settings.baseOpacity * (1 - animProgress * 0.9));
+                } else if (settings === objectSettings.object2) {
+                    const pulseRange = settings.pulseMax - settings.pulseMin;
+                    scale = settings.pulseMin + (Math.sin(animProgress * Math.PI * 3) * pulseRange * 0.5);
+                    opacity = settings.baseOpacity;
+                }
+            } else {
+                scale = 1;
+                opacity = settings === objectSettings.object3 ? 0.1 : settings.baseOpacity;
+            }
+
+            return { opacity, scale };
+        }
+    }
+
+    const pulseAnimator = new ExpandAndFadePulse();
+
+    function animatePulse() {
+        // Первая точка (САМАЯ ВЫСОКАЯ) - всегда статична
+        if (objectSettings.object1.visible) {
+            try {
+                // Проверяем, фиксирована ли уже точка
+                if (!bluePointFixed) {
+                    map.setPaintProperty('object-layer-1', 'model-opacity', objectSettings.object1.baseOpacity);
+                    bluePointFixed = true;
+                    console.log('Синяя точка зафиксирована');
+                }
+            } catch (error) {
+                console.warn('Ошибка при установке opacity синей точки:', error);
+                bluePointFixed = false;
+            }
+        }
+
+        // Вторая точка (ПОСЕРЕДИНЕ) - легкая пульсация
+        if (objectSettings.object2.visible) {
+            const state = pulseAnimator.getCurrentState(objectSettings.object2);
+            currentMiddleScale = state.scale;
+            currentMiddleOpacity = state.opacity;
+
+            const baseSize = objectSettings.object2.baseSize * currentBaseSize;
+            const animatedSize = baseSize * currentMiddleScale;
+
+            map.setPaintProperty('object-layer-2', 'model-opacity', currentMiddleOpacity);
+            map.setPaintProperty('object-layer-2', 'model-scale', [animatedSize, animatedSize, animatedSize]);
+        }
+
+        // Третья точка (САМАЯ НИЗКАЯ) - расширяется и исчезает
+        if (objectSettings.object3.visible) {
+            const state = pulseAnimator.getCurrentState(objectSettings.object3);
+            currentWaveScale = state.scale;
+            currentWaveOpacity = state.opacity;
+
+            const baseSize = objectSettings.object3.baseSize * currentBaseSize;
+            const animatedSize = baseSize * currentWaveScale;
+
+            map.setPaintProperty('object-layer-3', 'model-opacity', currentWaveOpacity);
+            map.setPaintProperty('object-layer-3', 'model-scale', [animatedSize, animatedSize, animatedSize]);
+        }
+
+        requestAnimationFrame(animatePulse);
+    }
+
+    // АНИМАЦИЯ ДВИЖЕНИЯ С ВОЗВРАТОМ И ОСТАНОВКАМИ
+    let progress = 0;
+    let direction = 1;
+    let isMoving = true;
+    let currentSegment = 0;
+    let lastTimestamp = 0;
+
+    function animateObjects(timestamp) {
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const deltaTime = timestamp - lastTimestamp;
+        lastTimestamp = timestamp;
+
+        if (isMoving) {
+            const speedFactor = Math.min(deltaTime / 16, 2);
+            progress += objectSettings.object1.animationSpeed * direction * speedFactor;
+
+            // Определяем текущий сегмент
+            const newSegment = Math.floor(progress * (lineCoordinates.length - 1));
+
+            // Если перешли на новый сегмент - проверяем остановку
+            if (newSegment !== currentSegment) {
+                currentSegment = newSegment;
+
+                // Останавливаемся на промежуточных точках (кроме начальной и конечной)
+                if (currentSegment > 0 && currentSegment < lineCoordinates.length - 1) {
+                    isMoving = false;
+                    setTimeout(() => {
+                        isMoving = true;
+                    }, 2000);
+                }
+            }
+
+            // Если достигли конца пути вперед - меняем направление
+            if (progress >= 1 && direction === 1) {
+                progress = 0.999;
+                isMoving = false;
+                setTimeout(() => {
+                    direction = -1;
+                    isMoving = true;
+                }, 2000);
+            }
+
+            // Если достигли начала пути назад - меняем направление
+            if (progress <= 0 && direction === -1) {
+                progress = 0.001;
+                isMoving = false;
+                setTimeout(() => {
+                    direction = 1;
+                    isMoving = true;
+                }, 2000);
+            }
+
+            // Ограничиваем прогресс
+            progress = Math.max(0, Math.min(1, progress));
+
+            // Все точки движутся вместе по одним координатам
+            const segmentIndex = Math.min(Math.floor(progress * (lineCoordinates.length - 1)), lineCoordinates.length - 2);
+            const segmentProgress = (progress * (lineCoordinates.length - 1)) - segmentIndex;
+
+            const startCoord = lineCoordinates[segmentIndex];
+            const endCoord = lineCoordinates[segmentIndex + 1];
+
+            const currentLng = startCoord[0] + (endCoord[0] - startCoord[0]) * segmentProgress;
+            const currentLat = startCoord[1] + (endCoord[1] - startCoord[1]) * segmentProgress;
+
+            // Обновляем позиции всех точек с учетом вертикальных смещений
+            // Синяя точка (object1) - с дополнительной проверкой
+            if (objectSettings.object1.visible) {
+                try {
+                    const startElevation = elevations1[segmentIndex];
+                    const endElevation = elevations1[segmentIndex + 1];
+                    const currentElevation = startElevation + (endElevation - startElevation) * segmentProgress;
+
+                    objectSource1.data.geometry.coordinates = [currentLng, currentLat];
+                    map.getSource('object-model-1').setData(objectSource1.data);
+                    
+                    // Сохраняем позицию для восстановления
+                    bluePointLastState.position = [currentLng, currentLat];
+                    bluePointLastState.elevation = currentElevation;
+                    
+                    map.setPaintProperty('object-layer-1', 'model-translation', [0, 0, currentElevation + (objectSettings.object1.verticalOffset || 0)]);
+                } catch (error) {
+                    console.warn('Ошибка при обновлении позиции синей точки:', error);
+                    
+                    // Пробуем восстановить позицию из сохраненного состояния
+                    if (bluePointLastState.position) {
+                        setTimeout(() => {
+                            try {
+                                objectSource1.data.geometry.coordinates = bluePointLastState.position;
+                                map.getSource('object-model-1').setData(objectSource1.data);
+                                if (bluePointLastState.elevation) {
+                                    map.setPaintProperty('object-layer-1', 'model-translation', [0, 0, bluePointLastState.elevation + (objectSettings.object1.verticalOffset || 0)]);
+                                }
+                            } catch (e) {
+                                console.warn('Не удалось восстановить позицию синей точки:', e);
+                            }
+                        }, 100);
+                    }
+                }
+            }
+
+            // Остальные точки
+            if (objectSettings.object2.visible) {
+                const startElevation = elevations2[segmentIndex];
+                const endElevation = elevations2[segmentIndex + 1];
+                const currentElevation = startElevation + (endElevation - startElevation) * segmentProgress;
+
+                objectSource2.data.geometry.coordinates = [currentLng, currentLat];
+                map.getSource('object-model-2').setData(objectSource2.data);
+                map.setPaintProperty('object-layer-2', 'model-translation', [0, 0, currentElevation + (objectSettings.object2.verticalOffset || 0)]);
+            }
+
+            if (objectSettings.object3.visible) {
+                const startElevation = elevations3[segmentIndex];
+                const endElevation = elevations3[segmentIndex + 1];
+                const currentElevation = startElevation + (endElevation - startElevation) * segmentProgress;
+
+                objectSource3.data.geometry.coordinates = [currentLng, currentLat];
+                map.getSource('object-model-3').setData(objectSource3.data);
+                map.setPaintProperty('object-layer-3', 'model-translation', [0, 0, currentElevation + (objectSettings.object3.verticalOffset || 0)]);
+            }
+        }
+
+        requestAnimationFrame(animateObjects);
+    }
+
+    // Функция восстановления синей точки
+    function restoreBluePoint() {
+        if (!bluePointLastState.position) return;
+        
+        try {
+            console.log('Восстанавливаем синюю точку...');
+            
+            // Восстанавливаем источник
+            objectSource1.data.geometry.coordinates = bluePointLastState.position;
+            map.getSource('object-model-1').setData(objectSource1.data);
+            
+            // Восстанавливаем позицию
+            if (bluePointLastState.elevation) {
+                map.setPaintProperty('object-layer-1', 'model-translation', 
+                    [0, 0, bluePointLastState.elevation + (objectSettings.object1.verticalOffset || 0)]);
+            }
+            
+            // Восстанавливаем масштаб
+            if (bluePointLastState.scale) {
+                map.setPaintProperty('object-layer-1', 'model-scale', 
+                    [bluePointLastState.scale, bluePointLastState.scale, bluePointLastState.scale]);
+            }
+            
+            // Восстанавливаем прозрачность
+            map.setPaintProperty('object-layer-1', 'model-opacity', objectSettings.object1.baseOpacity);
+            
+            bluePointFixed = true;
+            console.log('Синяя точка восстановлена');
+        } catch (error) {
+            console.warn('Ошибка при восстановлении синей точки:', error);
+        }
+    }
+
+    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    function createLineData(coordinates, elevations) {
+        return {
+            'type': 'Feature',
+            'properties': { 'elevation': elevations },
+            'geometry': { 'coordinates': coordinates, 'type': 'LineString' }
+        };
+    }
+
+    function createObjectSource(coord, modelUri) {
+        return {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'properties': { 'model-uri': modelUri },
+                'geometry': { 'coordinates': coord, 'type': 'Point' }
+            }
+        };
+    }
+
+    function addObjectLayer(layerId, sourceId, settings) {
+        const baseSize = settings.baseSize || settings.size;
+
+        map.addLayer({
+            'id': `object-layer-${layerId.slice(-1)}`,
+            'type': 'model',
+            'slot': 'middle',
+            'source': sourceId,
+            'minzoom': 10,
+            'maxzoom': 24,
+            'layout': {
+                'model-id': ['get', 'model-uri'],
+                'visibility': settings.visible ? 'visible' : 'none'
+            },
+            'paint': {
+                'model-opacity': settings.baseOpacity || 1.0,
+                'model-rotation': [0, 0, 0],
+                'model-scale': [baseSize, baseSize, baseSize],
+                'model-color': settings.pointColor,
+                'model-color-mix-intensity': 0.8,
+                'model-cast-shadows': false,
+                'model-translation': [0, 0, settings.elevations[0] + (settings.verticalOffset || 0)],
+                'model-emissive-strength': 1.0,
+                'model-scale-mode': 'map'
+            }
+        });
+        
+        console.log(`Слой object-layer-${layerId.slice(-1)} добавлен`);
+    }
+
+    // СЛУШАЕМ ИЗМЕНЕНИЯ ЗУМА
+    let zoomTimeout;
+    map.on('zoom', () => {
+        clearTimeout(zoomTimeout);
+        zoomTimeout = setTimeout(() => {
+            updateModelScaleForZoom();
+        }, 100);
+    });
+
+    // Слушаем события рендеринга для восстановления точки
+    map.on('render', () => {
+        // Периодически проверяем состояние синей точки
+        if (objectSettings.object1.visible && !bluePointFixed) {
+            setTimeout(() => {
+                try {
+                    if (map.getLayer('object-layer-1')) {
+                        restoreBluePoint();
+                    }
+                } catch (error) {
+                    // Игнорируем ошибки при проверке
+                }
+            }, 100);
+        }
+    });
+
+    // ФУНКЦИИ ДЛЯ УПРАВЛЕНИЯ
+    window.toggleMovement = function() {
+        isMoving = !isMoving;
+        console.log('Движение:', isMoving ? 'ВКЛ' : 'ВЫКЛ');
+    };
+
+    window.resetAnimation = function() {
+        progress = 0;
+        direction = 1;
+        isMoving = true;
+        currentSegment = 0;
+        lastTimestamp = 0;
+        console.log('Анимация сброшена в начальное положение');
+    };
+
+    window.fixBluePoint = function() {
+        restoreBluePoint();
+    };
+
+    // ЗАПУСК АНИМАЦИЙ
+    map.once('idle', () => {
+        console.log('Карта полностью загружена (idle)');
+        
+        // Даем дополнительное время на загрузку моделей
+        setTimeout(() => {
+            console.log('Запускаем анимации через 2 секунды...');
+            
+            // Инициализируем сохраненное состояние синей точки
+            bluePointLastState.position = lineCoordinates[0];
+            bluePointLastState.elevation = elevations1[0];
+            bluePointLastState.scale = objectSettings.object1.size * currentBaseSize;
+            
+            lastTimestamp = performance.now();
+            requestAnimationFrame(animateObjects);
+            requestAnimationFrame(animatePulse);
+            updateModelScaleForZoom();
+            
+            console.log('Анимации запущены!');
+            
+            // Плановое восстановление синей точки через 5 секунд
+            setTimeout(restoreBluePoint, 5000);
+            
+            // Проверяем состояние через 3 секунды
+            setTimeout(() => {
+                console.log('Проверка состояния через 3 секунды:');
+                console.log('- Слой 1:', map.getLayer('object-layer-1') ? 'OK' : 'ОТСУТСТВУЕТ');
+                console.log('- Слой 2:', map.getLayer('object-layer-2') ? 'OK' : 'ОТСУТСТВУЕТ');
+                console.log('- Слой 3:', map.getLayer('object-layer-3') ? 'OK' : 'ОТСУТСТВУЕТ');
+                console.log('- Синяя точка зафиксирована:', bluePointFixed);
+            }, 3000);
+        }, 2000);
+    });
+
+    console.log('Три точки идут вместе с возвратом и остановками!');
+    console.log('Остановки по 2 секунды на всех промежуточных точках');
+    console.log('СИНЯЯ (сверху), СЕРАЯ (посередине), ВОЛНА (снизу)');
+    console.log('Управление: toggleMovement(), resetAnimation(), fixBluePoint()');
+    console.log('ФИКСИРОВАННЫЙ РАЗМЕР: точки не увеличиваются при приближении камеры');
+});
+</script>
+</body>
+</html>
