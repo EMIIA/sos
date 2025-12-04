@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диск с радарной дугой и пульсирующей обводкой</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+
+    <script>
+        // === ФИКСИРОВАННЫЕ ПАРАМЕТРЫ ===
+        const DISC_RADIUS = 5;
+        const OUTLINE_BASE_WIDTH = DISC_RADIUS * 0.25;
+        
+        // === СЦЕНА (БЕЛЫЙ ФОН) ===
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 200);
+        camera.position.set(0, 10, 30);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.minDistance = 8;
+        controls.maxDistance = 80;
+        
+        // === ОСВЕЩЕНИЕ ===
+        const light = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(light);
+        
+        // === ДУГА С ПЛАВНЫМ ГРАДИЕНТОМ ===
+        const innerRadius = DISC_RADIUS + OUTLINE_BASE_WIDTH * 0.5;
+        const outerRadius = DISC_RADIUS + OUTLINE_BASE_WIDTH * 15; // В 3 РАЗА ШИРЕ (было 5, стало 15)
+        const arcSegments = 128; // Больше сегментов для плавности широкой дуги
+        
+        // Создаем буферную геометрию
+        const arcGeometry = new THREE.BufferGeometry();
+        
+        // Атрибуты
+        const vertices = [];
+        const indices = [];
+        const alphas = [];
+        
+        // Длина дуги - 120 градусов
+        const arcAngle = Math.PI * 2 * (120 / 360);
+        
+        // Создаем вершины для ОЧЕНЬ ШИРОКОЙ дуги
+        for (let i = 0; i <= arcSegments; i++) {
+            const t = i / arcSegments;
+            const angle = t * arcAngle;
+            
+            // Внутренняя вершина
+            vertices.push(
+                Math.cos(angle) * innerRadius,
+                Math.sin(angle) * innerRadius,
+                0
+            );
+            alphas.push(0.8); // Начальная прозрачность 80%
+            
+            // Внешняя вершина
+            vertices.push(
+                Math.cos(angle) * outerRadius,
+                Math.sin(angle) * outerRadius,
+                0
+            );
+            alphas.push(0.8); // Начальная прозрачность 80%
+        }
+        
+        // Создаем индексы
+        for (let i = 0; i < arcSegments; i++) {
+            const base = i * 2;
+            indices.push(base, base + 1, base + 2);
+            indices.push(base + 1, base + 3, base + 2);
+        }
+        
+        // Устанавливаем атрибуты
+        arcGeometry.setIndex(indices);
+        arcGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        const alphaAttribute = new THREE.Float32BufferAttribute(alphas, 1);
+        arcGeometry.setAttribute('alpha', alphaAttribute);
+        
+        // Шейдерный материал
+        const arcMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                color: { value: new THREE.Color(0x3d85c6) },
+                globalAlpha: { value: 1.0 }
+            },
+            vertexShader: `
+                attribute float alpha;
+                varying float vAlpha;
+                
+                void main() {
+                    vAlpha = alpha;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 color;
+                uniform float globalAlpha;
+                varying float vAlpha;
+                
+                void main() {
+                    gl_FragColor = vec4(color, vAlpha * globalAlpha);
+                }
+            `,
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+        
+        const arc = new THREE.Mesh(arcGeometry, arcMaterial);
+        arc.rotation.x = -Math.PI / 2;
+        arc.position.y = 0.05;
+        scene.add(arc);
+        
+        // === ДИСК ===
+        const disc = new THREE.Mesh(
+            new THREE.CircleGeometry(DISC_RADIUS, 64),
+            new THREE.MeshBasicMaterial({ 
+                color: 0x3d85c6,
+                side: THREE.DoubleSide
+            })
+        );
+        disc.rotation.x = -Math.PI / 2;
+        disc.position.y = 0;
+        scene.add(disc);
+        
+        // === ОБВОДКА ===
+        const outlineMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xF8F9FA,
+            transparent: true, 
+            opacity: 0.9,
+            side: THREE.DoubleSide
+        });
+        
+        const outline = new THREE.Mesh(
+            new THREE.RingGeometry(DISC_RADIUS, DISC_RADIUS + OUTLINE_BASE_WIDTH, 64),
+            outlineMaterial
+        );
+        outline.rotation.x = -Math.PI / 2;
+        outline.position.y = 0.1;
+        scene.add(outline);
+        
+        // === АНИМАЦИЯ ===
+        let startTime = Date.now();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const currentTime = (Date.now() - startTime) / 1000;
+            
+            // 1. АНИМАЦИЯ ДУГИ - ПОЛНЫЙ КРУГ (100% ПУТИ)
+            const arcDuration = 3.0; // Чуть медленнее для широкой дуги
+            const t = (currentTime % arcDuration) / arcDuration;
+            
+            // Вращение дуги на 100% пути
+            arc.rotation.z = -t * Math.PI * 2; // Полный круг по часовой стрелке
+            
+            // ГРАДИЕНТ ПРОЗРАЧНОСТИ ВНУТРИ ДУГИ
+            // Начальная прозрачность 80% (0.8), постепенно уменьшается к хвосту
+            const alphaArray = alphaAttribute.array;
+            for (let i = 0; i <= arcSegments; i++) {
+                const segmentT = i / arcSegments;
+                // Градиент: 0.8 в начале дуги, 0.0 в конце
+                const alphaValue = 0.8 * (1.0 - segmentT);
+                
+                const baseIndex = i * 2;
+                alphaArray[baseIndex] = alphaValue;     // Внутренняя вершина
+                alphaArray[baseIndex + 1] = alphaValue; // Внешняя вершина
+            }
+            alphaAttribute.needsUpdate = true;
+            
+            // 2. ГЛОБАЛЬНОЕ ИСЧЕЗНОВЕНИЕ - ТОЛЬКО В КОНЦЕ ПОЛНОГО КРУГА
+            // Дуга видна на всем протяжении 100% пути
+            // Исчезает только в самом конце цикла
+            let globalAlpha = 1.0;
+            if (t > 0.9) { // Последние 10% пути (90-100%)
+                // Плавное исчезновение от 1.0 до 0.0
+                globalAlpha = 1.0 - ((t - 0.9) / 0.1);
+            }
+            arcMaterial.uniforms.globalAlpha.value = globalAlpha;
+            
+            // 3. ПУЛЬСАЦИЯ ОБВОДКИ
+            const pulseDuration = 0.7;
+            const pulseT = (currentTime % pulseDuration) / pulseDuration;
+            
+            const pulseFactor = Math.abs(Math.sin(Math.PI * pulseT));
+            const currentWidth = OUTLINE_BASE_WIDTH * (1 + pulseFactor * 0.5);
+            
+            outline.geometry.dispose();
+            outline.geometry = new THREE.RingGeometry(
+                DISC_RADIUS,
+                DISC_RADIUS + currentWidth,
+                64
+            );
+            
+            outline.material.opacity = 0.8 + pulseFactor * 0.1;
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // === РЕСАЙЗ ===
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
