@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диск с пульсирующей обводкой</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+
+    <script>
+        // === ФИКСИРОВАННЫЕ ПАРАМЕТРЫ ===
+        const settings = {
+            frequency: 1.0,
+            radius: 30
+        };
+        
+        const DISC_RADIUS = 5;
+        const OUTLINE_BASE_WIDTH = DISC_RADIUS * 0.25; // 25% от радиуса
+        
+        // === СЦЕНА (БЕЛЫЙ ФОН) ===
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 200);
+        camera.position.set(0, 10, 30);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.minDistance = 8;
+        controls.maxDistance = 80;
+        
+        // === ОСВЕЩЕНИЕ ===
+        const light = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(light);
+        
+        // === СЛОЙ 1: ВОЛНА (самая нижняя, СИНЯЯ) ===
+        const waveMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x0099ff,
+            transparent: true, 
+            opacity: 0.7,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+        
+        const wave = new THREE.Mesh(
+            new THREE.RingGeometry(DISC_RADIUS - 0.2, DISC_RADIUS + 3, 64),
+            waveMaterial
+        );
+        wave.rotation.x = -Math.PI / 2;
+        wave.position.y = -0.2; // Глубоко под диском
+        scene.add(wave);
+        
+        // === СЛОЙ 2: ДИСК (посередине, СИНИЙ) ===
+        const discMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x0066ff,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+        
+        const disc = new THREE.Mesh(
+            new THREE.CircleGeometry(DISC_RADIUS, 64),
+            discMaterial
+        );
+        disc.rotation.x = -Math.PI / 2;
+        disc.position.y = 0;
+        scene.add(disc);
+        
+        // === СЛОЙ 3: ОБВОДКА (самая верхняя, #F8F9FA, ПУЛЬСИРУЕТ) ===
+        const outlineMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xF8F9FA,
+            transparent: true, 
+            opacity: 0.9, // Почти непрозрачная
+            side: THREE.DoubleSide
+        });
+        
+        // Начальные радиусы: внутренний = радиус диска, внешний = радиус диска + базовая ширина
+        const outline = new THREE.Mesh(
+            new THREE.RingGeometry(DISC_RADIUS, DISC_RADIUS + OUTLINE_BASE_WIDTH, 64),
+            outlineMaterial
+        );
+        outline.rotation.x = -Math.PI / 2;
+        outline.position.y = 0.1; // НАД диском
+        scene.add(outline);
+        
+        // === ВРЕМЕННАЯ ЛОГИКА ===
+        let startTime = Date.now();
+        
+        // === АНИМАЦИЯ ===
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Время с начала запуска
+            const currentTime = (Date.now() - startTime) / 1000;
+            
+            // Обновление волны
+            const waveCycle = (currentTime * settings.frequency) % 1.0;
+            const innerRadius = DISC_RADIUS - 0.2;
+            const outerRadius = DISC_RADIUS + 3 + waveCycle * (settings.radius - DISC_RADIUS);
+            wave.geometry.dispose();
+            wave.geometry = new THREE.RingGeometry(innerRadius, outerRadius, 64);
+            wave.material.opacity = 0.7 * (1 - waveCycle * 0.95);
+            
+            // ПУЛЬСАЦИЯ ОБВОДКИ - ВНУТРЕННИЙ РАДИУС ВСЕГДА РАДИУС ДИСКА, ВНЕШНИЙ ПУЛЬСИРУЕТ
+            const pulseSpeed = 2.0; // Гц
+            const pulseFactor = (Math.sin(currentTime * pulseSpeed * Math.PI * 2) + 1) / 2;
+            
+            // Внешний радиус пульсирует от базовой ширины до 150% от базовой ширины
+            const pulseMultiplier = 0.5; // Насколько сильно пульсирует
+            const currentWidth = OUTLINE_BASE_WIDTH * (1 + pulseFactor * pulseMultiplier);
+            
+            // Пересоздаем геометрию с фиксированным внутренним радиусом и пульсирующим внешним
+            outline.geometry.dispose();
+            outline.geometry = new THREE.RingGeometry(
+                DISC_RADIUS,           // Внутренний радиус ВСЕГДА равен радиусу диска
+                DISC_RADIUS + currentWidth, // Внешний радиус пульсирует
+                64
+            );
+            
+            // Прозрачность тоже может пульсировать
+            outline.material.opacity = 0.7 + pulseFactor * 0.2;
+            
+            // НЕ ИСПОЛЬЗУЕМ SCALE! Только геометрию
+            outline.position.y = 0.1; // Фиксированная позиция
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // === РЕСАЙЗ ===
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
