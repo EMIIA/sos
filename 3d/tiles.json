@@ -9,12 +9,14 @@
       "maxzoom": 14
     }
   },
-  "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=QN6ALYSRnAohNK6Y8BiB",
+  "glyphs": "https://map.emiia.keenetic.pro/fonts/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
       "type": "background",
-      "paint": {"background-color": "#f8f9fa"}
+      "paint": {
+        "background-color": "#f8f9fa"
+      }
     },
     {
       "id": "landcover",
@@ -38,7 +40,9 @@
       "source": "moscow",
       "source-layer": "water",
       "type": "fill",
-      "paint": {"fill-color": "#e8ebee"}
+      "paint": {
+        "fill-color": "#e8ebee"
+      }
     },
     {
       "id": "roads-base",
@@ -48,7 +52,13 @@
       "minzoom": 4,
       "paint": {
         "line-color": "#f0f2f4",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 6],
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          4, 0.5,
+          14, 6
+        ],
         "line-opacity": 0.8
       }
     },
@@ -67,7 +77,13 @@
           "secondary", "#f0f3f6",
           "#f8f9fa"
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 4],
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          4, 0.5,
+          14, 4
+        ],
         "line-opacity": 0.9
       }
     },
@@ -98,7 +114,13 @@
       "layout": {
         "text-field": ["get", "name"],
         "text-font": ["Montserrat Regular"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 10, 9, 14, 12],
+        "text-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          10, 9,
+          14, 12
+        ],
         "symbol-placement": "line"
       },
       "paint": {
@@ -116,7 +138,14 @@
       "layout": {
         "text-field": ["get", "name"],
         "text-font": ["Montserrat Bold"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 5, 10, 10, 16, 14, 24],
+        "text-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5, 10,
+          10, 16,
+          14, 24
+        ],
         "text-anchor": "center"
       },
       "paint": {
