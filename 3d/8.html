@@ -2,7 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+
     <title>3D Точка по линии</title>
     <style>
         body { 
@@ -17,9 +20,9 @@
             background: #f8f9fa; 
         }
     </style>
-    <script src="https://sos.emiia.ai/mapbox-gl.js"></script>
-    <link href="https://sos.emiia.ai/mapbox-gl.css" rel="stylesheet">
-<link href="https://sos.emiia.ai/css.css" rel="stylesheet">
+    <script src="https://sos.emiia.ai/mapbox-gl.js "></script>
+    <link href="https://sos.emiia.ai/mapbox-gl.css " rel="stylesheet">
+<link href="https://sos.emiia.ai/css.css " rel="stylesheet">
 </head>
 <body>
 <div id="map"></div>
@@ -27,7 +30,7 @@
 mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
 
 // Простая предзагрузка модели
-const modelUrl = 'https://sos.emiia.ai/circle_2_glb.glb';
+const modelUrl = 'https://sos.emiia.ai/circle_2_glb.glb ';
 console.log('Начинаем предзагрузку модели...');
 
 function preloadModel(url) {
@@ -50,7 +53,7 @@ preloadModel(modelUrl);
 
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'https://sos.emiia.ai/3d/tiles.json',
+    style: 'https://sos.emiia.ai/3d/tiles.json ',
     minZoom: 17,
     center: [37.630507, 55.833692],
     zoom: 18,
@@ -73,7 +76,7 @@ map.on('style.load', () => {
     
     map.addSource('mapbox-dem', {
         'type': 'raster-dem',
-        'url': 'https://sos.emiia.ai/3d/3d_tiles.json',
+        'url': 'https://sos.emiia.ai/3d/3d_tiles.json ',
         'tileSize': 512,
         'maxzoom': 24
     });
@@ -668,6 +671,13 @@ map.on('style.load', () => {
     console.log('Управление: toggleMovement(), resetAnimation(), fixBluePoint()');
     console.log('ФИКСИРОВАННЫЙ РАЗМЕР: точки не увеличиваются при приближении камеры');
 });
+
+
+
+
+
+
+
 
 
 
