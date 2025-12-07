@@ -21,7 +21,7 @@
       "source": "moscow",
       "source-layer": "landcover",
       "type": "fill",
-      "filter": ["in", ["get", "class"], "wood", "grass"],
+      "filter": ["in", "class", "wood", "grass"],
       "paint": {
         "fill-color": [
           "match",
