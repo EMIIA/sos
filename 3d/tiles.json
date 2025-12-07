@@ -21,9 +21,15 @@
       "source": "moscow",
       "source-layer": "landcover",
       "type": "fill",
-      "filter": ["in", "class", "wood", "grass"],
+      "filter": ["in", ["get", "class"], "wood", "grass"],
       "paint": {
-        "fill-color": ["match", ["get", "class"], "wood", "#e8ebe8", "grass", "#f0f2f0", "#f8f9fa"],
+        "fill-color": [
+          "match",
+          ["get", "class"],
+          "wood", "#e8ebe8",
+          "grass", "#f0f2f0",
+          "#f8f9fa"
+        ],
         "fill-opacity": 0.7
       }
     },
@@ -53,12 +59,18 @@
       "type": "line",
       "minzoom": 4,
       "paint": {
-        "line-color": ["match", ["get", "class"], "motorway", "#e0e3e6", "primary", "#e8ebee", "secondary", "#f0f3f6", "#f8f9fa"],
+        "line-color": [
+          "match",
+          ["get", "class"],
+          "motorway", "#e0e3e6",
+          "primary", "#e8ebee",
+          "secondary", "#f0f3f6",
+          "#f8f9fa"
+        ],
         "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 4],
         "line-opacity": 0.9
       }
     },
-    
     {
       "id": "housenumber",
       "source": "moscow",
@@ -67,7 +79,7 @@
       "minzoom": 14,
       "layout": {
         "text-field": ["get", "housenumber"],
-        "text-font": ["Montserrat Regular"], /* Key change */
+        "text-font": ["Montserrat Regular"],
         "text-size": 10,
         "text-anchor": "center"
       },
@@ -85,7 +97,7 @@
       "minzoom": 10,
       "layout": {
         "text-field": ["get", "name"],
-        "text-font": ["Montserrat Regular"], /* Key change */
+        "text-font": ["Montserrat Regular"],
         "text-size": ["interpolate", ["linear"], ["zoom"], 10, 9, 14, 12],
         "symbol-placement": "line"
       },
@@ -103,7 +115,7 @@
       "minzoom": 5,
       "layout": {
         "text-field": ["get", "name"],
-        "text-font": ["Montserrat Bold"], /* Key change */
+        "text-font": ["Montserrat Bold"],
         "text-size": ["interpolate", ["linear"], ["zoom"], 5, 10, 10, 16, 14, 24],
         "text-anchor": "center"
       },
