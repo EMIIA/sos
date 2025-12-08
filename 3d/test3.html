@@ -36,13 +36,12 @@ const lineCoordinates = [
     [37.631735, 55.834216]
 ];
 
-// 🐌 УМЕНЬШЕНА СКОРОСТЬ ДВИЖЕНИЯ
 const objectSettings = {
     object1: {
         pointColor: '#6fa8dc',
         lineColor: '#3d85c6',
         size: 140,
-        animationSpeed: 0.0005, // ← БЫЛО 0.0007
+        animationSpeed: 0.0005,
         elevations: [15, 25, 30, 35],
         modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
         baseOpacity: 1.0,
@@ -52,7 +51,7 @@ const objectSettings = {
         pointColor: '#f6f6f6',
         lineColor: '#d3d3d3',
         baseSize: 190,
-        animationSpeed: 0.0005, // ← БЫЛО 0.0007
+        animationSpeed: 0.0005,
         elevations: [14.98, 24.98, 29.98, 34.98],
         modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
         baseOpacity: 1.0,
@@ -64,7 +63,7 @@ const objectSettings = {
         pointColor: '#3d85c6',
         lineColor: '#3d85c6',
         baseSize: 180,
-        animationSpeed: 0.0005, // ← БЫЛО 0.0007
+        animationSpeed: 0.0005,
         elevations: [14.9, 24.9, 29.9, 34.9],
         modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
         baseOpacity: 0.6,
@@ -95,7 +94,7 @@ class AnimationEngine {
             currentSegmentProgress: 0,
             baseSize: 1.0,
             pulseTime: performance.now(),
-            lastTimestamp: performance.now(), // ← ИНИЦИАЛИЗИРОВАНО
+            lastTimestamp: performance.now(),
         };
         
         this.objectStates = {
@@ -205,15 +204,13 @@ class AnimationEngine {
     }
 
     animate(timestamp) {
-        // 🎯 ЗАЩИТА ОТ СКАЧКОВ НА СТАРТЕ
         if (!this.state.lastTimestamp || timestamp - this.state.lastTimestamp > 100) {
             this.state.lastTimestamp = timestamp;
         }
 
-        const deltaTime = Math.min(timestamp - this.state.lastTimestamp, 40); // ← БЫЛО 32, СТАЛО 40 (25 FPS)
+        const deltaTime = Math.min(timestamp - this.state.lastTimestamp, 40);
         this.state.lastTimestamp = timestamp;
 
-        // 1. ДВИЖЕНИЕ
         if (this.state.isMoving) {
             this.state.progress += objectSettings.object1.animationSpeed * this.state.direction * (deltaTime / 16);
 
@@ -248,7 +245,6 @@ class AnimationEngine {
             this.state.currentPosition.lat = startCoord[1] + (endCoord[1] - startCoord[1]) * this.state.currentSegmentProgress;
         }
 
-        // 2. ОБНОВЛЕНИЕ ВСЕХ ОБЪЕКТОВ
         const { lng, lat } = this.state.currentPosition;
         const segmentIdx = this.state.currentSegmentIndex;
         const segmentProg = this.state.currentSegmentProgress;
@@ -257,7 +253,6 @@ class AnimationEngine {
         this.updateObjectPosition(2, objectSettings.object2, lng, lat, segmentIdx, segmentProg);
         this.updateObjectPosition(3, objectSettings.object3, lng, lat, segmentIdx, segmentProg);
 
-        // 3. ПУЛЬСАЦИЯ (только для 2 и 3)
         this.updateObjectPulse(2, timestamp, objectSettings.object2);
         this.updateObjectPulse(3, timestamp, objectSettings.object3);
 
@@ -265,9 +260,9 @@ class AnimationEngine {
     }
 
     start() {
-        console.log('⚡ Движок запущен (FPS: 25, скорость: 0.0005)');
+        console.log('Движок запущен (FPS: 25, скорость: 0.0005)');
         this.updateAllModelScales();
-        this.state.lastTimestamp = performance.now(); // ← ПЕРЕЗАПИСЫВАЕМ перед стартом
+        this.state.lastTimestamp = performance.now();
         this.animate(performance.now());
     }
 }
@@ -275,7 +270,6 @@ class AnimationEngine {
 const animationEngine = new AnimationEngine();
 
 map.on('style.load', () => {
-    // Terrain
     map.addSource('mapbox-dem', {
         'type': 'raster-dem',
         'url': 'https://sos.emiia.ai/3d/3d_tiles.json',
@@ -284,7 +278,6 @@ map.on('style.load', () => {
     });
     map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
 
-    // ЛИНИИ
     ['elevated-line-1', 'elevated-line-2', 'elevated-line-3'].forEach((id, i) => {
         const obj = [objectSettings.object1, objectSettings.object2, objectSettings.object3][i];
         
@@ -314,7 +307,6 @@ map.on('style.load', () => {
         });
     });
 
-    // МОДЕЛИ
     [objectSettings.object1, objectSettings.object2, objectSettings.object3].forEach((obj, i) => {
         const layerId = `object-layer-${i + 1}`;
         const sourceId = `object-model-${i + 1}`;
@@ -353,23 +345,19 @@ map.on('style.load', () => {
         });
     });
 
-    // Зум
     let zoomTimeout;
     map.on('zoom', () => {
         clearTimeout(zoomTimeout);
         zoomTimeout = setTimeout(() => animationEngine.updateZoom(), 100);
     });
 
-    // Запуск
     map.once('idle', () => {
-        // ⏱️ УВЕЛИЧЕНА ЗАДЕРЖКА НА СТАРТЕ - 3с для мобильных, 2с для десктопа
         setTimeout(() => {
             animationEngine.start();
-            console.log('🚀 Движок запущен (FPS: 25, скорость: 0.0005)');
+            console.log('Движок запущен (FPS: 25, скорость: 0.0005)');
         }, isMobile ? 3000 : 2000);
     });
 
-    // ЗДАНИЯ
     if (!map.getSource('moscow')) {
         map.addSource('moscow', {
             url: 'EMIIA_AI',
@@ -432,7 +420,6 @@ map.on('style.load', () => {
         console.error('Ошибка зданий:', e);
     }
 
-    // Полигон
     map.addSource('polygon-source', {
         type: 'geojson',
         data: {
