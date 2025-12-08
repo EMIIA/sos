@@ -98,9 +98,9 @@ class AnimationEngine {
         };
         
         this.objectStates = {
-            obj1: { lastPosKey: null, lastScale: null, lastOpacity: null },
-            obj2: { lastPosKey: null, lastScale: null, lastOpacity: null },
-            obj3: { lastPosKey: null, lastScale: null, lastOpacity: null }
+            obj1: { lastPosKey: null, lastTranslation: null },
+            obj2: { lastPosKey: null, lastScale: null, lastOpacity: null, lastTranslation: null },
+            obj3: { lastPosKey: null, lastScale: null, lastOpacity: null, lastTranslation: null }
         };
 
         this.zoomSettings = { minZoom: 15, maxZoom: 22 };
@@ -130,7 +130,14 @@ class AnimationEngine {
             const layerId = `object-layer-${i + 1}`;
             const baseSize = obj.size || obj.baseSize;
             const finalSize = baseSize * this.state.baseSize;
-            map.setPaintProperty(layerId, 'model-scale', [finalSize, finalSize, finalSize]);
+            
+            const key = `obj${i + 1}`;
+            const scaleKey = `${finalSize.toFixed(3)}`;
+            
+            if (this.objectStates[key].lastScale !== scaleKey) {
+                map.setPaintProperty(layerId, 'model-scale', [finalSize, finalSize, finalSize]);
+                this.objectStates[key].lastScale = scaleKey;
+            }
         });
     }
 
@@ -175,12 +182,21 @@ class AnimationEngine {
             const elevation = objSettings.elevations[segmentIndex] + 
                 (objSettings.elevations[segmentIndex + 1] - objSettings.elevations[segmentIndex]) * segmentProgress;
 
-            map.setPaintProperty(layerId, 'model-translation', [0, 0, elevation + objSettings.verticalOffset]);
+            const translation = [0, 0, elevation + objSettings.verticalOffset];
+            const translationKey = `${translation[2].toFixed(3)}`;
+            
+            if (this.objectStates[key].lastTranslation !== translationKey) {
+                map.setPaintProperty(layerId, 'model-translation', translation);
+                this.objectStates[key].lastTranslation = translationKey;
+            }
+
             this.objectStates[key].lastPosKey = posKey;
         }
     }
 
     updateObjectPulse(index, stamp, objSettings) {
+        if (index === 1) return;
+
         const key = `obj${index}`;
         const layerId = `object-layer-${index}`;
         
@@ -194,12 +210,10 @@ class AnimationEngine {
             this.objectStates[key].lastScale = scaleKey;
         }
 
-        if (index > 1) {
-            const opacityKey = state.opacity.toFixed(3);
-            if (this.objectStates[key].lastOpacity !== opacityKey) {
-                map.setPaintProperty(layerId, 'model-opacity', state.opacity);
-                this.objectStates[key].lastOpacity = opacityKey;
-            }
+        const opacityKey = state.opacity.toFixed(3);
+        if (this.objectStates[key].lastOpacity !== opacityKey) {
+            map.setPaintProperty(layerId, 'model-opacity', state.opacity);
+            this.objectStates[key].lastOpacity = opacityKey;
         }
     }
 
@@ -253,6 +267,7 @@ class AnimationEngine {
         this.updateObjectPosition(2, objectSettings.object2, lng, lat, segmentIdx, segmentProg);
         this.updateObjectPosition(3, objectSettings.object3, lng, lat, segmentIdx, segmentProg);
 
+        // Пульсация ТОЛЬКО для объектов 2 и 3
         this.updateObjectPulse(2, timestamp, objectSettings.object2);
         this.updateObjectPulse(3, timestamp, objectSettings.object3);
 
@@ -278,6 +293,7 @@ map.on('style.load', () => {
     });
     map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
 
+    // Линии
     ['elevated-line-1', 'elevated-line-2', 'elevated-line-3'].forEach((id, i) => {
         const obj = [objectSettings.object1, objectSettings.object2, objectSettings.object3][i];
         
@@ -307,6 +323,7 @@ map.on('style.load', () => {
         });
     });
 
+    // Модели
     [objectSettings.object1, objectSettings.object2, objectSettings.object3].forEach((obj, i) => {
         const layerId = `object-layer-${i + 1}`;
         const sourceId = `object-model-${i + 1}`;
@@ -354,7 +371,6 @@ map.on('style.load', () => {
     map.once('idle', () => {
         setTimeout(() => {
             animationEngine.start();
-            console.log('Движок запущен (FPS: 25, скорость: 0.0005)');
         }, isMobile ? 3000 : 2000);
     });
 
