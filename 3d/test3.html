@@ -29,7 +29,6 @@ console.log('Мобильное устройство:', isMobile);
 
 mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
 
-// Координаты и настройки
 const lineCoordinates = [
     [37.630507, 55.833692],
     [37.630877, 55.834026],
@@ -37,12 +36,13 @@ const lineCoordinates = [
     [37.631735, 55.834216]
 ];
 
+// 🐌 УМЕНЬШЕНА СКОРОСТЬ ДВИЖЕНИЯ
 const objectSettings = {
     object1: {
         pointColor: '#6fa8dc',
         lineColor: '#3d85c6',
         size: 140,
-        animationSpeed: 0.0007,
+        animationSpeed: 0.0005, // ← БЫЛО 0.0007
         elevations: [15, 25, 30, 35],
         modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
         baseOpacity: 1.0,
@@ -52,7 +52,7 @@ const objectSettings = {
         pointColor: '#f6f6f6',
         lineColor: '#d3d3d3',
         baseSize: 190,
-        animationSpeed: 0.0007,
+        animationSpeed: 0.0005, // ← БЫЛО 0.0007
         elevations: [14.98, 24.98, 29.98, 34.98],
         modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
         baseOpacity: 1.0,
@@ -64,7 +64,7 @@ const objectSettings = {
         pointColor: '#3d85c6',
         lineColor: '#3d85c6',
         baseSize: 180,
-        animationSpeed: 0.0007,
+        animationSpeed: 0.0005, // ← БЫЛО 0.0007
         elevations: [14.9, 24.9, 29.9, 34.9],
         modelUri: 'https://sos.emiia.ai/circle_2_glb.glb',
         baseOpacity: 0.6,
@@ -83,189 +83,196 @@ const map = new mapboxgl.Map({
     antialias: true
 });
 
-// ЕДИНЫЙ контроллер анимации
-class AnimationController {
+class AnimationEngine {
     constructor() {
-        this.progress = 0;
-        this.direction = 1;
-        this.isMoving = true;
-        this.currentSegment = 0;
-        this.pulseTime = performance.now();
-        this.lastTimestamp = 0;
-        this.zoomSettings = { minZoom: 15, maxZoom: 22 };
-        this.currentBaseSize = 1.0;
-        
-        this.lastState = {
-            obj1: { position: null, scale: null, opacity: null },
-            obj2: { position: null, scale: null, opacity: null },
-            obj3: { position: null, scale: null, opacity: null }
+        this.state = {
+            progress: 0,
+            direction: 1,
+            isMoving: true,
+            currentSegment: 0,
+            currentPosition: { lng: lineCoordinates[0][0], lat: lineCoordinates[0][1] },
+            currentSegmentIndex: 0,
+            currentSegmentProgress: 0,
+            baseSize: 1.0,
+            pulseTime: performance.now(),
+            lastTimestamp: performance.now(), // ← ИНИЦИАЛИЗИРОВАНО
         };
+        
+        this.objectStates = {
+            obj1: { lastPosKey: null, lastScale: null, lastOpacity: null },
+            obj2: { lastPosKey: null, lastScale: null, lastOpacity: null },
+            obj3: { lastPosKey: null, lastScale: null, lastOpacity: null }
+        };
+
+        this.zoomSettings = { minZoom: 15, maxZoom: 22 };
     }
 
     updateZoom() {
         const zoom = map.getZoom();
-        const oldSize = this.currentBaseSize;
+        let newBaseSize = 1.0;
         
         if (zoom <= this.zoomSettings.minZoom) {
-            this.currentBaseSize = 1.0;
+            newBaseSize = 1.0;
         } else if (zoom >= this.zoomSettings.maxZoom) {
-            this.currentBaseSize = 0.3;
+            newBaseSize = 0.3;
         } else {
             const normalizedZoom = (zoom - this.zoomSettings.minZoom) / (this.zoomSettings.maxZoom - this.zoomSettings.minZoom);
-            this.currentBaseSize = 1.0 - (normalizedZoom * 0.7);
+            newBaseSize = 1.0 - (normalizedZoom * 0.7);
         }
 
-        if (this.currentBaseSize !== oldSize) {
-            this.updateAllScales();
+        if (this.state.baseSize !== newBaseSize) {
+            this.state.baseSize = newBaseSize;
+            this.updateAllModelScales();
         }
     }
 
-    updateAllScales() {
+    updateAllModelScales() {
         [objectSettings.object1, objectSettings.object2, objectSettings.object3].forEach((obj, i) => {
             const layerId = `object-layer-${i + 1}`;
             const baseSize = obj.size || obj.baseSize;
-            const finalSize = baseSize * this.currentBaseSize;
+            const finalSize = baseSize * this.state.baseSize;
             map.setPaintProperty(layerId, 'model-scale', [finalSize, finalSize, finalSize]);
         });
     }
 
-    getPulseState(stamp, isObject3) {
-        const cycleProgress = ((stamp - this.pulseTime) % 1800) / 1800;
+    getPulseState(stamp, objectIndex) {
+        const cycleProgress = ((stamp - this.state.pulseTime) % 1800) / 1800;
         
         if (cycleProgress < 0.833) {
             const animProgress = cycleProgress / 0.833;
             
-            if (isObject3) {
+            if (objectIndex === 3) {
                 return {
                     scale: 1 + (animProgress * 2.0),
                     opacity: Math.max(0.1, 0.6 * (1 - animProgress * 0.9))
                 };
-            } else {
-                const pulseRange = 1.08 - 0.92;
+            } else if (objectIndex === 2) {
+                const pulseRange = objectSettings.object2.pulseMax - objectSettings.object2.pulseMin;
                 return {
-                    scale: 0.92 + (Math.sin(animProgress * Math.PI * 3) * pulseRange * 0.5),
+                    scale: objectSettings.object2.pulseMin + (Math.sin(animProgress * Math.PI * 3) * pulseRange * 0.5),
                     opacity: 1.0
                 };
             }
         }
         
-        return isObject3 ? { scale: 1, opacity: 0.1 } : { scale: 1, opacity: 1.0 };
+        return objectIndex === 3 ? { scale: 1, opacity: 0.1 } : { scale: 1, opacity: 1.0 };
     }
 
-    updatePosition(sourceId, layerId, coords, elevation, offset) {
-        const source = map.getSource(sourceId);
-        if (!source) return;
-
-        const key = sourceId.includes('-1') ? 'obj1' : sourceId.includes('-2') ? 'obj2' : 'obj3';
-        const posKey = `${coords[0].toFixed(9)}-${coords[1].toFixed(9)}-${elevation.toFixed(3)}`;
+    updateObjectPosition(index, objSettings, lng, lat, segmentIndex, segmentProgress) {
+        const key = `obj${index}`;
+        const posKey = `${lng.toFixed(9)}-${lat.toFixed(9)}-${segmentIndex}-${segmentProgress.toFixed(3)}`;
         
-        if (this.lastState[key].position !== posKey) {
-            const data = source._data || source.data;
-            data.geometry.coordinates = coords;
-            source.setData(data);
-            this.lastState[key].position = posKey;
-        }
+        if (this.objectStates[key].lastPosKey !== posKey) {
+            const sourceId = `object-model-${index}`;
+            const layerId = `object-layer-${index}`;
+            const source = map.getSource(sourceId);
+            
+            if (source) {
+                const data = source._data || source.data;
+                data.geometry.coordinates = [lng, lat];
+                source.setData(data);
+            }
 
-        const translation = [0, 0, elevation + offset];
-        map.setPaintProperty(layerId, 'model-translation', translation);
+            const elevation = objSettings.elevations[segmentIndex] + 
+                (objSettings.elevations[segmentIndex + 1] - objSettings.elevations[segmentIndex]) * segmentProgress;
+
+            map.setPaintProperty(layerId, 'model-translation', [0, 0, elevation + objSettings.verticalOffset]);
+            this.objectStates[key].lastPosKey = posKey;
+        }
     }
 
-    updateScale(layerId, scale, key) {
-        const scaleKey = `${scale[0].toFixed(3)}-${scale[1].toFixed(3)}-${scale[2].toFixed(3)}`;
-        if (this.lastState[key].scale !== scaleKey) {
-            map.setPaintProperty(layerId, 'model-scale', scale);
-            this.lastState[key].scale = scaleKey;
-        }
-    }
+    updateObjectPulse(index, stamp, objSettings) {
+        const key = `obj${index}`;
+        const layerId = `object-layer-${index}`;
+        
+        const state = this.getPulseState(stamp, index);
+        const baseSize = objSettings.size || objSettings.baseSize;
+        const finalSize = baseSize * this.state.baseSize * state.scale;
 
-    updateOpacity(layerId, opacity, key) {
-        const opacityKey = opacity.toFixed(3);
-        if (this.lastState[key].opacity !== opacityKey) {
-            map.setPaintProperty(layerId, 'model-opacity', opacity);
-            this.lastState[key].opacity = opacityKey;
+        const scaleKey = finalSize.toFixed(3);
+        if (this.objectStates[key].lastScale !== scaleKey) {
+            map.setPaintProperty(layerId, 'model-scale', [finalSize, finalSize, finalSize]);
+            this.objectStates[key].lastScale = scaleKey;
+        }
+
+        if (index > 1) {
+            const opacityKey = state.opacity.toFixed(3);
+            if (this.objectStates[key].lastOpacity !== opacityKey) {
+                map.setPaintProperty(layerId, 'model-opacity', state.opacity);
+                this.objectStates[key].lastOpacity = opacityKey;
+            }
         }
     }
 
     animate(timestamp) {
-        if (!this.lastTimestamp) this.lastTimestamp = timestamp;
-        const deltaTime = Math.min(timestamp - this.lastTimestamp, 32);
-        this.lastTimestamp = timestamp;
-
-        // 1. ПУЛЬСАЦИЯ ОБЪЕКТОВ 2 и 3
-        const state2 = this.getPulseState(timestamp, false);
-        const state3 = this.getPulseState(timestamp, true);
-
-        const size2 = objectSettings.object2.baseSize * this.currentBaseSize * state2.scale;
-        this.updateScale('object-layer-2', [size2, size2, size2], 'obj2');
-        this.updateOpacity('object-layer-2', state2.opacity, 'obj2');
-
-        const size3 = objectSettings.object3.baseSize * this.currentBaseSize * state3.scale;
-        this.updateScale('object-layer-3', [size3, size3, size3], 'obj3');
-        this.updateOpacity('object-layer-3', state3.opacity, 'obj3');
-
-        // 2. ДВИЖЕНИЕ ВСЕХ ТОЧЕК
-        if (this.isMoving) {
-            this.progress += objectSettings.object1.animationSpeed * this.direction * (deltaTime / 16);
-
-            const newSegment = Math.floor(this.progress * (lineCoordinates.length - 1));
-            
-            if (newSegment !== this.currentSegment && 
-                newSegment > 0 && newSegment < lineCoordinates.length - 1) {
-                this.currentSegment = newSegment;
-                this.isMoving = false;
-                setTimeout(() => { this.isMoving = true; }, 2000);
-            }
-
-            if (this.progress >= 1 && this.direction === 1) {
-                this.progress = 0.999;
-                this.isMoving = false;
-                setTimeout(() => { this.direction = -1; this.isMoving = true; }, 2000);
-            } else if (this.progress <= 0 && this.direction === -1) {
-                this.progress = 0.001;
-                this.isMoving = false;
-                setTimeout(() => { this.direction = 1; this.isMoving = true; }, 2000);
-            }
-
-            this.progress = Math.max(0, Math.min(1, this.progress));
-
-            const segmentIndex = Math.min(Math.floor(this.progress * (lineCoordinates.length - 1)), lineCoordinates.length - 2);
-            const segmentProgress = (this.progress * (lineCoordinates.length - 1)) - segmentIndex;
-
-            const startCoord = lineCoordinates[segmentIndex];
-            const endCoord = lineCoordinates[segmentIndex + 1];
-            const currentLng = startCoord[0] + (endCoord[0] - startCoord[0]) * segmentProgress;
-            const currentLat = startCoord[1] + (endCoord[1] - startCoord[1]) * segmentProgress;
-
-            // Обновляем позиции ВСЕХ трех объектов
-            this.updatePosition('object-model-1', 'object-layer-1', 
-                [currentLng, currentLat], 
-                objectSettings.object1.elevations[segmentIndex] + 
-                (objectSettings.object1.elevations[segmentIndex + 1] - objectSettings.object1.elevations[segmentIndex]) * segmentProgress,
-                objectSettings.object1.verticalOffset);
-
-            this.updatePosition('object-model-2', 'object-layer-2', 
-                [currentLng, currentLat], 
-                objectSettings.object2.elevations[segmentIndex] + 
-                (objectSettings.object2.elevations[segmentIndex + 1] - objectSettings.object2.elevations[segmentIndex]) * segmentProgress,
-                objectSettings.object2.verticalOffset);
-
-            this.updatePosition('object-model-3', 'object-layer-3', 
-                [currentLng, currentLat], 
-                objectSettings.object3.elevations[segmentIndex] + 
-                (objectSettings.object3.elevations[segmentIndex + 1] - objectSettings.object3.elevations[segmentIndex]) * segmentProgress,
-                objectSettings.object3.verticalOffset);
+        // 🎯 ЗАЩИТА ОТ СКАЧКОВ НА СТАРТЕ
+        if (!this.state.lastTimestamp || timestamp - this.state.lastTimestamp > 100) {
+            this.state.lastTimestamp = timestamp;
         }
+
+        const deltaTime = Math.min(timestamp - this.state.lastTimestamp, 40); // ← БЫЛО 32, СТАЛО 40 (25 FPS)
+        this.state.lastTimestamp = timestamp;
+
+        // 1. ДВИЖЕНИЕ
+        if (this.state.isMoving) {
+            this.state.progress += objectSettings.object1.animationSpeed * this.state.direction * (deltaTime / 16);
+
+            const newSegment = Math.floor(this.state.progress * (lineCoordinates.length - 1));
+            
+            if (newSegment !== this.state.currentSegment && 
+                newSegment > 0 && newSegment < lineCoordinates.length - 1) {
+                this.state.currentSegment = newSegment;
+                this.state.isMoving = false;
+                setTimeout(() => { this.state.isMoving = true; }, 2000);
+            }
+
+            if (this.state.progress >= 1 && this.state.direction === 1) {
+                this.state.progress = 0.999;
+                this.state.isMoving = false;
+                setTimeout(() => { this.state.direction = -1; this.state.isMoving = true; }, 2000);
+            } else if (this.state.progress <= 0 && this.state.direction === -1) {
+                this.state.progress = 0.001;
+                this.state.isMoving = false;
+                setTimeout(() => { this.state.direction = 1; this.state.isMoving = true; }, 2000);
+            }
+
+            this.state.progress = Math.max(0, Math.min(1, this.state.progress));
+
+            this.state.currentSegmentIndex = Math.min(Math.floor(this.state.progress * (lineCoordinates.length - 1)), lineCoordinates.length - 2);
+            this.state.currentSegmentProgress = (this.state.progress * (lineCoordinates.length - 1)) - this.state.currentSegmentIndex;
+
+            const startCoord = lineCoordinates[this.state.currentSegmentIndex];
+            const endCoord = lineCoordinates[this.state.currentSegmentIndex + 1];
+            
+            this.state.currentPosition.lng = startCoord[0] + (endCoord[0] - startCoord[0]) * this.state.currentSegmentProgress;
+            this.state.currentPosition.lat = startCoord[1] + (endCoord[1] - startCoord[1]) * this.state.currentSegmentProgress;
+        }
+
+        // 2. ОБНОВЛЕНИЕ ВСЕХ ОБЪЕКТОВ
+        const { lng, lat } = this.state.currentPosition;
+        const segmentIdx = this.state.currentSegmentIndex;
+        const segmentProg = this.state.currentSegmentProgress;
+
+        this.updateObjectPosition(1, objectSettings.object1, lng, lat, segmentIdx, segmentProg);
+        this.updateObjectPosition(2, objectSettings.object2, lng, lat, segmentIdx, segmentProg);
+        this.updateObjectPosition(3, objectSettings.object3, lng, lat, segmentIdx, segmentProg);
+
+        // 3. ПУЛЬСАЦИЯ (только для 2 и 3)
+        this.updateObjectPulse(2, timestamp, objectSettings.object2);
+        this.updateObjectPulse(3, timestamp, objectSettings.object3);
 
         requestAnimationFrame((ts) => this.animate(ts));
     }
 
     start() {
-        this.updateAllScales();
+        console.log('⚡ Движок запущен (FPS: 25, скорость: 0.0005)');
+        this.updateAllModelScales();
+        this.state.lastTimestamp = performance.now(); // ← ПЕРЕЗАПИСЫВАЕМ перед стартом
         this.animate(performance.now());
     }
 }
 
-const animator = new AnimationController();
+const animationEngine = new AnimationEngine();
 
 map.on('style.load', () => {
     // Terrain
@@ -277,7 +284,7 @@ map.on('style.load', () => {
     });
     map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
 
-    // ЛИНИИ С ЭЛЕВАЦИЕЙ
+    // ЛИНИИ
     ['elevated-line-1', 'elevated-line-2', 'elevated-line-3'].forEach((id, i) => {
         const obj = [objectSettings.object1, objectSettings.object2, objectSettings.object3][i];
         
@@ -307,7 +314,7 @@ map.on('style.load', () => {
         });
     });
 
-    // Модели
+    // МОДЕЛИ
     [objectSettings.object1, objectSettings.object2, objectSettings.object3].forEach((obj, i) => {
         const layerId = `object-layer-${i + 1}`;
         const sourceId = `object-model-${i + 1}`;
@@ -350,24 +357,24 @@ map.on('style.load', () => {
     let zoomTimeout;
     map.on('zoom', () => {
         clearTimeout(zoomTimeout);
-        zoomTimeout = setTimeout(() => animator.updateZoom(), 100);
+        zoomTimeout = setTimeout(() => animationEngine.updateZoom(), 100);
     });
 
-    // Запуск анимации
+    // Запуск
     map.once('idle', () => {
+        // ⏱️ УВЕЛИЧЕНА ЗАДЕРЖКА НА СТАРТЕ - 3с для мобильных, 2с для десктопа
         setTimeout(() => {
-            animator.start();
-            console.log('✅ Анимация запущена!');
-        }, isMobile ? 2500 : 1500);
+            animationEngine.start();
+            console.log('🚀 Движок запущен (FPS: 25, скорость: 0.0005)');
+        }, isMobile ? 3000 : 2000);
     });
 
-    // === ЗДАНИЯ И ПОЛИГОНЫ (ДОБАВЛЕНО СРАЗУ ПОСЛЕ ЗАПУСКА АНИМАЦИИ) ===
+    // ЗДАНИЯ
     if (!map.getSource('moscow')) {
         map.addSource('moscow', {
             url: 'EMIIA_AI',
             type: 'vector',
         });
-        console.log('Источник moscow добавлен');
     }
 
     const layers = map.getStyle().layers;
@@ -379,7 +386,6 @@ map.on('style.load', () => {
         }
     }
 
-    // Добавляем слои зданий
     try {
         map.addLayer({
             'id': 'green-base',
@@ -390,15 +396,7 @@ map.on('style.load', () => {
             'maxzoom': 24,
             'paint': {
                 'fill-color': '#a4c2f4',
-                'fill-opacity': [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    14, 0.3,
-                    15.5, 0.3,
-                    18, 0.3,
-                    22, 0.3
-                ]
+                'fill-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0.3, 15.5, 0.3, 18, 0.3, 22, 0.3]
             }
         }, labelLayerId);
 
@@ -411,15 +409,7 @@ map.on('style.load', () => {
             'maxzoom': 24,
             'paint': {
                 'line-color': '#ffffff',
-                'line-width': [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    14, 1,
-                    16, 2,
-                    18, 2,
-                    20, 5
-                ],
+                'line-width': ['interpolate', ['linear'], ['zoom'], 14, 1, 16, 2, 18, 2, 20, 5],
                 'line-opacity': 1
             }
         }, labelLayerId);
@@ -438,10 +428,8 @@ map.on('style.load', () => {
                 'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.5, 0.8, 18, 0.0]
             }
         }, labelLayerId);
-
-        console.log('✅ Слои зданий добавлены');
     } catch (e) {
-        console.error('Ошибка при добавлении слоев зданий:', e);
+        console.error('Ошибка зданий:', e);
     }
 
     // Полигон
