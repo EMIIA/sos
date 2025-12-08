@@ -113,7 +113,7 @@
       "minzoom": 10,
       "layout": {
         "text-field": ["get", "name"],
-        "text-font": ["Montserrat Regular"],
+        "text-font": ["Noto Sans Regular"],
         "text-size": [
           "interpolate",
           ["linear"],
@@ -137,7 +137,7 @@
       "minzoom": 5,
       "layout": {
         "text-field": ["get", "name"],
-        "text-font": ["Montserrat Bold"],
+        "text-font": ["Noto Sans Bold"],
         "text-size": [
           "interpolate",
           ["linear"],
