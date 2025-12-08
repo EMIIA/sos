@@ -14,7 +14,9 @@
     {
       "id": "background",
       "type": "background",
-      "paint": {"background-color": "#0a0a0a"}
+      "paint": {
+        "background-color": "#f8f9fa"
+      }
     },
     {
       "id": "landcover",
@@ -23,7 +25,13 @@
       "type": "fill",
       "filter": ["in", "class", "wood", "grass"],
       "paint": {
-        "fill-color": ["match", ["get", "class"], "wood", "#1a3a1a", "grass", "#2d4a2d", "#2a2a2a"],
+        "fill-color": [
+          "match",
+          ["get", "class"],
+          "wood", "#e8ebe8",
+          "grass", "#f0f2f0",
+          "#f8f9fa"
+        ],
         "fill-opacity": 0.7
       }
     },
@@ -32,7 +40,9 @@
       "source": "moscow",
       "source-layer": "water",
       "type": "fill",
-      "paint": {"fill-color": "#1a4d66"}
+      "paint": {
+        "fill-color": "#e8ebee"
+      }
     },
     {
       "id": "roads-base",
@@ -41,8 +51,15 @@
       "type": "line",
       "minzoom": 4,
       "paint": {
-        "line-color": "#222222",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 6]
+        "line-color": "#f0f2f4",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          4, 0.5,
+          14, 6
+        ],
+        "line-opacity": 0.8
       }
     },
     {
@@ -52,21 +69,22 @@
       "type": "line",
       "minzoom": 4,
       "paint": {
-        "line-color": ["match", ["get", "class"], "motorway", "#ff5555", "primary", "#ffaa00", "secondary", "#ffff55", "#444444"],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 14, 4]
-      }
-    },
-    {
-      "id": "building-3d",
-      "source": "moscow",
-      "source-layer": "building",
-      "type": "fill-extrusion",
-      "minzoom": 13,
-      "paint": {
-        "fill-extrusion-color": "#3388ff",
-        "fill-extrusion-height": ["get", "render_height"],
-        "fill-extrusion-base": ["get", "render_min_height"],
-        "fill-extrusion-opacity": 0.8
+        "line-color": [
+          "match",
+          ["get", "class"],
+          "motorway", "#e0e3e6",
+          "primary", "#e8ebee",
+          "secondary", "#f0f3f6",
+          "#f8f9fa"
+        ],
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          4, 0.5,
+          14, 4
+        ],
+        "line-opacity": 0.9
       }
     },
     {
@@ -77,14 +95,14 @@
       "minzoom": 14,
       "layout": {
         "text-field": ["get", "housenumber"],
-        "text-font": ["Open Sans Regular"],
+        "text-font": ["Montserrat Regular"],
         "text-size": 10,
         "text-anchor": "center"
       },
       "paint": {
-        "text-color": "#ffffff",
-        "text-halo-color": "#000000",
-        "text-halo-width": 1
+        "text-color": "#999999",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.5
       }
     },
     {
@@ -96,13 +114,19 @@
       "layout": {
         "text-field": ["get", "name"],
         "text-font": ["Montserrat Regular"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 10, 9, 14, 12],
+        "text-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          10, 9,
+          14, 12
+        ],
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "#cccccc",
-        "text-halo-color": "#1a1a1a",
-        "text-halo-width": 1
+        "text-color": "#888888",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 2
       }
     },
     {
@@ -114,13 +138,20 @@
       "layout": {
         "text-field": ["get", "name"],
         "text-font": ["Montserrat Bold"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 5, 10, 10, 16, 14, 24],
+        "text-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5, 10,
+          10, 16,
+          14, 24
+        ],
         "text-anchor": "center"
       },
       "paint": {
-        "text-color": "#ffffff",
-        "text-halo-color": "#000000",
-        "text-halo-width": 1
+        "text-color": "#777777",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 2
       }
     }
   ]
