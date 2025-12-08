@@ -9,7 +9,7 @@
       "maxzoom": 24
     }
   },
-  "glyphs": "https://map.emiia.keenetic.pro/fonts/{fontstack}/{range}.pbf",
+  "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=QN6ALYSRnAohNK6Y8BiB",
   "layers": [
     {
       "id": "background",
