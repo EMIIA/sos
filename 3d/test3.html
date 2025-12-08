@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>3D Точка по линии</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+        }
+        #map { 
+            position: absolute; 
+            top: 0; 
+            bottom: 0; 
+            width: 100%; 
+            background: #f8f9fa; 
+        }
+    </style>
+    <script src="https://sos.emiia.ai/mapbox-gl.js"></script>
+    <link href="https://sos.emiia.ai/mapbox-gl.css" rel="stylesheet">
+    <link href="https://sos.emiia.ai/css.css" rel="stylesheet">
+</head>
+<body>
+<div id="map"></div>
+<script>
+
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
+
+const modelUrl = 'https://sos.emiia.ai/circle_2_glb.glb';
+
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'https://sos.emiia.ai/3d/tiles.json',
+    minZoom: 17,
+    center: [37.630507, 55.833692],
+    zoom: 18,
+    pitch: 60,
+    bearing: 30,
+    antialias: true,
+    fadeDuration: 0
+});
+
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ АНИМАЦИИ
+let animationFrameId = null;
+let pulseAnimationId = null;
+
+map.on('style.load', () => {
+    console.log('Стиль карты загружен, добавляем terrain...');
+    
+    map.addSource('mapbox-dem', {
+        'type': 'raster-dem',
+        'url': 'https://sos.emiia.ai/3d/3d_tiles.json',
+        'tileSize': 512,
+        'maxzoom': 24
+    });
+    map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 0.0 });
+
+    // ОДИНАКОВЫЕ КООРДИНАТЫ ДЛЯ ВСЕХ ТОЧЕК
+    const lineCoordinates = [
+        [37.630507, 55.833692],
+        [37.630877, 55.834026],
+        [37.631323, 55.834250],
+        [37.631735, 55.834216]
+    ];
+
+    // РАЗНЫЕ ВЫСОТЫ ДЛЯ ТРЕХ ТОЧЕК
+    const elevations1 = [15, 25, 30, 35];
+    const elevations2 = [14.98, 24.98, 29.98, 34.98];
+    const elevations3 = [14.9, 24.9, 29.9, 34.9];
+
+    // НАСТРОЙКИ ДЛЯ ТРЕХ ОБЪЕКТОВ
+    const objectSettings = {
+        object1: {
+            pointColor: '#6fa8dc',
+            lineColor: '#3d85c6',
+            size: 140,
+            visible: true,
+            animationSpeed: 0.0007,
+            coordinates: lineCoordinates,
+            elevations: elevations1,
+            modelUri: modelUrl,
+            baseOpacity: 1.0,
+            verticalOffset: 0.02,
+            layerId: 'object-layer-1'
+        },
+        object2: {
+            pointColor: '#f6f6f6',
+            lineColor: '#d3d3d3',
+            baseSize: 190,
+            visible: true,
+            animationSpeed: 0.0007,
+            coordinates: lineCoordinates,
+            elevations: elevations2,
+            modelUri: modelUrl,
+            baseOpacity: 1.0,
+            pulseMin: 0.92,
+            pulseMax: 1.08,
+            verticalOffset: 0.01,
+            layerId: 'object-layer-2'
+        },
+        object3: {
+            pointColor: '#3d85c6',
+            lineColor: '#3d85c6',
+            baseSize: 180,
+            visible: true,
+            animationSpeed: 0.0007,
+            coordinates: lineCoordinates,
+            elevations: elevations3,
+            modelUri: modelUrl,
+            baseOpacity: 0.6,
+            verticalOffset: 0.00,
+            layerId: 'object-layer-3'
+        }
+    };
+
+    // СОЗДАЕМ ЛИНИИ ТРАЕКТОРИЙ
+    map.addSource('elevated-line-1', {
+        'type': 'geojson',
+        'lineMetrics': true,
+        'data': createLineData(lineCoordinates, elevations1)
+    });
+
+    map.addSource('elevated-line-2', {
+        'type': 'geojson',
+        'lineMetrics': true,
+        'data': createLineData(lineCoordinates, elevations2)
+    });
+
+    map.addSource('elevated-line-3', {
+        'type': 'geojson',
+        'lineMetrics': true,
+        'data': createLineData(lineCoordinates, elevations3)
+    });
+
+    map.addLayer({
+        'id': 'elevated-line-1',
+        'type': 'line',
+        'source': 'elevated-line-1',
+        'layout': {
+            'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, elevations1[0], 1, elevations1[elevations1.length-1]],
+            'line-elevation-reference': 'sea'
+        },
+        'paint': {
+            'line-emissive-strength': 1.0,
+            'line-width': 4.0,
+            'line-color': objectSettings.object1.lineColor
+        }
+    });
+
+    map.addLayer({
+        'id': 'elevated-line-2',
+        'type': 'line',
+        'source': 'elevated-line-2',
+        'layout': {
+            'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, elevations2[0], 1, elevations2[elevations2.length-1]],
+            'line-elevation-reference': 'sea'
+        },
+        'paint': {
+            'line-emissive-strength': 1.0,
+            'line-width': 4.0,
+            'line-color': objectSettings.object2.lineColor
+        }
+    });
+
+    map.addLayer({
+        'id': 'elevated-line-3',
+        'type': 'line',
+        'source': 'elevated-line-3',
+        'layout': {
+            'line-z-offset': ['interpolate', ['linear'], ['line-progress'], 0, elevations3[0], 1, elevations3[elevations3.length-1]],
+            'line-elevation-reference': 'sea'
+        },
+        'paint': {
+            'line-emissive-strength': 1.0,
+            'line-width': 4.0,
+            'line-color': objectSettings.object3.lineColor
+        }
+    });
+
+    // СОЗДАЕМ ИСТОЧНИКИ ДЛЯ ТОЧЕК
+    const objectSources = {
+        point1: createObjectSource(lineCoordinates[0], objectSettings.object1.modelUri),
+        point2: createObjectSource(lineCoordinates[0], objectSettings.object2.modelUri),
+        point3: createObjectSource(lineCoordinates[0], objectSettings.object3.modelUri)
+    };
+
+    map.addSource('object-model-1', objectSources.point1);
+    map.addSource('object-model-2', objectSources.point2);
+    map.addSource('object-model-3', objectSources.point3);
+
+    // ДОБАВЛЯЕМ СЛОИ ДЛЯ ТОЧЕК С ОДИНАКОВЫМИ НАСТРОЙКАМИ
+    function addModelLayer(id, sourceId, settings) {
+        const baseSize = settings.baseSize || settings.size;
+        
+        const paintConfig = {
+            'model-opacity': settings.baseOpacity || 1.0,
+            'model-rotation': [0, 0, 0],
+            'model-scale': [baseSize, baseSize, baseSize],
+            'model-color': settings.pointColor,
+            'model-color-mix-intensity': 0.8,
+            'model-cast-shadows': false,
+            'model-translation': [0, 0, settings.elevations[0] + (settings.verticalOffset || 0)],
+            'model-emissive-strength': 1.0,
+            'model-scale-mode': 'map',
+            // УБИРАЕМ ВСЕ ПЕРЕХОДЫ - ЭТО ГЛАВНОЕ!
+            'model-opacity-transition': { duration: 0 },
+            'model-scale-transition': { duration: 0 },
+            'model-color-transition': { duration: 0 },
+            'model-translation-transition': { duration: 0 }
+        };
+
+        map.addLayer({
+            'id': settings.layerId,
+            'type': 'model',
+            'slot': 'middle',
+            'source': sourceId,
+            'minzoom': 10,
+            'maxzoom': 24,
+            'layout': {
+                'model-id': ['get', 'model-uri'],
+                'visibility': settings.visible ? 'visible' : 'none'
+            },
+            'paint': paintConfig
+        });
+    }
+
+    addModelLayer('object-1', 'object-model-1', objectSettings.object1);
+    addModelLayer('object-2', 'object-model-2', objectSettings.object2);
+    addModelLayer('object-3', 'object-model-3', objectSettings.object3);
+
+    // ФИКС: Сразу устанавливаем стабильные свойства для синей точки
+    setTimeout(() => {
+        try {
+            map.setPaintProperty('object-layer-1', 'model-opacity', 1.0);
+            map.setPaintProperty('object-layer-1', 'model-scale', [140, 140, 140]);
+            console.log('Синяя точка: свойства зафиксированы');
+        } catch (e) {
+            console.warn('Не удалось зафиксировать свойства:', e);
+        }
+    }, 100);
+
+    // ПУЛЬСАЦИЯ ТОЛЬКО ДЛЯ СЕРОЙ ТОЧКИ И ВОЛНЫ
+    let pulseTime = 0;
+    
+    function animatePulse(timestamp) {
+        pulseTime += 0.016; // ~60 FPS
+        
+        // Серая точка: легкая пульсация
+        const grayPulse = 0.95 + Math.sin(pulseTime * 2) * 0.05;
+        const graySize = objectSettings.object2.baseSize * grayPulse;
+        
+        if (objectSettings.object2.visible) {
+            map.setPaintProperty('object-layer-2', 'model-scale', [graySize, graySize, graySize]);
+        }
+        
+        // Волна: расширение и затухание
+        const waveProgress = (pulseTime * 2) % 1;
+        if (waveProgress < 0.5) {
+            const waveScale = 1 + waveProgress * 2;
+            const waveOpacity = 0.6 * (1 - waveProgress * 1.8);
+            const waveSize = objectSettings.object3.baseSize * waveScale;
+            
+            if (objectSettings.object3.visible) {
+                map.setPaintProperty('object-layer-3', 'model-scale', [waveSize, waveSize, waveSize]);
+                map.setPaintProperty('object-layer-3', 'model-opacity', waveOpacity);
+            }
+        } else {
+            if (objectSettings.object3.visible) {
+                map.setPaintProperty('object-layer-3', 'model-scale', 
+                    [objectSettings.object3.baseSize, objectSettings.object3.baseSize, objectSettings.object3.baseSize]);
+                map.setPaintProperty('object-layer-3', 'model-opacity', 0.1);
+            }
+        }
+        
+        pulseAnimationId = requestAnimationFrame(animatePulse);
+    }
+
+    // ГЛАВНАЯ АНИМАЦИЯ ДВИЖЕНИЯ ВСЕХ ТОЧЕК СИНХРОННО
+    let progress = 0;
+    let direction = 1;
+    let isMoving = true;
+    let lastTimestamp = 0;
+    
+    function animateMovement(timestamp) {
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const deltaTime = Math.min(timestamp - lastTimestamp, 100);
+        lastTimestamp = timestamp;
+        
+        if (isMoving) {
+            const speedFactor = deltaTime / 16;
+            progress += objectSettings.object1.animationSpeed * direction * speedFactor;
+            
+            // Проверка границ
+            if (progress >= 1 && direction === 1) {
+                progress = 0.999;
+                direction = -1;
+                isMoving = false;
+                setTimeout(() => { isMoving = true; }, 2000);
+            } else if (progress <= 0 && direction === -1) {
+                progress = 0.001;
+                direction = 1;
+                isMoving = false;
+                setTimeout(() => { isMoving = true; }, 2000);
+            }
+            
+            progress = Math.max(0, Math.min(1, progress));
+            
+            // Вычисляем текущую позицию для ВСЕХ точек
+            const segmentIndex = Math.min(
+                Math.floor(progress * (lineCoordinates.length - 1)), 
+                lineCoordinates.length - 2
+            );
+            const segmentProgress = (progress * (lineCoordinates.length - 1)) - segmentIndex;
+            
+            const startCoord = lineCoordinates[segmentIndex];
+            const endCoord = lineCoordinates[segmentIndex + 1];
+            
+            const currentLng = startCoord[0] + (endCoord[0] - startCoord[0]) * segmentProgress;
+            const currentLat = startCoord[1] + (endCoord[1] - startCoord[1]) * segmentProgress;
+            
+            // СИНХРОННО обновляем все три точки в одном кадре
+            try {
+                // 1. Синяя точка (самая высокая)
+                const elevation1 = elevations1[segmentIndex] + 
+                    (elevations1[segmentIndex + 1] - elevations1[segmentIndex]) * segmentProgress;
+                
+                objectSources.point1.data.geometry.coordinates = [currentLng, currentLat];
+                map.getSource('object-model-1').setData(objectSources.point1.data);
+                map.setPaintProperty('object-layer-1', 'model-translation', 
+                    [0, 0, elevation1 + objectSettings.object1.verticalOffset]);
+                
+                // 2. Серая точка (посередине)
+                const elevation2 = elevations2[segmentIndex] + 
+                    (elevations2[segmentIndex + 1] - elevations2[segmentIndex]) * segmentProgress;
+                
+                objectSources.point2.data.geometry.coordinates = [currentLng, currentLat];
+                map.getSource('object-model-2').setData(objectSources.point2.data);
+                map.setPaintProperty('object-layer-2', 'model-translation', 
+                    [0, 0, elevation2 + objectSettings.object2.verticalOffset]);
+                
+                // 3. Волна (самая низкая)
+                const elevation3 = elevations3[segmentIndex] + 
+                    (elevations3[segmentIndex + 1] - elevations3[segmentIndex]) * segmentProgress;
+                
+                objectSources.point3.data.geometry.coordinates = [currentLng, currentLat];
+                map.getSource('object-model-3').setData(objectSources.point3.data);
+                map.setPaintProperty('object-layer-3', 'model-translation', 
+                    [0, 0, elevation3 + objectSettings.object3.verticalOffset]);
+                    
+            } catch (error) {
+                // Игнорируем тихие ошибки
+            }
+        }
+        
+        animationFrameId = requestAnimationFrame(animateMovement);
+    }
+
+    // ЗАПУСК АНИМАЦИЙ
+    map.once('idle', () => {
+        console.log('Карта загружена, запускаем анимации...');
+        
+        setTimeout(() => {
+            // Запускаем обе анимации
+            lastTimestamp = performance.now();
+            animationFrameId = requestAnimationFrame(animateMovement);
+            pulseAnimationId = requestAnimationFrame(animatePulse);
+            
+            console.log('Анимации запущены синхронно');
+            
+            // Тестовая функция для проверки синхронности
+            window.checkSync = function() {
+                console.log('Прогресс:', progress.toFixed(3));
+                console.log('Направление:', direction === 1 ? 'вперед' : 'назад');
+                console.log('Движение:', isMoving ? 'ДА' : 'НЕТ');
+            };
+            
+        }, 1000);
+    });
+
+    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    function createLineData(coordinates, elevations) {
+        return {
+            'type': 'Feature',
+            'properties': { 'elevation': elevations },
+            'geometry': { 'coordinates': coordinates, 'type': 'LineString' }
+        };
+    }
+
+    function createObjectSource(coord, modelUri) {
+        return {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'properties': { 'model-uri': modelUri },
+                'geometry': { 'coordinates': coord, 'type': 'Point' }
+            }
+        };
+    }
+});
+
+// ВАШ CSS ДЛЯ ЗДАНИЙ
+map.on('load', () => {
+    const layers = map.getStyle().layers;
+    let labelLayerId;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+            labelLayerId = layers[i].id;
+            break;
+        }
+    }
+
+    map.addSource('EMIIA_AI_MAP', {
+        url: 'EMIIA_AI',
+        type: 'vector',
+    });
+
+    map.addLayer({
+        'id': 'green-base',
+        'source': 'moscow',
+        'source-layer': 'building',
+        'type': 'fill',
+        'minzoom': 14,
+        'maxzoom': 24,
+        'paint': {
+            'fill-color': '#a4c2f4',
+            'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0.3,
+                15.5, 0.3,
+                18, 0.3,
+                22, 0.3
+            ]
+        }
+    }, labelLayerId);
+
+    map.addLayer({
+        'id': 'building-outlines',
+        'source': 'moscow',
+        'source-layer': 'building',
+        'type': 'line',
+        'minzoom': 14,
+        'maxzoom': 24,
+        'paint': {
+            'line-color': '#ffffff',
+            'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 1,
+                16, 2,
+                18, 2,
+                20, 5
+            ],
+            'line-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 1,
+                15.5, 1,
+                18, 1,
+                22, 1
+            ]
+        }
+    }, labelLayerId);
+
+    map.addLayer({
+        'id': '3d-buildings',
+        'source': 'moscow',
+        'source-layer': 'building',
+        'type': 'fill-extrusion',
+        'minzoom': 14,
+        'maxzoom': 19,
+        'paint': {
+            'fill-extrusion-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'render_height'],
+                1, '#e4e4e4',
+                200, '#e4e4e4',
+                400, '#e4e4e4'
+            ],
+            'fill-extrusion-height': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,
+                15.5, ['get', 'render_height']
+            ],
+            'fill-extrusion-base': [
+                'case',
+                ['>=', ['get', 'zoom'], 16.5],
+                ['get', 'render_min_height'],
+                0
+            ],
+            'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,
+                15.5, 0.8,
+                18, 0.0
+            ]
+        }
+    }, labelLayerId);
+});
+
+// ВАШ ПОЛИГОН
+map.on('load', () => {
+    map.addSource('polygon-source', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                    [37.174014825136595, 55.97747637225763],
+                    [37.174223117007614, 55.97745607738463],
+                    [37.17408018404612, 55.97699461722809],
+                    [37.173873474273904, 55.977014791684724],
+                    [37.174014825136595, 55.97747637225763]
+                ]]
+            },
+            properties: {
+                height: 6.9
+            }
+        }
+    });
+
+    map.addLayer({
+        id: 'extruded-polygon',
+        type: 'fill-extrusion',
+        source: 'polygon-source',
+        paint: {
+            'fill-extrusion-color': '#e4e4e4',
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': 3.85,
+            'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                17.9, 0.007,
+                18.0, 0.009,
+                18.1, 0.2
+            ],
+            'fill-extrusion-ambient-occlusion-intensity': 0
+        }
+    });
+
+    map.setLight({
+        intensity: 0.1
+    });
+});
+
+// ОЧИСТКА АНИМАЦИЙ
+window.addEventListener('beforeunload', () => {
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    if (pulseAnimationId) cancelAnimationFrame(pulseAnimationId);
+});
+
+</script>
+</body>
+</html>
