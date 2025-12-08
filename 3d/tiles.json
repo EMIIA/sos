@@ -6,7 +6,7 @@
       "type": "vector",
       "tiles": ["https://map.emiia.keenetic.pro/tiles/{z}/{x}/{y}.pbf"],
       "minzoom": 0,
-      "maxzoom": 24
+      "maxzoom": 14
     }
   },
   "glyphs": "https://map.emiia.keenetic.pro/fonts/{fontstack}/{range}.pbf",
