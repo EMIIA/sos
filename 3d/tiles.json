@@ -28,8 +28,8 @@
         "fill-color": [
           "match",
           ["get", "class"],
-          "wood", "red",
-          "grass", "green",
+          "wood", "#edeef0",
+          "grass", "#e9ecf2",
           "#f8f9fa"
         ],
         "fill-opacity": 0.7
