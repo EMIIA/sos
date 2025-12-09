@@ -142,9 +142,9 @@
           "interpolate",
           ["linear"],
           ["zoom"],
-          5, 10,
-          10, 16,
-          14, 24
+          3, 10,
+          5, 16,
+          10, 24
         ],
         "text-anchor": "center"
       },
