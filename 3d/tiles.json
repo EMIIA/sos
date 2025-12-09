@@ -100,7 +100,7 @@
         "text-anchor": "center"
       },
       "paint": {
-        "text-color": "#a4c2f4",
+        "text-color": "#3c78d8",
         "text-halo-color": "#ffffff",
         "text-halo-width": 1.5
       }
@@ -124,7 +124,7 @@
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "#a4c2f4",
+        "text-color": "#3c78d8",
         "text-halo-color": "#ffffff",
         "text-halo-width": 2
       }
