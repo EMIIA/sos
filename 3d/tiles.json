@@ -124,7 +124,7 @@
         "symbol-placement": "line"
       },
       "paint": {
-        "text-color": "#888888",
+        "text-color": "red",
         "text-halo-color": "#ffffff",
         "text-halo-width": 2
       }
