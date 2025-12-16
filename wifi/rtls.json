@@ -1,0 +1,405 @@
+{
+  "networks": [
+    {
+      "channel": 60,
+      "distance": 15.2,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "52:FF:20:88:EF:9C",
+      "position": [
+        37.1638353,
+        55.98348535
+      ],
+      "rtt_ms": 12.2,
+      "rtt_real_ms": null,
+      "signal": -62.06545008549964,
+      "ssid": "EMIIA.AI MRV"
+    },
+    {
+      "channel": 3,
+      "distance": 15.3,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "28:DE:A8:6C:7B:AA",
+      "position": [
+        37.16334516,
+        55.98347678
+      ],
+      "rtt_ms": 5.5,
+      "rtt_real_ms": null,
+      "signal": -53.842148028450254,
+      "ssid": "MTS_GPON_E750"
+    },
+    {
+      "channel": 5,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "DC:E3:05:32:8C:AD",
+      "position": [
+        37.16384455,
+        55.98350836
+      ],
+      "rtt_ms": 2.3,
+      "rtt_real_ms": null,
+      "signal": -49.697371214484974,
+      "ssid": "BAVNET"
+    },
+    {
+      "channel": 2,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "1C:7E:E5:38:43:84",
+      "position": [
+        37.1639348,
+        55.9834453
+      ],
+      "rtt_ms": 28.4,
+      "rtt_real_ms": null,
+      "signal": -82.70467649099001,
+      "ssid": "dlink"
+    },
+    {
+      "channel": 11,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "50:D2:F5:B7:69:59",
+      "position": [
+        37.16320662,
+        55.98350926
+      ],
+      "rtt_ms": 33.4,
+      "rtt_real_ms": null,
+      "signal": -88.61736923266092,
+      "ssid": "Xiaomi_6958"
+    },
+    {
+      "channel": 11,
+      "distance": 16,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "44:FF:BA:1B:83:60",
+      "position": [
+        37.16384245,
+        55.9834712
+      ],
+      "rtt_ms": 2.3,
+      "rtt_real_ms": null,
+      "signal": -49.3411344306035,
+      "ssid": "MGTS_GPON_3A02"
+    },
+    {
+      "channel": 6,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "08:9A:C7:E7:4D:EE",
+      "position": [
+        37.16357556,
+        55.9835093
+      ],
+      "rtt_ms": 8.6,
+      "rtt_real_ms": null,
+      "signal": -57.72765861591958,
+      "ssid": "MTS_GPON_A34E"
+    },
+    {
+      "channel": 6,
+      "distance": 32.6,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "34:36:54:5B:CC:A6",
+      "position": [
+        37.16369862,
+        55.98350053
+      ],
+      "rtt_ms": 9.4,
+      "rtt_real_ms": null,
+      "signal": -58.80169269919678,
+      "ssid": "MTS_GPON_C5CB"
+    },
+    {
+      "channel": 6,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "36:36:54:5B:CC:A6",
+      "position": [
+        37.16384449,
+        55.98349542
+      ],
+      "rtt_ms": 9.7,
+      "rtt_real_ms": null,
+      "signal": -59.1139278228288,
+      "ssid": "guest-wifi-2.4G"
+    },
+    {
+      "channel": 1,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "78:81:02:63:0F:41",
+      "position": [
+        37.16361722,
+        55.98347085
+      ],
+      "rtt_ms": 34.5,
+      "rtt_real_ms": null,
+      "signal": -90,
+      "ssid": "MGTS_221"
+    },
+    {
+      "channel": 1,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "D8:AF:81:63:0B:3D",
+      "position": [
+        37.16365782,
+        55.98341059
+      ],
+      "rtt_ms": 34.5,
+      "rtt_real_ms": null,
+      "signal": -90,
+      "ssid": "Akado247"
+    },
+    {
+      "channel": 1,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "98:3B:67:D5:B7:82",
+      "position": [
+        37.16323122,
+        55.98348896
+      ],
+      "rtt_ms": 33.2,
+      "rtt_real_ms": null,
+      "signal": -88.59004061465491,
+      "ssid": "MGTS_GPON_0847"
+    },
+    {
+      "channel": 48,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "28:DE:A8:6C:7B:AC",
+      "position": [
+        37.16385397,
+        55.9834345
+      ],
+      "rtt_ms": 25,
+      "rtt_real_ms": null,
+      "signal": -78.2650736441856,
+      "ssid": "MTS_GPON5_E750"
+    },
+    {
+      "channel": 48,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "DC:E3:05:32:8C:B6",
+      "position": [
+        37.16326194,
+        55.98345525
+      ],
+      "rtt_ms": 11.4,
+      "rtt_real_ms": null,
+      "signal": -61.48430895555769,
+      "ssid": "BAVNET-5G"
+    },
+    {
+      "channel": 44,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "D8:AF:81:74:98:C9",
+      "position": [
+        37.16394296,
+        55.98343936
+      ],
+      "rtt_ms": 33.7,
+      "rtt_real_ms": null,
+      "signal": -89.15586569017991,
+      "ssid": "Lavr245-5"
+    },
+    {
+      "channel": 36,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "08:9A:C7:E7:4D:F0",
+      "position": [
+        37.16353325,
+        55.98344061
+      ],
+      "rtt_ms": 32.8,
+      "rtt_real_ms": null,
+      "signal": -87.89203704901547,
+      "ssid": "MTS_GPON5_A34E"
+    },
+    {
+      "channel": 36,
+      "distance": 16.2,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "44:FF:BA:1B:83:61",
+      "position": [
+        37.16364146,
+        55.98344106
+      ],
+      "rtt_ms": 2.2,
+      "rtt_real_ms": null,
+      "signal": -46.96840714773939,
+      "ssid": "MGTS_GPON5_3A02"
+    },
+    {
+      "channel": 48,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "34:36:54:5B:CC:A8",
+      "position": [
+        37.16356085,
+        55.98345228
+      ],
+      "rtt_ms": 32.7,
+      "rtt_real_ms": null,
+      "signal": -87.82608752679967,
+      "ssid": "MTS_GPON5_C5CB"
+    },
+    {
+      "channel": 7,
+      "distance": 16.3,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "D8:AF:81:74:98:C5",
+      "position": [
+        37.16322894,
+        55.98343407
+      ],
+      "rtt_ms": 2.2,
+      "rtt_real_ms": null,
+      "signal": -49.51723693349516,
+      "ssid": "Lavr245"
+    },
+    {
+      "channel": 12,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "B0:6E:BF:47:01:C0",
+      "position": [
+        37.16304205,
+        55.98346309
+      ],
+      "rtt_ms": 34.6,
+      "rtt_real_ms": null,
+      "signal": -89.9909206010997,
+      "ssid": "Akado253"
+    },
+    {
+      "channel": 6,
+      "distance": 41.6,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "64:6E:EA:BC:43:FD",
+      "position": [
+        37.16334144,
+        55.98344175
+      ],
+      "rtt_ms": 19.4,
+      "rtt_real_ms": null,
+      "signal": -71.10754261896298,
+      "ssid": "SPARTAK4g"
+    },
+    {
+      "channel": 1,
+      "distance": 16,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "D4:01:45:CC:7B:C6",
+      "position": [
+        37.16363696,
+        55.98348256
+      ],
+      "rtt_ms": 7.3,
+      "rtt_real_ms": null,
+      "signal": -56.27861833693403,
+      "ssid": "Beeline_2G_F1938F"
+    },
+    {
+      "channel": 10,
+      "distance": 15.6,
+      "known": true,
+      "last_seen": 1765465265.4868422,
+      "mac": "50:FF:20:68:EF:9C",
+      "position": [
+        37.16332212,
+        55.98346937
+      ],
+      "rtt_ms": 2.3,
+      "rtt_real_ms": null,
+      "signal": -49.883291591718056,
+      "ssid": "EMIIA.AI MRV"
+    },
+    {
+      "channel": 1,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "34:36:54:5A:DE:7A",
+      "position": [
+        37.16352235,
+        55.98341057
+      ],
+      "rtt_ms": 32.7,
+      "rtt_real_ms": null,
+      "signal": -88.08829781340565,
+      "ssid": "kolyanjkee"
+    },
+    {
+      "channel": 36,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "D4:01:45:CC:7B:C1",
+      "position": [
+        37.16352301,
+        55.98347209
+      ],
+      "rtt_ms": 34.2,
+      "rtt_real_ms": null,
+      "signal": -90,
+      "ssid": "Beeline_5G_F1938F"
+    },
+    {
+      "channel": 4,
+      "distance": 50,
+      "known": false,
+      "last_seen": 1765465262.3371537,
+      "mac": "7A:19:21:7B:9B:04",
+      "position": [
+        37.16306229,
+        55.9834891
+      ],
+      "rtt_ms": 26.5,
+      "rtt_real_ms": null,
+      "signal": -79.72263342918197,
+      "ssid": "Podvigins Home"
+    }
+  ],
+  "router": {
+    "ip": "192.168.1.1",
+    "mac": "50:FF:20:68:EF:9C",
+    "position": [
+      37.16332212,
+      55.98346937
+    ],
+    "ssid": "EMIIA.AI MRV"
+  },
+  "timestamp": "2025-12-11T18:01:06.430437",
+  "total_networks": 26
+}
