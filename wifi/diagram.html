@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMIIA.AI DBM - Схема базы данных пространственного интеллекта</title>
+  
+  <script src="https://www.emiia.ru/d3.v7.min.js"></script>
+  <script src="https://www.emiia.ru/dagre-d3.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background: white;
+    }
+    
+    #graph {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .node rect {
+      fill: #a4c2f4ff;
+      stroke: #f8f9fa;
+      stroke-width: 2.5px;
+      rx: 5px;
+      ry: 5px;
+    }
+
+    .node rect:hover {
+      fill: #3c78d8ff;
+    }
+
+    .node text {
+      fill: #f8f9fa;
+      font-size: 11px;
+    }
+
+    .edgePath path {
+      stroke: #3c78d8ff;
+      stroke-width: 1.5px;
+      fill: none;
+    }
+
+    .edgeLabel {
+      font-size: 10px;
+      fill: transparent;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+
+    .tooltip {
+      position: absolute;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      pointer-events: none;
+      font-size: 13px;
+      max-width: 280px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      backdrop-filter: blur(2px);
+      line-height: 1.4;
+    }
+    
+    .tooltip-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #3c78d8;
+      font-size: 14px;
+    }
+    
+    .tooltip-formula {
+      font-family: 'Courier New', monospace;
+      background: #f5f5f5;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+      white-space: pre-wrap;
+    }
+
+    rect {
+      fill: #a4c2f4ff;
+      stroke: #f8f9fa;
+      stroke-width: 2.5px;
+      rx: 5px;
+      ry: 5px;
+    }
+    
+    .node:hover rect {
+      fill: #3c78d8ff;
+    }
+    
+    .node text {
+      fill: #f8f9fa;
+      font-size: 11px;
+    }
+    
+    .node * {
+      pointer-events: visiblePainted;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="graph"></svg>
+
+  <script>
+    // Создаем граф с настройками
+    const g = new dagreD3.graphlib.Graph()
+      .setGraph({
+        rankdir: 'TB',
+        ranksep: 40,
+        edgesep: 15,
+        nodesep: 25
+      })
+      .setDefaultEdgeLabel(function() { return {}; });
+
+    // Настройка стрелок по умолчанию
+    g.graph().edge = g.graph().edge || {};
+    g.graph().edge.arrowhead = 'normal';
+    g.graph().edge.arrowheadStyle = 'fill: #3c78d8; stroke: #3c78d8;';
+
+    // Функция для вычисления размера узла на основе текста
+    function calculateNodeSize(text) {
+      const lines = text.split('\n');
+      const maxLineLength = Math.max(...lines.map(line => line.length));
+      
+      // Вычисляем ширину на основе длины самой длинной строки
+      const width = Math.max(160, maxLineLength * 7);
+      
+      // Вычисляем высоту на основе количества строк
+      const height = Math.max(60, lines.length * 15 + 20);
+      
+      return { width, height };
+    }
+
+    // Определяем узлы базы данных с автоматическим расчетом размеров
+    // Ядро системы
+    const dtLabel = 'digital_twin\nЦифровые двойники\n┄┄┄┄┄┄┄┄\n• twin_id (UUID)\n• physical_id\n• type\n• current_state (JSON)\n• embedding (vector)\n• is_active';
+    const dtSize = calculateNodeSize(dtLabel);
+    g.setNode('DigitalTwin', {
+      label: dtLabel,
+      width: dtSize.width,
+      height: dtSize.height,
+      description: 'Таблица: digital_twin\n\nХранит цифровые двойники физических объектов:\n- IoT устройства\n- Роботы\n- Транспорт\n- Персонал\n\nКлючевые поля:\n• twin_id - уникальный идентификатор\n• physical_id - MAC/серийный номер\n• embedding - вектор для ИИ поиска\n• is_active - флаг активности'
+    });
+
+    const saLabel = 'spatial_anchor\nПространственные точки\n┄┄┄┄┄┄┄┄\n• anchor_id (UUID)\n• geometry (PointZ)\n• topology_code\n• accuracy_mm\n• confidence';
+    const saSize = calculateNodeSize(saLabel);
+    g.setNode('SpatialAnchor', {
+      label: saLabel,
+      width: saSize.width,
+      height: saSize.height,
+      description: 'Таблица: spatial_anchor\n\nТочки пространственной привязки с 6DoF координатами.\n\nТехнологии:\n• EMIIA.AI MAP - топологическое кодирование\n• MRV SDK - миллиметровая точность\n\nТочность: до 10 мм\nДостоверность: 0.0-1.0'
+    });
+
+    const wnLabel = 'wifi_network\nWi-Fi сети\n┄┄┄┄┄┄┄┄\n• network_id (UUID)\n• mac_address\n• ssid\n• channel\n• signal_power\n• is_known';
+    const wnSize = calculateNodeSize(wnLabel);
+    g.setNode('WifiNetwork', {
+      label: wnLabel,
+      width: wnSize.width,
+      height: wnSize.height,
+      description: 'Таблица: wifi_network\n\nБаза данных Wi-Fi сетей для RTLS навигации.\n\nИспользуется для:\n• Позиционирования устройств\n• Анализа покрытия сети\n• Топологического картографирования\n\nДанные собираются через MRV SDK'
+    });
+
+    // ИИ модули
+    const aeLabel = 'ai_embedding\nВекторные эмбеддинги\n┄┄┄┄┄┄┄┄\n• embedding_id (UUID)\n• content_type\n• embedding (1536d)\n• metadata (JSON)\n• created_at';
+    const aeSize = calculateNodeSize(aeLabel);
+    g.setNode('AIEmbedding', {
+      label: aeLabel,
+      width: aeSize.width,
+      height: aeSize.height,
+      description: 'Таблица: ai_embedding\n\nВекторные представления для RAG и ИИ поиска.\n\nРазмерность: 1536 измерений\n\nТипы контента:\n• text - текстовые данные\n• sensor_data - показания датчиков\n• image - изображения\n• rf_signal - радиочастотные сигналы'
+    });
+
+    const rcLabel = 'rag_context\nRAG контекст\n┄┄┄┄┄┄┄┄\n• context_id (UUID)\n• query_text\n• query_embedding\n• retrieved_contexts\n• llm_response';
+    const rcSize = calculateNodeSize(rcLabel);
+    g.setNode('RAGContext', {
+      label: rcLabel,
+      width: rcSize.width,
+      height: rcSize.height,
+      description: 'Таблица: rag_context\n\nХранит контекст для Retrieval-Augmented Generation.\n\nСтруктура:\n• query_embedding - вектор запроса\n• retrieved_contexts - найденные контексты\n• llm_response - ответ ИИ модели\n\nИнтеграция с GPT-4, Claude, Gemini'
+    });
+
+    // Бизнес-логика
+    const bpLabel = 'business_process\nБизнес-процессы\n┄┄┄┄┄┄┄┄\n• process_id (UUID)\n• name\n• type\n• status\n• priority (1-10)\n• assigned_to';
+    const bpSize = calculateNodeSize(bpLabel);
+    g.setNode('BusinessProcess', {
+      label: bpLabel,
+      width: bpSize.width,
+      height: bpSize.height,
+      description: 'Таблица: business_process\n\nУправление бизнес-процессами предприятия.\n\nТипы процессов:\n• manufacturing - производство\n• logistics - логистика\n• maintenance - обслуживание\n\nПриоритет: 1-10 (10 - наивысший)\nИнтеграция с ERP системами'
+    });
+
+    const evLabel = 'event\nСобытия системы\n┄┄┄┄┄┄┄┄\n• event_id (UUID)\n• event_type\n• severity\n• timestamp\n• data (JSON)\n• resolved';
+    const evSize = calculateNodeSize(evLabel);
+    g.setNode('Event', {
+      label: evLabel,
+      width: evSize.width,
+      height: evSize.height,
+      description: 'Таблица: event\n\nЛогирование всех событий системы.\n\nУровни важности:\n• info - информация\n• warning - предупреждение\n• error - ошибка\n• critical - критическая\n\nВсе события привязаны к времени и месту'
+    });
+
+    const rsLabel = 'resource\nРесурсы\n┄┄┄┄┄┄┄┄\n• resource_id (UUID)\n• name\n• type\n• quantity\n• location_zone_id\n• status';
+    const rsSize = calculateNodeSize(rsLabel);
+    g.setNode('Resource', {
+      label: rsLabel,
+      width: rsSize.width,
+      height: rsSize.height,
+      description: 'Таблица: resource\n\nУправление ресурсами предприятия.\n\nТипы ресурсов:\n• material - материалы\n• tool - инструменты\n• vehicle - транспорт\n• personnel - персонал\n\nОтслеживание состояния и местоположения'
+    });
+
+    // Измерения и данные
+    const mmLabel = 'mrv_measurement\nИзмерения MRV\n┄┄┄┄┄┄┄┄\n• measurement_id (UUID)\n• scanner_id\n• network_id\n• timestamp\n• signal_strength\n• distance';
+    const mmSize = calculateNodeSize(mmLabel);
+    g.setNode('MRVMeasurement', {
+      label: mmLabel,
+      width: mmSize.width,
+      height: mmSize.height,
+      description: 'Таблица: mrv_measurement\n\nИзмерения машинного радиозрения (MRV).\n\nТочность позиционирования: 10-50 мм\nЧастота обновления: 10-100 Гц\n\nСвидетельство: RU 2021680482\nТехнология: EMIIA.AI SDK/MRV'
+    });
+
+    const trLabel = 'trajectory\nТраектории движения\n┄┄┄┄┄┄┄┄\n• trajectory_id (UUID)\n• twin_id\n• start_time\n• path (LineStringZ)\n• compressed_path';
+    const trSize = calculateNodeSize(trLabel);
+    g.setNode('Trajectory', {
+      label: trLabel,
+      width: trSize.width,
+      height: trSize.height,
+      description: 'Таблица: trajectory\n\nТраектории движения объектов.\n\nСжатие данных: EMIIA.AI MAP технология\nЭкономия объема: до 70%\n\nФормат: LineStringZ (3D линии)\nПоддержка: 6DoF позиционирование'
+    });
+
+    const tsLabel = 'time_series\nВременные ряды\n┄┄┄┄┄┄┄┄\n• series_id (UUID)\n• timestamp\n• metric_name\n• value\n• quality';
+    const tsSize = calculateNodeSize(tsLabel);
+    g.setNode('TimeSeries', {
+      label: tsLabel,
+      width: tsSize.width,
+      height: tsSize.height,
+      description: 'Таблица: time_series\n\nХранение временных рядов данных.\n\nОптимизация:\n• Партицирование по времени\n• BRIN индексы\n• Материализованные представления\n\nЧастота сбора: до 1 кГц'
+    });
+
+    // Пространственные данные
+    const znLabel = 'zone\nЗоны и геофенсы\n┄┄┄┄┄┄┄┄\n• zone_id (UUID)\n• name\n• type\n• geometry (PolygonZ)\n• topology_code\n• properties (JSON)';
+    const znSize = calculateNodeSize(znLabel);
+    g.setNode('Zone', {
+      label: znLabel,
+      width: znSize.width,
+      height: znSize.height,
+      description: 'Таблица: zone\n\nОпределение зон и геофенсов.\n\nТипы зон:\n• safe - безопасная\n• danger - опасная\n• restricted - ограниченная\n• work - рабочая\n\nГеометрия: PolygonZ (3D полигоны)'
+    });
+
+    // Внешние системы
+    const erpLabel = 'ERP/CRM Systems\nКорпоративные системы\n┄┄┄┄┄┄┄┄\n• SAP\n• 1C\n• Salesforce\n• Odoo';
+    const erpSize = calculateNodeSize(erpLabel);
+    g.setNode('ERP', {
+      label: erpLabel,
+      width: erpSize.width,
+      height: erpSize.height,
+      description: 'Интеграция с внешними ERP/CRM системами.\n\nAPI протоколы:\n• REST API\n• WebSocket\n• GraphQL\n• SOAP\n\nСинхронизация в реальном времени'
+    });
+
+    const llmLabel = 'LLM AI Agents\nИИ-агенты\n┄┄┄┄┄┄┄┄\n• GPT-4\n• Claude\n• Gemini\n• Local LLMs';
+    const llmSize = calculateNodeSize(llmLabel);
+    g.setNode('LLM', {
+      label: llmLabel,
+      width: llmSize.width,
+      height: llmSize.height,
+      description: 'Интеграция с ИИ моделями и агентами.\n\nПоддержка RAG:\n• Векторный поиск\n• Семантический анализ\n• Контекстуализация\n\nОбработка естественного языка'
+    });
+
+    const gisLabel = 'GIS Systems\nГеоинформационные системы\n┄┄┄┄┄┄┄┄\n• ArcGIS\n• QGIS\n• Yandex Maps\n• OpenStreetMap';
+    const gisSize = calculateNodeSize(gisLabel);
+    g.setNode('GIS', {
+      label: gisLabel,
+      width: gisSize.width,
+      height: gisSize.height,
+      description: 'Интеграция с GIS системами.\n\nФорматы данных:\n• GeoJSON\n• KML/KMZ\n• Shapefile\n• GPX\n\nЭкспорт/импорт пространственных данных'
+    });
+
+    // Определяем ребра (связи)
+    // Ядро системы
+    g.setEdge('DigitalTwin', 'SpatialAnchor', {
+      label: '1:1 anchor_id',
+      style: 'stroke: #4a90e2; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #4a90e2; stroke: #4a90e2;'
+    });
+
+    g.setEdge('DigitalTwin', 'WifiNetwork', {
+      label: '1:1 physical_id',
+      style: 'stroke: #4a90e2; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #4a90e2; stroke: #4a90e2;'
+    });
+
+    // ИИ модули
+    g.setEdge('DigitalTwin', 'AIEmbedding', {
+      label: '1:N embeddings',
+      style: 'stroke: #9c27b0; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #9c27b0; stroke: #9c27b0;'
+    });
+
+    g.setEdge('AIEmbedding', 'RAGContext', {
+      label: '1:1 context',
+      style: 'stroke: #9c27b0; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #9c27b0; stroke: #9c27b0;'
+    });
+
+    // Бизнес-логика
+    g.setEdge('DigitalTwin', 'BusinessProcess', {
+      label: 'N:1 assigned_to',
+      style: 'stroke: #ff9800; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #ff9800; stroke: #ff9800;'
+    });
+
+    g.setEdge('BusinessProcess', 'Event', {
+      label: '1:N events',
+      style: 'stroke: #ff9800; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #ff9800; stroke: #ff9800;'
+    });
+
+    g.setEdge('BusinessProcess', 'Resource', {
+      label: '1:N resources',
+      style: 'stroke: #ff9800; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #ff9800; stroke: #ff9800;'
+    });
+
+    // Измерения
+    g.setEdge('WifiNetwork', 'MRVMeasurement', {
+      label: '1:N measurements',
+      style: 'stroke: #00bcd4; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #00bcd4; stroke: #00bcd4;'
+    });
+
+    g.setEdge('DigitalTwin', 'MRVMeasurement', {
+      label: '1:N scanner',
+      style: 'stroke: #00bcd4; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #00bcd4; stroke: #00bcd4;'
+    });
+
+    g.setEdge('DigitalTwin', 'Trajectory', {
+      label: '1:N trajectories',
+      style: 'stroke: #00bcd4; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #00bcd4; stroke: #00bcd4;'
+    });
+
+    // Пространственные данные
+    g.setEdge('SpatialAnchor', 'Zone', {
+      label: '1:1 zone',
+      style: 'stroke: #4caf50; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #4caf50; stroke: #4caf50;'
+    });
+
+    g.setEdge('Trajectory', 'Zone', {
+      label: 'N:1 contains',
+      style: 'stroke: #4caf50; stroke-width: 2px;',
+      arrowheadStyle: 'fill: #4caf50; stroke: #4caf50;'
+    });
+
+    // Внешние системы (пунктирные линии)
+    g.setEdge('ERP', 'BusinessProcess', {
+      label: 'sync API',
+      style: 'stroke: #607d8b; stroke-width: 1.5px; stroke-dasharray: 5,5;',
+      arrowheadStyle: 'fill: #607d8b; stroke: #607d8b;'
+    });
+
+    g.setEdge('LLM', 'RAGContext', {
+      label: 'query RAG',
+      style: 'stroke: #607d8b; stroke-width: 1.5px; stroke-dasharray: 5,5;',
+      arrowheadStyle: 'fill: #607d8b; stroke: #607d8b;'
+    });
+
+    g.setEdge('GIS', 'Zone', {
+      label: 'import/export',
+      style: 'stroke: #607d8b; stroke-width: 1.5px; stroke-dasharray: 5,5;',
+      arrowheadStyle: 'fill: #607d8b; stroke: #607d8b;'
+    });
+
+    // Производные связи (точечные линии)
+    g.setEdge('MRVMeasurement', 'TimeSeries', {
+      label: 'aggregates',
+      style: 'stroke: #ff5722; stroke-width: 1.5px; stroke-dasharray: 2,2;',
+      arrowheadStyle: 'fill: #ff5722; stroke: #ff5722;'
+    });
+
+    g.setEdge('Event', 'BusinessProcess', {
+      label: 'triggers',
+      style: 'stroke: #ff5722; stroke-width: 1.5px; stroke-dasharray: 2,2;',
+      arrowheadStyle: 'fill: #ff5722; stroke: #ff5722;'
+    });
+
+    g.setEdge('Resource', 'Zone', {
+      label: 'located_in',
+      style: 'stroke: #ff5722; stroke-width: 1.5px; stroke-dasharray: 2,2;',
+      arrowheadStyle: 'fill: #ff5722; stroke: #ff5722;'
+    });
+
+    // Рендеринг
+    const svg = d3.select('#graph');
+    const inner = svg.append('g');
+    const render = new dagreD3.render();
+
+    // Создаем элемент для подсказки
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Функция для переноса текста
+    function wrapText(text, width) {
+      const lines = text.split('\n');
+      let result = [];
+      
+      lines.forEach(line => {
+        if (line.length * 6 > width) {
+          const words = line.split(' ');
+          let currentLine = '';
+          words.forEach(word => {
+            if ((currentLine + word).length * 6 > width) {
+              result.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine += (currentLine ? ' ' : '') + word;
+            }
+          });
+          if (currentLine) result.push(currentLine);
+        } else {
+          result.push(line);
+        }
+      });
+      
+      return result;
+    }
+
+    // Кастомизация отображения узлов
+    const oldLabel = dagreD3.label;
+    dagreD3.label = function(node) {
+      const lines = wrapText(node.label, node.width - 20);
+      const tspans = lines.map((line, i) => 
+        `<tspan x="0" dy="${i === 0 ? 0 : 1.2}em">${line}</tspan>`
+      ).join('');
+      return `<text text-anchor="middle" dominant-baseline="middle">${tspans}</text>`;
+    };
+    
+    // Рендерим граф
+    render(inner, g);
+    
+    // Корректируем позиционирование текста
+    inner.selectAll('g.node').each(function(d) {
+      const node = d3.select(this);
+      const text = node.select('text');
+      const rect = node.select('rect');
+      const bbox = text.node().getBBox();
+      
+      // Обновляем размеры прямоугольника
+      rect.attr('width', bbox.width + 20)
+          .attr('height', bbox.height + 15);
+          
+      // Обновляем размеры узла в графе
+      g.node(d).width = bbox.width + 20;
+      g.node(d).height = bbox.height + 15;
+    });
+    
+    // Перерисовываем с новыми размерами
+    render(inner, g);
+    
+    dagreD3.label = oldLabel;
+
+    // Обработчики событий для узлов
+    inner.selectAll("g.node")
+      .on("mouseover", function(event, nodeId) {
+        const node = g.node(nodeId);
+        const tooltipWidth = 280;
+        const margin = 15;
+        
+        tooltip.html(`
+          <div class="tooltip-title">${node.label.split('\n')[0]}</div>
+          <div class="tooltip-formula">${node.description.replace(/\n/g, '<br>')}</div>
+        `);
+        
+        const tooltipRect = tooltip.node().getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const nodeRect = this.getBoundingClientRect();
+
+        if (window.innerWidth <= 768) {
+          let topPos = nodeRect.bottom + 10;
+          
+          if (topPos + tooltipRect.height > viewportHeight) {
+            topPos = nodeRect.top - tooltipRect.height - 10;
+            if (topPos < margin) topPos = margin;
+          }
+          
+          let leftPos = nodeRect.left + (nodeRect.width - tooltipRect.width) / 2;
+          if (leftPos < margin) leftPos = margin;
+          if (leftPos + tooltipRect.width > viewportWidth - margin) {
+            leftPos = viewportWidth - tooltipRect.width - margin;
+          }
+          
+          tooltip.style("top", topPos + "px")
+                 .style("left", leftPos + "px")
+                 .style("transform", "none");
+        } else {
+          let left = event.pageX + 15;
+          let top = event.pageY - 20;
+          
+          if (left + tooltipWidth > viewportWidth - margin) {
+            left = event.pageX - tooltipWidth - 15;
+          }
+          
+          if (top + tooltipRect.height > viewportHeight - margin) {
+            top = event.pageY - tooltipRect.height - 10;
+          }
+          
+          if (top < margin) top = margin;
+          
+          tooltip.style("left", left + "px")
+                 .style("top", top + "px");
+        }
+        
+        tooltip.transition().duration(200).style("opacity", 0.95);
+      })
+      .on("mouseout", function() {
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
+
+    // Корректировка позиционирования текста на ребрах
+    inner.selectAll('g.edgeLabel text').each(function() {
+      const text = d3.select(this);
+      const bbox = text.node().getBBox();
+      text.attr('dy', -bbox.height / 2 + 5);
+      const rect = text.node().previousSibling;
+      if (rect && rect.tagName === 'rect') {
+        d3.select(rect)
+          .attr('x', bbox.x - 8)
+          .attr('y', bbox.y - 4)
+          .attr('width', bbox.width + 16)
+          .attr('height', bbox.height + 8)
+          .attr('rx', 3)
+          .attr('ry', 3);
+      }
+    });
+
+    // Масштабирование и перетаскивание
+    const zoom = d3.zoom()
+      .scaleExtent([0.5, 2])
+      .on('zoom', (event) => {
+        inner.attr('transform', event.transform);
+      });
+    svg.call(zoom);
+
+    // Центрирование графа
+    const graphWidth = g.graph().width;
+    const graphHeight = g.graph().height;
+    const svgWidth = window.innerWidth;
+    const svgHeight = window.innerHeight;
+    const xCenterOffset = (svgWidth - graphWidth) / 2;
+    const yCenterOffset = (svgHeight - graphHeight) / 2;
+    
+    // Если граф слишком большой для экрана, уменьшаем масштаб
+    const scale = Math.min(
+      1,
+      svgWidth / (graphWidth + 100),
+      svgHeight / (graphHeight + 100)
+    );
+    
+    svg.call(zoom.transform, d3.zoomIdentity
+      .translate((svgWidth - graphWidth * scale) / 2, (svgHeight - graphHeight * scale) / 2)
+      .scale(scale)
+    );
+  </script>
+</body>
+</html>
