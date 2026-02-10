@@ -20,6 +20,11 @@
 
 
 
+
+
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1038,14 +1043,27 @@ function resetNotifications() {
                 <span>Обновить данные</span>
             </div>
 
+
+
+     <div class="menu-divider"></div>
+            <div class="menu-item-with-icon" data-action="reset">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308c-.12.1-.12.284 0 .384l2.36 1.966a.25.25 0 0 0 .41-.192z"/>
+                </svg>
+                <span>Сброс данных</span>
+            </div>
+
             <div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="messages">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-dots" viewBox="0 0 16 16">
-  <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-  <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
-</svg>
+                    <path stroke="#f8f9fa" stroke-width="0.5" fill="#f8f9fa" d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2.5a2 2 0 0 0-1.6.8L8 14.333 6.1 11.8a2 2 0 0 0-1.6-.8H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                    <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                </svg>
                 <span>Сообщения</span>
             </div>
+
+
 
             <div class="menu-divider"></div>
             <div class="menu-item-with-icon" data-action="z1">
@@ -1344,9 +1362,14 @@ function handleAction(action, url = null, target = '_self') {
         case 'terms':
             window.location.href = 'https://emiia.ai/terms';
             break;
-        case 'messages':
+        case 'reset':
+            // Сброс уведомлений
             resetNotifications();
-            console.log('✅ Уведомления очищены');
+            console.log('✅ Уведомления сброшены');
+            break;
+        case 'messages':
+            // Переключение SVG — обрабатывается отдельным скриптом
+            console.log('🔄 Переключение SVG...');
             break;
         case 'z1':
             window.location.href = 'https://sos.emiia.ai/wifi/wifi';
@@ -2862,8 +2885,8 @@ var geojson = {
         'coordinates': [37.63147405, 55.83441285]
       },
       'properties': {
-        'title': 'ВкусВилл STORE #21',
-        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581] <br> ВкусВилл #21'
+        'title': 'EMIIA.AI SIP STORE #21',
+        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#3D4581] <br> #21'
       }
     }
   ]
@@ -2928,8 +2951,8 @@ var geojson = {
         'coordinates': [37.63563151,55.83852133]
       },
       'properties': {
-        'title': 'ВКУСВИЛЛ <br>DARK STORE #33',
-        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ВкусВилл ID R: [#3D4581] <br> ВкусВилл Dark Store #33'
+        'title': 'EMIIA.AI SIP <br>DARK STORE #33',
+        'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ <br>EMIIA.AI DBM: ID R: [#3D4581] <br>'
       }
     }
   ]
@@ -3220,12 +3243,6 @@ const svgThermometer = `<svg xmlns="http://www.w3.org/2000/svg" width="32" heigh
 
 
 
-
-
-
-
-
-
 // Создаем пульсирующие иконки для всех трех знаков с РАЗНЫМИ размерами и частотами
 const exclamationPulsing = createPulsingSVGIcon(svgExclamation, 60, 2000);   // Первый знак: размер 60, медленная пульсация (2000ms)
 const energyPulsing = createPulsingSVGIcon(svgEnergy, 80, 1400);             // Второй знак: размер 80, быстрая пульсация (1000ms)
@@ -3249,7 +3266,7 @@ map.addSource('point-1', {
                     'coordinates': [37.63570024, 55.83845765]
                 },
                 'properties': {
-                    'title': 'ВКУСВИЛЛ <br>DARK STORE #33',
+                    'title': 'EMIIA.AI SIP <br>DARK STORE #33',
                     'description': 'EMIIA.AI API: ID R: [#3D4582]'
                 }
             }
@@ -3269,7 +3286,7 @@ map.addSource('point-2', {
                     'coordinates': [37.63572517,55.83859092]
                 },
                 'properties': {
-                    'title': 'ВКУСВИЛЛ <br>DARK STORE #33',
+                    'title': 'EMIIA.AI SIP <br>DARK STORE #33',
                     'description': 'EMIIA.AI API: ID R: [#3D4583]'
                 }
             }
@@ -3294,7 +3311,7 @@ map.addSource('point-3', {
                     'coordinates': [37.63572125,55.83852512]
                 },
                 'properties': {
-                    'title': 'EMIIA.AI SIP: AI WMS<br>DARK STORE #33',
+                    'title': 'EMIIA.AI SIP: AI <br>DARK STORE #33',
                     'description': 'EMIIA.AI API: ID R: [#3D4584]'
                 }
             }
@@ -3573,7 +3590,207 @@ map.on('mouseleave', 'layer-3', function() {
 
 
 
+// === ДОБАВЛЯЕМ ПОСЛЕ СУЩЕСТВУЮЩЕГО КОДА, НЕ УДАЛЯЯ ЕГО ===
 
+// SVG для всех трех новых знаков (как указано)
+const newSVGIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-octagon" viewBox="0 0 16 16">
+  <path  fill="#FFba00" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z"/>
+  <path  fill="#FFba00" d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+</svg>
+`;
+
+// Создаем пульсирующие иконки для новых знаков (разные частоты для визуального разнообразия)
+const newPulsing1 = createPulsingSVGIcon(newSVGIcon, 65, 1800);  // Первый новый знак
+const newPulsing2 = createPulsingSVGIcon(newSVGIcon, 60, 1500);  // Второй новый знак  
+const newPulsing3 = createPulsingSVGIcon(newSVGIcon, 70, 2000);  // Третий новый знак
+
+// Добавляем пульсирующие версии для новых знаков
+map.addImage('new-pulsing-1', newPulsing1, { pixelRatio: 2 });
+map.addImage('new-pulsing-2', newPulsing2, { pixelRatio: 2 });
+map.addImage('new-pulsing-3', newPulsing3, { pixelRatio: 2 });
+
+// Создаем источники для новых знаков
+map.addSource('point-4', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [37.63538235, 55.83843804]
+                },
+                'properties': {
+                    'title': 'EMIIA.AI SIP <br>DARK STORE #33',
+                    'description': 'EMIIA.AI API: ID R: [#3D4585]'
+                }
+            }
+        ]
+    }
+});
+
+map.addSource('point-5', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [37.63551940, 55.83840573]
+                },
+                'properties': {
+                    'title': 'EMIIA.AI SIP <br>DARK STORE #33',
+                    'description': 'EMIIA.AI API: ID R: [#3D4586]'
+                }
+            }
+        ]
+    }
+});
+
+map.addSource('point-6', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [37.63612672, 55.83852930]
+                },
+                'properties': {
+                    'title': 'EMIIA.AI SIP <br>DARK STORE #33',
+                    'description': 'EMIIA.AI API: ID R: [#3D4587]'
+                }
+            }
+        ]
+    }
+});
+
+// Добавляем слои для новых знаков
+map.addLayer({
+    'id': 'layer-4',
+    'type': 'symbol',
+    'source': 'point-4',
+    'minzoom': 18,
+    'layout': {
+        'icon-image': 'new-pulsing-1',
+        'icon-offset': [0, 0],
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true
+    }
+});
+
+map.addLayer({
+    'id': 'layer-5',
+    'type': 'symbol',
+    'source': 'point-5',
+    'minzoom': 18,
+    'layout': {
+        'icon-image': 'new-pulsing-2',
+        'icon-offset': [0, 0],
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true
+    }
+});
+
+map.addLayer({
+    'id': 'layer-6',
+    'type': 'symbol',
+    'source': 'point-6',
+    'minzoom': 18,
+    'layout': {
+        'icon-image': 'new-pulsing-3',
+        'icon-offset': [0, 0],
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true
+    }
+});
+
+// HTML для popup всех трех новых знаков (одинаковый текст как у первого)
+const newRedLinesHTML = `
+<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+    <div style="color: #ff0000; font-size: 14px; margin-bottom: 8px;">
+        Нарушение промышленной безопасности.
+    </div>
+    <div style="color: #ff0000; font-size: 14px;">
+        <a href="https://www.emiia.ai/" 
+           target="_blank" 
+           style="color: #ff0000; text-decoration: none;">
+            ОТЧЁТ ❯
+        </a>
+    </div>
+</div>
+`;
+
+// Обработчики клика по новым знакам
+map.on('click', 'layer-4', function(e) {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const description = e.features[0].properties.description;
+    const title = e.features[0].properties.title;
+    
+    exclamationPopup
+        .setLngLat(coordinates)
+        .setHTML(
+            '<h3>' + title + '</h3><p>' + description + '</p>' + newRedLinesHTML
+        )
+        .addTo(map);
+});
+
+map.on('click', 'layer-5', function(e) {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const description = e.features[0].properties.description;
+    const title = e.features[0].properties.title;
+    
+    exclamationPopup
+        .setLngLat(coordinates)
+        .setHTML(
+            '<h3>' + title + '</h3><p>' + description + '</p>' + newRedLinesHTML
+        )
+        .addTo(map);
+});
+
+map.on('click', 'layer-6', function(e) {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const description = e.features[0].properties.description;
+    const title = e.features[0].properties.title;
+    
+    exclamationPopup
+        .setLngLat(coordinates)
+        .setHTML(
+            '<h3>' + title + '</h3><p>' + description + '</p>' + newRedLinesHTML
+        )
+        .addTo(map);
+});
+
+// Обработчики для показа курсора при наведении на новые знаки
+map.on('mouseenter', 'layer-4', function() {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'layer-4', function() {
+    map.getCanvas().style.cursor = '';
+});
+
+map.on('mouseenter', 'layer-5', function() {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'layer-5', function() {
+    map.getCanvas().style.cursor = '';
+});
+
+map.on('mouseenter', 'layer-6', function() {
+    map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'layer-6', function() {
+    map.getCanvas().style.cursor = '';
+});
 
 
 
@@ -5358,7 +5575,7 @@ map.addSource('model23', {
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://sos.emiia.ai/VV_ZONE_GLB.glb'
+            'model-uri': 'https://sos.emiia.ai/VV_ZONE_GLB.gl'
         },
         'geometry': {
             'coordinates': [37.6357745,55.8383770],
@@ -5430,13 +5647,13 @@ map.addLayer({
 
 
 
-// Добавить источник GeoJSON с указанием модели ВКУСВИЛЛ
+// Добавить источник GeoJSON с указанием модели ВКУСВИЛЛ БАЗА
 map.addSource('model20', {
     'type': 'geojson',
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://sos.emiia.ai/VV_BASE_GLB.glb'
+            'model-uri': 'https://www.emiia.ru/vv/rezervnaja_copy_glb.glb'
         },
         'geometry': {
             'coordinates': [37.6357745,55.8383770],
@@ -5747,11 +5964,6 @@ map.on('load', () => {
 
 
 });
-
-
-
-
-
 
 
 
@@ -6644,8 +6856,350 @@ textarea::placeholder {
 
 
 
+
+
+
+
+<!-- СКРИПТ ЭКСТРУЗИИ (4 ЗОНЫ) -->
+<script>
+(function() {
+    'use strict';
+    
+    const EXTRUSION_HEIGHT = 4.5;
+    const EXTRUSION_OPACITY = 0.5;
+    
+    // Все 4 зоны
+    const zones = [
+        // Зона 1 точка остановки №1
+        [[37.63562028,55.83848023],
+         [37.63565139, 55.83852160],
+         [37.63569232, 55.83851084],
+         [37.63566214,55.83846955],
+         [37.63562028,55.83848023]],
+
+        // Зона 2 курьеры
+        [[37.63579566, 55.83836359],
+         [37.63582623, 55.83840300],
+         [37.63590614,55.83838327],
+         [37.63587510, 55.83834421],
+         [37.63579566, 55.83836359]],
+
+
+        // Зона 3 начальная точка движения робот
+        [[37.63564016, 55.83828259],
+         [37.63569513,55.83835382],
+         [37.63576039,55.83833700],
+         [37.63570430, 55.83826678],
+         [37.63564016, 55.83828259]],
+        
+       
+        // Зона 4
+        [[37.63586790,55.83850825],
+         [37.63582291, 55.83851879],
+         [37.63585426,55.83856156],
+         [37.63590079,55.83855028],
+         [37.63586790,55.83850825]]
+    ];
+    
+    // Ждем загрузки карты
+    if (!map.loaded()) {
+        map.on('load', initZones);
+    } else {
+        initZones();
+    }
+    
+    function initZones() {
+        zones.forEach((polygon, index) => {
+            const zoneId = `extrusion-zone-${index + 1}`;
+            
+            // Создаем источник
+            map.addSource(zoneId + '-src', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [polygon]
+                    },
+                    'properties': {'height': EXTRUSION_HEIGHT}
+                }
+            });
+            
+            // Создаем слой
+            map.addLayer({
+                'id': zoneId,
+                'type': 'fill-extrusion',
+                'source': zoneId + '-src',
+                'minzoom': 17,
+                'paint': {
+                    'fill-extrusion-color': '#90EE90',
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-base': 0,
+                    'fill-extrusion-opacity': 0,
+                    'fill-extrusion-vertical-gradient': false
+                }
+            });
+        });
+        
+        // Запускаем проверку
+        setInterval(checkZones, 50);
+    }
+    
+    function checkZones() {
+        zones.forEach((polygon, index) => {
+            const zoneId = `extrusion-zone-${index + 1}`;
+            let anyInside = false;
+            
+            // Проверяем точки
+            ['dot-point-1', 'dot-point-2'].forEach(pointId => {
+                try {
+                    const source = map.getSource(pointId);
+                    if (source && source._data && source._data.features && source._data.features[0]) {
+                        const coords = source._data.features[0].geometry.coordinates;
+                        if (pointInPolygon(coords, polygon)) {
+                            anyInside = true;
+                        }
+                    }
+                } catch(e) {}
+            });
+            
+            // Устанавливаем прозрачность
+            const opacity = anyInside ? EXTRUSION_OPACITY : 0;
+            try {
+                map.setPaintProperty(zoneId, 'fill-extrusion-opacity', opacity);
+            } catch(e) {}
+        });
+    }
+    
+    function pointInPolygon(point, vs) {
+        const x = point[0], y = point[1];
+        let inside = false;
+        for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+            const xi = vs[i][0], yi = vs[i][1];
+            const xj = vs[j][0], yj = vs[j][1];
+            const intersect = ((yi > y) !== (yj > y)) &&
+                (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
+    }
+    
+})();
+</script>
+
+
+
+
+
+
+
+
+<!-- ВСТАВЬТЕ В КОНЕЦ </body>, ПЕРЕД ЗАКРЫВАЮЩИМ ТЕГОМ -->
+
+<script>
+// === УПРАВЛЕНИЕ АНИМИРОВАННЫМИ SVG (СТАТИЧНЫМИ ИКОНКАМИ) ===
+// === ОБРАБОТЧИК ДЛЯ ПУНКТА "СООБЩЕНИЯ" (SVG-СЛОИ) ===
+(function() {
+    'use strict';
+    
+    // Состояние видимости SVG-слоев (по умолчанию ВЫКЛЮЧЕНЫ)
+    let svgLayersVisible = false;
+    
+    // Все SVG-слои, которые управляются этим пунктом
+    const svgLayers = [
+        'layer-1',                   // восклицательный знак (красный)
+        'layer-2',                   // энергия (красная молния)
+        'layer-3',                   // термометр и влажность
+        'layer-4',                   // жёлтый восклицательный знак 1
+        'layer-5',                   // жёлтый восклицательный знак 2
+        'layer-6',                   // жёлтый восклицательный знак 3
+        'stop-points-layer-1',       // точки остановок 1
+        'stop-points-layer-2',       // точки остановок 2
+        'passed-route-line-1',       // пройденный путь 1
+        'passed-route-line-2',       // пройденный путь 2
+        'future-route-line-1',       // предстоящий путь 1
+        'future-route-line-2',       // предстоящий путь 2
+        'line-background',           // бегущая линия фон
+        'line-dashed'                // бегущая линия пунктир
+    ];
+    
+    // Функция переключения видимости SVG-слоев
+    function toggleSVGLayers() {
+        svgLayersVisible = !svgLayersVisible;
+        
+        svgLayers.forEach(layerId => {
+            try {
+                if (map.getLayer(layerId)) {
+                    // Для слоёв точек остановок отключаем minzoom при скрытии
+                    if (layerId === 'stop-points-layer-1' || layerId === 'stop-points-layer-2') {
+                        if (svgLayersVisible) {
+                            // Показываем: включаем minzoom обратно и делаем visible
+                            map.setLayerZoomRange(layerId, 20, 24);
+                            map.setLayoutProperty(layerId, 'visibility', 'visible');
+                        } else {
+                            // Скрываем: отключаем minzoom и делаем none
+                            map.setLayerZoomRange(layerId, 0, 24);
+                            map.setLayoutProperty(layerId, 'visibility', 'none');
+                        }
+                    } else {
+                        // Обычные слои
+                        map.setLayoutProperty(layerId, 'visibility', 
+                            svgLayersVisible ? 'visible' : 'none');
+                    }
+                }
+            } catch (e) {
+                console.log('Слой не найден:', layerId);
+            }
+        });
+        
+        updateMenuIcon();
+        console.log('SVG-слои:', svgLayersVisible ? 'ВКЛЮЧЕНЫ' : 'ВЫКЛЮЧЕНЫ');
+    }
+    
+    // Обновление иконки и текста в меню
+    function updateMenuIcon() {
+        const messagesItem = document.querySelector('[data-action="messages"]');
+        if (!messagesItem) return;
+        
+        const svg = messagesItem.querySelector('svg');
+        const span = messagesItem.querySelector('span');
+        
+        if (svgLayersVisible) {
+            // Активное состояние — зеленый цвет
+            messagesItem.style.background = 'rgba(144, 238, 144, 0.2)';
+            if (svg) {
+                svg.style.color = '#90EE90';
+                svg.querySelectorAll('path').forEach(path => {
+                    path.setAttribute('stroke', '#90EE90');
+                    path.setAttribute('fill', '#90EE90');
+                });
+            }
+            if (span) span.style.color = '#90EE90';
+        } else {
+            // Неактивное состояние — стандартный цвет
+            messagesItem.style.background = '';
+            if (svg) {
+                svg.style.color = '#f8f9fa';
+                svg.querySelectorAll('path').forEach(path => {
+                    path.setAttribute('stroke', '#f8f9fa');
+                    path.setAttribute('fill', '#f8f9fa');
+                });
+            }
+            if (span) span.style.color = '#f8f9fa';
+        }
+    }
+    
+    // Скрыть все SVG-слои при инициализации
+    function hideAllSVGLayers() {
+        svgLayers.forEach(layerId => {
+            try {
+                if (map.getLayer(layerId)) {
+                    // Для слоёв точек остановок отключаем minzoom при скрытии
+                    if (layerId === 'stop-points-layer-1' || layerId === 'stop-points-layer-2') {
+                        map.setLayerZoomRange(layerId, 0, 24);
+                    }
+                    map.setLayoutProperty(layerId, 'visibility', 'none');
+                }
+            } catch (e) {}
+        });
+    }
+    
+    // Инициализация обработчика
+    function init() {
+        // Сначала скрываем все слои
+        hideAllSVGLayers();
+        
+        const messagesItem = document.querySelector('[data-action="messages"]');
+        if (!messagesItem) {
+            setTimeout(init, 500);
+            return;
+        }
+        
+        // Удаляем старые обработчики через клонирование
+        const newItem = messagesItem.cloneNode(true);
+        messagesItem.parentNode.replaceChild(newItem, messagesItem);
+        
+        // Навешиваем новый обработчик
+        newItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            // Переключаем SVG-слои
+            toggleSVGLayers();
+            
+            // Закрываем меню
+            closeDotsMenu();
+        });
+        
+        // Устанавливаем начальное состояние иконки
+        updateMenuIcon();
+        
+        console.log('✅ Обработчик "Сообщения" (SVG) инициализирован');
+    }
+    
+    // Функция закрытия меню (должна быть доступна из глобальной области)
+    function closeDotsMenu() {
+        const dotsMenu = document.getElementById('dotsMenu');
+        const dotsOverlay = document.getElementById('dotsOverlay');
+        
+        if (!dotsMenu) return;
+        
+        // Закрыть все подменю
+        const allSubmenuParents = dotsMenu.querySelectorAll('.submenu-parent');
+        const allSubmenus = dotsMenu.querySelectorAll('.submenu');
+        
+        allSubmenuParents.forEach(parent => parent.classList.remove('active'));
+        allSubmenus.forEach(submenu => submenu.classList.remove('active'));
+        
+        // Анимация закрытия
+        dotsMenu.style.opacity = '0';
+        dotsMenu.style.transform = 'translateY(10px) scale(0.95)';
+        
+        if (dotsOverlay) {
+            dotsOverlay.style.opacity = '0';
+        }
+        
+        setTimeout(() => {
+            dotsMenu.style.display = 'none';
+            if (dotsOverlay) dotsOverlay.style.display = 'none';
+        }, 300);
+    }
+    
+    // Запуск
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    
+    // Резервные попытки
+    setTimeout(init, 1000);
+    setTimeout(init, 2000);
+    setTimeout(init, 3000);
+    
+})();
+</script>
+
+<style>
+.menu-item-with-icon[data-action="messages"] svg {
+    transition: all 0.3s ease;
+    color: #f8f9fa;
+    fill: #f8f9fa;
+}
+
+.menu-item-with-icon[data-action="messages"]:hover {
+    background: #cccccc69;
+}
+</style>
+
+
+
+
+
 </body>
 </html>
+
+
 
 
 
