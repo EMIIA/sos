@@ -1317,22 +1317,19 @@ function resetNotifications() {
                 background: #cccccc69;
             }
             
-            /* Стилизация скроллбара для WebKit браузеров */
-            #dotsMenu::-webkit-scrollbar {
-                width: 6px;
-            }
-            
-            #dotsMenu::-webkit-scrollbar-track {
-                background: rgba(204, 204, 204, 0.2);
-                border-radius: 10px;
-                margin: 8px 0;
-            }
-            
-            #dotsMenu::-webkit-scrollbar-thumb {
-                background: rgba(248, 249, 250, 0.5);
-                border-radius: 10px;
-            }
-            
+           /* Стилизация скроллбара для WebKit браузеров — ПОЛНОСТЬЮ СКРЫТ */
+#dotsMenu::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    background: transparent !important;
+}
+
+#dotsMenu {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE/Edge */
+    overflow-y: auto; /* сохраняем прокрутку */
+    -webkit-overflow-scrolling: touch; /* плавная прокрутка iOS */
+}
             #dotsMenu::-webkit-scrollbar-thumb:hover {
                 background: rgba(248, 249, 250, 0.7);
             }
