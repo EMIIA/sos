@@ -33,14 +33,26 @@
 
 
 
-<meta charset="UTF-8">
+ <meta charset="UTF-8">
+  <!-- 1. Этот тег КРИТИЧЕН для белого текста на новых iOS -->
+  <meta name="color-scheme" content="dark">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  
+  <!-- 2. Дублируем тег PWA (обязательно!) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-
-
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-<meta name="color-scheme" content="dark">
+  <style>
+    /* 3. Жестко фиксируем темный фон для всего окна */
+    :root { color-scheme: dark; }
+    html, body { 
+      background-color: #383838 !important; 
+      margin: 0; 
+      padding: 0; 
+      height: 100vh;
+    }
+  </style>
 
 
 
@@ -109,7 +121,7 @@ html {
     background-color: #383838 !important;
 }
 body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; background: #383838 }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; background: #383838}
 
 
 
