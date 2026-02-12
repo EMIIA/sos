@@ -30,35 +30,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-
-
  <meta charset="UTF-8">
-  <!-- 1. Этот тег КРИТИЧЕН для белого текста на новых iOS -->
-  <meta name="color-scheme" content="dark">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  
-  <!-- 2. Дублируем тег PWA (обязательно!) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ <meta name="color-scheme" content="dark">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+ 
+ <!-- Оставляем ТОЛЬКО эти два для Apple в самом верху -->
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ <meta name="theme-color" content="#000000">
 
-  <style>
-    /* 3. Жестко фиксируем темный фон для всего окна */
+ <style>
+    /* Мгновенная заливка до загрузки шрифтов и карт */
     :root { color-scheme: dark; }
     html, body { 
-      background-color: #383838 !important; 
-      margin: 0; 
-      padding: 0; 
-      height: 100vh;
+      background: #000000 !important; 
+      background-color: #000000 !important;
+      margin: 0; padding: 0; height: 100vh; 
     }
-  </style>
-
+ </style>
 
 
 <!-- PWA -->
 <link rel="shortcut icon" href="https://sos.emiia.ai/vv.ico" type="image/x-icon">
-<meta name="theme-color" content="#383838">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
@@ -74,6 +68,31 @@
 <meta property="og:title" content="AI WMS"/>
 <meta property="og:image" content="https://sos.emiia.ai/vvjpg.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
+
+
+
+
+
+
+
+
+
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+	<style>
+@import url('https://www.emiia.ru/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+  <style>  
+@import url('/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+</style>
+
+<link rel="stylesheet" href="https://www.emiia.ru/cssfamily=Montserrat.css">
+<link rel="stylesheet" href="/cssfamily=Montserrat.css">
+
 
 
 
@@ -98,43 +117,8 @@
 <link href="/mapbox-gl.css" rel="stylesheet">
 
 
-<style>
-@import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
-</style>
-
-	<style>
-@import url('https://www.emiia.ru/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
-</style>
-
-  <style>  
-@import url('/css.css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
-</style>
-
-<link rel="stylesheet" href="https://www.emiia.ru/cssfamily=Montserrat.css">
-<link rel="stylesheet" href="/cssfamily=Montserrat.css">
 
 
-
-<style>
-
-html {
-    background-color: #383838 !important;
-}
-body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; background: #383838}
-
-
-
-
-
-
-
-
-
-
-
-
-</style>
 </head>
 <body>
 
