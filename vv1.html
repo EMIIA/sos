@@ -3,41 +3,42 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
- <meta charset="UTF-8">
- <meta name="color-scheme" content="dark">
- <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 
 
+<meta charset="UTF-8">
 
 
-<script>
-ap.on('load', function() {
-    // Находим мета-тег и переписываем его содержимое после загрузки карты
-    let meta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-    if (meta) {
-        meta.setAttribute('content', 'default'); // Сброс
-        setTimeout(() => {
-            meta.setAttribute('content', 'black-translucent'); // Принудительный возврат к белому
-        }, 100);
-    }
-});
+<meta name="color-scheme" content="dark">
 
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-
-
-
- 
- <!-- Оставляем ТОЛЬКО эти два для Apple в самом верху -->
- <meta name="apple-mobile-web-app-capable" content="yes">
- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <meta name="theme-color" content="#000000">
-
- 
 
 
 <!-- PWA -->
@@ -46,7 +47,6 @@ ap.on('load', function() {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
-
 
 
 <title>ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</title>
@@ -58,11 +58,6 @@ ap.on('load', function() {
 <meta property="og:title" content="AI WMS"/>
 <meta property="og:image" content="https://sos.emiia.ai/vvjpg.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
-
-
-
-
-
 
 
 
@@ -85,10 +80,16 @@ ap.on('load', function() {
 
 
 
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; background: #000000; }
 
 
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</style>
+
+
+
 
 
 
@@ -101,37 +102,39 @@ ap.on('load', function() {
 <link href="/mapbox-gl.css" rel="stylesheet">
 
 
-<style>
-  /* Жестко заливаем всё черным, чтобы iOS увидела только тьму */
-  html, body { 
-    background-color: #000000 !important; 
-    color-scheme: dark !important;
-  }
-
- :root {
-    color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-    :root {
-        color-scheme: dark !important;
-    }
-}
-</style>
-
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 
 </head>
-
-
-
-
-
-
-
-
-
-
 <body>
+
+
+
+
+
+
+
+<script>
+
+
+        // Принудительное обновление статус-бара после загрузки карты
+        map.on('load', function() {
+            const meta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+            if (meta) {
+                meta.setAttribute('content', 'default'); 
+                setTimeout(() => {
+                    meta.setAttribute('content', 'black-translucent');
+                }, 50);
+            }
+        });
+    </script>
+
+
+
+
+
+
+
 
 <style type="text/css">
    
@@ -7310,29 +7313,3 @@ textarea::placeholder {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
