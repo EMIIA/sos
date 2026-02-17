@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -760,16 +761,19 @@ button,
 }
 
 .mapboxgl-popup {
-    max-width: 290px;
+    max-width: 320px;
+    min-width: 320px;
 }
 
 .mapboxgl-popup-content {
     text-align: left;
     font-family: 'Montserrat', montserrat !important; 
-    border-radius: 20px;
+    border-radius: 30px;
     background-color: #f8f9fa ;
     color: var(--popup-text-color);
-    padding: 15px;
+    padding: 25px;
+    max-width: 280px;
+    min-width: 280px;
 }
 
 .mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
@@ -855,8 +859,8 @@ margin-top: 15px;  /* Опустить к маркеру */
 
 .custom-popup-content {
     background: var(--popup-bg-color);
-    border-radius: 20px;
-    padding: 15px;
+    border-radius: 30px;
+    padding: 25px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     border: 1px solid #e1e5e9;
     min-width: 320px;
