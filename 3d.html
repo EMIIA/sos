@@ -1028,6 +1028,9 @@ margin-top: 15px;  /* Опустить к маркеру */
 }
 </style>
 
+
+
+
 <style>
 /* Убираем мерцание маркеров */
 .marker, .marker1, .mapboxgl-marker {
@@ -1045,9 +1048,7 @@ margin-top: 15px;  /* Опустить к маркеру */
         filter: none !important;
         -webkit-filter: none !important;
     }
-
-
-
+}
 
 /* ИСПРАВЛЕНО: Убираем возможные проблемы с pointer-events */
 .mapboxgl-popup.hexagon-popup {
@@ -1061,24 +1062,14 @@ margin-top: 15px;  /* Опустить к маркеру */
 .mapboxgl-popup.hexagon-popup .mapboxgl-popup-close-button {
     pointer-events: auto !important;
     z-index: 10;
-}
-
-
-
-/* ИСПРАВЛЕНО: Для iOS PWA */
-.mapboxgl-popup.hexagon-popup .mapboxgl-popup-close-button {
-    pointer-events: auto !important;
-    z-index: 10;
-    -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
 }
-
-
-}
 </style>
+
+
 
 </head>
 <body>
@@ -2044,6 +2035,10 @@ function setupHexagonClickHandler() {
     });
 }
 
+
+
+
+
 function setupTooltipHandler(resolution) {
     if (!map) return;
     
@@ -2088,25 +2083,45 @@ function setupTooltipHandler(resolution) {
             currentPopup = null;
         }
         
-        tooltipTimeout = // ИСПРАВЛЕНО: Добавляем обработчики touch для iOS PWA
-setTimeout(() => {
-    const popupEl = window.hexagonPopup.getElement();
-    if (popupEl) {
-        const closeBtn = popupEl.querySelector('.mapboxgl-popup-close-button');
-        if (closeBtn) {
-            closeBtn.addEventListener('touchend', function(ev) {
-                ev.preventDefault();
-                ev.stopPropagation();
-                if (window.hexagonPopup) {
-                    window.hexagonPopup.remove();
-                    window.hexagonPopup = null;
+        tooltipTimeout = setTimeout(() => {
+            const features = map.queryRenderedFeatures(e.point, {
+                layers: [clickLayerId]
+            });
+            
+            if (features.length && !currentPopup) {
+                const feature = features[0];
+                const popupContent = createTooltip(feature);
+                
+                currentPopup = new mapboxgl.Popup({
+                    closeButton: false,
+                    closeOnClick: false,
+                    className: 'custom-tooltip',
+                    anchor: 'bottom',
+                    offset: 10
+                })
+                    .setLngLat(e.lngLat)
+                    .setHTML(popupContent)
+                    .addTo(map);
+                
+                const popupElement = currentPopup.getElement();
+                if (popupElement) {
+                    popupElement.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        isPopupClick = true;
+                        closeTooltip();
+                    });
                 }
-            }, { passive: false });
-        }
-    }
-}, 50);
+            }
+        }, 500);
     });
 }
+
+
+
+
+
+
+
 
 function generateGrid() {
     if (!map || !mapLoaded || isGenerating || !gridActive) return;
