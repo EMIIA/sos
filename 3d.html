@@ -2675,7 +2675,107 @@ function initializeMap() {
                 });
             }
 
-            map.addSource('model20', {
+           
+
+
+
+
+
+
+// Добавляем четвертый источник для нового GLB-файла нижний ВкусВилл нижний
+map.addSource('model22', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+           'coordinates': [37.6357745,55.8383770], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower22',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model22',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+
+
+
+17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+
+
+
+    
+        ],
+        
+
+
+
+
+        
+
+
+
+
+
+'model-rotation': [0, 0.0, -155.8],
+        'model-scale': [1215.5, 1120.0, 1170],
+
+
+
+
+        'model-translation': [0, 0, -0.1], // ЗДЕСЬ: поднятие на 10 единиц по Z
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+
+
+        'model-emissive-strength': 0.9
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ map.addSource('model20', {
                 'type': 'geojson',
                 'data': {
                     'type': 'Feature',
@@ -2718,6 +2818,89 @@ function initializeMap() {
                     'model-emissive-strength': 0.99
                 }
             });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Добавляем второй источник для нового GLB-файла верхний ВкусВилл
+map.addSource('model21', {
+    'type': 'geojson',
+    'data': {
+        'type': 'Feature',
+        'properties': {
+            'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' // Замените на URL второго GLB
+        },
+        'geometry': {
+           'coordinates': [37.6357745,55.8383770], // Другие координаты
+            'type': 'Point'
+        }
+    }
+});
+
+
+
+
+
+
+map.addLayer({
+    'id': 'tower21',
+    'type': 'model',
+    'slot': 'middle',
+    'source': 'model21',
+    'minzoom': 15,
+    'maxzoom': 24,
+    'layout': {
+        'model-id': ['get', 'model-uri']
+    },
+
+
+
+    'paint': {
+        'model-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            17, 0,    // Полная прозрачность (0%) на зуме 17
+            18, 0.1, // Средняя прозрачность (50%) на зуме 17.75
+18.5, 0.9, // Средняя прозрачность (50%) на зуме 17.75
+            19, 1,  // 90% прозрачности (90%) на зуме 18.5
+19.5, 1  // 90% прозрачности (90%) на зуме 18.5
+        ],
+
+        'model-rotation': [0, 0.0, -155.8],
+        'model-scale': [1215.5, 1120.0, 1170],
+        'model-color-mix-intensity': 1,
+        'model-cast-shadows': true,
+        'model-translation': [0, 0, 6.9],
+        'model-emissive-strength': 0.9
+
+
+
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
 
             modelAdded = true;
             console.log('3D модель успешно добавлена');
@@ -2900,7 +3083,7 @@ function handlePwaClick(e) {
 <!-- ВОССТАНОВЛЕННЫЙ БЛОК СПРАВА ВНИЗУ -->
 <div class="header1">
     <a href="javascript:void(0)" onclick="handlePwaClick(event)" 
-       style="display: inline-block; padding: 0; border-radius: 50%; transition: all 0.2s ease;"
+       style="display: inline-block; padding: 0; border-radius: 18%; transition: all 0.2s ease;"
        onmouseout="this.style.background='none'; this.style.transform='scale(1)';"
        ontouchstart="this.style.background='rgba(61, 133, 198, 0.2)'; this.style.transform='scale(0.95)';"
        ontouchend="this.style.background='none'; this.style.transform='scale(1)';"
