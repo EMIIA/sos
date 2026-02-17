@@ -767,41 +767,41 @@ button,
     text-align: left;
     font-family: 'Montserrat', montserrat !important; 
     border-radius: 20px;
-    background-color: var(--popup-bg-color);
+    background-color: white;
     color: var(--popup-text-color);
     padding: 15px;
 }
 
 .mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
-    border-bottom-color: var(--popup-bg-color) !important;
+    border-bottom-color: white !important;
 }
 
 .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
-    border-bottom-color: var(--popup-bg-color) !important;
+    border-bottom-color: white !important;
 }
 
 .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
-    border-bottom-color: var(--popup-bg-color) !important;
+    border-bottom-color: white !important;
 }
 
 .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
-    border-top-color: var(--popup-bg-color) !important;
+    border-top-color: white !important;
 }
 
 .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
-    border-top-color: var(--popup-bg-color) !important;
+    border-top-color: white !important;
 }
 
 .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
-    border-top-color: var(--popup-bg-color) !important;
+    border-top-color: white !important;
 }
 
 .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
-    border-right-color: var(--popup-bg-color) !important;
+    border-right-color: white !important;
 }
 
 .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
-    border-left-color: var(--popup-bg-color) !important;
+    border-left-color: white !important;
 }
 
 .mapboxgl-popup-close-button {
@@ -850,6 +850,7 @@ button,
     font-family: 'Montserrat', sans-serif;
     pointer-events: auto;
     transform: translate(-50%, -100%);
+margin-top: 15px;  /* Опустить к маркеру */
 }
 
 .custom-popup-content {
@@ -992,7 +993,7 @@ button,
 
 /* Стили для попапа гексагонов - ИСПРАВЛЕНО */
 .hexagon-popup-content {
-    background: var(--popup-bg-color);
+    background: white;
     border-radius: 18px;
     padding: 15px 40px 15px 15px; /* ИСПРАВЛЕНО: отступ справа 40px для крестика */  
     min-width: 200px;
@@ -1547,12 +1548,17 @@ function createTooltip(feature) {
     
     const props = feature.properties;
     const lat = props.center_lat.toFixed(12);
-    const lng = props.center_lng.toFixed(12);
+    const lng = props.center_lng.toFixed(14);
     
+    // ИСПРАВЛЕНО: Добавлена строка Resolution
     return `
         <div class="tooltip-row">
             <span class="tooltip-label">ID:</span>
             <span class="tooltip-value">${props.id}</span>
+        </div>
+        <div class="tooltip-row">
+            <span class="tooltip-label">Resolution:</span>
+            <span class="tooltip-value">${currentResolution}</span>
         </div>
         <div class="tooltip-row">
             <span class="tooltip-label">Lat:</span>
@@ -1564,7 +1570,6 @@ function createTooltip(feature) {
         </div>
     `;
 }
-
 function closeTooltip() {
     if (tooltipTimeout) {
         clearTimeout(tooltipTimeout);
@@ -2370,29 +2375,44 @@ function initializeMap() {
 
     // Функция для создания HTML попапа
     function createPopupHTML(title, description, switchState) {
-        return `
-            <div class="custom-popup-content">
-                <div class="custom-popup-tail"></div>
-                <button class="custom-popup-close" id="custom-popup-close-btn">×</button>
-                <h3 style="margin: 0 0 10px 0; color: #383838; font-size: 16px; font-weight: 600; padding-right: 25px;">${title}</h3>
-                <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.5;">${description}</p>
-                
-                <div class="marker-popup-switch">
-                    <label class="switch-container" style="cursor: pointer;">
-                        <div class="switch">
-                            <input type="checkbox" id="custom-marker-switch" ${switchState ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </div>
-                        <span class="switch-text">MARKER1</span>
-                    </label>
-                    <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                    </svg>
-                </div>
+    return `
+        <div class="custom-popup-content">
+            <div class="custom-popup-tail"></div>
+            <button class="custom-popup-close" id="custom-popup-close-btn">×</button>
+            <h3 style="margin: 0 0 10px 0; color: #383838; font-size: 16px; font-weight: 600; padding-right: 25px;">${title}</h3>
+            <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.5;">${description}</p>
+            
+            <div class="marker-popup-switch">
+                <label class="switch-container" style="cursor: pointer;">
+                    <div class="switch">
+                        <input type="checkbox" id="custom-marker-switch" ${switchState ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </div>
+                    <span class="switch-text">EMIIA.AI H12 AUTO</span>
+                </label>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
+                </svg>
             </div>
-        `;
-    }
-
+            
+            <!-- ИСПРАВЛЕНО: Добавлена секция Функции -->
+            <div style="height: 1px; background-color: #e9ecef; margin: 15px 0;"></div>
+            
+            <div class="marker-popup-functions" style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#3d85c6" viewBox="0 0 16 16">
+                        <path d="M2 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5.5a.5.5 0 0 1 0 1H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v4a.5.5 0 0 1-1 0V4a1 1 0 0 0-1-1z"/>
+                        <path d="M3.146 5.146a.5.5 0 0 1 .708 0L5.177 6.47a.75.75 0 0 1 0 1.06L3.854 8.854a.5.5 0 1 1-.708-.708L4.293 7 3.146 5.854a.5.5 0 0 1 0-.708M5.5 9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5"/>
+                    </svg>
+                    <span style="font-size: 14px; font-weight: 500; color: #3d85c6; font-family: 'Montserrat', sans-serif;"> Добавить функции</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#3d85c6" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                </svg>
+            </div>
+        </div>
+    `;
+}
     // ИСПРАВЛЕНО: Функция обновления позиции попапа НАД маркером через getBoundingClientRect
     function updatePopupPositionAboveMarker() {
         if (!currentMarkerElement || customPopupContainer.style.display === 'none') return;
