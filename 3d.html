@@ -2987,6 +2987,18 @@ map.addLayer({
     });
 }
 
+// ================== ФУНКЦИЯ ПЕРЕХОДА НА PWA ДЛЯ MRV ==================
+
+function handleMrvNavigation() {
+    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    
+    if (isPWA) {
+        window.location.href = 'https://sos.emiia.ai/3d.html';
+    } else {
+        window.location.assign('https://sos.emiia.ai/3d.html');
+    }
+}
+
 // ================== ОБРАБОТЧИКИ СОБЫТИЙ ==================
 
 function setupEventListeners() {
@@ -3009,6 +3021,19 @@ function setupEventListeners() {
         if (switchElement && labelElement) {
             labelElement.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('settings-icon')) {
+                    // Особая обработка для MRV - переход на PWA
+                    if (switchConfig.id === 'mrv-switch') {
+                        const mrvSwitch = document.getElementById('mrv-switch');
+                        if (!mrvSwitch.checked) {
+                            mrvSwitch.checked = true;
+                            updateIcons();
+                            setTimeout(() => {
+                                handleMrvNavigation();
+                            }, 300);
+                        }
+                        return;
+                    }
+                    
                     switchElement.checked = !switchElement.checked;
                     
                     if (switchConfig.id !== 'toggle-switch') {
@@ -3022,6 +3047,13 @@ function setupEventListeners() {
             
             switchElement.addEventListener('change', function() {
                 console.log(`${switchConfig.id} изменен: ${this.checked ? 'вкл' : 'выкл'}`);
+                
+                // Особая обработка для MRV - переход на PWA при включении
+                if (switchConfig.id === 'mrv-switch' && this.checked) {
+                    setTimeout(() => {
+                        handleMrvNavigation();
+                    }, 300);
+                }
             });
         }
     });
