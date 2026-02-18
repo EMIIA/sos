@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -1202,6 +1200,8 @@ margin-top: 15px;  /* Опустить к маркеру */
                         <div class="custom-option" data-value="20">20</div>
                         <div class="custom-option" data-value="21">21</div>
                         <div class="custom-option" data-value="22">22</div>
+                        <div class="custom-option" data-value="23">23</div>
+                        <div class="custom-option" data-value="24">24</div>
                     </div>
                     <select id="resolution-select" class="native-select-hidden">
                         <option value="10">10</option>
@@ -1217,6 +1217,8 @@ margin-top: 15px;  /* Опустить к маркеру */
                         <option value="20">20</option>
                         <option value="21">21</option>
                         <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
                     </select>
                 </div>
             </div>
@@ -1308,7 +1310,9 @@ class StableH3Grid {
             19: 6,
             20: 2.5,
             21: 1,
-            22: 0.4
+            22: 0.4,
+            23: 0.15,
+            24: 0.06
         };
     }
     
@@ -1680,7 +1684,9 @@ function displayResolutionLayers(resolution, isActive = false) {
                     18, 0.4,
                     20, 0.5,
                     21, 0.6,
-                    22, 0.7
+                    22, 0.7,
+                    23, 0.8,
+                    24, 0.9
                 ],
                 'line-opacity': isActive ? [
                     'interpolate', ['linear'], ['zoom'],
@@ -1688,7 +1694,8 @@ function displayResolutionLayers(resolution, isActive = false) {
                     10, 0.5,
                     15, 0.7,
                     20, 0.9,
-                    22, 1.0
+                    22, 1.0,
+                    24, 1.0
                 ] : 0
             }
         });
@@ -1699,7 +1706,8 @@ function displayResolutionLayers(resolution, isActive = false) {
             10, 0.5,
             15, 0.7,
             20, 0.9,
-            22, 1.0
+            22, 1.0,
+            24, 1.0
         ] : 0);
     }
     
@@ -1733,7 +1741,9 @@ function displayResolutionLayers(resolution, isActive = false) {
                     18, 1.0,
                     20, 1.25,
                     21, 1.5,
-                    22, 1.75
+                    22, 1.75,
+                    23, 2.0,
+                    24, 2.25
                 ],
                 'line-opacity': [
                     'interpolate', ['linear'], ['zoom'],
@@ -1741,7 +1751,8 @@ function displayResolutionLayers(resolution, isActive = false) {
                     10, 0.8,
                     15, 0.9,
                     20, 1.0,
-                    22, 1.0
+                    22, 1.0,
+                    24, 1.0
                 ]
             }
         });
@@ -1819,7 +1830,8 @@ function updateResolutionVisibility(resolution, isActive) {
             10, 0.5,
             15, 0.7,
             20, 0.9,
-            22, 1.0
+            22, 1.0,
+            24, 1.0
         ] : 0);
     }
     
