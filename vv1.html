@@ -2181,7 +2181,7 @@ mapboxgl.accessToken = 'YOUR_EMIIA_AI_ACCESS_TOKEN';
 
 const map = new mapboxgl.Map({
     container: 'map', 
-    style: 'https://sos.emiia.ai/moscow_style_2.json',
+    style: 'https://sos.emiia.ai/moscow_style_2.json ',
     zoom: 18.3,
     minZoom: 9,
     maxZoom: 20.5,
@@ -2542,7 +2542,11 @@ map.on('load', () => {
         type: 'vector',
     });
 
-    // Добавляем зеленую подложку ПОД зданиями
+    
+
+
+
+// Добавляем зеленую подложку ПОД зданиями
     map.addLayer({
         'id': 'green-base',
         'source': 'openmaptiles',
@@ -2563,6 +2567,8 @@ map.on('load', () => {
             ]
         }
     }, labelLayerId);
+
+
 
     // Добавляем белые линии по контуру зданий
     map.addLayer({
@@ -2687,8 +2693,8 @@ map.on('load', function() {
             data: geoJsonData
         },
         paint: {
-            'fill-color': '#d2ddee',
-            'fill-opacity': 1
+            'fill-color': '#a4c2f4',
+            'fill-opacity': 0.0
         }
     });
 
@@ -2940,7 +2946,7 @@ var geojson = {
         'coordinates': [37.63563151,55.83852133]
       },
       'properties': {
-        'title': 'EMIIA.AI SIP <br>AI DARK STORE #33',
+        'title': 'EMIIA.AI SIP <br>DARK STORE #33',
         'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ <br>EMIIA.AI DBM: ID R: [#3D4581] <br>'
       }
     }
@@ -4942,6 +4948,7 @@ map.on('load', () => {
         requestAnimationFrame(animatePoint2);
     }, 1000);
 });
+
 
 
 
