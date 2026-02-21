@@ -851,7 +851,7 @@ button,
 .custom-popup-content {
     background: var(--popup-bg-color);
     border-radius: 30px;
-    padding: 25px;
+    padding: 48px 25px 30px 25px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     border: 1px solid #e1e5e9;
     min-width: 330px;
@@ -989,7 +989,7 @@ button,
 .hexagon-popup-content {
     background: #f8f9fa;
     border-radius: 18px;
-    padding: 15px 28px 15px 15px;
+    padding: 25px 25px 3px 15px;
     min-width: 200px;
     max-width: 280px;
     position: relative;
@@ -1019,6 +1019,13 @@ button,
     font-family: 'Montserrat', 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
     font-weight: 500;
     text-align: right;
+}
+
+/* Разделительная линия в попапе */
+.popup-divider {
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 10px 0;
 }
 
 /* Ссылка Отчет */
@@ -1254,7 +1261,7 @@ button,
                 <div class="icon-item">
                     <span class="icon-label">EMIIA.AI MAP:</span>
                     <svg class="icon-status icon-inactive" id="map-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                        <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 12 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
                     </svg>
                 </div>
                 
@@ -1467,7 +1474,8 @@ const SAI_SOURCES = {
         layerId: 'sai-r-layer',
         lineLayerId: 'sai-r-line-layer',
         color: '#FFB3BA', // Пастельный красный
-        height: 5
+        height: 5,
+        accuracy: '82,5%' // Точность для красного
     },
     y: {
         url: 'https://www.emiia.ru/hexagon/hexagons_y_json.json',
@@ -1475,7 +1483,8 @@ const SAI_SOURCES = {
         layerId: 'sai-y-layer',
         lineLayerId: 'sai-y-line-layer',
         color: '#FFFFBA', // Пастельный желтый
-        height: 3
+        height: 3,
+        accuracy: '94%' // Точность для желтого
     },
     g: {
         url: 'https://www.emiia.ru/hexagon/hexagons_g_json.json',
@@ -1483,7 +1492,8 @@ const SAI_SOURCES = {
         layerId: 'sai-g-layer',
         lineLayerId: 'sai-g-line-layer',
         color: '#BAFFC9', // Пастельный зеленый
-        height: 1
+        height: 1,
+        accuracy: '99%' // Точность для зеленого
     }
 };
 
@@ -1931,7 +1941,12 @@ function setupHexagonClickHandler() {
                     <span class="tooltip-label">Lng:</span>
                     <span class="tooltip-value">${lng}</span>
                 </div>
-                <a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Отчет ❯</a>
+                <div class="popup-divider"></div>
+                <div class="tooltip-row">
+                    <span class="tooltip-label">Точность данных:</span>
+                    <span class="tooltip-value">99%</span>
+                </div>
+                <a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a>
             </div>
         `;
         
@@ -2057,6 +2072,9 @@ function setupSAIClickHandler() {
             const lat = coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных';
             const lng = coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных';
             
+            // Получаем точность из конфигурации источника
+            const accuracy = config.accuracy;
+            
             const popupContent = `
                 <div class="hexagon-popup-content">
                     <div class="tooltip-row">
@@ -2075,7 +2093,12 @@ function setupSAIClickHandler() {
                         <span class="tooltip-label">Lng:</span>
                         <span class="tooltip-value">${lng}</span>
                     </div>
-                    <a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Отчет ❯</a>
+                    <div class="popup-divider"></div>
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Точность данных:</span>
+                        <span class="tooltip-value">${accuracy}</span>
+                    </div>
+                    <a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a>
                 </div>
             `;
             
@@ -2391,7 +2414,7 @@ function initializeMap() {
             'type': 'Feature',
             'geometry': {
                 'type': 'Point',
-                'coordinates': [37.63563151, 55.83852133]
+                'coordinates': [37.63600178,55.83877508]
             },
             'properties': {
                 'title': 'EMIIA.AI SIP <br>AI DARK STORE #33',
@@ -2537,7 +2560,7 @@ function initializeMap() {
 
         function updateMarkerVisibility() {
             var zoom = map.getZoom();
-            if (zoom > 17) {
+            if (zoom > 24) {
                 el.style.opacity = '0';
                 el.style.pointerEvents = 'none';
                 el.style.display = 'none';
