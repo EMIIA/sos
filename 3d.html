@@ -2610,6 +2610,66 @@ function initializeMap() {
         antialias: true
     });
 
+
+
+// ================== НАЧАЛО БЛОКА СКРЫТИЕ НАЗВАНИЙ УЛИЦ И НОМЕРОВ ДОМОВ ==================
+map.on('style.load', function() {
+    // Ждем небольшую задержку, чтобы стиль полностью загрузился
+    setTimeout(function() {
+        if (!map || !map.getStyle()) return;
+        
+        // Получаем все слои карты
+        const layers = map.getStyle().layers;
+        
+        // Проходим по каждому слою
+        layers.forEach(function(layer) {
+            // Проверяем, является ли слой символьным (текстовым)
+            if (layer.type === 'symbol') {
+                // Устанавливаем прозрачность текста в 0 (полностью прозрачный)
+                map.setPaintProperty(layer.id, 'text-opacity', 0);
+                map.setPaintProperty(layer.id, 'icon-opacity', 0);
+            }
+            
+            // Дополнительно: проверяем по названию слоя для надежности
+            const layerId = layer.id.toLowerCase();
+            if (layerId.includes('road') || 
+                layerId.includes('street') || 
+                layerId.includes('label') || 
+                layerId.includes('housenumber') ||
+                layerId.includes('number') ||
+                layerId.includes('name') ||
+                layerId.includes('place') ||
+                layerId.includes('poi')) {
+                if (map.getLayer(layer.id)) {
+                    map.setPaintProperty(layer.id, 'text-opacity', 0);
+                    map.setPaintProperty(layer.id, 'icon-opacity', 0);
+                }
+            }
+        });
+        
+        console.log('Названия улиц и номера домов скрыты');
+    }, 500); // Небольшая задержка для загрузки стиля
+});
+
+// Также обрабатываем изменение стиля (если стиль меняется динамически)
+map.on('styledata', function() {
+    // Повторяем ту же логику при изменении данных стиля
+    setTimeout(function() {
+        if (!map || !map.getStyle()) return;
+        
+        const layers = map.getStyle().layers;
+        layers.forEach(function(layer) {
+            if (layer.type === 'symbol') {
+                map.setPaintProperty(layer.id, 'text-opacity', 0);
+                map.setPaintProperty(layer.id, 'icon-opacity', 0);
+            }
+        });
+    }, 100);
+});
+// ================== КОНЕЦ БЛОКА СКРЫТИЕ НАЗВАНИЙ УЛИЦ И НОМЕРОВ ДОМОВ ==================
+
+
+
     var geojson = {
         'type': 'FeatureCollection',
         'features': [{
