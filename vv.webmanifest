@@ -1,7 +1,7 @@
 {
   "background_color": "#F8F9FA",
   "theme_color": "#000000",
-  "description": "EMIIA.AI • ❯",
+  "description": "EMIIA.AI ❯",
   "display": "standalone",
   "icons": [
     {
@@ -10,8 +10,8 @@
             "type": "image/png"
     }
   ],
-  "name": "EMIIA.AI SIP • ❯",
-  "short_name": "EMIIA.AI • ❯",
+  "name": "EMIIA.AI SIP ❯",
+  "short_name": "EMIIA.AI ❯",
   "start_url": "/vv.html",
 "scope": "/"
 }
