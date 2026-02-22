@@ -1,7 +1,7 @@
 {
   "background_color": "#000000",
   "theme_color": "#000000",
-  "description": "DARK STORE • ❯",
+  "description": "DARK STORE ❯",
   "display": "standalone",
   "icons": [
     {
@@ -10,7 +10,7 @@
             "type": "image/png"
     }
   ],
-  "name": "EMIIA.AI SIP • ❯",
-  "short_name": "DARK STORE • ❯",
+  "name": "EMIIA.AI SIP ❯",
+  "short_name": "DARK STORE ❯",
   "start_url": "/vv1.html"
 }
