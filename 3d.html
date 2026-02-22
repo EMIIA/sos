@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -1195,6 +1194,21 @@ button,
                 </svg>
             </div>
             
+            <div class="form-check">
+                <label class="form-check-label" for="iot-toggle">
+                    <div class="switch-container">
+                        <div class="switch">
+                            <input type="checkbox" id="iot-switch">
+                            <span class="slider"></span>
+                        </div>
+                        <span class="switch-text">EMIIA.AI IoT</span>
+                    </div>
+                </label>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2zm6 1v2h2v6h-2v2H5v-2H3V5h2V3zm1-2h3v3h-3zm3 11v3h-3v-3zM4 15H1v-3h3zM1 4V1h3v3z"/>
+                </svg>
+            </div>
+            
             <div class="control-group">
                 <label for="resolution-select">Resolution:</label>
                 <div class="custom-select-wrapper" id="resolution-wrapper">
@@ -1288,6 +1302,13 @@ button,
                         <path d="m154.585 115.218c-0.186 20.651-17.184 38.474-38.332 40.193l-0.097-5.252c18.078-1.614 32.65-16.93 32.955-34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/>
                         <path d="m37.415 115.218c0.186 20.65 17.184 38.474 38.332 40.192l0.097-5.252c-18.078-1.614-32.65-16.93-32.955-34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/>
                         <circle cx="96" cy="96" r="21" fill="currentColor"/>
+                    </svg>
+                </div>
+                
+                <div class="icon-item">
+                    <span class="icon-label">EMIIA.AI IoT:</span>
+                    <svg class="icon-status icon-inactive" id="iot-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2zm6 1v2h2v6h-2v2H5v-2H3V5h2V3zm1-2h3v3h-3zm3 11v3h-3v-3zM4 15H1v-3h3zM1 4V1h3v3z"/>
                     </svg>
                 </div>
             </div>
@@ -1466,34 +1487,64 @@ let hexagonVisible = false;
 let saiSwitchState = false;
 let saiVisible = false;
 
-// SAI источники данных
+// ================== ПЕРЕМЕННЫЕ ДЛЯ АНИМАЦИИ SAI ==================
+let saiAnimationId = null;
+let saiAnimationStartTime = null;
+
+// SAI источники данных с параметрами анимации
+// ============================================================
+// РЕГУЛИРОВКА ВЫСОТЫ КРАСНОГО ИСТОЧНИКА:
+// heightAmplitude - амплитуда колебания высоты (на сколько поднимается)
+// spatialWaveAmplitude - амплитуда пространственной волны (волна внутри цвета)
+// ============================================================
 const SAI_SOURCES = {
     r: {
         url: 'https://www.emiia.ru/hexagon/hexagons_r_json.json',
         sourceId: 'sai-r-source',
         layerId: 'sai-r-layer',
         lineLayerId: 'sai-r-line-layer',
-        color: '#FFB3BA', // Пастельный красный
-        height: 5,
-        accuracy: '82,5%' // Точность для красного
+        color: '#FFB3BA',
+        baseHeight: 3,
+        heightAmplitude: 1,          // ← ИЗМЕНИ ЭТО для регулировки высоты красного (уменьши до 2 или 1.5)
+        spatialWaveAmplitude: 2,      // Амплитуда пространственной волны внутри красного
+        spatialWaveSpeed: 0.3,        // Скорость пространственной волны
+        baseOpacity: 0.4,
+        opacityAmplitude: 0.15,
+        phaseOffset: 0,
+        accuracy: '82,5%',
+        geoJSON: null                 // Кэшированные данные с добавленными фазами
     },
     y: {
         url: 'https://www.emiia.ru/hexagon/hexagons_y_json.json',
         sourceId: 'sai-y-source',
         layerId: 'sai-y-layer',
         lineLayerId: 'sai-y-line-layer',
-        color: '#FFFFBA', // Пастельный желтый
-        height: 3,
-        accuracy: '94%' // Точность для желтого
+        color: '#FFFFBA',
+        baseHeight: 2,
+        heightAmplitude: 1,
+        spatialWaveAmplitude: 1.5,    // Амплитуда пространственной волны внутри желтого
+        spatialWaveSpeed: 0.35,       // Скорость немного другая для разнообразия
+        baseOpacity: 0.4,
+        opacityAmplitude: 0.12,
+        phaseOffset: Math.PI * 2 / 3,
+        accuracy: '94%',
+        geoJSON: null
     },
     g: {
         url: 'https://www.emiia.ru/hexagon/hexagons_g_json.json',
         sourceId: 'sai-g-source',
         layerId: 'sai-g-layer',
         lineLayerId: 'sai-g-line-layer',
-        color: '#BAFFC9', // Пастельный зеленый
-        height: 1,
-        accuracy: '99%' // Точность для зеленого
+        color: '#BAFFC9',
+        baseHeight: 1.5,
+        heightAmplitude: 1.5,
+        spatialWaveAmplitude: 1,      // Амплитуда пространственной волны внутри зеленого
+        spatialWaveSpeed: 0.25,       // Скорость волны
+        baseOpacity: 0.4,
+        opacityAmplitude: 0.1,
+        phaseOffset: Math.PI * 4 / 3,
+        accuracy: '99%',
+        geoJSON: null
     }
 };
 
@@ -1536,11 +1587,13 @@ function updateIcons() {
     const dbmIcon = document.getElementById('dbm-icon');
     const vlmIcon = document.getElementById('vlm-icon');
     const mrvIcon = document.getElementById('mrv-icon');
+    const iotIcon = document.getElementById('iot-icon');
     
     const mapActive = document.getElementById('map-switch').checked;
     const dbmActive = document.getElementById('dbm-switch').checked;
     const vlmActive = document.getElementById('vlm-switch').checked;
     const mrvActive = document.getElementById('mrv-switch').checked;
+    const iotActive = document.getElementById('iot-switch').checked;
     
     if (mapActive) {
         mapIcon.classList.remove('icon-inactive');
@@ -1572,6 +1625,27 @@ function updateIcons() {
     } else {
         mrvIcon.classList.remove('icon-active');
         mrvIcon.classList.add('icon-inactive');
+    }
+    
+    if (iotActive) {
+        iotIcon.classList.remove('icon-inactive');
+        iotIcon.classList.add('icon-active');
+    } else {
+        iotIcon.classList.remove('icon-active');
+        iotIcon.classList.add('icon-inactive');
+    }
+}
+
+function updateIotIcon(active) {
+    const iotIcon = document.getElementById('iot-icon');
+    if (!iotIcon) return;
+    
+    if (active) {
+        iotIcon.classList.remove('icon-inactive');
+        iotIcon.classList.add('icon-active');
+    } else {
+        iotIcon.classList.remove('icon-active');
+        iotIcon.classList.add('icon-inactive');
     }
 }
 
@@ -1943,7 +2017,7 @@ function setupHexagonClickHandler() {
                 </div>
                 <div class="popup-divider"></div>
                 <div class="tooltip-row">
-                    <span class="tooltip-label">Точность данных:</span>
+                    <span class="tooltip-label">Точность:</span>
                     <span class="tooltip-value">99%</span>
                 </div>
                 <a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a>
@@ -1965,14 +2039,39 @@ function setupHexagonClickHandler() {
 
 // ================== SAI (HEAT MAP) ФУНКЦИИ ==================
 
+// Подготовка GeoJSON с добавлением случайных фаз для пространственной волны
+function prepareSAIGeoJSON(geoJSON, config) {
+    if (!geoJSON || !geoJSON.features) return geoJSON;
+    
+    // Добавляем каждому гексагону случайную фазу для анимации
+    geoJSON.features.forEach((feature, idx) => {
+        if (!feature.properties) feature.properties = {};
+        
+        // Случайная фаза на основе индекса (псевдослучайная, но детерминированная)
+        // Это создаёт эффект "хождения" по гексагонам
+        const phaseFromIndex = (idx * 0.618033988749895) % 1; // Золотое сечение для распределения
+        const phaseFromCoords = feature.properties.center_lat ? 
+            (feature.properties.center_lat * 100 + feature.properties.center_lng * 100) % (Math.PI * 2) : 0;
+        
+        // Комбинируем для уникальной фазы каждого гексагона
+        feature.properties._wavePhase = phaseFromIndex * Math.PI * 2 + phaseFromCoords;
+        feature.properties._animatedHeight = config.baseHeight;
+    });
+    
+    return geoJSON;
+}
+
 async function loadSAIData() {
     const results = {};
     for (const [key, config] of Object.entries(SAI_SOURCES)) {
         try {
             const response = await fetch(config.url);
             if (response.ok) {
-                results[key] = await response.json();
-                console.log(`SAI ${key} data loaded:`, results[key].features?.length || 0, 'features');
+                const geoJSON = await response.json();
+                // Подготавливаем данные с фазами для анимации
+                config.geoJSON = prepareSAIGeoJSON(geoJSON, config);
+                results[key] = config.geoJSON;
+                console.log(`SAI ${key} data loaded and prepared:`, results[key].features?.length || 0, 'features');
             }
         } catch (error) {
             console.error(`Error loading SAI ${key}:`, error);
@@ -1981,38 +2080,135 @@ async function loadSAIData() {
     return results;
 }
 
+// ================== ФУНКЦИЯ АНИМАЦИИ SAI ==================
+// Анимация с пространственной волной - каждый гексагон имеет свою фазу
+function startSAIAnimation() {
+    if (saiAnimationId) return;
+    
+    saiAnimationStartTime = performance.now();
+    console.log('SAI animation started with spatial wave effect');
+    
+    let lastGeoJSONUpdate = 0;
+    const geoJSONUpdateInterval = 50; // Обновлять GeoJSON каждые 50мс (20 FPS для пространственной волны)
+    
+    function animate(currentTime) {
+        if (!saiVisible || !map) {
+            saiAnimationId = null;
+            return;
+        }
+        
+        const elapsed = (currentTime - saiAnimationStartTime) / 1000;
+        const speed = 0.5; // Скорость глобальной анимации между цветами
+        
+        for (const [key, config] of Object.entries(SAI_SOURCES)) {
+            const layer = map.getLayer(config.layerId);
+            if (!layer) continue;
+            
+            // Глобальная фаза для этого цвета (волна между источниками)
+            const globalPhase = elapsed * speed * Math.PI * 2 + config.phaseOffset;
+            const globalSineValue = Math.sin(globalPhase);
+            
+            // Глобальное смещение высоты и прозрачности
+            const globalHeightOffset = globalSineValue * config.heightAmplitude;
+            const globalOpacityOffset = globalSineValue * config.opacityAmplitude;
+            
+            // Базовые значения с глобальной анимацией
+            const baseHeightWithGlobal = config.baseHeight + globalHeightOffset;
+            const baseOpacityWithGlobal = config.baseOpacity + globalOpacityOffset;
+            
+            // Обновляем GeoJSON с пространственной волной (каждые 50мс для производительности)
+            if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval && config.geoJSON) {
+                const spatialPhase = elapsed * config.spatialWaveSpeed * Math.PI * 2;
+                
+                // Обновляем высоту каждого гексагона
+                config.geoJSON.features.forEach((feature, idx) => {
+                    // Используем сохраненную случайную фазу для этого гексагона
+                    const hexPhase = feature.properties._wavePhase || 0;
+                    
+                    // Вычисляем высоту с пространственной волной
+                    const spatialSineValue = Math.sin(spatialPhase + hexPhase);
+                    const spatialHeightOffset = spatialSineValue * config.spatialWaveAmplitude;
+                    
+                    // Итоговая высота = базовая + глобальная волна + пространственная волна
+                    feature.properties._animatedHeight = baseHeightWithGlobal + spatialHeightOffset;
+                });
+                
+                // Обновляем источник
+                const source = map.getSource(config.sourceId);
+                if (source) {
+                    source.setData(config.geoJSON);
+                }
+            }
+            
+            // Используем expression для получения высоты из свойства
+            try {
+                map.setPaintProperty(config.layerId, 'fill-extrusion-height', 
+                    ['coalesce', ['get', '_animatedHeight'], baseHeightWithGlobal]
+                );
+                map.setPaintProperty(config.layerId, 'fill-extrusion-opacity', baseOpacityWithGlobal);
+            } catch (e) {
+                console.error('Animation error:', e);
+            }
+        }
+        
+        if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval) {
+            lastGeoJSONUpdate = currentTime;
+        }
+        
+        saiAnimationId = requestAnimationFrame(animate);
+    }
+    
+    saiAnimationId = requestAnimationFrame(animate);
+}
+
+function stopSAIAnimation() {
+    if (saiAnimationId) {
+        cancelAnimationFrame(saiAnimationId);
+        saiAnimationId = null;
+        console.log('SAI animation stopped');
+    }
+}
+
 function addSAIToMap(data) {
     if (!map || !mapLoaded) return;
+    
+    // Определяем слой ПЕРЕД которым добавлять SAI (под H12 AUTO)
+    // Если H12 AUTO включен, добавляем SAI ПОД него
+    const beforeLayerId = map.getLayer(hexagonLayerId) ? hexagonLayerId : null;
     
     for (const [key, config] of Object.entries(SAI_SOURCES)) {
         const sourceData = data[key];
         if (!sourceData) continue;
         
-        // Remove existing layers/sources
         if (map.getLayer(config.lineLayerId)) map.removeLayer(config.lineLayerId);
         if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
         if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
         
-        // Add source
         map.addSource(config.sourceId, {
             type: 'geojson',
             data: sourceData
         });
         
-        // Add fill-extrusion layer
+        // Используем expression для высоты - берём из свойства _animatedHeight
+        // Это позволяет каждому гексагону иметь свою высоту
+        // SAI слои добавляем ПОД H12 AUTO (если он есть)
         map.addLayer({
             id: config.layerId,
             type: 'fill-extrusion',
             source: config.sourceId,
             paint: {
                 'fill-extrusion-color': config.color,
-                'fill-extrusion-height': config.height,
-                'fill-extrusion-opacity': 0.4,
+                // Expression: использовать свойство _animatedHeight или базовую высоту
+                'fill-extrusion-height': [
+                    'coalesce',
+                    ['get', '_animatedHeight'],
+                    config.baseHeight
+                ],
+                'fill-extrusion-opacity': config.baseOpacity,
                 'fill-extrusion-base': 0
             }
-        });
+        }, beforeLayerId); // Добавляем ПЕРЕД H12 AUTO (т.е. ПОД него)
         
-        // Add line layer for borders
         map.addLayer({
             id: config.lineLayerId,
             type: 'line',
@@ -2022,14 +2218,21 @@ function addSAIToMap(data) {
                 'line-width': 1,
                 'line-opacity': 0.8
             }
-        });
+        }, beforeLayerId);
     }
     
     setupSAIClickHandler();
     saiVisible = true;
+    
+    // Запускаем анимацию после небольшой задержки
+    setTimeout(() => {
+        startSAIAnimation();
+    }, 100);
 }
 
 function removeSAIFromMap() {
+    stopSAIAnimation();
+    
     if (!map) return;
     
     for (const [key, config] of Object.entries(SAI_SOURCES)) {
@@ -2072,7 +2275,6 @@ function setupSAIClickHandler() {
             const lat = coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных';
             const lng = coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных';
             
-            // Получаем точность из конфигурации источника
             const accuracy = config.accuracy;
             
             const popupContent = `
@@ -2343,7 +2545,7 @@ async function addHexagonsToMap() {
             paint: {
                 'fill-extrusion-color': '#3d85c6',
                 'fill-extrusion-height': 7,
-                'fill-extrusion-opacity': 0.3,
+                'fill-extrusion-opacity': 0.15,  // Уменьшено с 0.3 до 0.15 чтобы видеть SAI под ним
                 'fill-extrusion-base': 0
             }
         });
@@ -2461,6 +2663,19 @@ function initializeMap() {
                     </svg>
                 </div>
                 
+                <div class="marker-popup-switch" style="margin-top: 0; padding-top: 10px;">
+                    <label class="switch-container" style="cursor: pointer;">
+                        <div class="switch">
+                            <input type="checkbox" id="custom-marker-sdk-switch">
+                            <span class="slider"></span>
+                        </div>
+                        <span class="switch-text">EMIIA.AI SDK/MRV</span>
+                    </label>
+                    <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
+                    </svg>
+                </div>
+                
                 <div style="height: 1px; background-color: #e9ecef; margin: 15px 0;"></div>
                 
                 <div class="marker-popup-functions" style="display: flex; align-items: center; justify-content: space-between;">
@@ -2540,6 +2755,26 @@ function initializeMap() {
                     saiCheckbox.checked = !saiCheckbox.checked;
                     window.toggleSAI(saiCheckbox.checked);
                 }
+            });
+        }
+        
+        // Обработчик для переключателя SDK/MRV
+        const sdkCheckbox = document.getElementById('custom-marker-sdk-switch');
+        if (sdkCheckbox) {
+            sdkCheckbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                if (this.checked) {
+                    handleIoTNavigation();
+                }
+            });
+        }
+        
+        const sdkSwitchContainer = customPopupContainer.querySelectorAll('.marker-popup-switch .switch-container')[2];
+        if (sdkSwitchContainer) {
+            sdkSwitchContainer.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                handleIoTNavigation();
             });
         }
     }
@@ -2818,6 +3053,19 @@ function handleMrvNavigation() {
     }
 }
 
+// ================== ФУНКЦИЯ ПЕРЕХОДА НА PWA ДЛЯ IoT ==================
+
+function handleIoTNavigation() {
+    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    const targetUrl = 'https://sos.emiia.ai/mrv.html';
+    
+    if (isPWA) {
+        window.location.href = targetUrl;
+    } else {
+        window.location.assign(targetUrl);
+    }
+}
+
 // ================== ОБРАБОТЧИКИ СОБЫТИЙ ==================
 
 function setupEventListeners() {
@@ -2829,7 +3077,8 @@ function setupEventListeners() {
         { id: 'map-switch', labelFor: 'map-toggle' },
         { id: 'dbm-switch', labelFor: 'dbm-toggle' },
         { id: 'vlm-switch', labelFor: 'vlm-toggle' },
-        { id: 'mrv-switch', labelFor: 'mrv-toggle' }
+        { id: 'mrv-switch', labelFor: 'mrv-toggle' },
+        { id: 'iot-switch', labelFor: 'iot-toggle' }
     ];
     
     switches.forEach(switchConfig => {
@@ -2849,6 +3098,16 @@ function setupEventListeners() {
                         return;
                     }
                     
+                    if (switchConfig.id === 'iot-switch') {
+                        const iotSwitch = document.getElementById('iot-switch');
+                        if (!iotSwitch.checked) {
+                            iotSwitch.checked = true;
+                            updateIotIcon(true);
+                            setTimeout(() => { handleIoTNavigation(); }, 300);
+                        }
+                        return;
+                    }
+                    
                     switchElement.checked = !switchElement.checked;
                     if (switchConfig.id !== 'toggle-switch') updateIcons();
                     const event = new Event('change');
@@ -2859,6 +3118,9 @@ function setupEventListeners() {
             switchElement.addEventListener('change', function() {
                 if (switchConfig.id === 'mrv-switch' && this.checked) {
                     setTimeout(() => { handleMrvNavigation(); }, 300);
+                }
+                if (switchConfig.id === 'iot-switch' && this.checked) {
+                    setTimeout(() => { handleIoTNavigation(); }, 300);
                 }
             });
         }
@@ -2901,6 +3163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dbm-switch').checked = false;
     document.getElementById('vlm-switch').checked = true;
     document.getElementById('mrv-switch').checked = false;
+    document.getElementById('iot-switch').checked = false;
     
     setTimeout(() => {
         const controls = document.getElementById('controls');
