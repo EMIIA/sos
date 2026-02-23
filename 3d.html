@@ -185,7 +185,11 @@ a.mapboxgl-ctrl-logo{ width: 0; height: 0; margin: 0 0 -4px-4px; display: block;
 @supports (-webkit-touch-callout: none) { .marker, .marker1 { filter: none !important; -webkit-filter: none !important; } }
 .mapboxgl-popup.hexagon-popup { pointer-events: auto !important; }
 .mapboxgl-popup.hexagon-popup .mapboxgl-popup-content { pointer-events: auto !important; }
-.mapboxgl-popup.hexagon-popup .mapboxgl-popup-close-button { pointer-events: auto !important; z-index: 10; touch-action: manipulation; cursor: pointer; user-select: none; -webkit-user-select: none; }
+.mapboxgl-popup.hexagon-popup .mapboxgl-popup-close-button { pointer-events: auto !important; z-index: 10; touch-action: manipulation; cursor: pointer; user-select: none; -webkit-user-select: none; } 
+.mapboxgl-canvas { 
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
 </style>
 
 </head>
@@ -430,11 +434,10 @@ const H12_CONFIG = {
     
 color: '#3d85c6',
 
-baseHeight: 2, 
-
+baseHeight: 2,
 heightAmplitude: 1,
 
- spatialWaveAmplitude: 6, spatialWaveSpeed: 1, baseOpacity: 0.4,  geoJSON: null
+ spatialWaveAmplitude: 7, spatialWaveSpeed: 1, baseOpacity: 0.35,  geoJSON: null
 
 
 
@@ -804,34 +807,45 @@ function startH12Animation() {
     console.log('H12 AUTO animation started');
     let lastGeoJSONUpdate = 0;
     const geoJSONUpdateInterval = 50;
+    
     function animate(currentTime) {
         if (!hexagonVisible || !map) { h12AnimationId = null; return; }
         const elapsed = (currentTime - h12AnimationStartTime) / 1000;
-        const speed = 0.5;
         const layer = map.getLayer(hexagonLayerId);
         if (!layer) { h12AnimationId = null; return; }
-        const globalPhase = elapsed * speed * Math.PI * 2;
-        const globalSineValue = Math.sin(globalPhase);
-        const globalHeightOffset = globalSineValue * H12_CONFIG.heightAmplitude;
-        const globalOpacityOffset = globalSineValue * H12_CONFIG.opacityAmplitude;
-        const baseHeightWithGlobal = H12_CONFIG.baseHeight + globalHeightOffset;
-        const baseOpacityWithGlobal = H12_CONFIG.baseOpacity + globalOpacityOffset;
+        
         if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval && H12_CONFIG.geoJSON) {
             const spatialPhase = elapsed * H12_CONFIG.spatialWaveSpeed * Math.PI * 2;
+            
             H12_CONFIG.geoJSON.features.forEach((feature) => {
                 const hexPhase = feature.properties._wavePhase || 0;
-                const spatialSineValue = Math.sin(spatialPhase + hexPhase);
+                
+                // ТОЛЬКО пространственная волна (индивидуальная)
+                const spatialSineValue = (Math.sin(spatialPhase + hexPhase) + 1) / 2; // Преобразуем от -1..1 в 0..1
+                
+                // Высота: базовая + (амплитуда * значение от 0 до 1)
+                // spatialHeightOffset будет от 0 до spatialWaveAmplitude
                 const spatialHeightOffset = spatialSineValue * H12_CONFIG.spatialWaveAmplitude;
-                feature.properties._animatedHeight = baseHeightWithGlobal + spatialHeightOffset;
+                
+                // Итоговая высота: базовая + смещение (никогда не ниже baseHeight)
+                feature.properties._animatedHeight = H12_CONFIG.baseHeight + spatialHeightOffset;
             });
+            
             const source = map.getSource(hexagonSourceId);
             if (source) source.setData(H12_CONFIG.geoJSON);
+            lastGeoJSONUpdate = currentTime;
         }
-        try { map.setPaintProperty(hexagonLayerId, 'fill-extrusion-height', ['coalesce', ['get', '_animatedHeight'], baseHeightWithGlobal]); map.setPaintProperty(hexagonLayerId, 'fill-extrusion-opacity', baseOpacityWithGlobal); }
+        
+        try { 
+            map.setPaintProperty(hexagonLayerId, 'fill-extrusion-height', 
+                ['coalesce', ['get', '_animatedHeight'], H12_CONFIG.baseHeight]); 
+            map.setPaintProperty(hexagonLayerId, 'fill-extrusion-opacity', H12_CONFIG.baseOpacity); 
+        }
         catch (e) { console.error('H12 animation error:', e); }
-        if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval) lastGeoJSONUpdate = currentTime;
+        
         h12AnimationId = requestAnimationFrame(animate);
     }
+    
     h12AnimationId = requestAnimationFrame(animate);
 }
 
