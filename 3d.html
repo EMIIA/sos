@@ -14,1073 +14,178 @@
 
 <!-- PWA STYLE -->
 <style>
-body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    overflow: hidden;
-}
-
-#map {
-    position: fixed;
-    top: -100px;
-    bottom: -100px;
-    left: 0;
-    right: 0;
-    background: #f8f9fa;
-    margin: 0 !important;
-    padding: 0 !important;
-}
+body { margin: 0; padding: 0; height: 100vh; overflow: hidden; }
+#map { position: fixed; top: -100px; bottom: -100px; left: 0; right: 0; background: #f8f9fa; margin: 0 !important; padding: 0 !important; }
 </style>
 
 <style>
-.header1 {
-    padding: 0rem;
-    position: fixed;
-    bottom: 50px;
-    z-index: 20000;
-    right: 5%;
-}
-
-@media (max-width: 768px) {
-    .header1 {
-        bottom: 0px;
-        right: 1%;
-    }
-}
+.header1 { padding: 0rem; position: fixed; bottom: 50px; z-index: 20000; right: 5%; }
+@media (max-width: 768px) { .header1 { bottom: 0px; right: 1%; } }
 </style>
 
 <style>
-.loader {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
-#wave path {
-    fill: #818cf8;
-    transform-origin: 50% 50%;
-    animation: pulse 1s infinite;
-}
-#wave.stop path {
-    animation-play-state: paused;
-}
-
+.loader { display: flex; align-items: center; justify-content: center; height: 100%; }
+#wave path { fill: #818cf8; transform-origin: 50% 50%; animation: pulse 1s infinite; }
+#wave.stop path { animation-play-state: paused; }
 #wave #Line_1 { animation-delay: 0.0s; }
 #wave #Line_2 { animation-delay: 0.15s; }
 #wave #Line_3 { animation-delay: 0.3s; }
 #wave #Line_4 { animation-delay: 0.45s; }
 #wave #Line_5 { animation-delay: 0.6s; }
-
-@keyframes pulse {
-    0%   { transform: scaleY(1);}
-    50%  { transform: scaleY(0.7);}
-    100% { transform: scaleY(1);}
-}
-
-textarea::placeholder {
-    color: #E2E8F0 !important;
-}
-
-@media (max-width: 640px) {
-    textarea::placeholder {
-        color: #E2E8F0 !important;
-    }
-}
+@keyframes pulse { 0% { transform: scaleY(1); } 50% { transform: scaleY(0.7); } 100% { transform: scaleY(1); } }
+textarea::placeholder { color: #E2E8F0 !important; }
+@media (max-width: 640px) { textarea::placeholder { color: #E2E8F0 !important; } }
 </style>
 
-<!-- Подключаем шрифт Montserrat -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- 3D -->
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js"></script>
 <script src="/mapbox-gl.js" type="text/javascript"></script>
-
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
 <link href="/mapbox-gl.css" rel="stylesheet">
 
 <script>
 const selectWrappers = document.querySelectorAll('.custom-select-wrapper');
-
 selectWrappers.forEach(wrapper => {
-    wrapper.addEventListener('touchend', (e) => {
-        e.stopPropagation(); 
-    }, { passive: false });
-
-    wrapper.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
+    wrapper.addEventListener('touchend', (e) => { e.stopPropagation(); }, { passive: false });
+    wrapper.addEventListener('click', (e) => { e.stopPropagation(); });
 });
-
 const optionsBox = document.querySelectorAll('.custom-options');
-optionsBox.forEach(box => {
-    box.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: false });
-});
+optionsBox.forEach(box => { box.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: false }); });
 </script>
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    overflow: hidden;
-    background: #f8f9fa;
-}
-
-#controls {
-    position: absolute;
-    bottom: 70px;
-    left: 25px;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px;
-    border-radius: 38px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    max-width: 280px;
-    min-width: 280px;
-    max-height: 80vh;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    overflow: hidden;
-    transform-origin: bottom left;
-    padding-bottom: 0 !important;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-}
-
-@media (max-width: 768px) {
-    #controls {
-        position: fixed;
-        bottom: 17px !important; 
-        left: 29px !important;
-        padding-bottom: 20px; 
-        box-sizing: border-box;
-        margin-bottom: 0 !important;
-        overflow-y: auto;
-    }
-}
-
-.custom-option {
-    padding: 12px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.header-text, .control-item-label { 
-    white-space: nowrap;
-}
-
-#controls {
-    max-width: 90vw;
-    min-width: 300px;
-    width: max-content;
-}
-
-#controls div, #controls span {
-    white-space: nowrap;
-}
-
-#controls.collapsed {
-    padding-bottom: 10px;
-    height: auto;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-#controls:not(.collapsed):after {
-    content: "";
-    position: absolute;
-    top: 55px; 
-    left: 0;
-    right: 0;
-    height: 30px;
-    background: linear-gradient(to bottom, 
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.9) 50%,
-        rgba(255, 255, 255, 0) 100%
-    );
-    pointer-events: none;
-    z-index: 15;
-}
-
-#controls:not(.collapsed):before {
-    content: "";
-    position: absolute;
-    bottom: 0; 
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(to top, 
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.9) 50%,
-        rgba(255, 255, 255, 0) 100%
-    );
-    pointer-events: none;
-    z-index: 15;
-    border-radius: 0 0 38px 38px;
-}
-
-#controls.collapsed:after {
-    display: none;
-}
-
-#controls.collapsed {
-    padding-top: 12px;
-    padding-bottom: 0px;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.header-text {
-    font-size: 17px;
-    color: #383838;
-    font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 43px;
-    flex-grow: 1;
-}
-
-.toggle-icon {
-    width: 20px;
-    height: 20px;
-    fill: #3d85c6;
-    transition: transform 0.3s ease;
-    flex-shrink: 0;
-    transform: rotate(0deg);
-}
-
-.toggle-icon.collapsed {
-    transform: rotate(180deg);
-}
-
-.menu-content {
-    transition: all 0.3s ease;
-    overflow: hidden;
-    max-height: 60vh;
-    margin-right: -20px;
-    padding-right: 20px;
-}
-
-.menu-content.collapsed {
-    max-height: 0;
-    opacity: 0;
-    margin: 0;
-    padding: 0;
-}
-
-.menu-content::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-}
-
-.menu-content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.menu-content::-webkit-scrollbar-thumb {
-    background: transparent;
-}
-
-.menu-content {
-    scrollbar-width: none;
-}
-
-.control-group {
-    margin-bottom: 15px;
-    position: relative;
-}
-
-.control-group label {
-    display: block;
-    font-size: 14px;
-    color: #383838;
-    margin-bottom: 5px;
-    font-weight: 500;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.custom-select-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-.custom-select-trigger {
-    width: 100%;
-    padding: 8px 30px 8px 12px;
-    border: 2px solid #e1e5e9;
-    border-radius: 15px;
-    background: white;
-    font-size: 14px;
-    font-family: 'Montserrat', sans-serif;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: border-color 0.2s;
-    color: #333;
-}
-
-.custom-select-trigger:hover,
-.custom-select-wrapper.open .custom-select-trigger {
-    border-color: #3d85c6;
-}
-
-.custom-select-trigger::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%233d85c6' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: center;
-    transition: transform 0.3s ease;
-}
-
-.custom-select-wrapper.open .custom-select-trigger::after {
-    transform: translateY(-50%) rotate(180deg);
-}
-
-.custom-options {
-    position: absolute;
-    top: calc(100% + 5px);
-    left: 0;
-    right: 0;
-    background: white;
-    border: 2px solid #e1e5e9;
-    border-radius: 15px;
-    max-height: 200px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    z-index: 10000;
-    display: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.custom-options::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-}
-
-.custom-options::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.custom-options::-webkit-scrollbar-thumb {
-    background: transparent;
-}
-
-.custom-select-wrapper.open .custom-options {
-    display: block;
-}
-
-.custom-option {
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 14px;
-    font-family: 'Montserrat', sans-serif;
-    transition: background-color 0.2s;
-    color: #333;
-}
-
-.custom-option:hover {
-    background-color: #f0f4f8;
-}
-
-.custom-option.selected {
-    background-color: #e8f0fe;
-    color: #3d85c6;
-    font-weight: 500;
-}
-
-.native-select-hidden {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    height: 0;
-    width: 0;
-}
-
-.form-check {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    padding: 0;
-    min-height: 0;
-}
-
-.form-check-input {
-    width: 0;
-    height: 0;
-    opacity: 0;
-    position: absolute;
-}
-
-.form-check-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    font-size: 14px;
-    font-weight: 500;
-    color: #3d85c6;
-    font-family: 'Montserrat', sans-serif;
-    flex: 1;
-}
-
-.switch-container {
-    display: flex;
-    align-items: center;
-    flex: 1;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 42px;
-    height: 21px;
-    margin-right: 10px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 21px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 15px;
-    width: 15px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-input:checked + .slider {
-    background-color: #3d85c6;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-input:checked + .slider:before {
-    transform: translateX(21px);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #3d85c6, 0 0 0 2px rgba(61, 133, 198, 0.2);
-}
-
-.slider:active:before {
-    width: 18px;
-}
-
-.slider, .slider:before {
-    transition: all 0.3s ease;
-}
-
-.switch-text {
-    margin-left: 5px;
-    font-size: 14px;
-    font-weight: 500;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.settings-icon {
-    width: 16px;
-    height: 16px;
-    fill: #3d85c6;
-    margin-left: 10px;
-    flex-shrink: 0;
-}
-
-.stats {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 18px;
-    margin-bottom: 15px;
-    border: 1px solid #e9ecef;
-}
-
-.stat-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 13px;
-    color: #495057;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.stat-value {
-    font-weight: 600;
-    font-family: 'Montserrat', monospace;
-    color: #333;
-}
-
-.grid-active .stat-value {
-    color: #3d85c6;
-}
-
-.grid-inactive .stat-value {
-    color: #666;
-}
-
-.icon-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 13px;
-}
-
-.icon-label {
-    flex: 1;
-    color: #495057;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.icon-status {
-    width: 16px;
-    height: 16px;
-    margin-left: 8px;
-    fill: currentColor;
-    stroke: currentColor;
-}
-
-.icon-active {
-    fill: #3d85c6;
-    stroke: #3d85c6;
-    color: #3d85c6;
-}
-
-.icon-inactive {
-    fill: #ccc;
-    stroke: #ccc;
-    color: #ccc;
-}
-
-.account-settings {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #e9ecef;
-}
-
-.account-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: #383838;
-    font-family: 'Montserrat', sans-serif;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.account-icon {
-    width: 16px;
-    height: 16px;
-    fill: #3d85c6;
-    margin-left: 10px;
-    flex-shrink: 0;
-}
-
-.mapboxgl-popup {
-    max-width: none !important;
-    z-index: 2000;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.mapboxgl-popup-content {
-    padding: 12px 15px;
-    border-radius: 18px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #e1e5e9;
-    animation: fadeIn 0.2s ease-in-out;
-    white-space: nowrap;
-    width: max-content;
-    pointer-events: auto !important;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.tooltip-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 12px;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.tooltip-label {
-    color: #666;
-    font-weight: 500;
-    margin-right: 10px;
-    min-width: 40px;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.tooltip-value {
-    color: #333;
-    font-family: 'Montserrat', 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
-    font-weight: 500;
-    word-break: break-all;
-}
-
-a.mapboxgl-ctrl-logo{
-    width: 0;
-    height: 0;
-    margin: 0 0 -4px-4px;
-    display: block;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    overflow: hidden;
-    background-image: url(data:image/svg+xml;charset=utf-8,%3Csvg width='88' height='23' viewBox='0 0 88 23' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill-rule='evenodd'%3E %3Cdefs%3E %3Cpath id='logo' );
-}
-
-.grid-icon {
-    width: 16px;
-    height: 16px;
-    margin-left: 8px;
-    fill: currentColor;
-    stroke: currentColor;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; background: #f8f9fa; }
+#controls { position: absolute; bottom: 70px; left: 25px; z-index: 1000; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 38px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); max-width: 280px; min-width: 280px; max-height: 80vh; backdrop-filter: blur(10px); transition: all 0.3s ease; overflow: hidden; transform-origin: bottom left; padding-bottom: 0 !important; }
+@media (max-width: 768px) { #controls { position: fixed; bottom: 17px !important; left: 29px !important; padding-bottom: 20px; box-sizing: border-box; margin-bottom: 0 !important; overflow-y: auto; } }
+.custom-option { padding: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.header-text, .control-item-label { white-space: nowrap; }
+#controls { max-width: 90vw; min-width: 300px; width: max-content; }
+#controls div, #controls span { white-space: nowrap; }
+#controls.collapsed { padding-bottom: 10px; height: auto; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; cursor: pointer; }
+#controls:not(.collapsed):after { content: ""; position: absolute; top: 55px; left: 0; right: 0; height: 30px; background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 100%); pointer-events: none; z-index: 15; }
+#controls:not(.collapsed):before { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 100%); pointer-events: none; z-index: 15; border-radius: 0 0 38px 38px; }
+#controls.collapsed:after { display: none; }
+#controls.collapsed { padding-top: 12px; padding-bottom: 0px; }
+.header-left { display: flex; align-items: center; gap: 6px; }
+.header-text { font-size: 17px; color: #383838; font-weight: 600; font-family: 'Montserrat', sans-serif; }
+.header-left { display: flex; align-items: center; gap: 43px; flex-grow: 1; }
+.toggle-icon { width: 20px; height: 20px; fill: #3d85c6; transition: transform 0.3s ease; flex-shrink: 0; transform: rotate(0deg); }
+.toggle-icon.collapsed { transform: rotate(180deg); }
+.menu-content { transition: all 0.3s ease; overflow: hidden; max-height: 60vh; margin-right: -20px; padding-right: 20px; }
+.menu-content.collapsed { max-height: 0; opacity: 0; margin: 0; padding: 0; }
+.menu-content::-webkit-scrollbar { width: 0px; background: transparent; }
+.menu-content::-webkit-scrollbar-track { background: transparent; }
+.menu-content::-webkit-scrollbar-thumb { background: transparent; }
+.menu-content { scrollbar-width: none; }
+.control-group { margin-bottom: 15px; position: relative; }
+.control-group label { display: block; font-size: 14px; color: #383838; margin-bottom: 5px; font-weight: 500; font-family: 'Montserrat', sans-serif; }
+.custom-select-wrapper { position: relative; width: 100%; }
+.custom-select-trigger { width: 100%; padding: 8px 30px 8px 12px; border: 2px solid #e1e5e9; border-radius: 15px; background: white; font-size: 14px; font-family: 'Montserrat', sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s; color: #333; }
+.custom-select-trigger:hover, .custom-select-wrapper.open .custom-select-trigger { border-color: #3d85c6; }
+.custom-select-trigger::after { content: ""; position: absolute; top: 50%; right: 12px; transform: translateY(-50%); width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%233d85c6' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; transition: transform 0.3s ease; }
+.custom-select-wrapper.open .custom-select-trigger::after { transform: translateY(-50%) rotate(180deg); }
+.custom-options { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: white; border: 2px solid #e1e5e9; border-radius: 15px; max-height: 200px; overflow-y: auto; overflow-x: hidden; z-index: 10000; display: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); scrollbar-width: none; -ms-overflow-style: none; }
+.custom-options::-webkit-scrollbar { width: 0px; background: transparent; }
+.custom-options::-webkit-scrollbar-track { background: transparent; }
+.custom-options::-webkit-scrollbar-thumb { background: transparent; }
+.custom-select-wrapper.open .custom-options { display: block; }
+.custom-option { padding: 8px 12px; cursor: pointer; font-size: 14px; font-family: 'Montserrat', sans-serif; transition: background-color 0.2s; color: #333; }
+.custom-option:hover { background-color: #f0f4f8; }
+.custom-option.selected { background-color: #e8f0fe; color: #3d85c6; font-weight: 500; }
+.native-select-hidden { position: absolute; opacity: 0; pointer-events: none; height: 0; width: 0; }
+.form-check { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 0; min-height: 0; }
+.form-check-input { width: 0; height: 0; opacity: 0; position: absolute; }
+.form-check-label { display: flex; align-items: center; cursor: pointer; user-select: none; font-size: 14px; font-weight: 500; color: #3d85c6; font-family: 'Montserrat', sans-serif; flex: 1; }
+.switch-container { display: flex; align-items: center; flex: 1; }
+.switch { position: relative; display: inline-block; width: 42px; height: 21px; margin-right: 10px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 21px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); }
+.slider:before { position: absolute; content: ""; height: 15px; width: 15px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+input:checked + .slider { background-color: #3d85c6; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3); }
+input:checked + .slider:before { transform: translateX(21px); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+input:focus + .slider { box-shadow: 0 0 1px #3d85c6, 0 0 0 2px rgba(61, 133, 198, 0.2); }
+.slider:active:before { width: 18px; }
+.slider, .slider:before { transition: all 0.3s ease; }
+.switch-text { margin-left: 5px; font-size: 14px; font-weight: 500; font-family: 'Montserrat', sans-serif; }
+.settings-icon { width: 16px; height: 16px; fill: #3d85c6; margin-left: 10px; flex-shrink: 0; }
+.stats { background: #f8f9fa; padding: 12px; border-radius: 18px; margin-bottom: 15px; border: 1px solid #e9ecef; }
+.stat-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #495057; font-family: 'Montserrat', sans-serif; }
+.stat-value { font-weight: 600; font-family: 'Montserrat', monospace; color: #333; }
+.grid-active .stat-value { color: #3d85c6; }
+.grid-inactive .stat-value { color: #666; }
+.icon-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; }
+.icon-label { flex: 1; color: #495057; font-family: 'Montserrat', sans-serif; }
+.icon-status { width: 16px; height: 16px; margin-left: 8px; fill: currentColor; stroke: currentColor; }
+.icon-active { fill: #3d85c6; stroke: #3d85c6; color: #3d85c6; }
+.icon-inactive { fill: #ccc; stroke: #ccc; color: #ccc; }
+.account-settings { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e9ecef; }
+.account-text { font-size: 14px; font-weight: 500; color: #383838; font-family: 'Montserrat', sans-serif; flex: 1; display: flex; align-items: center; gap: 6px; }
+.account-icon { width: 16px; height: 16px; fill: #3d85c6; margin-left: 10px; flex-shrink: 0; }
+.mapboxgl-popup { max-width: none !important; z-index: 2000; font-family: 'Montserrat', sans-serif; }
+.mapboxgl-popup-content { padding: 12px 15px; border-radius: 18px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); border: 1px solid #e1e5e9; animation: fadeIn 0.2s ease-in-out; white-space: nowrap; width: max-content; pointer-events: auto !important; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.tooltip-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; font-family: 'Montserrat', sans-serif; }
+.tooltip-label { color: #666; font-weight: 500; margin-right: 10px; min-width: 40px; font-family: 'Montserrat', sans-serif; }
+.tooltip-value { color: #333; font-family: 'Montserrat', 'SF Mono', Monaco, Consolas, 'Courier New', monospace; font-weight: 500; word-break: break-all; }
+a.mapboxgl-ctrl-logo{ width: 0; height: 0; margin: 0 0 -4px-4px; display: block; background-repeat: no-repeat; cursor: pointer; overflow: hidden; }
+.grid-icon { width: 16px; height: 16px; margin-left: 8px; fill: currentColor; stroke: currentColor; }
 </style>
 
 <style>
-* {
-    -webkit-tap-highlight-color: transparent;
-}
-
-.form-check-label,
-.switch,
-.switch-text,
-.custom-select-trigger,
-.custom-option,
-.header1,
-.header1 a,
-.mapboxgl-popup-close-button,
-button,
-[onclick] {
-    -webkit-tap-highlight-color: transparent !important;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-}
-
-.form-check-label:active,
-.switch:active,
-.custom-select-trigger:active {
-    opacity: 0.9;
-    transform: scale(0.98);
-    transition: all 0.1s ease;
-}
-
-.header1 a:active {
-    transform: scale(0.95);
-    background-color: rgba(61, 133, 198, 0.1);
-}
+* { -webkit-tap-highlight-color: transparent; }
+.form-check-label, .switch, .switch-text, .custom-select-trigger, .custom-option, .header1, .header1 a, .mapboxgl-popup-close-button, button, [onclick] { -webkit-tap-highlight-color: transparent !important; -webkit-user-select: none; -webkit-touch-callout: none; }
+.form-check-label:active, .switch:active, .custom-select-trigger:active { opacity: 0.9; transform: scale(0.98); transition: all 0.1s ease; }
+.header1 a:active { transform: scale(0.95); background-color: rgba(61, 133, 198, 0.1); }
 </style>
 
 <style>
-:root {
-    --popup-bg-color: #f8f9fa;
-    --popup-text-color: #3d85c6;
-    --close-button-color: #3d85c6;
-    --close-button-hover-color: #383838;
-    --close-button-bg-hover: rgba(0, 0, 0, 0.1);
-}
-
-.marker {
-    background-image: url('https://sos.emiia.ai/vv_g_m_STORE_21_90EE90.svg');
-    background-size: cover;
-    width: 80px;
-    height: 80px;
-    border-radius: 0%;
-    cursor: pointer;
-}
-
-.marker1 {
-    background-image: url('https://sos.emiia.ai/vv_1_svg.svg');
-    background-size: cover;
-    width: 110px;
-    height: 110px;
-    border-radius: 0%;
-    cursor: pointer;
-    transform: translate(-50%, -50%);
-    z-index: 999;
-}
-
-.mapboxgl-popup-content {
-    text-align: left;
-    font-family: 'Montserrat', montserrat !important; 
-    border-radius: 30px;
-    background-color: #f8f9fa ;
-    color: var(--popup-text-color);
-    padding: 25px;
-    max-width: 320px;
-    min-width: 280px;
-}
-
-.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
-    border-bottom-color: #f8f9fa  !important;
-}
-
-.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
-    border-bottom-color: #f8f9fa  !important;
-}
-
-.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
-    border-bottom-color:#f8f9fa !important;
-}
-
-.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
-    border-top-color: #f8f9fa  !important;
-}
-
-.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
-    border-top-color: #f8f9fa  !important;
-}
-
-.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
-    border-top-color: #f8f9fa  !important;
-}
-
-.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
-    border-right-color: #f8f9fa  !important;
-}
-
-.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
-    border-left-color: #f8f9fa !important;
-}
-
-.mapboxgl-popup-close-button {
-    color: var(--close-button-color);
-    font-size: 24px;
-    padding: 12px;
-    margin: 4px;
-    border: none;
-    background: none;
-    border-radius: 12px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-@media (max-width: 768px) {
-    .mapboxgl-popup-close-button {
-        font-size: 28px;
-        padding: 14px;
-        margin: 6px;
-        width: 44px;
-        height: 44px;
-    }
-}
-
-.mapboxgl-popup-close-button:hover {
-    background: rgba(0, 0, 0, 0.1);
-    transform: scale(1.1);
-}
-
-.mapboxgl-popup-close-button:active {
-    transform: scale(0.95);
-}
-
-/* ========== КАСТОМНЫЙ ПОПАП ДЛЯ МАРКЕРА ========== */
-#custom-marker-popup {
-    position: fixed;
-    display: none;
-    z-index: 999;
-    font-family: 'Montserrat', sans-serif;
-    pointer-events: auto;
-    transform: translate(-50%, -100%);
-    margin-top: 15px;
-}
-
-.custom-popup-content {
-    background: var(--popup-bg-color);
-    border-radius: 30px;
-    padding: 48px 25px 30px 25px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    border: 1px solid #e1e5e9;
-    min-width: 330px;
-    max-width: 330px;
-    position: relative;
-    pointer-events: auto;
-    animation: fadeIn 0.2s ease-in-out;
-}
-
-.custom-popup-tail {
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid var(--popup-bg-color);
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
-}
-
-.custom-popup-close {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: none;
-    font-size: 28px;
-    color: var(--close-button-color);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-    z-index: 1;
-    padding: 0;
-    line-height: 1;
-}
-
-.custom-popup-close:hover {
-    background: var(--close-button-bg-hover);
-    color: var(--close-button-hover-color);
-    transform: scale(1.1);
-}
-
-.custom-popup-close:active {
-    transform: scale(0.95);
-}
-
-/* Переключатель в попапе */
-.marker-popup-switch {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid #e9ecef;
-}
-
-.marker-popup-switch .switch-container {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.marker-popup-switch .switch {
-    position: relative;
-    display: inline-block;
-    width: 42px;
-    height: 21px;
-    margin-right: 10px;
-}
-
-.marker-popup-switch .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    position: absolute;
-}
-
-.marker-popup-switch .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 21px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.marker-popup-switch .slider:before {
-    position: absolute;
-    content: "";
-    height: 15px;
-    width: 15px;
-    left: 3px;
-    bottom: 3px;
-    background-color: #f8f9fa;
-    transition: .4s;
-    border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.marker-popup-switch input:checked + .slider {
-    background-color: #3d85c6;
-}
-
-.marker-popup-switch input:checked + .slider:before {
-    transform: translateX(21px);
-}
-
-.marker-popup-switch .switch-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: #3d85c6;
-    font-family: 'Montserrat', sans-serif;
-    margin-left: 5px;
-}
-
-.marker-popup-switch .settings-icon {
-    width: 16px;
-    height: 16px;
-    fill: #3d85c6;
-    margin-left: 10px;
-}
-
-/* Стили для попапа гексагонов */
-.hexagon-popup-content {
-    background: #f8f9fa;
-    border-radius: 18px;
-    padding: 25px 25px 3px 15px;
-    min-width: 200px;
-    max-width: 280px;
-    position: relative;
-}
-
-.hexagon-popup-content .tooltip-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 12px;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.hexagon-popup-content .tooltip-row:last-child {
-    margin-bottom: 0;
-}
-
-.hexagon-popup-content .tooltip-label {
-    color: #666;
-    font-weight: 500;
-    margin-right: 10px;
-    min-width: 50px;
-}
-
-.hexagon-popup-content .tooltip-value {
-    color: #333;
-    font-family: 'Montserrat', 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
-    font-weight: 500;
-    text-align: right;
-}
-
-/* Разделительная линия в попапе */
-.popup-divider {
-    height: 1px;
-    background-color: #e9ecef;
-    margin: 10px 0;
-}
-
-/* Ссылка Отчет */
-.report-link {
-    display: block;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #e9ecef;
-    color: #3d85c6;
-    font-size: 14px;
-    font-weight: 500;
-    font-family: 'Montserrat', sans-serif;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.report-link:hover {
-    text-decoration: underline;
-}
-</style>
-
-<style>
-/* Убираем мерцание маркеров */
-.marker, .marker1, .mapboxgl-marker {
-    opacity: 1 !important;
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-    will-change: transform;
-    -webkit-transition: none !important;
-    transition: none !important;
-}
-
-@supports (-webkit-touch-callout: none) {
-    .marker, .marker1 {
-        filter: none !important;
-        -webkit-filter: none !important;
-    }
-}
-
-.mapboxgl-popup.hexagon-popup {
-    pointer-events: auto !important;
-}
-
-.mapboxgl-popup.hexagon-popup .mapboxgl-popup-content {
-    pointer-events: auto !important;
-}
-
-.mapboxgl-popup.hexagon-popup .mapboxgl-popup-close-button {
-    pointer-events: auto !important;
-    z-index: 10;
-    touch-action: manipulation;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-}
+:root { --popup-bg-color: #f8f9fa; --popup-text-color: #3d85c6; --close-button-color: #3d85c6; --close-button-hover-color: #383838; --close-button-bg-hover: rgba(0, 0, 0, 0.1); }
+.marker { background-image: url('https://sos.emiia.ai/vv_g_m_STORE_21_90EE90.svg'); background-size: cover; width: 80px; height: 80px; border-radius: 0%; cursor: pointer; }
+.marker1 { background-image: url('https://sos.emiia.ai/vv_1_svg.svg'); background-size: cover; width: 110px; height: 110px; border-radius: 0%; cursor: pointer; transform: translate(-50%, -50%); z-index: 999; }
+.mapboxgl-popup-content { text-align: left; font-family: 'Montserrat', montserrat !important; border-radius: 30px; background-color: #f8f9fa ; color: var(--popup-text-color); padding: 25px; max-width: 320px; min-width: 280px; }
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip { border-bottom-color: #f8f9fa !important; }
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip { border-bottom-color: #f8f9fa !important; }
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip { border-bottom-color:#f8f9fa !important; }
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip { border-top-color: #f8f9fa !important; }
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip { border-top-color: #f8f9fa !important; }
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip { border-top-color: #f8f9fa !important; }
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip { border-right-color: #f8f9fa !important; }
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip { border-left-color: #f8f9fa !important; }
+.mapboxgl-popup-close-button { color: var(--close-button-color); font-size: 24px; padding: 12px; margin: 4px; border: none; background: none; border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+@media (max-width: 768px) { .mapboxgl-popup-close-button { font-size: 28px; padding: 14px; margin: 6px; width: 44px; height: 44px; } }
+.mapboxgl-popup-close-button:hover { background: rgba(0, 0, 0, 0.1); transform: scale(1.1); }
+.mapboxgl-popup-close-button:active { transform: scale(0.95); }
+#custom-marker-popup { position: fixed; display: none; z-index: 999; font-family: 'Montserrat', sans-serif; pointer-events: auto; transform: translate(-50%, -100%); margin-top: 15px; }
+.custom-popup-content { background: var(--popup-bg-color); border-radius: 30px; padding: 48px 25px 30px 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid #e1e5e9; min-width: 330px; max-width: 330px; position: relative; pointer-events: auto; animation: fadeIn 0.2s ease-in-out; }
+.custom-popup-tail { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid var(--popup-bg-color); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+.custom-popup-close { position: absolute; top: 5px; right: 5px; width: 40px; height: 40px; border: none; background: none; font-size: 28px; color: var(--close-button-color); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: all 0.2s ease; z-index: 1; padding: 0; line-height: 1; }
+.custom-popup-close:hover { background: var(--close-button-bg-hover); color: var(--close-button-hover-color); transform: scale(1.1); }
+.custom-popup-close:active { transform: scale(0.95); }
+.marker-popup-switch { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e9ecef; }
+.marker-popup-switch .switch-container { display: flex; align-items: center; cursor: pointer; }
+.marker-popup-switch .switch { position: relative; display: inline-block; width: 42px; height: 21px; margin-right: 10px; }
+.marker-popup-switch .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.marker-popup-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 21px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); }
+.marker-popup-switch .slider:before { position: absolute; content: ""; height: 15px; width: 15px; left: 3px; bottom: 3px; background-color: #f8f9fa; transition: .4s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+.marker-popup-switch input:checked + .slider { background-color: #3d85c6; }
+.marker-popup-switch input:checked + .slider:before { transform: translateX(21px); }
+.marker-popup-switch .switch-text { font-size: 14px; font-weight: 500; color: #3d85c6; font-family: 'Montserrat', sans-serif; margin-left: 5px; }
+.marker-popup-switch .settings-icon { width: 16px; height: 16px; fill: #3d85c6; margin-left: 10px; }
+.hexagon-popup-content { background: #f8f9fa; border-radius: 18px; padding: 25px 25px 3px 15px; min-width: 200px; max-width: 280px; position: relative; }
+.hexagon-popup-content .tooltip-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; font-family: 'Montserrat', sans-serif; }
+.hexagon-popup-content .tooltip-row:last-child { margin-bottom: 0; }
+.hexagon-popup-content .tooltip-label { color: #666; font-weight: 500; margin-right: 10px; min-width: 50px; }
+.hexagon-popup-content .tooltip-value { color: #333; font-family: 'Montserrat', 'SF Mono', Monaco, Consolas, 'Courier New', monospace; font-weight: 500; text-align: right; }
+.popup-divider { height: 1px; background-color: #e9ecef; margin: 10px 0; }
+.report-link { display: block; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef; color: #3d85c6; font-size: 14px; font-weight: 500; font-family: 'Montserrat', sans-serif; text-decoration: none; cursor: pointer; }
+.report-link:hover { text-decoration: underline; }
+.marker, .marker1, .mapboxgl-marker { opacity: 1 !important; -webkit-transform: translate3d(0, 0, 0); transform: translate3d(0, 0, 0); -webkit-backface-visibility: hidden; will-change: transform; -webkit-transition: none !important; transition: none !important; }
+@supports (-webkit-touch-callout: none) { .marker, .marker1 { filter: none !important; -webkit-filter: none !important; } }
+.mapboxgl-popup.hexagon-popup { pointer-events: auto !important; }
+.mapboxgl-popup.hexagon-popup .mapboxgl-popup-content { pointer-events: auto !important; }
+.mapboxgl-popup.hexagon-popup .mapboxgl-popup-close-button { pointer-events: auto !important; z-index: 10; touch-action: manipulation; cursor: pointer; user-select: none; -webkit-user-select: none; }
 </style>
 
 </head>
@@ -1090,8 +195,7 @@ button,
     <div id="controls">
         <div class="header" id="menu-toggle">
             <div class="header-left">
-                <svg version="1.1" viewBox="30 30 132 132" xmlns="http://www.w3.org/2000/svg" 
-     style="height: 1.8em; width: auto; vertical-align: middle;">
+                <svg version="1.1" viewBox="30 30 132 132" xmlns="http://www.w3.org/2000/svg" style="height: 1.8em; width: auto; vertical-align: middle;">
                     <g>
                         <path fill="#3d85c6" d="m154.585 76.782l0 0c-0.186-20.651-17.184-38.474-38.332-40.193l-0.097 5.252c18.078 1.614 32.65 16.93 32.955 34.638z" fill-rule="evenodd"></path>
                         <path stroke="#3d85c6" stroke-width="14.66" stroke-linejoin="round" stroke-linecap="butt" d="m154.585 76.782l0 0c-0.186-20.651-17.184-38.474-38.332-40.193l-0.097 5.252c18.078 1.614 32.65 16.93 32.955 34.638z" fill-rule="evenodd"></path>
@@ -1106,13 +210,8 @@ button,
                 </svg>
                 <span class="header-text">EMIIA.AI SDK</span>
             </div>
-
-            <svg class="toggle-icon" id="toggle-icon" xmlns="http://www.w3.org/2000/svg" 
-     width="30" height="30" 
-     fill="#3c78d8" 
-     viewBox="0 0 16 16" 
-     style="stroke: #3c78d8; stroke-width: 1.8px; display: inline-block; vertical-align: middle;">
-    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+            <svg class="toggle-icon" id="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#3c78d8" viewBox="0 0 16 16" style="stroke: #3c78d8; stroke-width: 1.8px; display: inline-block; vertical-align: middle;">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
             </svg>
         </div>
         
@@ -1122,91 +221,61 @@ button,
             <div class="form-check">
                 <label class="form-check-label" for="grid-toggle">
                     <div class="switch-container">
-                        <div class="switch">
-                            <input type="checkbox" id="toggle-switch">
-                            <span class="slider"></span>
-                        </div>
+                        <div class="switch"><input type="checkbox" id="toggle-switch"><span class="slider"></span></div>
                         <span class="switch-text">EMIIA.AI H12</span>
                     </div>
                 </label>
-                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                </svg>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg>
             </div>
             
             <div class="form-check">
                 <label class="form-check-label" for="map-toggle">
                     <div class="switch-container">
-                        <div class="switch">
-                            <input type="checkbox" id="map-switch">
-                            <span class="slider"></span>
-                        </div>
+                        <div class="switch"><input type="checkbox" id="map-switch"><span class="slider"></span></div>
                         <span class="switch-text">EMIIA.AI MAP</span>
                     </div>
                 </label>
-                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                </svg>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg>
             </div>
             
             <div class="form-check">
                 <label class="form-check-label" for="dbm-toggle">
                     <div class="switch-container">
-                        <div class="switch">
-                            <input type="checkbox" id="dbm-switch">
-                            <span class="slider"></span>
-                        </div>
+                        <div class="switch"><input type="checkbox" id="dbm-switch"><span class="slider"></span></div>
                         <span class="switch-text">EMIIA.AI DBM</span>
                     </div>
                 </label>
-                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                </svg>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg>
             </div>
             
             <div class="form-check">
                 <label class="form-check-label" for="vlm-toggle">
                     <div class="switch-container">
-                        <div class="switch">
-                            <input type="checkbox" id="vlm-switch">
-                            <span class="slider"></span>
-                        </div>
+                        <div class="switch"><input type="checkbox" id="vlm-switch"><span class="slider"></span></div>
                         <span class="switch-text">EMIIA.AI LLM/VLA</span>
                     </div>
                 </label>
-                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                </svg>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg>
             </div>
             
             <div class="form-check">
                 <label class="form-check-label" for="mrv-toggle">
                     <div class="switch-container">
-                        <div class="switch">
-                            <input type="checkbox" id="mrv-switch">
-                            <span class="slider"></span>
-                        </div>
+                        <div class="switch"><input type="checkbox" id="mrv-switch"><span class="slider"></span></div>
                         <span class="switch-text">EMIIA.AI MRV</span>
                     </div>
                 </label>
-                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                </svg>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg>
             </div>
             
             <div class="form-check">
                 <label class="form-check-label" for="iot-toggle">
                     <div class="switch-container">
-                        <div class="switch">
-                            <input type="checkbox" id="iot-switch">
-                            <span class="slider"></span>
-                        </div>
+                        <div class="switch"><input type="checkbox" id="iot-switch"><span class="slider"></span></div>
                         <span class="switch-text">EMIIA.AI IoT</span>
                     </div>
                 </label>
-                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2zm6 1v2h2v6h-2v2H5v-2H3V5h2V3zm1-2h3v3h-3zm3 11v3h-3v-3zM4 15H1v-3h3zM1 4V1h3v3z"/>
-                </svg>
+                <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg>
             </div>
             
             <div class="control-group">
@@ -1231,21 +300,7 @@ button,
                         <div class="custom-option" data-value="24">24</div>
                     </div>
                     <select id="resolution-select" class="native-select-hidden">
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                        <option value="13">13</option>
-                        <option value="14">14</option>
-                        <option value="15" selected>15</option>
-                        <option value="16">16</option>
-                        <option value="17">17</option>
-                        <option value="18">18</option>
-                        <option value="19">19</option>
-                        <option value="20">20</option>
-                        <option value="21">21</option>
-                        <option value="22">22</option>
-                        <option value="23">23</option>
-                        <option value="24">24</option>
+                        <option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15" selected>15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option>
                     </select>
                 </div>
             </div>
@@ -1254,71 +309,23 @@ button,
                 <div class="stat-item" id="grid-status-item">
                     <span>Grid:</span>
                     <div id="grid-status">
-                        <svg class="grid-icon icon-inactive" id="grid-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M14 4.577v6.846L8 15l-6-3.577V4.577L8 1zM8.5.134a1 1 0 0 0-1 0l-6 3.577a1 1 0 0 0-.5.866v6.846a1 1 0 0 0 .5.866l6 3.577a1 1 0 0 0 1 0l6-3.577a1 1 0 0 0 .5-.866V4.577a1 1 0 0 0-.5-.866z"/>
-                        </svg>
+                        <svg class="grid-icon icon-inactive" id="grid-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M14 4.577v6.846L8 15l-6-3.577V4.577L8 1zM8.5.134a1 1 0 0 0-1 0l-6 3.577a1 1 0 0 0-.5.866v6.846a1 1 0 0 0 .5.866l6 3.577a1 1 0 0 0 1 0l6-3.577a1 1 0 0 0 .5-.866V4.577a1 1 0 0 0-.5-.866z"/></svg>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <span>Center:</span>
-                    <span id="center-coords" class="stat-value">37.7749, -122.4194</span>
-                </div>
-                <div class="stat-item">
-                    <span>level:</span>
-                    <span id="map-zoom" class="stat-value">12</span>
-                </div>
-                <div class="stat-item">
-                    <span>Selection:</span>
-                    <span id="marked-count" class="stat-value">0</span>
-                </div>
+                <div class="stat-item"><span>Center:</span><span id="center-coords" class="stat-value">37.7749, -122.4194</span></div>
+                <div class="stat-item"><span>level:</span><span id="map-zoom" class="stat-value">12</span></div>
+                <div class="stat-item"><span>Selection:</span><span id="marked-count" class="stat-value">0</span></div>
                 
-                <div class="icon-item">
-                    <span class="icon-label">EMIIA.AI MAP:</span>
-                    <svg class="icon-status icon-inactive" id="map-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 12 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
-                    </svg>
-                </div>
-                
-                <div class="icon-item">
-                    <span class="icon-label">EMIIA.AI DBM:</span>
-                    <svg class="icon-status icon-inactive" id="dbm-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path d="M4.318 2.687C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4c0-.374.356-.875 1.318-1.313M13 5.698V7c0 .374-.356.875-1.318 1.313C10.766 8.729 9.464 9 8 9s-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777A5 5 0 0 0 13 5.698M14 4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13zm-1 4.698V10c0 .374-.356.875-1.318 1.313C10.766 11.729 9.464 12 8 12s-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777A5 5 0 0 0 13 8.698m0 3V13c0 .374-.356.875-1.318 1.313C10.766 14.729 9.464 15 8 15s-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13s3.022-.289 4.096-.777c.324-.147.633-.323.904-.525"/>
-                    </svg>
-                </div>
-                
-                <div class="icon-item">
-                    <span class="icon-label">EMIIA.AI LLM/VLA:</span>
-                    <svg class="icon-status icon-inactive" id="vlm-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5"/>
-                        <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3"/>
-                    </svg>
-                </div>
-                
-                <div class="icon-item">
-                    <span class="icon-label">EMIIA.AI MRV:</span>
-                    <svg class="icon-status icon-inactive" id="mrv-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="30 31 132 132">
-                        <path d="m154.585 76.782c-0.186-20.651-17.184-38.474-38.332-40.193l-0.097 5.252c18.078 1.614 32.65 16.93 32.955 34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/>
-                        <path d="m37.415 76.782c0.186-20.651 17.184-38.474 38.332-40.193l0.097 5.252c-18.078 1.614-32.65 16.93-32.955 34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/>
-                        <path d="m154.585 115.218c-0.186 20.651-17.184 38.474-38.332 40.193l-0.097-5.252c18.078-1.614 32.65-16.93 32.955-34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/>
-                        <path d="m37.415 115.218c0.186 20.65 17.184 38.474 38.332 40.192l0.097-5.252c-18.078-1.614-32.65-16.93-32.955-34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/>
-                        <circle cx="96" cy="96" r="21" fill="currentColor"/>
-                    </svg>
-                </div>
-                
-                <div class="icon-item">
-                    <span class="icon-label">EMIIA.AI IoT:</span>
-                    <svg class="icon-status icon-inactive" id="iot-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2zm6 1v2h2v6h-2v2H5v-2H3V5h2V3zm1-2h3v3h-3zm3 11v3h-3v-3zM4 15H1v-3h3zM1 4V1h3v3z"/>
-                    </svg>
-                </div>
+                <div class="icon-item"><span class="icon-label">EMIIA.AI MAP:</span><svg class="icon-status icon-inactive" id="map-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 12 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/></svg></div>
+                <div class="icon-item"><span class="icon-label">EMIIA.AI DBM:</span><svg class="icon-status icon-inactive" id="dbm-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M4.318 2.687C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4c0-.374.356-.875 1.318-1.313M13 5.698V7c0 .374-.356.875-1.318 1.313C10.766 8.729 9.464 9 8 9s-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777A5 5 0 0 0 13 5.698M14 4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13zm-1 4.698V10c0 .374-.356.875-1.318 1.313C10.766 11.729 9.464 12 8 12s-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777A5 5 0 0 0 13 8.698m0 3V13c0 .374-.356.875-1.318 1.313C10.766 14.729 9.464 15 8 15s-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13s3.022-.289 4.096-.777c.324-.147.633-.323.904-.525"/></svg></div>
+                <div class="icon-item"><span class="icon-label">EMIIA.AI LLM/VLA:</span><svg class="icon-status icon-inactive" id="vlm-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5"/><path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3"/></svg></div>
+                <div class="icon-item"><span class="icon-label">EMIIA.AI MRV:</span><svg class="icon-status icon-inactive" id="mrv-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="30 31 132 132"><path d="m154.585 76.782c-0.186-20.651-17.184-38.474-38.332-40.193l-0.097 5.252c18.078 1.614 32.65 16.93 32.955 34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/><path d="m37.415 76.782c0.186-20.651 17.184-38.474 38.332-40.193l0.097 5.252c-18.078 1.614-32.65 16.93-32.955 34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/><path d="m154.585 115.218c-0.186 20.651-17.184 38.474-38.332 40.193l-0.097-5.252c18.078-1.614 32.65-16.93 32.955-34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/><path d="m37.415 115.218c0.186 20.65 17.184 38.474 38.332 40.192l0.097-5.252c-18.078-1.614-32.65-16.93-32.955-34.638z" fill="none" stroke="currentColor" stroke-width="14.66" stroke-linejoin="round"/><circle cx="96" cy="96" r="21" fill="currentColor"/></svg></div>
+                <div class="icon-item"><span class="icon-label">EMIIA.AI IoT:</span><svg class="icon-status icon-inactive" id="iot-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2zm6 1v2h2v6h-2v2H5v-2H3V5h2V3zm1-2h3v3h-3zm3 11v3h-3v-3zM4 15H1v-3h3zM1 4V1h3v3z"/></svg></div>
             </div>
             
             <div class="account-settings" style="margin-bottom: 35px;">
                 <span class="account-text">Настройки и аккаунт</span>
-                <svg class="account-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                </svg>
+                <svg class="account-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/></svg>
             </div>
         </div>
     </div>
@@ -1330,47 +337,12 @@ class StableH3Grid {
         this.EARTH_RADIUS = 6371000.0;
         this.SQRT3 = Math.sqrt(3);
         this.APOTHEM_FACTOR = this.SQRT3 / 2;
-        
-        this.VISIBLE_EDGE_LENGTHS = {
-            10: 66000,
-            11: 25000,
-            12: 9000,
-            13: 3000,
-            14: 1000,
-            15: 250,
-            16: 100,
-            17: 40,
-            18: 16,
-            19: 6,
-            20: 2.5,
-            21: 1,
-            22: 0.4,
-            23: 0.15,
-            24: 0.06
-        };
+        this.VISIBLE_EDGE_LENGTHS = {10:66000,11:25000,12:9000,13:3000,14:1000,15:250,16:100,17:40,18:16,19:6,20:2.5,21:1,22:0.4,23:0.15,24:0.06};
     }
-    
-    getVisibleEdgeLength(resolution) {
-        return this.VISIBLE_EDGE_LENGTHS[resolution] || 250;
-    }
-    
-    getApothem(resolution) {
-        return this.getVisibleEdgeLength(resolution) * this.APOTHEM_FACTOR;
-    }
-    
-    getCenterDistance(resolution) {
-        return this.SQRT3 * this.getApothem(resolution);
-    }
-    
-    generateRandomId() {
-        const chars = '0123456789abcdef';
-        let result = '';
-        for (let i = 0; i < 22; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
-    }
-    
+    getVisibleEdgeLength(resolution) { return this.VISIBLE_EDGE_LENGTHS[resolution] || 250; }
+    getApothem(resolution) { return this.getVisibleEdgeLength(resolution) * this.APOTHEM_FACTOR; }
+    getCenterDistance(resolution) { return this.SQRT3 * this.getApothem(resolution); }
+    generateRandomId() { const chars = '0123456789abcdef'; let result = ''; for (let i = 0; i < 22; i++) { result += chars.charAt(Math.floor(Math.random() * chars.length)); } return result; }
     generateCells(centerLat, centerLng, resolution) {
         const centerDistance = this.getCenterDistance(resolution);
         const apothem = this.getApothem(resolution);
@@ -1379,9 +351,7 @@ class StableH3Grid {
         const centerLatRad = centerLat * Math.PI / 180;
         const cosCenterLat = Math.cos(centerLatRad);
         const metersToLat = 180 / (Math.PI * this.EARTH_RADIUS);
-        
         let cellIndex = 0;
-        
         for (let q = -radius; q <= radius; q++) {
             for (let r = -radius; r <= radius; r++) {
                 if (Math.abs(q + r) <= radius) {
@@ -1393,28 +363,16 @@ class StableH3Grid {
                     const cellLng = centerLng + dLng;
                     const vertices = this.createHexagonVertices(cellLat, cellLng, apothem);
                     const cellId = this.generateRandomId();
-                    
-                    cells.push({
-                        center: { lat: cellLat, lng: cellLng },
-                        vertices: vertices,
-                        id: cellId,
-                        index: cellIndex,
-                        q: q,
-                        r: r,
-                        resolution: resolution,
-                        marked: false
-                    });
+                    cells.push({center: { lat: cellLat, lng: cellLng }, vertices: vertices, id: cellId, index: cellIndex, q: q, r: r, resolution: resolution, marked: false});
                     cellIndex++;
                 }
             }
         }
         return cells;
     }
-    
     createHexagonVertices(centerLat, centerLng, apothem) {
         const vertices = [];
         const centerLatRad = centerLat * Math.PI / 180;
-        
         for (let i = 0; i < 6; i++) {
             const angle = 2 * Math.PI * i / 6 - Math.PI / 6;
             const dx = apothem * Math.cos(angle);
@@ -1425,26 +383,12 @@ class StableH3Grid {
         }
         return vertices;
     }
-    
     createGeoJSON(cells) {
         const features = [];
         cells.forEach((cell) => {
             const coordinates = cell.vertices.map(v => [v[1], v[0]]);
             coordinates.push(coordinates[0]);
-            features.push({
-                type: 'Feature',
-                properties: {
-                    id: cell.id,
-                    index: cell.index,
-                    center_lat: cell.center.lat,
-                    center_lng: cell.center.lng,
-                    marked: cell.marked || false
-                },
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [coordinates]
-                }
-            });
+            features.push({type: 'Feature', properties: {id: cell.id, index: cell.index, center_lat: cell.center.lat, center_lng: cell.center.lng, marked: cell.marked || false}, geometry: {type: 'Polygon', coordinates: [coordinates]}});
         });
         return { type: 'FeatureCollection', features: features };
     }
@@ -1452,13 +396,7 @@ class StableH3Grid {
 
 // ================== КОНСТАНТЫ ==================
 const MAPBOX_TOKEN = 'pk.eyJ1IjoicHJvY3Jhc3RpbmF0aW8iLCJhIjoiY2o4b3FtcW42MDZpNjJ4bnQxMWR0ejl4dSJ9.3ORIDvrfCQZ_UUyc1f2pUw';
-const INITIAL_VIEW = {
-    center: [37.6357745, 55.8383770],
-    zoom: 20,
-    pitch: 30,
-    attributionControl: false,
-    bearing: 0
-};
+const INITIAL_VIEW = {center: [37.6357745, 55.8383770], zoom: 20, pitch: 30, attributionControl: false, bearing: 0};
 
 // ================== ПЕРЕМЕННЫЕ ==================
 let map = null;
@@ -1483,6 +421,28 @@ let hexagonLayerId = 'hexagon-layer';
 let hexagonLineLayerId = 'hexagon-line-layer';
 let hexagonVisible = false;
 
+// ================== ПЕРЕМЕННЫЕ ДЛЯ АНИМАЦИИ H12 AUTO ==================
+let h12AnimationId = null;
+let h12AnimationStartTime = null;
+
+// Конфигурация анимации H12 AUTO
+const H12_CONFIG = {
+    
+  
+
+
+color: '#3d85c6',
+
+baseHeight: 2, 
+
+heightAmplitude: -1,
+
+ spatialWaveAmplitude: 6, spatialWaveSpeed: 1, baseOpacity: 0.4,  geoJSON: null
+
+
+
+};
+
 // Переменные для SAI (Heat map)
 let saiSwitchState = false;
 let saiVisible = false;
@@ -1492,60 +452,13 @@ let saiAnimationId = null;
 let saiAnimationStartTime = null;
 
 // SAI источники данных с параметрами анимации
-// ============================================================
-// РЕГУЛИРОВКА ВЫСОТЫ КРАСНОГО ИСТОЧНИКА:
-// heightAmplitude - амплитуда колебания высоты (на сколько поднимается)
-// spatialWaveAmplitude - амплитуда пространственной волны (волна внутри цвета)
-// ============================================================
 const SAI_SOURCES = {
-    r: {
-        url: 'https://www.emiia.ru/hexagon/hexagons_r_json.json',
-        sourceId: 'sai-r-source',
-        layerId: 'sai-r-layer',
-        lineLayerId: 'sai-r-line-layer',
-        color: '#FFB3BA',
-        baseHeight: 3,
-        heightAmplitude: 1,          // ← ИЗМЕНИ ЭТО для регулировки высоты красного (уменьши до 2 или 1.5)
-        spatialWaveAmplitude: 2,      // Амплитуда пространственной волны внутри красного
-        spatialWaveSpeed: 0.3,        // Скорость пространственной волны
-        baseOpacity: 0.4,
-        opacityAmplitude: 0.15,
-        phaseOffset: 0,
-        accuracy: '82,5%',
-        geoJSON: null                 // Кэшированные данные с добавленными фазами
-    },
-    y: {
-        url: 'https://www.emiia.ru/hexagon/hexagons_y_json.json',
-        sourceId: 'sai-y-source',
-        layerId: 'sai-y-layer',
-        lineLayerId: 'sai-y-line-layer',
-        color: '#FFFFBA',
-        baseHeight: 2,
-        heightAmplitude: 1,
-        spatialWaveAmplitude: 1.5,    // Амплитуда пространственной волны внутри желтого
-        spatialWaveSpeed: 0.35,       // Скорость немного другая для разнообразия
-        baseOpacity: 0.4,
-        opacityAmplitude: 0.12,
-        phaseOffset: Math.PI * 2 / 3,
-        accuracy: '94%',
-        geoJSON: null
-    },
-    g: {
-        url: 'https://www.emiia.ru/hexagon/hexagons_g_json.json',
-        sourceId: 'sai-g-source',
-        layerId: 'sai-g-layer',
-        lineLayerId: 'sai-g-line-layer',
-        color: '#BAFFC9',
-        baseHeight: 1.5,
-        heightAmplitude: 1.5,
-        spatialWaveAmplitude: 1,      // Амплитуда пространственной волны внутри зеленого
-        spatialWaveSpeed: 0.25,       // Скорость волны
-        baseOpacity: 0.4,
-        opacityAmplitude: 0.1,
-        phaseOffset: Math.PI * 4 / 3,
-        accuracy: '99%',
-        geoJSON: null
-    }
+
+    r: {url: 'https://www.emiia.ru/hexagon/hexagons_r_json.json', sourceId: 'sai-r-source', layerId: 'sai-r-layer', lineLayerId: 'sai-r-line-layer', color: '#FFB3BA', baseHeight: 5, heightAmplitude: 4, spatialWaveAmplitude: 5, spatialWaveSpeed: 1, baseOpacity: 0.5, opacityAmplitude: 0.4, phaseOffset: Math.PI * 4 / 3, accuracy: '99%', geoJSON: null},
+
+    y: {url: 'https://www.emiia.ru/hexagon/hexagons_y_json.json', sourceId: 'sai-y-source', layerId: 'sai-y-layer', lineLayerId: 'sai-y-line-layer', color: '#FFFFBA', baseHeight: 5, heightAmplitude: 4, spatialWaveAmplitude: 5, spatialWaveSpeed: 1, baseOpacity: 0.5, opacityAmplitude: 0.4, phaseOffset: Math.PI * 4 / 3, accuracy: '99%', geoJSON: null},
+
+    g: {url: 'https://www.emiia.ru/hexagon/hexagons_g_json.json', sourceId: 'sai-g-source', layerId: 'sai-g-layer', lineLayerId: 'sai-g-line-layer', color: '#BAFFC9', baseHeight: 5, heightAmplitude: 4, spatialWaveAmplitude: 5, spatialWaveSpeed: 1, baseOpacity: 0.5, opacityAmplitude: 0.4, phaseOffset: Math.PI * 4 / 3, accuracy: '99%', geoJSON: null}
 };
 
 let popupSwitchState = false;
@@ -1557,30 +470,12 @@ function updateGridStatus(active) {
     gridActive = active;
     const gridStatusItem = document.getElementById('grid-status-item');
     const gridIcon = document.getElementById('grid-icon');
-    
-    if (active) {
-        gridIcon.classList.remove('icon-inactive');
-        gridIcon.classList.add('icon-active');
-        gridStatusItem.className = 'stat-item grid-active';
-        document.getElementById('toggle-switch').checked = true;
-    } else {
-        gridIcon.classList.remove('icon-active');
-        gridIcon.classList.add('icon-inactive');
-        gridStatusItem.className = 'stat-item grid-inactive';
-        document.getElementById('toggle-switch').checked = false;
-    }
+    if (active) { gridIcon.classList.remove('icon-inactive'); gridIcon.classList.add('icon-active'); gridStatusItem.className = 'stat-item grid-active'; document.getElementById('toggle-switch').checked = true; }
+    else { gridIcon.classList.remove('icon-active'); gridIcon.classList.add('icon-inactive'); gridStatusItem.className = 'stat-item grid-inactive'; document.getElementById('toggle-switch').checked = false; }
 }
 
-function updateCenterDisplay(center) {
-    if (!center) return;
-    const lat = center.lat.toFixed(6);
-    const lng = center.lng.toFixed(6);
-    document.getElementById('center-coords').textContent = `${lat}, ${lng}`;
-}
-
-function updateMarkedCount() {
-    document.getElementById('marked-count').textContent = markedCells.size;
-}
+function updateCenterDisplay(center) { if (!center) return; document.getElementById('center-coords').textContent = `${center.lat.toFixed(6)}, ${center.lng.toFixed(6)}`; }
+function updateMarkedCount() { document.getElementById('marked-count').textContent = markedCells.size; }
 
 function updateIcons() {
     const mapIcon = document.getElementById('map-icon');
@@ -1588,315 +483,82 @@ function updateIcons() {
     const vlmIcon = document.getElementById('vlm-icon');
     const mrvIcon = document.getElementById('mrv-icon');
     const iotIcon = document.getElementById('iot-icon');
-    
     const mapActive = document.getElementById('map-switch').checked;
     const dbmActive = document.getElementById('dbm-switch').checked;
     const vlmActive = document.getElementById('vlm-switch').checked;
     const mrvActive = document.getElementById('mrv-switch').checked;
     const iotActive = document.getElementById('iot-switch').checked;
-    
-    if (mapActive) {
-        mapIcon.classList.remove('icon-inactive');
-        mapIcon.classList.add('icon-active');
-    } else {
-        mapIcon.classList.remove('icon-active');
-        mapIcon.classList.add('icon-inactive');
-    }
-    
-    if (dbmActive) {
-        dbmIcon.classList.remove('icon-inactive');
-        dbmIcon.classList.add('icon-active');
-    } else {
-        dbmIcon.classList.remove('icon-active');
-        dbmIcon.classList.add('icon-inactive');
-    }
-    
-    if (vlmActive) {
-        vlmIcon.classList.remove('icon-inactive');
-        vlmIcon.classList.add('icon-active');
-    } else {
-        vlmIcon.classList.remove('icon-active');
-        vlmIcon.classList.add('icon-inactive');
-    }
-    
-    if (mrvActive) {
-        mrvIcon.classList.remove('icon-inactive');
-        mrvIcon.classList.add('icon-active');
-    } else {
-        mrvIcon.classList.remove('icon-active');
-        mrvIcon.classList.add('icon-inactive');
-    }
-    
-    if (iotActive) {
-        iotIcon.classList.remove('icon-inactive');
-        iotIcon.classList.add('icon-active');
-    } else {
-        iotIcon.classList.remove('icon-active');
-        iotIcon.classList.add('icon-inactive');
-    }
+    if (mapActive) { mapIcon.classList.remove('icon-inactive'); mapIcon.classList.add('icon-active'); } else { mapIcon.classList.remove('icon-active'); mapIcon.classList.add('icon-inactive'); }
+    if (dbmActive) { dbmIcon.classList.remove('icon-inactive'); dbmIcon.classList.add('icon-active'); } else { dbmIcon.classList.remove('icon-active'); dbmIcon.classList.add('icon-inactive'); }
+    if (vlmActive) { vlmIcon.classList.remove('icon-inactive'); vlmIcon.classList.add('icon-active'); } else { vlmIcon.classList.remove('icon-active'); vlmIcon.classList.add('icon-inactive'); }
+    if (mrvActive) { mrvIcon.classList.remove('icon-inactive'); mrvIcon.classList.add('icon-active'); } else { mrvIcon.classList.remove('icon-active'); mrvIcon.classList.add('icon-inactive'); }
+    if (iotActive) { iotIcon.classList.remove('icon-inactive'); iotIcon.classList.add('icon-active'); } else { iotIcon.classList.remove('icon-active'); iotIcon.classList.add('icon-inactive'); }
 }
 
 function updateIotIcon(active) {
     const iotIcon = document.getElementById('iot-icon');
     if (!iotIcon) return;
-    
-    if (active) {
-        iotIcon.classList.remove('icon-inactive');
-        iotIcon.classList.add('icon-active');
-    } else {
-        iotIcon.classList.remove('icon-active');
-        iotIcon.classList.add('icon-inactive');
-    }
+    if (active) { iotIcon.classList.remove('icon-inactive'); iotIcon.classList.add('icon-active'); } else { iotIcon.classList.remove('icon-active'); iotIcon.classList.add('icon-inactive'); }
 }
 
 function createTooltip(feature) {
     if (!feature || !feature.properties) return '';
     const props = feature.properties;
-    const lat = props.center_lat ? props.center_lat.toFixed(14) : 'нет данных';
-    const lng = props.center_lng ? props.center_lng.toFixed(14) : 'нет данных';
-    
-    return `
-        <div class="tooltip-row">
-            <span class="tooltip-label">ID:</span>
-            <span class="tooltip-value">${props.id || 'нет данных'}</span>
-        </div>
-        <div class="tooltip-row">
-            <span class="tooltip-label">Resolution:</span>
-            <span class="tooltip-value">${props.resolution || currentResolution}</span>
-        </div>
-        <div class="tooltip-row">
-            <span class="tooltip-label">Lat:</span>
-            <span class="tooltip-value">${lat}</span>
-        </div>
-        <div class="tooltip-row">
-            <span class="tooltip-label">Lng:</span>
-            <span class="tooltip-value">${lng}</span>
-        </div>
-    `;
+    return `<div class="tooltip-row"><span class="tooltip-label">ID:</span><span class="tooltip-value">${props.id || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Resolution:</span><span class="tooltip-value">${props.resolution || currentResolution}</span></div><div class="tooltip-row"><span class="tooltip-label">Lat:</span><span class="tooltip-value">${props.center_lat ? props.center_lat.toFixed(14) : 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lng:</span><span class="tooltip-value">${props.center_lng ? props.center_lng.toFixed(14) : 'нет данных'}</span></div>`;
 }
 
-function closeTooltip() {
-    if (tooltipTimeout) {
-        clearTimeout(tooltipTimeout);
-        tooltipTimeout = null;
-    }
-    if (currentPopup) {
-        currentPopup.remove();
-        currentPopup = null;
-    }
-    isPopupClick = false;
-}
+function closeTooltip() { if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; } if (currentPopup) { currentPopup.remove(); currentPopup = null; } isPopupClick = false; }
 
 function generateGridForResolution(resolution) {
     if (!map || !mapLoaded) return null;
     const center = map.getCenter();
     lastCenter = center;
-    
     try {
         const cells = h3Grid.generateCells(center.lat, center.lng, resolution);
-        markedCells.forEach(cellId => {
-            const cell = cells.find(c => c.id === cellId);
-            if (cell) cell.marked = true;
-        });
+        markedCells.forEach(cellId => { const cell = cells.find(c => c.id === cellId); if (cell) cell.marked = true; });
         const geoJSON = h3Grid.createGeoJSON(cells);
         updateCenterDisplay(center);
         return { cells, geoJSON };
-    } catch (error) {
-        console.error('Ошибка генерации:', error);
-        return null;
-    }
+    } catch (error) { console.error('Ошибка генерации:', error); return null; }
 }
 
-function getOrCreateResolutionData(resolution) {
-    if (!resolutionData[resolution]) {
-        const data = generateGridForResolution(resolution);
-        if (data) resolutionData[resolution] = data;
-    }
-    return resolutionData[resolution];
-}
+function getOrCreateResolutionData(resolution) { if (!resolutionData[resolution]) { const data = generateGridForResolution(resolution); if (data) resolutionData[resolution] = data; } return resolutionData[resolution]; }
 
 function displayResolutionLayers(resolution, isActive = false) {
     if (!map) return;
     const data = getOrCreateResolutionData(resolution);
     if (!data) return;
-    
     const sourceId = `cells-source-${resolution}`;
     const boundariesLayerId = `cells-boundaries-${resolution}`;
     const fillLayerId = `cells-fill-${resolution}`;
     const markedFillLayerId = `cells-marked-fill-${resolution}`;
     const markedLayerId = `cells-marked-${resolution}`;
     const clickLayerId = `cells-click-${resolution}`;
-    
-    if (!map.getSource(sourceId)) {
-        map.addSource(sourceId, { type: 'geojson', data: data.geoJSON });
-    }
-    
-    if (!map.getLayer(fillLayerId)) {
-        map.addLayer({
-            id: fillLayerId,
-            type: 'fill',
-            source: sourceId,
-            filter: ['==', ['get', 'marked'], false],
-            paint: { 'fill-color': 'red', 'fill-opacity': 0.0 }
-        });
-    }
-    
+    if (!map.getSource(sourceId)) { map.addSource(sourceId, { type: 'geojson', data: data.geoJSON }); }
+    if (!map.getLayer(fillLayerId)) { map.addLayer({ id: fillLayerId, type: 'fill', source: sourceId, filter: ['==', ['get', 'marked'], false], paint: { 'fill-color': 'red', 'fill-opacity': 0.0 } }); }
     if (!map.getLayer(boundariesLayerId)) {
-        map.addLayer({
-            id: boundariesLayerId,
-            type: 'line',
-            source: sourceId,
-            filter: ['==', ['get', 'marked'], false],
-            paint: {
-                'line-color': '#3d85c6',
-                'line-width': [
-                    'interpolate', ['linear'], ['zoom'],
-                    0, 0.05, 5, 0.1, 10, 0.2, 15, 0.3, 18, 0.4, 20, 0.5, 21, 0.6, 22, 0.7, 23, 0.8, 24, 0.9
-                ],
-                'line-opacity': isActive ? [
-                    'interpolate', ['linear'], ['zoom'],
-                    0, 0.2, 10, 0.5, 15, 0.7, 20, 0.9, 22, 1.0, 24, 1.0
-                ] : 0
-            }
-        });
-    } else {
-        map.setPaintProperty(boundariesLayerId, 'line-opacity', isActive ? [
-            'interpolate', ['linear'], ['zoom'],
-            0, 0.2, 10, 0.5, 15, 0.7, 20, 0.9, 22, 1.0, 24, 1.0
-        ] : 0);
-    }
-    
-    if (!map.getLayer(markedFillLayerId)) {
-        map.addLayer({
-            id: markedFillLayerId,
-            type: 'fill',
-            source: sourceId,
-            filter: ['==', ['get', 'marked'], true],
-            paint: { 'fill-color': '#3d85c6', 'fill-opacity': 0.2 }
-        });
-    }
-    
-    if (!map.getLayer(markedLayerId)) {
-        map.addLayer({
-            id: markedLayerId,
-            type: 'line',
-            source: sourceId,
-            filter: ['==', ['get', 'marked'], true],
-            paint: {
-                'line-color': '#3d85c6',
-                'line-width': [
-                    'interpolate', ['linear'], ['zoom'],
-                    0, 0.12, 5, 0.25, 10, 0.5, 15, 0.75, 18, 1.0, 20, 1.25, 21, 1.5, 22, 1.75, 23, 2.0, 24, 2.25
-                ],
-                'line-opacity': [
-                    'interpolate', ['linear'], ['zoom'],
-                    0, 0.5, 10, 0.8, 15, 0.9, 20, 1.0, 22, 1.0, 24, 1.0
-                ]
-            }
-        });
-    }
-    
-    if (isActive && !map.getLayer(clickLayerId)) {
-        map.addLayer({
-            id: clickLayerId,
-            type: 'fill',
-            source: sourceId,
-            paint: { 'fill-color': 'transparent', 'fill-opacity': 0 }
-        });
-        setupClickHandler(resolution);
-        setupTooltipHandler(resolution);
-    } else if (!isActive && map.getLayer(clickLayerId)) {
-        map.removeLayer(clickLayerId);
-        map.off('click', clickLayerId);
-        map.off('mousemove', clickLayerId);
-        map.off('mouseleave', clickLayerId);
-        map.off('mouseenter', clickLayerId);
-    }
-}
-
-function removeClickLayer(resolution) {
-    if (!map) return;
-    const clickLayerId = `cells-click-${resolution}`;
-    if (map.getLayer(clickLayerId)) map.removeLayer(clickLayerId);
-    map.off('click', clickLayerId);
-    map.off('mousemove', clickLayerId);
-    map.off('mouseleave', clickLayerId);
-    map.off('mouseenter', clickLayerId);
-}
-
-function addClickLayer(resolution) {
-    if (!map) return;
-    const sourceId = `cells-source-${resolution}`;
-    const clickLayerId = `cells-click-${resolution}`;
-    if (!map.getSource(sourceId)) return;
-    if (map.getLayer(clickLayerId)) return;
-    map.addLayer({
-        id: clickLayerId,
-        type: 'fill',
-        source: sourceId,
-        paint: { 'fill-color': 'transparent', 'fill-opacity': 0 }
-    });
-    setupClickHandler(resolution);
-    setupTooltipHandler(resolution);
-}
-
-function updateResolutionVisibility(resolution, isActive) {
-    if (!map) return;
-    const boundariesLayerId = `cells-boundaries-${resolution}`;
-    if (map.getLayer(boundariesLayerId)) {
-        map.setPaintProperty(boundariesLayerId, 'line-opacity', isActive ? [
-            'interpolate', ['linear'], ['zoom'],
-            0, 0.2, 10, 0.5, 15, 0.7, 20, 0.9, 22, 1.0, 24, 1.0
-        ] : 0);
-    }
-    if (!isActive) removeClickLayer(resolution);
+        map.addLayer({ id: boundariesLayerId, type: 'line', source: sourceId, filter: ['==', ['get', 'marked'], false], paint: { 'line-color': '#3d85c6', 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.05, 5, 0.1, 10, 0.2, 15, 0.3, 18, 0.4, 20, 0.5, 21, 0.6, 22, 0.7, 23, 0.8, 24, 0.9], 'line-opacity': isActive ? ['interpolate', ['linear'], ['zoom'], 0, 0.2, 10, 0.5, 15, 0.7, 20, 0.9, 22, 1.0, 24, 1.0] : 0 } });
+    } else { map.setPaintProperty(boundariesLayerId, 'line-opacity', isActive ? ['interpolate', ['linear'], ['zoom'], 0, 0.2, 10, 0.5, 15, 0.7, 20, 0.9, 22, 1.0, 24, 1.0] : 0); }
+    if (!map.getLayer(markedFillLayerId)) { map.addLayer({ id: markedFillLayerId, type: 'fill', source: sourceId, filter: ['==', ['get', 'marked'], true], paint: { 'fill-color': '#3d85c6', 'fill-opacity': 0.2 } }); }
+    if (!map.getLayer(markedLayerId)) { map.addLayer({ id: markedLayerId, type: 'line', source: sourceId, filter: ['==', ['get', 'marked'], true], paint: { 'line-color': '#3d85c6', 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.12, 5, 0.25, 10, 0.5, 15, 0.75, 18, 1.0, 20, 1.25, 21, 1.5, 22, 1.75, 23, 2.0, 24, 2.25], 'line-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.5, 10, 0.8, 15, 0.9, 20, 1.0, 22, 1.0, 24, 1.0] } }); }
+    if (isActive && !map.getLayer(clickLayerId)) { map.addLayer({ id: clickLayerId, type: 'fill', source: sourceId, paint: { 'fill-color': 'transparent', 'fill-opacity': 0 } }); setupClickHandler(resolution); setupTooltipHandler(resolution); }
+    else if (!isActive && map.getLayer(clickLayerId)) { map.removeLayer(clickLayerId); map.off('click', clickLayerId); map.off('mousemove', clickLayerId); map.off('mouseleave', clickLayerId); map.off('mouseenter', clickLayerId); }
 }
 
 function removeResolutionLayers(resolution) {
     if (!map) return;
     const sourceId = `cells-source-${resolution}`;
-    const boundariesLayerId = `cells-boundaries-${resolution}`;
-    const fillLayerId = `cells-fill-${resolution}`;
-    const markedFillLayerId = `cells-marked-fill-${resolution}`;
-    const markedLayerId = `cells-marked-${resolution}`;
-    const clickLayerId = `cells-click-${resolution}`;
-    
-    try {
-        if (map.getLayer(clickLayerId)) map.removeLayer(clickLayerId);
-        if (map.getLayer(markedLayerId)) map.removeLayer(markedLayerId);
-        if (map.getLayer(markedFillLayerId)) map.removeLayer(markedFillLayerId);
-        if (map.getLayer(boundariesLayerId)) map.removeLayer(boundariesLayerId);
-        if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
-        if (map.getSource(sourceId)) map.removeSource(sourceId);
-    } catch (e) {
-        console.error('Ошибка удаления слоев:', e);
-    }
+    try { if (map.getLayer(`cells-click-${resolution}`)) map.removeLayer(`cells-click-${resolution}`); if (map.getLayer(`cells-marked-${resolution}`)) map.removeLayer(`cells-marked-${resolution}`); if (map.getLayer(`cells-marked-fill-${resolution}`)) map.removeLayer(`cells-marked-fill-${resolution}`); if (map.getLayer(`cells-boundaries-${resolution}`)) map.removeLayer(`cells-boundaries-${resolution}`); if (map.getLayer(`cells-fill-${resolution}`)) map.removeLayer(`cells-fill-${resolution}`); if (map.getSource(sourceId)) map.removeSource(sourceId); }
+    catch (e) { console.error('Ошибка удаления слоев:', e); }
 }
 
 function switchResolution(newResolution) {
     if (!gridActive || isGenerating) return;
     isGenerating = true;
-    
     setTimeout(() => {
-        try {
-            closeTooltip();
-            if (activeResolution !== null && activeResolution !== newResolution) {
-                updateResolutionVisibility(activeResolution, false);
-            }
-            if (resolutionData[newResolution]) {
-                updateResolutionVisibility(newResolution, true);
-                addClickLayer(newResolution);
-            } else {
-                displayResolutionLayers(newResolution, true);
-            }
-            activeResolution = newResolution;
-            currentResolution = newResolution;
-            updateMarkedCount();
-        } catch (error) {
-            console.error('Ошибка переключения резолюции:', error);
-        } finally {
-            isGenerating = false;
-        }
+        try { closeTooltip(); if (activeResolution !== null && activeResolution !== newResolution) { if (map.getLayer(`cells-boundaries-${activeResolution}`)) map.setPaintProperty(`cells-boundaries-${activeResolution}`, 'line-opacity', 0); if (map.getLayer(`cells-click-${activeResolution}`)) { map.removeLayer(`cells-click-${activeResolution}`); map.off('click', `cells-click-${activeResolution}`); map.off('mousemove', `cells-click-${activeResolution}`); map.off('mouseleave', `cells-click-${activeResolution}`); map.off('mouseenter', `cells-click-${activeResolution}`); } } displayResolutionLayers(newResolution, true); activeResolution = newResolution; currentResolution = newResolution; updateMarkedCount(); }
+        catch (error) { console.error('Ошибка переключения резолюции:', error); }
+        finally { isGenerating = false; }
     }, 10);
 }
 
@@ -1904,32 +566,21 @@ function setupClickHandler(resolution) {
     if (!map) return;
     const clickLayerId = `cells-click-${resolution}`;
     const sourceId = `cells-source-${resolution}`;
-    
     map.off('click', clickLayerId);
     map.on('click', clickLayerId, (e) => {
         if (activeResolution !== resolution) return;
-        if (isPopupClick) {
-            isPopupClick = false;
-            return;
-        }
-        
+        if (isPopupClick) { isPopupClick = false; return; }
         const features = map.queryRenderedFeatures(e.point, { layers: [clickLayerId] });
         if (!features.length) return;
-        
         const feature = features[0];
         const cellId = feature.properties.id;
         const cellIndex = feature.properties.index;
         const isMarked = feature.properties.marked;
-        
         const data = resolutionData[resolution];
         if (data && data.cells[cellIndex]) {
             const newMarkedState = !isMarked;
             data.cells[cellIndex].marked = newMarkedState;
-            if (newMarkedState) {
-                markedCells.add(cellId);
-            } else {
-                markedCells.delete(cellId);
-            }
+            if (newMarkedState) markedCells.add(cellId); else markedCells.delete(cellId);
             updateMarkedCount();
             data.geoJSON.features[cellIndex].properties.marked = newMarkedState;
             const source = map.getSource(sourceId);
@@ -1940,533 +591,187 @@ function setupClickHandler(resolution) {
 }
 
 function getHexagonCoordinates(props) {
-    let lat = null;
-    let lng = null;
-    if (props.center) {
-        if (typeof props.center === 'object') {
-            lat = props.center.lat;
-            lng = props.center.lng;
-        } else if (typeof props.center === 'string') {
-            try {
-                const parsed = JSON.parse(props.center);
-                lat = parsed.lat;
-                lng = parsed.lng;
-            } catch (e) {}
-        }
-    }
-    if (!lat && props['center.lat'] !== undefined) {
-        lat = props['center.lat'];
-        lng = props['center.lng'];
-    }
-    if (!lat && props.center_lat !== undefined) {
-        lat = props.center_lat;
-        lng = props.center_lng;
-    }
-    if (!lat && props.lat !== undefined) {
-        lat = props.lat;
-        lng = props.lng;
-    }
+    let lat = null, lng = null;
+    if (props.center) { if (typeof props.center === 'object') { lat = props.center.lat; lng = props.center.lng; } else if (typeof props.center === 'string') { try { const parsed = JSON.parse(props.center); lat = parsed.lat; lng = parsed.lng; } catch (e) {} } }
+    if (!lat && props['center.lat'] !== undefined) { lat = props['center.lat']; lng = props['center.lng']; }
+    if (!lat && props.center_lat !== undefined) { lat = props.center_lat; lng = props.center_lng; }
+    if (!lat && props.lat !== undefined) { lat = props.lat; lng = props.lng; }
     return { lat, lng };
 }
 
 function setupHexagonClickHandler() {
     if (!map) return;
-    
     map.off('click', hexagonLayerId);
     map.off('mouseenter', hexagonLayerId);
     map.off('mouseleave', hexagonLayerId);
-    map.off('mousemove', hexagonLayerId);
-    
-    map.on('mouseenter', hexagonLayerId, () => {
-        map.getCanvas().style.cursor = 'pointer';
-    });
-    
-    map.on('mouseleave', hexagonLayerId, () => {
-        map.getCanvas().style.cursor = '';
-    });
-    
+    map.on('mouseenter', hexagonLayerId, () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', hexagonLayerId, () => { map.getCanvas().style.cursor = ''; });
     map.on('click', hexagonLayerId, (e) => {
         const features = map.queryRenderedFeatures(e.point, { layers: [hexagonLayerId] });
         if (!features.length) return;
-        
         const feature = features[0];
         const props = feature.properties;
-        const id = props.id || 'нет данных';
-        const resolution = props.resolution || 'нет данных';
         const coords = getHexagonCoordinates(props);
-        const lat = coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных';
-        const lng = coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных';
-        
-        const popupContent = `
-            <div class="hexagon-popup-content">
-                <div class="tooltip-row">
-                    <span class="tooltip-label">ID:</span>
-                    <span class="tooltip-value">${id}</span>
-                </div>
-                <div class="tooltip-row">
-                    <span class="tooltip-label">Resolution:</span>
-                    <span class="tooltip-value">${resolution}</span>
-                </div>
-                <div class="tooltip-row">
-                    <span class="tooltip-label">Lat:</span>
-                    <span class="tooltip-value">${lat}</span>
-                </div>
-                <div class="tooltip-row">
-                    <span class="tooltip-label">Lng:</span>
-                    <span class="tooltip-value">${lng}</span>
-                </div>
-                <div class="popup-divider"></div>
-                <div class="tooltip-row">
-                    <span class="tooltip-label">Точность данных:</span>
-                    <span class="tooltip-value">99%</span>
-                </div>
-                <a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a>
-            </div>
-        `;
-        
-        new mapboxgl.Popup({
-            closeButton: true,
-            closeOnClick: true,
-            className: 'hexagon-popup'
-        })
-            .setLngLat(e.lngLat)
-            .setHTML(popupContent)
-            .addTo(map);
-        
+        const popupContent = `<div class="hexagon-popup-content"><div class="tooltip-row"><span class="tooltip-label">ID:</span><span class="tooltip-value">${props.id || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Resolution:</span><span class="tooltip-value">${props.resolution || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lat:</span><span class="tooltip-value">${coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lng:</span><span class="tooltip-value">${coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных'}</span></div><div class="popup-divider"></div><div class="tooltip-row"><span class="tooltip-label">Точность:</span><span class="tooltip-value">99%</span></div><a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a></div>`;
+        new mapboxgl.Popup({ closeButton: true, closeOnClick: true, className: 'hexagon-popup' }).setLngLat(e.lngLat).setHTML(popupContent).addTo(map);
         e.preventDefault();
     });
 }
 
 // ================== SAI (HEAT MAP) ФУНКЦИИ ==================
 
-// Подготовка GeoJSON с добавлением случайных фаз для пространственной волны
 function prepareSAIGeoJSON(geoJSON, config) {
     if (!geoJSON || !geoJSON.features) return geoJSON;
-    
-    // Добавляем каждому гексагону случайную фазу для анимации
     geoJSON.features.forEach((feature, idx) => {
         if (!feature.properties) feature.properties = {};
-        
-        // Случайная фаза на основе индекса (псевдослучайная, но детерминированная)
-        // Это создаёт эффект "хождения" по гексагонам
-        const phaseFromIndex = (idx * 0.618033988749895) % 1; // Золотое сечение для распределения
-        const phaseFromCoords = feature.properties.center_lat ? 
-            (feature.properties.center_lat * 100 + feature.properties.center_lng * 100) % (Math.PI * 2) : 0;
-        
-        // Комбинируем для уникальной фазы каждого гексагона
+        const phaseFromIndex = (idx * 0.618033988749895) % 1;
+        const phaseFromCoords = feature.properties.center_lat ? (feature.properties.center_lat * 100 + feature.properties.center_lng * 100) % (Math.PI * 2) : 0;
         feature.properties._wavePhase = phaseFromIndex * Math.PI * 2 + phaseFromCoords;
         feature.properties._animatedHeight = config.baseHeight;
     });
-    
     return geoJSON;
 }
 
 async function loadSAIData() {
     const results = {};
     for (const [key, config] of Object.entries(SAI_SOURCES)) {
-        try {
-            const response = await fetch(config.url);
-            if (response.ok) {
-                const geoJSON = await response.json();
-                // Подготавливаем данные с фазами для анимации
-                config.geoJSON = prepareSAIGeoJSON(geoJSON, config);
-                results[key] = config.geoJSON;
-                console.log(`SAI ${key} data loaded and prepared:`, results[key].features?.length || 0, 'features');
-            }
-        } catch (error) {
-            console.error(`Error loading SAI ${key}:`, error);
-        }
+        try { const response = await fetch(config.url); if (response.ok) { const geoJSON = await response.json(); config.geoJSON = prepareSAIGeoJSON(geoJSON, config); results[key] = config.geoJSON; console.log(`SAI ${key} loaded:`, results[key].features?.length || 0, 'features'); } }
+        catch (error) { console.error(`Error loading SAI ${key}:`, error); }
     }
     return results;
 }
 
-// ================== ФУНКЦИЯ АНИМАЦИИ SAI ==================
-// Анимация с пространственной волной - каждый гексагон имеет свою фазу
 function startSAIAnimation() {
     if (saiAnimationId) return;
-    
     saiAnimationStartTime = performance.now();
-    console.log('SAI animation started with spatial wave effect');
-    
+    console.log('SAI animation started');
     let lastGeoJSONUpdate = 0;
-    const geoJSONUpdateInterval = 50; // Обновлять GeoJSON каждые 50мс (20 FPS для пространственной волны)
-    
+    const geoJSONUpdateInterval = 50;
     function animate(currentTime) {
-        if (!saiVisible || !map) {
-            saiAnimationId = null;
-            return;
-        }
-        
+        if (!saiVisible || !map) { saiAnimationId = null; return; }
         const elapsed = (currentTime - saiAnimationStartTime) / 1000;
-        const speed = 0.5; // Скорость глобальной анимации между цветами
-        
+        const speed = 0.0;
         for (const [key, config] of Object.entries(SAI_SOURCES)) {
             const layer = map.getLayer(config.layerId);
             if (!layer) continue;
-            
-            // Глобальная фаза для этого цвета (волна между источниками)
             const globalPhase = elapsed * speed * Math.PI * 2 + config.phaseOffset;
             const globalSineValue = Math.sin(globalPhase);
-            
-            // Глобальное смещение высоты и прозрачности
             const globalHeightOffset = globalSineValue * config.heightAmplitude;
-            const globalOpacityOffset = globalSineValue * config.opacityAmplitude;
-            
-            // Базовые значения с глобальной анимацией
             const baseHeightWithGlobal = config.baseHeight + globalHeightOffset;
-            const baseOpacityWithGlobal = config.baseOpacity + globalOpacityOffset;
-            
-            // Обновляем GeoJSON с пространственной волной (каждые 50мс для производительности)
             if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval && config.geoJSON) {
-                const spatialPhase = elapsed * config.spatialWaveSpeed * Math.PI * 2;
-                
-                // Обновляем высоту каждого гексагона
-                config.geoJSON.features.forEach((feature, idx) => {
-                    // Используем сохраненную случайную фазу для этого гексагона
+                const spatialPhase = elapsed * config.spatialWaveSpeed * Math.PI;
+                config.geoJSON.features.forEach((feature) => {
                     const hexPhase = feature.properties._wavePhase || 0;
-                    
-                    // Вычисляем высоту с пространственной волной
                     const spatialSineValue = Math.sin(spatialPhase + hexPhase);
                     const spatialHeightOffset = spatialSineValue * config.spatialWaveAmplitude;
-                    
-                    // Итоговая высота = базовая + глобальная волна + пространственная волна
                     feature.properties._animatedHeight = baseHeightWithGlobal + spatialHeightOffset;
                 });
-                
-                // Обновляем источник
                 const source = map.getSource(config.sourceId);
-                if (source) {
-                    source.setData(config.geoJSON);
-                }
+                if (source) source.setData(config.geoJSON);
             }
-            
-            // Используем expression для получения высоты из свойства
-            try {
-                map.setPaintProperty(config.layerId, 'fill-extrusion-height', 
-                    ['coalesce', ['get', '_animatedHeight'], baseHeightWithGlobal]
-                );
-                map.setPaintProperty(config.layerId, 'fill-extrusion-opacity', baseOpacityWithGlobal);
-            } catch (e) {
-                console.error('Animation error:', e);
-            }
+            try { map.setPaintProperty(config.layerId, 'fill-extrusion-height', ['coalesce', ['get', '_animatedHeight'], baseHeightWithGlobal]); map.setPaintProperty(config.layerId, 'fill-extrusion-opacity', config.baseOpacity); }
+            catch (e) { console.error('Animation error:', e); }
         }
-        
-        if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval) {
-            lastGeoJSONUpdate = currentTime;
-        }
-        
+        if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval) lastGeoJSONUpdate = currentTime;
         saiAnimationId = requestAnimationFrame(animate);
     }
-    
     saiAnimationId = requestAnimationFrame(animate);
 }
 
-function stopSAIAnimation() {
-    if (saiAnimationId) {
-        cancelAnimationFrame(saiAnimationId);
-        saiAnimationId = null;
-        console.log('SAI animation stopped');
-    }
-}
+function stopSAIAnimation() { if (saiAnimationId) { cancelAnimationFrame(saiAnimationId); saiAnimationId = null; console.log('SAI animation stopped'); } }
 
 function addSAIToMap(data) {
     if (!map || !mapLoaded) return;
-    
-    // Определяем слой ПЕРЕД которым добавлять SAI (под H12 AUTO)
-    // Если H12 AUTO включен, добавляем SAI ПОД него
     const beforeLayerId = map.getLayer(hexagonLayerId) ? hexagonLayerId : null;
-    
     for (const [key, config] of Object.entries(SAI_SOURCES)) {
         const sourceData = data[key];
         if (!sourceData) continue;
-        
         if (map.getLayer(config.lineLayerId)) map.removeLayer(config.lineLayerId);
         if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
         if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
-        
-        map.addSource(config.sourceId, {
-            type: 'geojson',
-            data: sourceData
-        });
-        
-        // Используем expression для высоты - берём из свойства _animatedHeight
-        // Это позволяет каждому гексагону иметь свою высоту
-        // SAI слои добавляем ПОД H12 AUTO (если он есть)
-        map.addLayer({
-            id: config.layerId,
-            type: 'fill-extrusion',
-            source: config.sourceId,
-            paint: {
-                'fill-extrusion-color': config.color,
-                // Expression: использовать свойство _animatedHeight или базовую высоту
-                'fill-extrusion-height': [
-                    'coalesce',
-                    ['get', '_animatedHeight'],
-                    config.baseHeight
-                ],
-                'fill-extrusion-opacity': config.baseOpacity,
-                'fill-extrusion-base': 0
-            }
-        }, beforeLayerId); // Добавляем ПЕРЕД H12 AUTO (т.е. ПОД него)
-        
-        map.addLayer({
-            id: config.lineLayerId,
-            type: 'line',
-            source: config.sourceId,
-            paint: {
-                'line-color': config.color,
-                'line-width': 1,
-                'line-opacity': 0.8
-            }
-        }, beforeLayerId);
+        map.addSource(config.sourceId, { type: 'geojson', data: sourceData });
+        map.addLayer({ id: config.layerId, type: 'fill-extrusion', source: config.sourceId, paint: { 'fill-extrusion-color': config.color, 'fill-extrusion-height': ['coalesce', ['get', '_animatedHeight'], config.baseHeight], 'fill-extrusion-opacity': config.baseOpacity, 'fill-extrusion-base': 0 } }, beforeLayerId);
+        map.addLayer({ id: config.lineLayerId, type: 'line', source: config.sourceId, paint: { 'line-color': config.color, 'line-width': 1, 'line-opacity': 0.8 } }, beforeLayerId);
     }
-    
     setupSAIClickHandler();
     saiVisible = true;
-    
-    // Запускаем анимацию после небольшой задержки
-    setTimeout(() => {
-        startSAIAnimation();
-    }, 100);
+    setTimeout(() => { startSAIAnimation(); }, 100);
 }
 
 function removeSAIFromMap() {
     stopSAIAnimation();
-    
     if (!map) return;
-    
     for (const [key, config] of Object.entries(SAI_SOURCES)) {
-        try {
-            if (map.getLayer(config.lineLayerId)) map.removeLayer(config.lineLayerId);
-            if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
-            if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
-        } catch (e) {
-            console.error(`Error removing SAI ${key}:`, e);
-        }
+        try { if (map.getLayer(config.lineLayerId)) map.removeLayer(config.lineLayerId); if (map.getLayer(config.layerId)) map.removeLayer(config.layerId); if (map.getSource(config.sourceId)) map.removeSource(config.sourceId); }
+        catch (e) { console.error(`Error removing SAI ${key}:`, e); }
     }
     saiVisible = false;
 }
 
 function setupSAIClickHandler() {
     if (!map) return;
-    
     for (const [key, config] of Object.entries(SAI_SOURCES)) {
         map.off('click', config.layerId);
         map.off('mouseenter', config.layerId);
         map.off('mouseleave', config.layerId);
-        
-        map.on('mouseenter', config.layerId, () => {
-            map.getCanvas().style.cursor = 'pointer';
-        });
-        
-        map.on('mouseleave', config.layerId, () => {
-            map.getCanvas().style.cursor = '';
-        });
-        
+        map.on('mouseenter', config.layerId, () => { map.getCanvas().style.cursor = 'pointer'; });
+        map.on('mouseleave', config.layerId, () => { map.getCanvas().style.cursor = ''; });
         map.on('click', config.layerId, (e) => {
             const features = map.queryRenderedFeatures(e.point, { layers: [config.layerId] });
             if (!features.length) return;
-            
             const feature = features[0];
             const props = feature.properties;
-            const id = props.id || 'нет данных';
-            const resolution = props.resolution || 'нет данных';
             const coords = getHexagonCoordinates(props);
-            const lat = coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных';
-            const lng = coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных';
-            
-            const accuracy = config.accuracy;
-            
-            const popupContent = `
-                <div class="hexagon-popup-content">
-                    <div class="tooltip-row">
-                        <span class="tooltip-label">ID:</span>
-                        <span class="tooltip-value">${id}</span>
-                    </div>
-                    <div class="tooltip-row">
-                        <span class="tooltip-label">Resolution:</span>
-                        <span class="tooltip-value">${resolution}</span>
-                    </div>
-                    <div class="tooltip-row">
-                        <span class="tooltip-label">Lat:</span>
-                        <span class="tooltip-value">${lat}</span>
-                    </div>
-                    <div class="tooltip-row">
-                        <span class="tooltip-label">Lng:</span>
-                        <span class="tooltip-value">${lng}</span>
-                    </div>
-                    <div class="popup-divider"></div>
-                    <div class="tooltip-row">
-                        <span class="tooltip-label">Точность данных x̄ (≤ 10 мс):</span>
-                        <span class="tooltip-value">${accuracy}</span>
-                    </div>
-                    <a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a>
-                </div>
-            `;
-            
-            new mapboxgl.Popup({
-                closeButton: true,
-                closeOnClick: true,
-                className: 'hexagon-popup'
-            })
-                .setLngLat(e.lngLat)
-                .setHTML(popupContent)
-                .addTo(map);
-            
+            const popupContent = `<div class="hexagon-popup-content"><div class="tooltip-row"><span class="tooltip-label">ID:</span><span class="tooltip-value">${props.id || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Resolution:</span><span class="tooltip-value">${props.resolution || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lat:</span><span class="tooltip-value">${coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lng:</span><span class="tooltip-value">${coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных'}</span></div><div class="popup-divider"></div><div class="tooltip-row"><span class="tooltip-label">Точность:</span><span class="tooltip-value">${config.accuracy}</span></div><a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a></div>`;
+            new mapboxgl.Popup({ closeButton: true, closeOnClick: true, className: 'hexagon-popup' }).setLngLat(e.lngLat).setHTML(popupContent).addTo(map);
             e.preventDefault();
         });
     }
 }
 
-async function toggleSAI(checked) {
-    console.log('SAI toggle:', checked);
-    saiSwitchState = checked;
-    
-    if (checked) {
-        const data = await loadSAIData();
-        addSAIToMap(data);
-    } else {
-        removeSAIFromMap();
-    }
-}
+async function toggleSAI(checked) { console.log('SAI toggle:', checked); saiSwitchState = checked; if (checked) { const data = await loadSAIData(); addSAIToMap(data); } else { removeSAIFromMap(); } }
 
-// ================== ФУНКЦИЯ ДЛЯ ССЫЛКИ "Отчет ❯" ==================
-
-function handleReportClick(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-    
-    const targetUrl = "https://sos.emiia.ai/vv1.html";
-    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-    
-    if (isPWA) {
-        window.location.href = targetUrl;
-    } else {
-        window.location.assign(targetUrl);
-    }
-}
+function handleReportClick(e) { if (e) { e.preventDefault(); e.stopPropagation(); } const targetUrl = "https://sos.emiia.ai/vv1.html"; const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
 
 // ================== ОСТАЛЬНЫЕ ФУНКЦИИ ==================
 
 function setupTooltipHandler(resolution) {
     if (!map) return;
     const clickLayerId = `cells-click-${resolution}`;
-    
     map.off('mousemove', clickLayerId);
     map.off('mouseleave', clickLayerId);
     map.off('mouseenter', clickLayerId);
-    
-    map.on('mouseenter', clickLayerId, () => {
-        if (activeResolution !== resolution) {
-            map.getCanvas().style.cursor = '';
-            return;
-        }
-        map.getCanvas().style.cursor = 'pointer';
-    });
-    
-    map.on('mouseleave', clickLayerId, () => {
-        map.getCanvas().style.cursor = '';
-        if (tooltipTimeout) {
-            clearTimeout(tooltipTimeout);
-            tooltipTimeout = null;
-        }
-        if (currentPopup) {
-            currentPopup.remove();
-            currentPopup = null;
-        }
-    });
-    
+    map.on('mouseenter', clickLayerId, () => { if (activeResolution !== resolution) { map.getCanvas().style.cursor = ''; return; } map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', clickLayerId, () => { map.getCanvas().style.cursor = ''; if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; } if (currentPopup) { currentPopup.remove(); currentPopup = null; } });
     map.on('mousemove', clickLayerId, (e) => {
         if (activeResolution !== resolution) return;
-        if (tooltipTimeout) {
-            clearTimeout(tooltipTimeout);
-            tooltipTimeout = null;
-        }
-        if (currentPopup) {
-            currentPopup.remove();
-            currentPopup = null;
-        }
-        
+        if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; }
+        if (currentPopup) { currentPopup.remove(); currentPopup = null; }
         tooltipTimeout = setTimeout(() => {
             const features = map.queryRenderedFeatures(e.point, { layers: [clickLayerId] });
             if (features.length && !currentPopup) {
                 const feature = features[0];
-                const popupContent = createTooltip(feature);
-                
-                currentPopup = new mapboxgl.Popup({
-                    closeButton: false,
-                    closeOnClick: false,
-                    className: 'custom-tooltip',
-                    anchor: 'bottom',
-                    offset: 10
-                })
-                    .setLngLat(e.lngLat)
-                    .setHTML(popupContent)
-                    .addTo(map);
-                
+                currentPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, className: 'custom-tooltip', anchor: 'bottom', offset: 10 }).setLngLat(e.lngLat).setHTML(createTooltip(feature)).addTo(map);
                 const popupElement = currentPopup.getElement();
-                if (popupElement) {
-                    popupElement.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        isPopupClick = true;
-                        closeTooltip();
-                    });
-                }
+                if (popupElement) popupElement.addEventListener('click', function(e) { e.stopPropagation(); isPopupClick = true; closeTooltip(); });
             }
         }, 500);
     });
 }
 
-function generateGrid() {
-    if (!map || !mapLoaded || isGenerating || !gridActive) return;
-    switchResolution(currentResolution);
-}
+function generateGrid() { if (!map || !mapLoaded || isGenerating || !gridActive) return; switchResolution(currentResolution); }
 
-function toggleGrid() {
-    if (isGenerating) return;
-    
-    if (!gridActive) {
-        updateGridStatus(true);
-        generateGrid();
-    } else {
-        markedCells.clear();
-        updateMarkedCount();
-        closeTooltip();
-        Object.keys(resolutionData).forEach(resolution => {
-            removeResolutionLayers(parseInt(resolution));
-        });
-        resolutionData = {};
-        activeResolution = null;
-        updateGridStatus(false);
-    }
-}
-
-function cleanupLayers() {
-    Object.keys(resolutionData).forEach(resolution => {
-        removeResolutionLayers(parseInt(resolution));
-    });
-    resolutionData = {};
-    activeResolution = null;
-}
+function toggleGrid() { if (isGenerating) return; if (!gridActive) { updateGridStatus(true); generateGrid(); } else { markedCells.clear(); updateMarkedCount(); closeTooltip(); Object.keys(resolutionData).forEach(resolution => { removeResolutionLayers(parseInt(resolution)); }); resolutionData = {}; activeResolution = null; updateGridStatus(false); } }
 
 function toggleMenu() {
     const controls = document.getElementById('controls');
     const menuContent = document.getElementById('menu-content');
     const toggleIcon = document.getElementById('toggle-icon');
-    
     controls.classList.toggle('collapsed');
     menuContent.classList.toggle('collapsed');
     toggleIcon.classList.toggle('collapsed');
-    
-    if (menuContent.classList.contains('collapsed')) {
-        menuContent.style.maxHeight = '0';
-        menuContent.style.overflow = 'hidden';
-    } else {
-        menuContent.style.maxHeight = '60vh';
-        menuContent.style.overflowY = 'scroll';
-    }
+    if (menuContent.classList.contains('collapsed')) { menuContent.style.maxHeight = '0'; menuContent.style.overflow = 'hidden'; }
+    else { menuContent.style.maxHeight = '60vh'; menuContent.style.overflowY = 'scroll'; }
 }
 
 function initCustomSelect() {
@@ -2475,120 +780,94 @@ function initCustomSelect() {
     const optionsContainer = document.getElementById('resolution-options');
     const options = optionsContainer.querySelectorAll('.custom-option');
     const nativeSelect = document.getElementById('resolution-select');
-    
-    trigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.querySelectorAll('.custom-select-wrapper.open').forEach(el => {
-            if (el !== wrapper) el.classList.remove('open');
-        });
-        wrapper.classList.toggle('open');
-    });
-    
-    options.forEach(option => {
-        option.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const value = option.getAttribute('data-value');
-            const text = option.textContent;
-            trigger.textContent = text;
-            options.forEach(opt => opt.classList.remove('selected'));
-            option.classList.add('selected');
-            nativeSelect.value = value;
-            wrapper.classList.remove('open');
-            const event = new Event('change', { bubbles: true });
-            nativeSelect.dispatchEvent(event);
-        });
-    });
-    
-    document.addEventListener('click', (e) => {
-        if (!wrapper.contains(e.target)) {
-            wrapper.classList.remove('open');
-        }
-    });
-    
+    trigger.addEventListener('click', (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select-wrapper.open').forEach(el => { if (el !== wrapper) el.classList.remove('open'); }); wrapper.classList.toggle('open'); });
+    options.forEach(option => { option.addEventListener('click', (e) => { e.stopPropagation(); const value = option.getAttribute('data-value'); trigger.textContent = option.textContent; options.forEach(opt => opt.classList.remove('selected')); option.classList.add('selected'); nativeSelect.value = value; wrapper.classList.remove('open'); nativeSelect.dispatchEvent(new Event('change', { bubbles: true })); }); });
+    document.addEventListener('click', (e) => { if (!wrapper.contains(e.target)) wrapper.classList.remove('open'); });
     const menuContent = document.getElementById('menu-content');
-    if (menuContent) {
-        menuContent.addEventListener('scroll', () => {
-            wrapper.classList.remove('open');
-        });
-    }
+    if (menuContent) menuContent.addEventListener('scroll', () => { wrapper.classList.remove('open'); });
 }
 
-async function loadHexagonsFromJSON() {
-    try {
-        const response = await fetch('https://www.emiia.ru/hexagon/hexagons_json.json');
-        if (!response.ok) throw new Error('Ошибка загрузки JSON');
-        const data = await response.json();
-        console.log('Загружены гексагоны:', data.features?.length || 0);
-        return data;
-    } catch (error) {
-        console.error('Ошибка загрузки гексагонов:', error);
-        return null;
-    }
+// ================== H12 AUTO АНИМАЦИЯ ==================
+
+function prepareH12GeoJSON(geoJSON) {
+    if (!geoJSON || !geoJSON.features) return geoJSON;
+    geoJSON.features.forEach((feature, idx) => {
+        if (!feature.properties) feature.properties = {};
+        const phaseFromIndex = (idx * 0.618033988749895) % 1;
+        const phaseFromCoords = feature.properties.center_lat ? (feature.properties.center_lat * 100 + feature.properties.center_lng * 100) % (Math.PI * 2) : 0;
+        feature.properties._wavePhase = phaseFromIndex * Math.PI * 2 + phaseFromCoords;
+        feature.properties._animatedHeight = H12_CONFIG.baseHeight;
+    });
+    return geoJSON;
 }
+
+function startH12Animation() {
+    if (h12AnimationId) return;
+    h12AnimationStartTime = performance.now();
+    console.log('H12 AUTO animation started');
+    let lastGeoJSONUpdate = 0;
+    const geoJSONUpdateInterval = 50;
+    function animate(currentTime) {
+        if (!hexagonVisible || !map) { h12AnimationId = null; return; }
+        const elapsed = (currentTime - h12AnimationStartTime) / 1000;
+        const speed = 0.5;
+        const layer = map.getLayer(hexagonLayerId);
+        if (!layer) { h12AnimationId = null; return; }
+        const globalPhase = elapsed * speed * Math.PI * 2;
+        const globalSineValue = Math.sin(globalPhase);
+        const globalHeightOffset = globalSineValue * H12_CONFIG.heightAmplitude;
+        const globalOpacityOffset = globalSineValue * H12_CONFIG.opacityAmplitude;
+        const baseHeightWithGlobal = H12_CONFIG.baseHeight + globalHeightOffset;
+        const baseOpacityWithGlobal = H12_CONFIG.baseOpacity + globalOpacityOffset;
+        if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval && H12_CONFIG.geoJSON) {
+            const spatialPhase = elapsed * H12_CONFIG.spatialWaveSpeed * Math.PI * 2;
+            H12_CONFIG.geoJSON.features.forEach((feature) => {
+                const hexPhase = feature.properties._wavePhase || 0;
+                const spatialSineValue = Math.sin(spatialPhase + hexPhase);
+                const spatialHeightOffset = spatialSineValue * H12_CONFIG.spatialWaveAmplitude;
+                feature.properties._animatedHeight = baseHeightWithGlobal + spatialHeightOffset;
+            });
+            const source = map.getSource(hexagonSourceId);
+            if (source) source.setData(H12_CONFIG.geoJSON);
+        }
+        try { map.setPaintProperty(hexagonLayerId, 'fill-extrusion-height', ['coalesce', ['get', '_animatedHeight'], baseHeightWithGlobal]); map.setPaintProperty(hexagonLayerId, 'fill-extrusion-opacity', baseOpacityWithGlobal); }
+        catch (e) { console.error('H12 animation error:', e); }
+        if (currentTime - lastGeoJSONUpdate > geoJSONUpdateInterval) lastGeoJSONUpdate = currentTime;
+        h12AnimationId = requestAnimationFrame(animate);
+    }
+    h12AnimationId = requestAnimationFrame(animate);
+}
+
+function stopH12Animation() { if (h12AnimationId) { cancelAnimationFrame(h12AnimationId); h12AnimationId = null; console.log('H12 AUTO animation stopped'); } }
+
+async function loadHexagonsFromJSON() { try { const response = await fetch('https://www.emiia.ru/hexagon/hexagons_json.json'); if (!response.ok) throw new Error('Ошибка загрузки JSON'); const data = await response.json(); console.log('Загружены гексагоны:', data.features?.length || 0); return data; } catch (error) { console.error('Ошибка загрузки гексагонов:', error); return null; } }
 
 async function addHexagonsToMap() {
     if (!map || !mapLoaded) return;
     const data = await loadHexagonsFromJSON();
     if (!data || !data.features) return;
-    
+    H12_CONFIG.geoJSON = prepareH12GeoJSON(data);
     try {
         if (map.getLayer(hexagonLayerId)) map.removeLayer(hexagonLayerId);
         if (map.getLayer(hexagonLineLayerId)) map.removeLayer(hexagonLineLayerId);
         if (map.getSource(hexagonSourceId)) map.removeSource(hexagonSourceId);
-        
-        map.addSource(hexagonSourceId, { type: 'geojson', data: data });
-        
-        map.addLayer({
-            id: hexagonLayerId,
-            type: 'fill-extrusion',
-            source: hexagonSourceId,
-            paint: {
-                'fill-extrusion-color': '#3d85c6',
-                'fill-extrusion-height': 7,
-                'fill-extrusion-opacity': 0.15,  // Уменьшено с 0.3 до 0.15 чтобы видеть SAI под ним
-                'fill-extrusion-base': 0
-            }
-        });
-        
-        map.addLayer({
-            id: hexagonLineLayerId,
-            type: 'line',
-            source: hexagonSourceId,
-            paint: {
-                'line-color': '#3d85c6',
-                'line-width': 2,
-                'line-opacity': 0.8
-            }
-        });
-        
+        map.addSource(hexagonSourceId, { type: 'geojson', data: H12_CONFIG.geoJSON });
+        map.addLayer({ id: hexagonLayerId, type: 'fill-extrusion', source: hexagonSourceId, paint: { 'fill-extrusion-color': H12_CONFIG.color, 'fill-extrusion-height': ['coalesce', ['get', '_animatedHeight'], H12_CONFIG.baseHeight], 'fill-extrusion-opacity': H12_CONFIG.baseOpacity, 'fill-extrusion-base': 0 } });
+        map.addLayer({ id: hexagonLineLayerId, type: 'line', source: hexagonSourceId, paint: { 'line-color': H12_CONFIG.color, 'line-width': 2, 'line-opacity': 0.8 } });
         setupHexagonClickHandler();
         hexagonVisible = true;
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
+        setTimeout(() => { startH12Animation(); }, 100);
+    } catch (error) { console.error('Ошибка:', error); }
 }
 
 function removeHexagonsFromMap() {
+    stopH12Animation();
     if (!map) return;
-    try {
-        if (map.getLayer(hexagonLayerId)) map.removeLayer(hexagonLayerId);
-        if (map.getLayer(hexagonLineLayerId)) map.removeLayer(hexagonLineLayerId);
-        if (map.getSource(hexagonSourceId)) map.removeSource(hexagonSourceId);
-        hexagonVisible = false;
-    } catch (error) {
-        console.error('Ошибка удаления:', error);
-    }
+    try { if (map.getLayer(hexagonLayerId)) map.removeLayer(hexagonLayerId); if (map.getLayer(hexagonLineLayerId)) map.removeLayer(hexagonLineLayerId); if (map.getSource(hexagonSourceId)) map.removeSource(hexagonSourceId); hexagonVisible = false; H12_CONFIG.geoJSON = null; }
+    catch (error) { console.error('Ошибка удаления:', error); }
 }
 
-window.toggleHexagons = function(checked) {
-    popupSwitchState = checked;
-    if (checked) {
-        addHexagonsToMap();
-    } else {
-        removeHexagonsFromMap();
-    }
-};
-
+window.toggleHexagons = function(checked) { popupSwitchState = checked; if (checked) addHexagonsToMap(); else removeHexagonsFromMap(); };
 window.toggleSAI = toggleSAI;
 window.handleReportClick = handleReportClick;
 
@@ -2596,279 +875,68 @@ window.handleReportClick = handleReportClick;
 
 function initializeMap() {
     mapboxgl.accessToken = MAPBOX_TOKEN;
-    
-    map = new mapboxgl.Map({
-        container: 'map',
-        style: 'https://sos.emiia.ai/moscow_style_2.json',
-        center: INITIAL_VIEW.center,
-        zoom: INITIAL_VIEW.zoom,
-        pitch: INITIAL_VIEW.pitch,
-        bearing: INITIAL_VIEW.bearing,
-        maxZoom: 24,
-        attributionControl: false,
-        minZoom: 0,
-        antialias: true
+    map = new mapboxgl.Map({ container: 'map', style: 'https://sos.emiia.ai/moscow_style_2.json', center: INITIAL_VIEW.center, zoom: INITIAL_VIEW.zoom, pitch: INITIAL_VIEW.pitch, bearing: INITIAL_VIEW.bearing, maxZoom: 24, attributionControl: false, minZoom: 0, antialias: true });
+
+    map.on('style.load', function() {
+        setTimeout(function() {
+            if (!map || !map.getStyle()) return;
+            const layers = map.getStyle().layers;
+            layers.forEach(function(layer) {
+                if (layer.type === 'symbol') { map.setPaintProperty(layer.id, 'text-opacity', 0); map.setPaintProperty(layer.id, 'icon-opacity', 0); }
+                const layerId = layer.id.toLowerCase();
+                if (layerId.includes('road') || layerId.includes('street') || layerId.includes('label') || layerId.includes('housenumber') || layerId.includes('number') || layerId.includes('name') || layerId.includes('place') || layerId.includes('poi')) { if (map.getLayer(layer.id)) { map.setPaintProperty(layer.id, 'text-opacity', 0); map.setPaintProperty(layer.id, 'icon-opacity', 0); } }
+            });
+            console.log('Названия улиц и номера домов скрыты');
+        }, 500);
     });
 
+    map.on('styledata', function() {
+        setTimeout(function() {
+            if (!map || !map.getStyle()) return;
+            const layers = map.getStyle().layers;
+            layers.forEach(function(layer) { if (layer.type === 'symbol') { map.setPaintProperty(layer.id, 'text-opacity', 0); map.setPaintProperty(layer.id, 'icon-opacity', 0); } });
+        }, 100);
+    });
 
-
-// ================== НАЧАЛО БЛОКА СКРЫТИЕ НАЗВАНИЙ УЛИЦ И НОМЕРОВ ДОМОВ ==================
-map.on('style.load', function() {
-    // Ждем небольшую задержку, чтобы стиль полностью загрузился
-    setTimeout(function() {
-        if (!map || !map.getStyle()) return;
-        
-        // Получаем все слои карты
-        const layers = map.getStyle().layers;
-        
-        // Проходим по каждому слою
-        layers.forEach(function(layer) {
-            // Проверяем, является ли слой символьным (текстовым)
-            if (layer.type === 'symbol') {
-                // Устанавливаем прозрачность текста в 0 (полностью прозрачный)
-                map.setPaintProperty(layer.id, 'text-opacity', 0);
-                map.setPaintProperty(layer.id, 'icon-opacity', 0);
-            }
-            
-            // Дополнительно: проверяем по названию слоя для надежности
-            const layerId = layer.id.toLowerCase();
-            if (layerId.includes('road') || 
-                layerId.includes('street') || 
-                layerId.includes('label') || 
-                layerId.includes('housenumber') ||
-                layerId.includes('number') ||
-                layerId.includes('name') ||
-                layerId.includes('place') ||
-                layerId.includes('poi')) {
-                if (map.getLayer(layer.id)) {
-                    map.setPaintProperty(layer.id, 'text-opacity', 0);
-                    map.setPaintProperty(layer.id, 'icon-opacity', 0);
-                }
-            }
-        });
-        
-        console.log('Названия улиц и номера домов скрыты');
-    }, 500); // Небольшая задержка для загрузки стиля
-});
-
-// Также обрабатываем изменение стиля (если стиль меняется динамически)
-map.on('styledata', function() {
-    // Повторяем ту же логику при изменении данных стиля
-    setTimeout(function() {
-        if (!map || !map.getStyle()) return;
-        
-        const layers = map.getStyle().layers;
-        layers.forEach(function(layer) {
-            if (layer.type === 'symbol') {
-                map.setPaintProperty(layer.id, 'text-opacity', 0);
-                map.setPaintProperty(layer.id, 'icon-opacity', 0);
-            }
-        });
-    }, 100);
-});
-// ================== КОНЕЦ БЛОКА СКРЫТИЕ НАЗВАНИЙ УЛИЦ И НОМЕРОВ ДОМОВ ==================
-
-
-
-    var geojson = {
-        'type': 'FeatureCollection',
-        'features': [{
-            'type': 'Feature',
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [37.63600178,55.83877508]
-            },
-            'properties': {
-                'title': 'EMIIA.AI SIP <br>AI DARK STORE #33',
-                'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ <br>EMIIA.AI DBM: ID R: [#3D4581] <br>'
-            }
-        }]
-    };
+    var geojson = { 'type': 'FeatureCollection', 'features': [{ 'type': 'Feature', 'geometry': { 'type': 'Point', 'coordinates': [37.63600178,55.83877508] }, 'properties': { 'title': 'EMIIA.AI SIP <br>AI DARK STORE #33', 'description': 'EMIIA.AI API: JSON DATASET OUTPUT ❯ <br>EMIIA.AI DBM: ID R: [#3D4581] <br>' } }] };
 
     const customPopupContainer = document.createElement('div');
     customPopupContainer.id = 'custom-marker-popup';
     document.body.appendChild(customPopupContainer);
 
     function createPopupHTML(title, description, switchState, saiState) {
-        return `
-            <div class="custom-popup-content">
-                <div class="custom-popup-tail"></div>
-                <button class="custom-popup-close" id="custom-popup-close-btn">×</button>
-                <h3 style="margin: 0 0 10px 0; color: #383838; font-size: 16px; font-weight: 600; padding-right: 25px;">${title}</h3>
-                <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.5;">${description}</p>
-                
-                <div class="marker-popup-switch">
-                    <label class="switch-container" style="cursor: pointer;">
-                        <div class="switch">
-                            <input type="checkbox" id="custom-marker-switch" ${switchState ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </div>
-                        <span class="switch-text">EMIIA.AI H12 AUTO</span>
-                    </label>
-                    <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                    </svg>
-                </div>
-                
-                <div class="marker-popup-switch" style="margin-top: 0; padding-top: 10px;">
-                    <label class="switch-container" style="cursor: pointer;">
-                        <div class="switch">
-                            <input type="checkbox" id="custom-marker-sai-switch" ${saiState ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </div>
-                        <span class="switch-text">EMIIA.AI SAI</span>
-                    </label>
-                    <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                    </svg>
-                </div>
-                
-                <div class="marker-popup-switch" style="margin-top: 0; padding-top: 10px;">
-                    <label class="switch-container" style="cursor: pointer;">
-                        <div class="switch">
-                            <input type="checkbox" id="custom-marker-sdk-switch">
-                            <span class="slider"></span>
-                        </div>
-                        <span class="switch-text">EMIIA.AI SDK/MRV</span>
-                    </label>
-                    <svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                    </svg>
-                </div>
-                
-                <div style="height: 1px; background-color: #e9ecef; margin: 15px 0;"></div>
-                
-                <div class="marker-popup-functions" style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#3d85c6" viewBox="0 0 16 16">
-                            <path d="M2 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5.5a.5.5 0 0 1 0 1H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v4a.5.5 0 0 1-1 0V4a1 1 0 0 0-1-1z"/>
-                            <path d="M3.146 5.146a.5.5 0 0 1 .708 0L5.177 6.47a.75.75 0 0 1 0 1.06L3.854 8.854a.5.5 0 1 1-.708-.708L4.293 7 3.146 5.854a.5.5 0 0 1 0-.708M5.5 9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5"/>
-                        </svg>
-                        <span style="font-size: 14px; font-weight: 500; color: #3d85c6; font-family: 'Montserrat', sans-serif;"> Добавить функции</span>
-                    </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#3d85c6" viewBox="0 0 16 16">
-                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                    </svg>
-                </div>
-            </div>
-        `;
+        return `<div class="custom-popup-content"><div class="custom-popup-tail"></div><button class="custom-popup-close" id="custom-popup-close-btn">×</button><h3 style="margin: 0 0 10px 0; color: #383838; font-size: 16px; font-weight: 600; padding-right: 25px;">${title}</h3><p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.5;">${description}</p><div class="marker-popup-switch"><label class="switch-container" style="cursor: pointer;"><div class="switch"><input type="checkbox" id="custom-marker-switch" ${switchState ? 'checked' : ''}><span class="slider"></span></div><span class="switch-text">EMIIA.AI H12 AUTO</span></label><svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg></div><div class="marker-popup-switch" style="margin-top: 0; padding-top: 10px;"><label class="switch-container" style="cursor: pointer;"><div class="switch"><input type="checkbox" id="custom-marker-sai-switch" ${saiState ? 'checked' : ''}><span class="slider"></span></div><span class="switch-text">EMIIA.AI SAI</span></label><svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg></div><div class="marker-popup-switch" style="margin-top: 0; padding-top: 10px;"><label class="switch-container" style="cursor: pointer;"><div class="switch"><input type="checkbox" id="custom-marker-sdk-switch"><span class="slider"></span></div><span class="switch-text">EMIIA.AI SDK/MRV</span></label><svg class="settings-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/></svg></div><div style="height: 1px; background-color: #e9ecef; margin: 15px 0;"></div><div class="marker-popup-functions" style="display: flex; align-items: center; justify-content: space-between;"><div style="display: flex; align-items: center; gap: 6px;"><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#3d85c6" viewBox="0 0 16 16"><path d="M2 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5.5a.5.5 0 0 1 0 1H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v4a.5.5 0 0 1-1 0V4a1 1 0 0 0-1-1z"/><path d="M3.146 5.146a.5.5 0 0 1 .708 0L5.177 6.47a.75.75 0 0 1 0 1.06L3.854 8.854a.5.5 0 1 1-.708-.708L4.293 7 3.146 5.854a.5.5 0 0 1 0-.708M5.5 9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5"/></svg><span style="font-size: 14px; font-weight: 500; color: #3d85c6; font-family: 'Montserrat', sans-serif;"> Добавить функции</span></div><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#3d85c6" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/></svg></div></div>`;
     }
 
-    function updatePopupPositionAboveMarker() {
-        if (!currentMarkerElement || customPopupContainer.style.display === 'none') return;
-        const markerRect = currentMarkerElement.getBoundingClientRect();
-        customPopupContainer.style.left = (markerRect.left + markerRect.width / 2) + 'px';
-        customPopupContainer.style.top = (markerRect.top - 10) + 'px';
-    }
+    function updatePopupPositionAboveMarker() { if (!currentMarkerElement || customPopupContainer.style.display === 'none') return; const markerRect = currentMarkerElement.getBoundingClientRect(); customPopupContainer.style.left = (markerRect.left + markerRect.width / 2) + 'px'; customPopupContainer.style.top = (markerRect.top - 10) + 'px'; }
 
     function openCustomPopup(markerElement, title, description) {
         currentMarkerElement = markerElement;
         customPopupContainer.innerHTML = createPopupHTML(title, description, popupSwitchState, saiSwitchState);
         customPopupContainer.style.display = 'block';
         updatePopupPositionAboveMarker();
-        
         const closeBtn = document.getElementById('custom-popup-close-btn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                customPopupContainer.style.display = 'none';
-            });
-        }
-        
+        if (closeBtn) closeBtn.addEventListener('click', function(e) { e.stopPropagation(); e.preventDefault(); customPopupContainer.style.display = 'none'; });
         const checkbox = document.getElementById('custom-marker-switch');
-        if (checkbox) {
-            checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                window.toggleHexagons(this.checked);
-            });
-        }
-        
+        if (checkbox) checkbox.addEventListener('change', function(e) { e.stopPropagation(); window.toggleHexagons(this.checked); });
         const saiCheckbox = document.getElementById('custom-marker-sai-switch');
-        if (saiCheckbox) {
-            saiCheckbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                window.toggleSAI(this.checked);
-            });
-        }
-        
+        if (saiCheckbox) saiCheckbox.addEventListener('change', function(e) { e.stopPropagation(); window.toggleSAI(this.checked); });
         const switchContainer = customPopupContainer.querySelector('.marker-popup-switch .switch-container');
-        if (switchContainer) {
-            switchContainer.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                const checkbox = document.getElementById('custom-marker-switch');
-                if (checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                    window.toggleHexagons(checkbox.checked);
-                }
-            });
-        }
-        
+        if (switchContainer) switchContainer.addEventListener('click', function(e) { e.stopPropagation(); e.preventDefault(); const checkbox = document.getElementById('custom-marker-switch'); if (checkbox) { checkbox.checked = !checkbox.checked; window.toggleHexagons(checkbox.checked); } });
         const saiSwitchContainer = customPopupContainer.querySelectorAll('.marker-popup-switch .switch-container')[1];
-        if (saiSwitchContainer) {
-            saiSwitchContainer.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                const saiCheckbox = document.getElementById('custom-marker-sai-switch');
-                if (saiCheckbox) {
-                    saiCheckbox.checked = !saiCheckbox.checked;
-                    window.toggleSAI(saiCheckbox.checked);
-                }
-            });
-        }
-        
-        // Обработчик для переключателя SDK/MRV
+        if (saiSwitchContainer) saiSwitchContainer.addEventListener('click', function(e) { e.stopPropagation(); e.preventDefault(); const saiCheckbox = document.getElementById('custom-marker-sai-switch'); if (saiCheckbox) { saiCheckbox.checked = !saiCheckbox.checked; window.toggleSAI(saiCheckbox.checked); } });
         const sdkCheckbox = document.getElementById('custom-marker-sdk-switch');
-        if (sdkCheckbox) {
-            sdkCheckbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                if (this.checked) {
-                    handleIoTNavigation();
-                }
-            });
-        }
-        
+        if (sdkCheckbox) sdkCheckbox.addEventListener('change', function(e) { e.stopPropagation(); if (this.checked) handleIoTNavigation(); });
         const sdkSwitchContainer = customPopupContainer.querySelectorAll('.marker-popup-switch .switch-container')[2];
-        if (sdkSwitchContainer) {
-            sdkSwitchContainer.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                handleIoTNavigation();
-            });
-        }
+        if (sdkSwitchContainer) sdkSwitchContainer.addEventListener('click', function(e) { e.stopPropagation(); e.preventDefault(); handleIoTNavigation(); });
     }
 
     geojson.features.forEach(function (marker) {
         var el = document.createElement('div');
         el.className = 'marker1';
-        
-        el.addEventListener('click', function(e) {
-            e.stopPropagation();
-            customPopupContainer.style.display = 'none';
-            openCustomPopup(el, marker.properties.title, marker.properties.description);
-        });
-
-        new mapboxgl.Marker({ element: el, anchor: 'center' })
-            .setLngLat(marker.geometry.coordinates)
-            .addTo(map);
-
-        function updateMarkerVisibility() {
-            var zoom = map.getZoom();
-            if (zoom > 24) {
-                el.style.opacity = '0';
-                el.style.pointerEvents = 'none';
-                el.style.display = 'none';
-                if (customPopupContainer.style.display !== 'none') {
-                    customPopupContainer.style.display = 'none';
-                }
-            } else {
-                el.style.opacity = '1';
-                el.style.pointerEvents = 'auto';
-                el.style.display = 'block';
-            }
-        }
-
+        el.addEventListener('click', function(e) { e.stopPropagation(); customPopupContainer.style.display = 'none'; openCustomPopup(el, marker.properties.title, marker.properties.description); });
+        new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat(marker.geometry.coordinates).addTo(map);
+        function updateMarkerVisibility() { var zoom = map.getZoom(); if (zoom > 24) { el.style.opacity = '0'; el.style.pointerEvents = 'none'; el.style.display = 'none'; if (customPopupContainer.style.display !== 'none') customPopupContainer.style.display = 'none'; } else { el.style.opacity = '1'; el.style.pointerEvents = 'auto'; el.style.display = 'block'; } }
         map.on('zoom', updateMarkerVisibility);
         updateMarkerVisibility();
     });
@@ -2882,403 +950,101 @@ map.on('styledata', function() {
 
     map.on('load', () => {
         mapLoaded = true;
-        
         const layers = map.getStyle().layers;
         let labelLayerId;
-        for (let i = 0; i < layers.length; i++) {
-            if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-                labelLayerId = layers[i].id;
-                break;
-            }
-        }
-
-        map.addSource('openmaptiles', {
-            url: 'https://sos.emiia.ai/tiles.json',
-            type: 'vector'
-        });
-
-        if (reliefValue === 0) {
-            if (map.getTerrain()) map.setTerrain(null);
-        } else {
-            map.setTerrain({ source: 'openmaptiles', exaggeration: reliefValue });
-        }
-
-        map.setLight({
-            'anchor': 'viewport',
-            'color': '#ffffff',
-            'intensity': 0.2,
-            'position': [1.15, 90, 80]
-        });
-
-        map.addLayer({
-            'id': 'green-base',
-            'source': 'openmaptiles',
-            'source-layer': 'building',
-            'type': 'fill',
-            'minzoom': 14,
-            'maxzoom': 24,
-            'paint': { 'fill-color': '#a4c2f4', 'fill-opacity': 0.3 }
-        }, labelLayerId);
-
-        map.addLayer({
-            'id': 'building-outlines',
-            'source': 'openmaptiles',
-            'source-layer': 'building',
-            'type': 'line',
-            'minzoom': 14,
-            'maxzoom': 24,
-            'paint': {
-                'line-color': '#ffffff',
-                'line-width': ['interpolate', ['linear'], ['zoom'], 14, 1, 16, 2, 18, 2, 20, 5]
-            }
-        }, labelLayerId);
-
-        map.addLayer({
-            'id': '3d-buildings',
-            'source': 'openmaptiles',
-            'source-layer': 'building',
-            'type': 'fill-extrusion',
-            'minzoom': 14,
-            'maxzoom': 19,
-            'paint': {
-                'fill-extrusion-color': '#f0f0f0',
-                'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.5, ['get', 'render_height']],
-                'fill-extrusion-base': 0,
-                'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.5, 0.4, 18, 0.0],
-                'fill-extrusion-color': '#d0e0f0'
-            }
-        }, labelLayerId);
-
+        for (let i = 0; i < layers.length; i++) { if (layers[i].type === 'symbol' && layers[i].layout['text-field']) { labelLayerId = layers[i].id; break; } }
+        map.addSource('openmaptiles', { url: 'https://sos.emiia.ai/tiles.json', type: 'vector' });
+        if (reliefValue === 0) { if (map.getTerrain()) map.setTerrain(null); } else { map.setTerrain({ source: 'openmaptiles', exaggeration: reliefValue }); }
+        map.setLight({ 'anchor': 'viewport', 'color': '#ffffff', 'intensity': 0.2, 'position': [1.15, 90, 80] });
+        map.addLayer({ 'id': 'green-base', 'source': 'openmaptiles', 'source-layer': 'building', 'type': 'fill', 'minzoom': 14, 'maxzoom': 24, 'paint': { 'fill-color': '#a4c2f4', 'fill-opacity': 0.3 } }, labelLayerId);
+        map.addLayer({ 'id': 'building-outlines', 'source': 'openmaptiles', 'source-layer': 'building', 'type': 'line', 'minzoom': 14, 'maxzoom': 24, 'paint': { 'line-color': '#ffffff', 'line-width': ['interpolate', ['linear'], ['zoom'], 14, 1, 16, 2, 18, 2, 20, 5] } }, labelLayerId);
+        map.addLayer({ 'id': '3d-buildings', 'source': 'openmaptiles', 'source-layer': 'building', 'type': 'fill-extrusion', 'minzoom': 14, 'maxzoom': 19, 'paint': { 'fill-extrusion-color': '#d0e0f0', 'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.5, ['get', 'render_height']], 'fill-extrusion-base': 0, 'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.5, 0.4, 18, 0.0] } }, labelLayerId);
         setTimeout(add3DModelSafe, 1000);
     });
 
     function add3DModelSafe() {
         if (modelAdded || !map) return;
-        
         try {
-            if (map.getSource('model20')) {
-                modelAdded = true;
-                return;
-            }
-
-            if (map.setConfigProperty) {
-                map.setConfigProperty('basemap', 'lightPreset', 'dusk');
-            }
-
-            if (!map.getSource('eraser')) {
-                map.addSource('eraser', {
-                    'type': 'geojson',
-                    'data': {
-                        'type': 'FeatureCollection',
-                        'features': [{
-                            'type': 'Feature',
-                            'properties': {},
-                            'geometry': {
-                                'coordinates': [[[37.63138653415112, 55.83397767687967], [37.631323474598645, 55.83401161180973], [37.63138506034616, 55.834039583692146], [37.63144337877924, 55.83400424627024], [37.63138653415112, 55.83397767687967]]],
-                                'type': 'Polygon'
-                            }
-                        }]
-                    }
-                });
-            }
-
-            map.addSource('model22', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'properties': { 'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' },
-                    'geometry': { 'coordinates': [37.6357745, 55.8383770], 'type': 'Point' }
-                }
-            });
-
-            map.addLayer({
-                'id': 'tower22',
-                'type': 'model',
-                'slot': 'middle',
-                'source': 'model22',
-                'minzoom': 15,
-                'maxzoom': 24,
-                'layout': { 'model-id': ['get', 'model-uri'] },
-                'paint': {
-                    'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1],
-                    'model-rotation': [0, 0.0, -155.8],
-                    'model-scale': [1215.5, 1120.0, 1170],
-                    'model-translation': [0, 0, -0.1],
-                    'model-color-mix-intensity': 1,
-                    'model-cast-shadows': true,
-                    'model-emissive-strength': 0.9
-                }
-            });
-
-            map.addSource('model20', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'properties': { 'model-uri': 'https://www.emiia.ru/vv/rezervnaja_copy_glb.glb' },
-                    'geometry': { 'coordinates': [37.6357745, 55.8383770], 'type': 'Point' }
-                }
-            });
-
-            map.addLayer({
-                'id': 'tower20',
-                'type': 'model',
-                'source': 'model20',
-                'minzoom': 15,
-                'maxzoom': 24,
-                'layout': { 'model-id': ['get', 'model-uri'] },
-                'paint': {
-                    'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 0, 18.3, 0, 18.5, 0.4, 18.6, 0.5, 19.5, 0.7, 24, 0.7],
-                    'model-rotation': [0, 0.0, -155.8],
-                    'model-scale': [1215.5, 1120.0, 1170],
-                    'model-color-mix-intensity': 0,
-                    'model-cast-shadows': true,
-                    'model-translation': [0, 0, 0.0],
-                    'model-emissive-strength': 0.99
-                }
-            });
-
-            map.addSource('model21', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'properties': { 'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' },
-                    'geometry': { 'coordinates': [37.6357745, 55.8383770], 'type': 'Point' }
-                }
-            });
-
-            map.addLayer({
-                'id': 'tower21',
-                'type': 'model',
-                'slot': 'middle',
-                'source': 'model21',
-                'minzoom': 15,
-                'maxzoom': 24,
-                'layout': { 'model-id': ['get', 'model-uri'] },
-                'paint': {
-                    'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1],
-                    'model-rotation': [0, 0.0, -155.8],
-                    'model-scale': [1215.5, 1120.0, 1170],
-                    'model-color-mix-intensity': 1,
-                    'model-cast-shadows': true,
-                    'model-translation': [0, 0, 6.9],
-                    'model-emissive-strength': 0.9
-                }
-            });
-
+            if (map.getSource('model20')) { modelAdded = true; return; }
+            if (map.setConfigProperty) map.setConfigProperty('basemap', 'lightPreset', 'dusk');
+            if (!map.getSource('eraser')) map.addSource('eraser', { 'type': 'geojson', 'data': { 'type': 'FeatureCollection', 'features': [{ 'type': 'Feature', 'properties': {}, 'geometry': { 'coordinates': [[[37.63138653415112, 55.83397767687967], [37.631323474598645, 55.83401161180973], [37.63138506034616, 55.834039583692146], [37.63144337877924, 55.83400424627024], [37.63138653415112, 55.83397767687967]]], 'type': 'Polygon' } }] } });
+            map.addSource('model22', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' }, 'geometry': { 'coordinates': [37.6357745, 55.8383770], 'type': 'Point' } } });
+            map.addLayer({ 'id': 'tower22', 'type': 'model', 'slot': 'middle', 'source': 'model22', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1], 'model-rotation': [0, 0.0, -155.8], 'model-scale': [1215.5, 1120.0, 1170], 'model-translation': [0, 0, -0.1], 'model-color-mix-intensity': 1, 'model-cast-shadows': true, 'model-emissive-strength': 0.9 } });
+            map.addSource('model20', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': { 'model-uri': 'https://www.emiia.ru/vv/rezervnaja_copy_glb.glb' }, 'geometry': { 'coordinates': [37.6357745, 55.8383770], 'type': 'Point' } } });
+            map.addLayer({ 'id': 'tower20', 'type': 'model', 'source': 'model20', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 0, 18.3, 0, 18.5, 0.4, 18.6, 0.5, 19.5, 0.7, 24, 0.7], 'model-rotation': [0, 0.0, -155.8], 'model-scale': [1215.5, 1120.0, 1170], 'model-color-mix-intensity': 0, 'model-cast-shadows': true, 'model-translation': [0, 0, 0.0], 'model-emissive-strength': 0.99 } });
+            map.addSource('model21', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VV_VERH_GLB.glb' }, 'geometry': { 'coordinates': [37.6357745, 55.8383770], 'type': 'Point' } } });
+            map.addLayer({ 'id': 'tower21', 'type': 'model', 'slot': 'middle', 'source': 'model21', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1], 'model-rotation': [0, 0.0, -155.8], 'model-scale': [1215.5, 1120.0, 1170], 'model-color-mix-intensity': 1, 'model-cast-shadows': true, 'model-translation': [0, 0, 6.9], 'model-emissive-strength': 0.9 } });
             modelAdded = true;
-        } catch (error) {
-            console.error('Ошибка добавления 3D модели:', error);
-        }
+        } catch (error) { console.error('Ошибка добавления 3D модели:', error); }
     }
 
-    map.on('style.load', () => {
-        if (!modelAdded) setTimeout(add3DModelSafe, 1000);
-    });
-
+    map.on('style.load', () => { if (!modelAdded) setTimeout(add3DModelSafe, 1000); });
     setTimeout(() => { if (!modelAdded) add3DModelSafe(); }, 3000);
 
-    map.on('zoom', () => {
-        document.getElementById('map-zoom').textContent = map.getZoom().toFixed(1);
-        closeTooltip();
-    });
-    
-    map.on('move', () => {
-        updateCenterDisplay(map.getCenter());
-        closeTooltip();
-    });
-    
+    map.on('zoom', () => { document.getElementById('map-zoom').textContent = map.getZoom().toFixed(1); closeTooltip(); });
+    map.on('move', () => { updateCenterDisplay(map.getCenter()); closeTooltip(); });
     map.on('pitch', () => { closeTooltip(); });
     map.on('rotate', () => { closeTooltip(); });
     map.on('drag', () => { closeTooltip(); });
-    
-    map.on('load', () => {
-        mapLoaded = true;
-        updateCenterDisplay(map.getCenter());
-        document.getElementById('map-zoom').textContent = map.getZoom().toFixed(1);
-        updateMarkedCount();
-        updateIcons();
-    });
+    map.on('load', () => { mapLoaded = true; updateCenterDisplay(map.getCenter()); document.getElementById('map-zoom').textContent = map.getZoom().toFixed(1); updateMarkedCount(); updateIcons(); });
 }
 
-// ================== ФУНКЦИЯ ПЕРЕХОДА НА PWA ДЛЯ MRV ==================
+function handleMrvNavigation() { const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const targetUrl = 'https://sos.emiia.ai/3d.html'; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
 
-function handleMrvNavigation() {
-    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-    const targetUrl = 'https://sos.emiia.ai/3d.html';
-    
-    if (isPWA) {
-        window.location.href = targetUrl;
-    } else {
-        window.location.assign(targetUrl);
-    }
-}
-
-// ================== ФУНКЦИЯ ПЕРЕХОДА НА PWA ДЛЯ IoT ==================
-
-function handleIoTNavigation() {
-    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-    const targetUrl = 'https://sos.emiia.ai/mrv.html';
-    
-    if (isPWA) {
-        window.location.href = targetUrl;
-    } else {
-        window.location.assign(targetUrl);
-    }
-}
-
-// ================== ОБРАБОТЧИКИ СОБЫТИЙ ==================
+function handleIoTNavigation() { const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const targetUrl = 'https://sos.emiia.ai/mrv.html'; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
 
 function setupEventListeners() {
     document.getElementById('toggle-switch').addEventListener('change', toggleGrid);
     document.getElementById('menu-toggle').addEventListener('click', toggleMenu);
-    
-    const switches = [
-        { id: 'toggle-switch', labelFor: 'grid-toggle' },
-        { id: 'map-switch', labelFor: 'map-toggle' },
-        { id: 'dbm-switch', labelFor: 'dbm-toggle' },
-        { id: 'vlm-switch', labelFor: 'vlm-toggle' },
-        { id: 'mrv-switch', labelFor: 'mrv-toggle' },
-        { id: 'iot-switch', labelFor: 'iot-toggle' }
-    ];
-    
+    const switches = [{ id: 'toggle-switch', labelFor: 'grid-toggle' }, { id: 'map-switch', labelFor: 'map-toggle' }, { id: 'dbm-switch', labelFor: 'dbm-toggle' }, { id: 'vlm-switch', labelFor: 'vlm-toggle' }, { id: 'mrv-switch', labelFor: 'mrv-toggle' }, { id: 'iot-switch', labelFor: 'iot-toggle' }];
     switches.forEach(switchConfig => {
         const switchElement = document.getElementById(switchConfig.id);
         const labelElement = document.querySelector(`.form-check-label[for="${switchConfig.labelFor}"]`);
-        
         if (switchElement && labelElement) {
             labelElement.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('settings-icon')) {
-                    if (switchConfig.id === 'mrv-switch') {
-                        const mrvSwitch = document.getElementById('mrv-switch');
-                        if (!mrvSwitch.checked) {
-                            mrvSwitch.checked = true;
-                            updateIcons();
-                            setTimeout(() => { handleMrvNavigation(); }, 300);
-                        }
-                        return;
-                    }
-                    
-                    if (switchConfig.id === 'iot-switch') {
-                        const iotSwitch = document.getElementById('iot-switch');
-                        if (!iotSwitch.checked) {
-                            iotSwitch.checked = true;
-                            updateIotIcon(true);
-                            setTimeout(() => { handleIoTNavigation(); }, 300);
-                        }
-                        return;
-                    }
-                    
+                    if (switchConfig.id === 'mrv-switch') { const mrvSwitch = document.getElementById('mrv-switch'); if (!mrvSwitch.checked) { mrvSwitch.checked = true; updateIcons(); setTimeout(() => { handleMrvNavigation(); }, 300); } return; }
+                    if (switchConfig.id === 'iot-switch') { const iotSwitch = document.getElementById('iot-switch'); if (!iotSwitch.checked) { iotSwitch.checked = true; updateIotIcon(true); setTimeout(() => { handleIoTNavigation(); }, 300); } return; }
                     switchElement.checked = !switchElement.checked;
                     if (switchConfig.id !== 'toggle-switch') updateIcons();
-                    const event = new Event('change');
-                    switchElement.dispatchEvent(event);
+                    switchElement.dispatchEvent(new Event('change'));
                 }
             });
-            
-            switchElement.addEventListener('change', function() {
-                if (switchConfig.id === 'mrv-switch' && this.checked) {
-                    setTimeout(() => { handleMrvNavigation(); }, 300);
-                }
-                if (switchConfig.id === 'iot-switch' && this.checked) {
-                    setTimeout(() => { handleIoTNavigation(); }, 300);
-                }
-            });
+            switchElement.addEventListener('change', function() { if (switchConfig.id === 'mrv-switch' && this.checked) setTimeout(() => { handleMrvNavigation(); }, 300); if (switchConfig.id === 'iot-switch' && this.checked) setTimeout(() => { handleIoTNavigation(); }, 300); });
         }
     });
-    
-    document.querySelectorAll('.settings-icon').forEach(icon => {
-        icon.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    });
-    
+    document.querySelectorAll('.settings-icon').forEach(icon => { icon.addEventListener('click', function(e) { e.stopPropagation(); }); });
     const resolutionSelect = document.getElementById('resolution-select');
-    if (resolutionSelect) {
-        resolutionSelect.addEventListener('change', () => {
-            const newResolution = parseInt(resolutionSelect.value);
-            if (gridActive && !isGenerating && newResolution !== currentResolution) {
-                switchResolution(newResolution);
-            }
-        });
-    }
-    
+    if (resolutionSelect) resolutionSelect.addEventListener('change', () => { const newResolution = parseInt(resolutionSelect.value); if (gridActive && !isGenerating && newResolution !== currentResolution) switchResolution(newResolution); });
     const accountSettings = document.querySelector('.account-settings');
-    if (accountSettings) {
-        accountSettings.addEventListener('click', function() {});
-    }
+    if (accountSettings) accountSettings.addEventListener('click', function() {});
 }
 
-// ================== ЗАПУСК ==================
-
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof mapboxgl === 'undefined') {
-        alert('Mapbox библиотека не загружена');
-        return;
-    }
-    
+    if (typeof mapboxgl === 'undefined') { alert('Mapbox библиотека не загружена'); return; }
     initCustomSelect();
-    
     document.getElementById('toggle-switch').checked = false;
     document.getElementById('map-switch').checked = false;
     document.getElementById('dbm-switch').checked = false;
     document.getElementById('vlm-switch').checked = true;
     document.getElementById('mrv-switch').checked = false;
     document.getElementById('iot-switch').checked = false;
-    
-    setTimeout(() => {
-        const controls = document.getElementById('controls');
-        const menuContent = document.getElementById('menu-content');
-        const toggleIcon = document.getElementById('toggle-icon');
-        
-        controls.classList.add('collapsed');
-        menuContent.classList.add('collapsed');
-        toggleIcon.classList.add('collapsed');
-        
-        menuContent.style.maxHeight = '0';
-        menuContent.style.overflow = 'hidden';
-    }, 100);
-    
+    setTimeout(() => { const controls = document.getElementById('controls'); const menuContent = document.getElementById('menu-content'); const toggleIcon = document.getElementById('toggle-icon'); controls.classList.add('collapsed'); menuContent.classList.add('collapsed'); toggleIcon.classList.add('collapsed'); menuContent.style.maxHeight = '0'; menuContent.style.overflow = 'hidden'; }, 100);
     setupEventListeners();
     initializeMap();
-    
     setTimeout(() => { updateIcons(); }, 500);
 });
 </script>
 
 <script>
-function handlePwaClick(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    const targetUrl = "https://sos.emiia.ai/vv1.html";
-    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-
-    if (isPWA) {
-        window.location.href = targetUrl;
-    } else {
-        window.location.assign(targetUrl);
-    }
-}
+function handlePwaClick(e) { if (e) { e.preventDefault(); e.stopPropagation(); } const targetUrl = "https://sos.emiia.ai/vv1.html"; const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
 </script>
 
-<!-- БЛОК СПРАВА ВНИЗУ -->
 <div class="header1">
-    <a href="javascript:void(0)" onclick="handlePwaClick(event)" 
-       style="display: inline-block; padding: 0; border-radius: 18%; transition: all 0.2s ease;"
-       onmouseout="this.style.background='none'; this.style.transform='scale(1)';"
-       ontouchstart="this.style.background='rgba(61, 133, 198, 0.2)'; this.style.transform='scale(0.95)';"
-       ontouchend="this.style.background='none'; this.style.transform='scale(1)';"
-    >
+    <a href="javascript:void(0)" onclick="handlePwaClick(event)" style="display: inline-block; padding: 0; border-radius: 18%; transition: all 0.2s ease;" onmouseout="this.style.background='none'; this.style.transform='scale(1)';" ontouchstart="this.style.background='rgba(61, 133, 198, 0.2)'; this.style.transform='scale(0.95)';" ontouchend="this.style.background='none'; this.style.transform='scale(1)';">
         <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 100 100" id="wave" data-name="Layer 1">
             <path id="Line_1" data-name="Line 1" fill="#3D85C6" stroke="#3D85C6" d="m49.244102 60.047245l0 0c-0.20874405 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -19.33857c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 19.33857c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
             <path id="Line_2" data-name="Line 2" fill="#3D85C6" stroke="#3D85C6" d="m41.362213 65.66929l0 0c-0.20874405 0 -0.3779602 -0.16921234 -0.3779602 -0.3779602l0 -30.58266c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921997 0.3779602 0.3779602l0 30.58266c0 0.20874786 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
             <path id="Line_3" data-name="Line 3" fill="#3D85C6" stroke="#3D85C6" d="m33.480324 55.842518l0 0c-0.20874405 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -10.929115c0 -0.100242615 0.03981781 -0.19638062 0.110702515 -0.2672615c0.07088089 -0.07088089 0.16701508 -0.1106987 0.2672577 -0.1106987l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 10.929115l0 0c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
             <path id="Line_4" data-name="Line 4" fill="#3D85C6" stroke="#3D85C6" d="m57.12599 61.92126l0 0c-0.20874023 0 -0.3779602 -0.16921997 -0.3779602 -0.3779602l0 -23.086601c0 -0.1002388 0.039821625 -0.1963768 0.110702515 -0.2672577c0.07088089 -0.07088089 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874405 0 0.3779602 0.16921997 0.3779602 0.3779602l0 23.086601l0 0c0 0.20874023 -0.16921616 0.3779602 -0.3779602 0.3779602z" fill-rule="evenodd"/>
-            <path id="Line_5" data-name="Line 5" fill="#3D85C6" stroke="#3D85C6" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602 0.3779602l0 9.039352c0 0.20874405 -0.16921997 0.3779602 -0.3779602 0.3779602z"/>
-        </svg>
-    </a>
-</div>
-
-</html>
+            <path id="Line_5" data-name="Line 5" fill="#3D85C6" stroke="#3D85C6" d="m65.00788 54.897636l0 0c-0.20874023 0 -0.3779602 -0.16921616 -0.3779602 -0.3779602l0 -9.039352c0 -0.100242615 0.03981781 -0.1963768 0.110702515 -0.2672577c0.070884705 -0.070884705 0.16701508 -0.110702515 0.2672577 -0.110702515l1.511795 0c0.20874023 0 0.3779602 0.16921616 0.3779602
