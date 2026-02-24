@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -465,6 +466,20 @@ const SAI_SOURCES = {
 let popupSwitchState = false;
 let currentMarkerElement = null;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ================== ФУНКЦИИ ==================
 
 function updateGridStatus(active) {
@@ -618,6 +633,16 @@ function setupHexagonClickHandler() {
         e.preventDefault();
     });
 }
+
+
+
+
+
+
+
+
+
+
 
 // ================== SAI (HEAT MAP) ФУНКЦИИ ==================
 
@@ -879,9 +904,23 @@ function removeHexagonsFromMap() {
     catch (error) { console.error('Ошибка удаления:', error); }
 }
 
-window.toggleHexagons = function(checked) { popupSwitchState = checked; if (checked) addHexagonsToMap(); else removeHexagonsFromMap(); };
+
 window.toggleSAI = toggleSAI;
 window.handleReportClick = handleReportClick;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ================== ИНИЦИАЛИЗАЦИЯ КАРТЫ ==================
 
@@ -1046,7 +1085,423 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeMap();
     setTimeout(() => { updateIcons(); }, 500);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
+
+
+
+
+
+
+
+
+
+<script>
+// ================== 7 ГЕКСАГОНОВ ПО ПУТИ ==================
+let pathAnimation = {
+    id: null,
+    startTime: null,
+    sources: [],
+    layers: [],
+    lineLayers: []
+};
+
+const PATH_CONFIG = {
+    color: '#3d85c6',
+    baseHeight: 2,
+    heightAmplitude: 4,
+    baseOpacity: 0.5,
+    lineColor: '#3d85c6',
+    lineWidth: 0.1,
+    speed: 0.01,           // Базовая скорость
+    stopDuration: 3,        // Длительность остановки на точках (3 секунды)
+    endStopDuration: 3,     // Длительность остановки в конце пути
+    slowDownDistance: 0.2,
+    pathIndex: 0
+};
+
+// 5 путей
+const PATHS = [
+    {
+        coords: [
+            [37.63586467,55.83838781], [37.63585017,55.83836861], [37.63594252,55.83834578],
+            [37.63598143,55.8383977], [37.63563796,55.83848348], [37.63556925,55.83850933],
+            [37.63559508,55.83854435], [37.63564159,55.83860005], [37.63585585,55.83854527],
+            [37.63605058,55.83849579], [37.63598143,55.8383977], [37.63594252,55.83834578],
+            [37.63586467,55.83838781]
+        ],
+        stops: [4, 8],
+        endStop: true
+    },
+    {
+        coords: [
+            [37.6359,55.8384], [37.6358,55.8383], [37.6357,55.8384],
+            [37.6358,55.8385], [37.6359,55.8385], [37.6359,55.8384]
+        ],
+        stops: [2, 4],
+        endStop: true
+    },
+    {
+        coords: [
+            [37.6360,55.8384], [37.6359,55.8383], [37.6358,55.8384],
+            [37.6359,55.8385], [37.6360,55.8385], [37.6360,55.8384]
+        ],
+        stops: [1, 3],
+        endStop: true
+    },
+    {
+        coords: [
+            [37.6357,55.8384], [37.6356,55.8383], [37.6355,55.8384],
+            [37.6356,55.8385], [37.6357,55.8385], [37.6357,55.8384]
+        ],
+        stops: [2, 4],
+        endStop: true
+    },
+    {
+        coords: [
+            [37.6361,55.8384], [37.6360,55.8383], [37.6359,55.8384],
+            [37.6360,55.8385], [37.6361,55.8385], [37.6361,55.8384]
+        ],
+        stops: [1, 4],
+        endStop: true
+    }
+];
+
+// Точные координаты гексагонов из JSON
+const HEX_GROUP = [
+    {
+        vertices: [
+            [37.63590315636097,55.838361010095355], [37.63590315636097,55.83836412543678],
+            [37.635898351689214,55.8383656831075], [37.63589354701746,55.83836412543678],
+            [37.63589354701746,55.838361010095355], [37.635898351689214,55.83835945242464]
+        ],
+        center: [37.635898351689214,55.83836256776607]
+    },
+    {
+        vertices: [
+            [37.6359079610333,55.8383656831075], [37.6359079610333,55.838368798448926],
+            [37.63590315636097,55.83837035611964], [37.63589835168864,55.838368798448926],
+            [37.63589835168864,55.8383656831075], [37.63590315636097,55.83836412543678]
+        ],
+        center: [37.63590315636097,55.83836724077821]
+    },
+    {
+        vertices: [
+            [37.63590796103214,55.83835633708321], [37.63590796103214,55.83835945242464],
+            [37.63590315636097,55.838361010095355], [37.6358983516898,55.83835945242464],
+            [37.6358983516898,55.83835633708321], [37.63590315636097,55.8383547794125]
+        ],
+        center: [37.63590315636097,55.838357894753926]
+    },
+    {
+        vertices: [
+            [37.63591276570447,55.838361010095355], [37.63591276570447,55.83836412543678],
+            [37.635907961032714,55.8383656831075], [37.63590315636096,55.83836412543678],
+            [37.63590315636096,55.838361010095355], [37.635907961032714,55.83835945242464]
+        ],
+        center: [37.635907961032714,55.83836256776607]
+    },
+    {
+        vertices: [
+            [37.6359175703768,55.8383656831075], [37.6359175703768,55.838368798448926],
+            [37.63591276570447,55.83837035611964], [37.63590796103214,55.838368798448926],
+            [37.63590796103214,55.8383656831075], [37.63591276570447,55.83836412543678]
+        ],
+        center: [37.63591276570447,55.83836724077821]
+    },
+    {
+        vertices: [
+            [37.63591757037564,55.83835633708321], [37.63591757037564,55.83835945242464],
+            [37.63591276570447,55.838361010095355], [37.6359079610333,55.83835945242464],
+            [37.6359079610333,55.83835633708321], [37.63591276570447,55.8383547794125]
+        ],
+        center: [37.63591276570447,55.838357894753926]
+    },
+    {
+        vertices: [
+            [37.635922375047976,55.838361010095355], [37.635922375047976,55.83836412543678],
+            [37.63591757037622,55.8383656831075], [37.63591276570447,55.83836412543678],
+            [37.63591276570447,55.838361010095355], [37.63591757037622,55.83835945242464]
+        ],
+        center: [37.63591757037622,55.83836256776607]
+    }
+];
+
+function startPathAnimation() {
+    console.log('=== PATH ANIMATION START ===');
+    
+    if (!map) {
+        setTimeout(startPathAnimation, 500);
+        return;
+    }
+    
+    stopPathAnimation();
+    
+    const layers = map.getStyle().layers;
+    let beforeLayerId = null;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].id.includes('sai-') || layers[i].id.includes('hexagon-layer')) {
+            beforeLayerId = layers[i].id;
+            break;
+        }
+    }
+    if (!beforeLayerId) {
+        for (let i = 0; i < layers.length; i++) {
+            if (layers[i].type !== 'background') {
+                beforeLayerId = layers[i].id;
+                break;
+            }
+    }}
+    
+    const currentPath = PATHS[PATH_CONFIG.pathIndex];
+    const startPos = currentPath.coords[0];
+    
+    // Создаем 7 гексагонов
+    for (let i = 0; i < 7; i++) {
+        const hex = HEX_GROUP[i];
+        const sourceId = `path-hex-${i}`;
+        const layerId = `path-layer-${i}`;
+        const lineLayerId = `path-line-${i}`;
+        
+        const offset = [
+            hex.center[0] - HEX_GROUP[0].center[0],
+            hex.center[1] - HEX_GROUP[0].center[1]
+        ];
+        
+        const shiftedVertices = hex.vertices.map(v => [
+            v[0] - hex.center[0] + startPos[0] + offset[0],
+            v[1] - hex.center[1] + startPos[1] + offset[1]
+        ]);
+        
+        map.addSource(sourceId, {
+            type: 'geojson',
+            data: {
+                type: 'Feature',
+                properties: {
+                    offset,
+                    phase: i * 0.9,
+                    originalVertices: hex.vertices,
+                    originalCenter: hex.center
+                },
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [[...shiftedVertices, shiftedVertices[0]]]
+                }
+            }
+        });
+        
+        map.addLayer({
+            id: layerId, type: 'fill-extrusion', source: sourceId,
+            paint: {
+                'fill-extrusion-color': PATH_CONFIG.color,
+                'fill-extrusion-height': PATH_CONFIG.baseHeight,
+                'fill-extrusion-opacity': PATH_CONFIG.baseOpacity,
+                'fill-extrusion-base': 0
+            }
+        }, beforeLayerId);
+        
+        map.addLayer({
+            id: lineLayerId, type: 'line', source: sourceId,
+            paint: {
+                'line-color': PATH_CONFIG.lineColor,
+                'line-width': PATH_CONFIG.lineWidth,
+                'line-opacity': 0.9
+            }
+        }, beforeLayerId);
+        
+        pathAnimation.sources.push(sourceId);
+        pathAnimation.layers.push(layerId);
+        pathAnimation.lineLayers.push(lineLayerId);
+    }
+    
+    pathAnimation.startTime = performance.now();
+    let stopState = {
+        activeStop: -1,
+        stopStartTime: 0,
+        currentT: 0,
+        targetT: 0
+    };
+    
+    function animate(now) {
+        if (typeof hexagonVisible !== 'undefined' && !hexagonVisible) {
+            pathAnimation.id = null;
+            return;
+        }
+        
+        const elapsed = (now - pathAnimation.startTime) / 1000;
+        const globalPhase = elapsed * 2 * Math.PI;
+        const currentPath = PATHS[PATH_CONFIG.pathIndex];
+        
+        // Постоянная скорость без ускорения
+        let rawT = (elapsed * PATH_CONFIG.speed) % 1;
+        let targetT = rawT;
+        
+        // Проверка на конец пути
+        if (rawT > 0.98 && currentPath.endStop && stopState.activeStop === -1) {
+            stopState.activeStop = 'end';
+            stopState.stopStartTime = now;
+            stopState.targetT = 1.0;
+        }
+        
+        // Проверка остановок
+        if (stopState.activeStop === -1) {
+            for (let stopIdx of currentPath.stops) {
+                const stopT = stopIdx / (currentPath.coords.length - 1);
+                const distToStop = Math.abs(rawT - stopT);
+                
+                if (distToStop < 0.01) {
+                    stopState.activeStop = stopIdx;
+                    stopState.stopStartTime = now;
+                    stopState.targetT = stopT;
+                    break;
+                }
+            }
+        }
+        
+        // Обработка остановок
+        if (stopState.activeStop !== -1) {
+            let stopDuration = stopState.activeStop === 'end' ? PATH_CONFIG.endStopDuration : PATH_CONFIG.stopDuration;
+            const stopElapsed = (now - stopState.stopStartTime) / 1000;
+            
+            if (stopElapsed < stopDuration) {
+                targetT = stopState.targetT; // Стоим
+            } else {
+                stopState.activeStop = -1; // Едем дальше
+                // Не сбрасываем время, просто продолжаем движение
+            }
+        }
+        
+        // Плавное движение без рывков
+        let currentT = stopState.currentT;
+        const step = 0.05; // Скорость интерполяции
+        
+        // Нормализуем разницу для плавного перехода через 0
+        let diff = targetT - currentT;
+        if (diff > 0.5) diff -= 1;
+        if (diff < -0.5) diff += 1;
+        
+        currentT += diff * step;
+        
+        // Нормализуем в диапазон [0, 1)
+        if (currentT >= 1) currentT -= 1;
+        if (currentT < 0) currentT += 1;
+        
+        stopState.currentT = currentT;
+        
+        // Находим сегмент пути
+        const totalPoints = currentPath.coords.length;
+        const floatIdx = currentT * (totalPoints - 1);
+        const segIdx = Math.floor(floatIdx);
+        const segT = floatIdx - segIdx;
+        
+        // Катмулл-ром сплайн для плавности
+        const p1 = currentPath.coords[segIdx];
+        const p2 = currentPath.coords[Math.min(totalPoints - 1, segIdx + 1)];
+        
+        // Линейная интерполяция для простоты и стабильности
+        const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
+        const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
+        
+        // Обновляем каждый гексагон
+        for (let i = 0; i < 7; i++) {
+            const source = map.getSource(`path-hex-${i}`);
+            if (!source) continue;
+            
+            const data = source._data;
+            if (!data) continue;
+            
+            const hex = HEX_GROUP[i];
+            const offset = data.properties.offset;
+            const phase = data.properties.phase;
+            
+            const newVertices = hex.vertices.map(v => [
+                v[0] - hex.center[0] + centerLng + offset[0],
+                v[1] - hex.center[1] + centerLat + offset[1]
+            ]);
+            
+            data.geometry.coordinates = [[...newVertices, newVertices[0]]];
+            
+            const spatialSineValue = Math.sin(globalPhase + phase);
+            const heightOffset = spatialSineValue * PATH_CONFIG.heightAmplitude;
+            data.properties.height = Math.max(0, PATH_CONFIG.baseHeight + heightOffset);
+            
+            source.setData(data);
+            map.setPaintProperty(`path-layer-${i}`, 'fill-extrusion-height', data.properties.height);
+        }
+        
+        pathAnimation.id = requestAnimationFrame(animate);
+    }
+    
+    pathAnimation.id = requestAnimationFrame(animate);
+}
+
+function stopPathAnimation() {
+    if (pathAnimation.id) {
+        cancelAnimationFrame(pathAnimation.id);
+        pathAnimation.id = null;
+    }
+    if (map) {
+        pathAnimation.sources.forEach(id => { try { map.removeSource(id); } catch(e){} });
+        pathAnimation.layers.forEach(id => { try { map.removeLayer(id); } catch(e){} });
+        pathAnimation.lineLayers.forEach(id => { try { map.removeLayer(id); } catch(e){} });
+    }
+    pathAnimation.sources = [];
+    pathAnimation.layers = [];
+    pathAnimation.lineLayers = [];
+}
+
+// Управление
+window.setPathSpeed = function(speed) { PATH_CONFIG.speed = speed; };
+window.setPathIndex = function(index) { PATH_CONFIG.pathIndex = index; };
+window.setStopDuration = function(seconds) { PATH_CONFIG.stopDuration = seconds; };
+window.setEndStopDuration = function(seconds) { PATH_CONFIG.endStopDuration = seconds; };
+window.updatePathStops = function(pathIndex, newStops) {
+    if (PATHS[pathIndex]) {
+        PATHS[pathIndex].stops = newStops;
+        console.log(`Path ${pathIndex} stops updated:`, newStops);
+    }
+};
+
+// Замените в toggle
+window.toggleHexagons = async function(checked) {
+    popupSwitchState = checked;
+    if (checked) {
+        await addHexagonsToMap();
+        setTimeout(startPathAnimation, 1000);
+    } else {
+        stopPathAnimation();
+        removeHexagonsFromMap();
+    }
+};
+</script>
+
+
+
+
+
+
+
+
+
 
 <script>
 function handlePwaClick(e) { if (e) { e.preventDefault(); e.stopPropagation(); } const targetUrl = "https://sos.emiia.ai/vv1.html"; const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
