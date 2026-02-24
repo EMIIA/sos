@@ -1116,32 +1116,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
-// ================== 7 ГЕКСАГОНОВ ПО ПУТИ ==================
+// ================== 7 ГЕКСАГОНОВ ПО 2 ПУТЯМ ОДНОВРЕМЕННО ==================
 let pathAnimation = {
     id: null,
     startTime: null,
     sources: [],
     layers: [],
-    lineLayers: []
+    lineLayers: [],
+    isActive: false,
+    visible: false
 };
 
-const PATH_CONFIG = {
-    color: '#3d85c6',
-    baseHeight: 2,
-    heightAmplitude: 4,
-    baseOpacity: 0.5,
-    lineColor: '#3d85c6',
-    lineWidth: 0.1,
-    speed: 0.01,           // Базовая скорость
-    stopDuration: 3,        // Длительность остановки на точках (3 секунды)
-    endStopDuration: 3,     // Длительность остановки в конце пути
-    slowDownDistance: 0.2,
-    pathIndex: 0
-};
-
-// 5 путей
-const PATHS = [
+// Конфигурация для двух путей (оба синие)
+const PATHS_CONFIG = [
     {
+        // Первый путь
         coords: [
             [37.63586467,55.83838781], [37.63585017,55.83836861], [37.63594252,55.83834578],
             [37.63598143,55.8383977], [37.63563796,55.83848348], [37.63556925,55.83850933],
@@ -1153,38 +1142,34 @@ const PATHS = [
         endStop: true
     },
     {
+        // Второй путь
         coords: [
-            [37.6359,55.8384], [37.6358,55.8383], [37.6357,55.8384],
-            [37.6358,55.8385], [37.6359,55.8385], [37.6359,55.8384]
+            [37.63573089,55.83832215],
+            [37.63543959,55.83839318],
+            [37.63551033,55.83847803],
+            [37.63553685,55.83851043],
+            [37.63563796,55.83848348],
+            [37.63553685,55.83851043],
+            [37.63543959,55.83839318],
+            [37.63573089,55.83832215]
         ],
         stops: [2, 4],
-        endStop: true
-    },
-    {
-        coords: [
-            [37.6360,55.8384], [37.6359,55.8383], [37.6358,55.8384],
-            [37.6359,55.8385], [37.6360,55.8385], [37.6360,55.8384]
-        ],
-        stops: [1, 3],
-        endStop: true
-    },
-    {
-        coords: [
-            [37.6357,55.8384], [37.6356,55.8383], [37.6355,55.8384],
-            [37.6356,55.8385], [37.6357,55.8385], [37.6357,55.8384]
-        ],
-        stops: [2, 4],
-        endStop: true
-    },
-    {
-        coords: [
-            [37.6361,55.8384], [37.6360,55.8383], [37.6359,55.8384],
-            [37.6360,55.8385], [37.6361,55.8385], [37.6361,55.8384]
-        ],
-        stops: [1, 4],
         endStop: true
     }
 ];
+
+const PATH_CONFIG = {
+    color: '#3d85c6',           // Синий цвет для всех
+    baseHeight: 2,
+    heightAmplitude: 4,
+    baseOpacity: 0.5,
+    lineColor: '#3d85c6',
+    lineWidth: 0.1,
+    speed: 0.01,
+    stopDuration: 3,
+    endStopDuration: 3,
+    slowDownDistance: 0.2
+};
 
 // Точные координаты гексагонов из JSON
 const HEX_GROUP = [
@@ -1246,15 +1231,44 @@ const HEX_GROUP = [
     }
 ];
 
+function setPathVisibility(visible) {
+    pathAnimation.visible = visible;
+    
+    pathAnimation.layers.forEach(layerId => {
+        if (map && map.getLayer(layerId)) {
+            map.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+        }
+    });
+    
+    pathAnimation.lineLayers.forEach(layerId => {
+        if (map && map.getLayer(layerId)) {
+            map.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+        }
+    });
+    
+    if (visible && !pathAnimation.isActive) {
+        startPathAnimation();
+    } else if (!visible && pathAnimation.isActive) {
+        stopPathAnimation();
+    }
+}
+
 function startPathAnimation() {
-    console.log('=== PATH ANIMATION START ===');
+    console.log('=== PATH ANIMATION START WITH 2 PATHS ===');
     
     if (!map) {
         setTimeout(startPathAnimation, 500);
         return;
     }
     
+    if (pathAnimation.isActive) {
+        setPathVisibility(true);
+        return;
+    }
+    
     stopPathAnimation();
+    pathAnimation.isActive = true;
+    pathAnimation.visible = true;
     
     const layers = map.getStyle().layers;
     let beforeLayerId = null;
@@ -1272,180 +1286,219 @@ function startPathAnimation() {
             }
     }}
     
-    const currentPath = PATHS[PATH_CONFIG.pathIndex];
-    const startPos = currentPath.coords[0];
+    // Создаем гексагоны для каждого пути
+    PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
+        const startPos = pathConfig.coords[0];
+        
+        for (let i = 0; i < 7; i++) {
+            const hex = HEX_GROUP[i];
+            const sourceId = `path-${pathIdx}-hex-${i}`;
+            const layerId = `path-${pathIdx}-layer-${i}`;
+            const lineLayerId = `path-${pathIdx}-line-${i}`;
+            
+            const offset = [
+                hex.center[0] - HEX_GROUP[0].center[0],
+                hex.center[1] - HEX_GROUP[0].center[1]
+            ];
+            
+            const shiftedVertices = hex.vertices.map(v => [
+                v[0] - hex.center[0] + startPos[0] + offset[0],
+                v[1] - hex.center[1] + startPos[1] + offset[1]
+            ]);
+            
+            // Разные фазы для каждого гексагона
+            const phase = (pathIdx * 7 + i) * 0.9;
+            
+            if (!map.getSource(sourceId)) {
+                map.addSource(sourceId, {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        properties: {
+                            offset,
+                            phase: phase,
+                            originalVertices: hex.vertices,
+                            originalCenter: hex.center,
+                            pathIndex: pathIdx,
+                            animatedHeight: PATH_CONFIG.baseHeight
+                        },
+                        geometry: {
+                            type: 'Polygon',
+                            coordinates: [[...shiftedVertices, shiftedVertices[0]]]
+                        }
+                    }
+                });
+                pathAnimation.sources.push(sourceId);
+            }
+            
+            if (!map.getLayer(layerId)) {
+                map.addLayer({
+                    id: layerId, 
+                    type: 'fill-extrusion', 
+                    source: sourceId,
+                    paint: {
+                        'fill-extrusion-color': PATH_CONFIG.color,
+                        'fill-extrusion-height': [
+                            'coalesce',
+                            ['get', 'animatedHeight'],
+                            PATH_CONFIG.baseHeight
+                        ],
+                        'fill-extrusion-opacity': PATH_CONFIG.baseOpacity,
+                        'fill-extrusion-base': 0
+                    }
+                }, beforeLayerId);
+                pathAnimation.layers.push(layerId);
+            }
+            
+            if (!map.getLayer(lineLayerId)) {
+                map.addLayer({
+                    id: lineLayerId, 
+                    type: 'line', 
+                    source: sourceId,
+                    paint: {
+                        'line-color': PATH_CONFIG.lineColor,
+                        'line-width': PATH_CONFIG.lineWidth,
+                        'line-opacity': 0.9
+                    }
+                }, beforeLayerId);
+                pathAnimation.lineLayers.push(lineLayerId);
+            }
+            
+            map.setLayoutProperty(layerId, 'visibility', 'visible');
+            map.setLayoutProperty(lineLayerId, 'visibility', 'visible');
+        }
+    });
     
-    // Создаем 7 гексагонов
-    for (let i = 0; i < 7; i++) {
-        const hex = HEX_GROUP[i];
-        const sourceId = `path-hex-${i}`;
-        const layerId = `path-layer-${i}`;
-        const lineLayerId = `path-line-${i}`;
-        
-        const offset = [
-            hex.center[0] - HEX_GROUP[0].center[0],
-            hex.center[1] - HEX_GROUP[0].center[1]
-        ];
-        
-        const shiftedVertices = hex.vertices.map(v => [
-            v[0] - hex.center[0] + startPos[0] + offset[0],
-            v[1] - hex.center[1] + startPos[1] + offset[1]
-        ]);
-        
-        map.addSource(sourceId, {
-            type: 'geojson',
-            data: {
-                type: 'Feature',
-                properties: {
-                    offset,
-                    phase: i * 0.9,
-                    originalVertices: hex.vertices,
-                    originalCenter: hex.center
-                },
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [[...shiftedVertices, shiftedVertices[0]]]
-                }
-            }
-        });
-        
-        map.addLayer({
-            id: layerId, type: 'fill-extrusion', source: sourceId,
-            paint: {
-                'fill-extrusion-color': PATH_CONFIG.color,
-                'fill-extrusion-height': PATH_CONFIG.baseHeight,
-                'fill-extrusion-opacity': PATH_CONFIG.baseOpacity,
-                'fill-extrusion-base': 0
-            }
-        }, beforeLayerId);
-        
-        map.addLayer({
-            id: lineLayerId, type: 'line', source: sourceId,
-            paint: {
-                'line-color': PATH_CONFIG.lineColor,
-                'line-width': PATH_CONFIG.lineWidth,
-                'line-opacity': 0.9
-            }
-        }, beforeLayerId);
-        
-        pathAnimation.sources.push(sourceId);
-        pathAnimation.layers.push(layerId);
-        pathAnimation.lineLayers.push(lineLayerId);
-    }
+    console.log('Both paths created - both blue with pulsing hexagons');
     
-    pathAnimation.startTime = performance.now();
-    let stopState = {
+    // Инициализируем состояние остановок для каждого пути
+    window.stopStates = PATHS_CONFIG.map(() => ({
         activeStop: -1,
         stopStartTime: 0,
         currentT: 0,
         targetT: 0
-    };
+    }));
+    
+    pathAnimation.startTime = performance.now();
+    let lastUpdate = 0;
     
     function animate(now) {
-        if (typeof hexagonVisible !== 'undefined' && !hexagonVisible) {
+        if (!pathAnimation.isActive || !pathAnimation.visible) {
             pathAnimation.id = null;
             return;
         }
         
         const elapsed = (now - pathAnimation.startTime) / 1000;
         const globalPhase = elapsed * 2 * Math.PI;
-        const currentPath = PATHS[PATH_CONFIG.pathIndex];
         
-        // Постоянная скорость без ускорения
-        let rawT = (elapsed * PATH_CONFIG.speed) % 1;
-        let targetT = rawT;
-        
-        // Проверка на конец пути
-        if (rawT > 0.98 && currentPath.endStop && stopState.activeStop === -1) {
-            stopState.activeStop = 'end';
-            stopState.stopStartTime = now;
-            stopState.targetT = 1.0;
-        }
-        
-        // Проверка остановок
-        if (stopState.activeStop === -1) {
-            for (let stopIdx of currentPath.stops) {
-                const stopT = stopIdx / (currentPath.coords.length - 1);
-                const distToStop = Math.abs(rawT - stopT);
-                
-                if (distToStop < 0.01) {
-                    stopState.activeStop = stopIdx;
-                    stopState.stopStartTime = now;
-                    stopState.targetT = stopT;
-                    break;
+        // Обновляем каждый путь независимо
+        PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
+            const stopState = window.stopStates[pathIdx];
+            
+            // Постоянная скорость
+            let rawT = (elapsed * PATH_CONFIG.speed) % 1;
+            let targetT = rawT;
+            
+            // Проверка на конец пути
+            if (rawT > 0.98 && pathConfig.endStop && stopState.activeStop === -1) {
+                stopState.activeStop = 'end';
+                stopState.stopStartTime = now;
+                stopState.targetT = 1.0;
+            }
+            
+            // Проверка остановок
+            if (stopState.activeStop === -1) {
+                for (let stopIdx of pathConfig.stops) {
+                    const stopT = stopIdx / (pathConfig.coords.length - 1);
+                    const distToStop = Math.abs(rawT - stopT);
+                    
+                    if (distToStop < 0.01) {
+                        stopState.activeStop = stopIdx;
+                        stopState.stopStartTime = now;
+                        stopState.targetT = stopT;
+                        break;
+                    }
                 }
             }
-        }
-        
-        // Обработка остановок
-        if (stopState.activeStop !== -1) {
-            let stopDuration = stopState.activeStop === 'end' ? PATH_CONFIG.endStopDuration : PATH_CONFIG.stopDuration;
-            const stopElapsed = (now - stopState.stopStartTime) / 1000;
             
-            if (stopElapsed < stopDuration) {
-                targetT = stopState.targetT; // Стоим
-            } else {
-                stopState.activeStop = -1; // Едем дальше
-                // Не сбрасываем время, просто продолжаем движение
+            // Обработка остановок
+            if (stopState.activeStop !== -1) {
+                let stopDuration = stopState.activeStop === 'end' ? PATH_CONFIG.endStopDuration : PATH_CONFIG.stopDuration;
+                const stopElapsed = (now - stopState.stopStartTime) / 1000;
+                
+                if (stopElapsed < stopDuration) {
+                    targetT = stopState.targetT;
+                } else {
+                    stopState.activeStop = -1;
+                }
             }
-        }
-        
-        // Плавное движение без рывков
-        let currentT = stopState.currentT;
-        const step = 0.05; // Скорость интерполяции
-        
-        // Нормализуем разницу для плавного перехода через 0
-        let diff = targetT - currentT;
-        if (diff > 0.5) diff -= 1;
-        if (diff < -0.5) diff += 1;
-        
-        currentT += diff * step;
-        
-        // Нормализуем в диапазон [0, 1)
-        if (currentT >= 1) currentT -= 1;
-        if (currentT < 0) currentT += 1;
-        
-        stopState.currentT = currentT;
-        
-        // Находим сегмент пути
-        const totalPoints = currentPath.coords.length;
-        const floatIdx = currentT * (totalPoints - 1);
-        const segIdx = Math.floor(floatIdx);
-        const segT = floatIdx - segIdx;
-        
-        // Катмулл-ром сплайн для плавности
-        const p1 = currentPath.coords[segIdx];
-        const p2 = currentPath.coords[Math.min(totalPoints - 1, segIdx + 1)];
-        
-        // Линейная интерполяция для простоты и стабильности
-        const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
-        const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
-        
-        // Обновляем каждый гексагон
-        for (let i = 0; i < 7; i++) {
-            const source = map.getSource(`path-hex-${i}`);
-            if (!source) continue;
             
-            const data = source._data;
-            if (!data) continue;
+            // Плавное движение
+            let currentT = stopState.currentT;
+            const step = 0.05;
             
-            const hex = HEX_GROUP[i];
-            const offset = data.properties.offset;
-            const phase = data.properties.phase;
+            let diff = targetT - currentT;
+            if (diff > 0.5) diff -= 1;
+            if (diff < -0.5) diff += 1;
             
-            const newVertices = hex.vertices.map(v => [
-                v[0] - hex.center[0] + centerLng + offset[0],
-                v[1] - hex.center[1] + centerLat + offset[1]
-            ]);
+            currentT += diff * step;
             
-            data.geometry.coordinates = [[...newVertices, newVertices[0]]];
+            if (currentT >= 1) currentT -= 1;
+            if (currentT < 0) currentT += 1;
             
-            const spatialSineValue = Math.sin(globalPhase + phase);
-            const heightOffset = spatialSineValue * PATH_CONFIG.heightAmplitude;
-            data.properties.height = Math.max(0, PATH_CONFIG.baseHeight + heightOffset);
+            stopState.currentT = currentT;
             
-            source.setData(data);
-            map.setPaintProperty(`path-layer-${i}`, 'fill-extrusion-height', data.properties.height);
+            // Находим сегмент пути
+            const totalPoints = pathConfig.coords.length;
+            const floatIdx = currentT * (totalPoints - 1);
+            const segIdx = Math.floor(floatIdx);
+            const segT = floatIdx - segIdx;
+            
+            const p1 = pathConfig.coords[segIdx];
+            const p2 = pathConfig.coords[Math.min(totalPoints - 1, segIdx + 1)];
+            
+            const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
+            const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
+            
+            // Обновляем гексагоны этого пути
+            for (let i = 0; i < 7; i++) {
+                const sourceId = `path-${pathIdx}-hex-${i}`;
+                const layerId = `path-${pathIdx}-layer-${i}`;
+                const source = map.getSource(sourceId);
+                if (!source) continue;
+                
+                const data = source._data;
+                if (!data) continue;
+                
+                const hex = HEX_GROUP[i];
+                const offset = data.properties.offset;
+                const phase = data.properties.phase;
+                
+                const newVertices = hex.vertices.map(v => [
+                    v[0] - hex.center[0] + centerLng + offset[0],
+                    v[1] - hex.center[1] + centerLat + offset[1]
+                ]);
+                
+                data.geometry.coordinates = [[...newVertices, newVertices[0]]];
+                
+                // ПУЛЬСАЦИЯ ВЫСОТЫ как у красных гексагонов
+                const spatialSineValue = Math.sin(globalPhase + phase);
+                const heightOffset = spatialSineValue * PATH_CONFIG.heightAmplitude;
+                const currentHeight = Math.max(0, PATH_CONFIG.baseHeight + heightOffset);
+                
+                data.properties.animatedHeight = currentHeight;
+                
+                source.setData(data);
+                
+                // Обновляем высоту в слое каждые 50ms для плавности
+                if (now - lastUpdate > 50) {
+                    map.setPaintProperty(layerId, 'fill-extrusion-height', currentHeight);
+                }
+            }
+        });
+        
+        if (now - lastUpdate > 50) {
+            lastUpdate = now;
         }
         
         pathAnimation.id = requestAnimationFrame(animate);
@@ -1459,39 +1512,57 @@ function stopPathAnimation() {
         cancelAnimationFrame(pathAnimation.id);
         pathAnimation.id = null;
     }
+    pathAnimation.isActive = false;
+    setPathVisibility(false);
+}
+
+function removePathLayers() {
     if (map) {
-        pathAnimation.sources.forEach(id => { try { map.removeSource(id); } catch(e){} });
-        pathAnimation.layers.forEach(id => { try { map.removeLayer(id); } catch(e){} });
-        pathAnimation.lineLayers.forEach(id => { try { map.removeLayer(id); } catch(e){} });
+        pathAnimation.layers.forEach(id => { try { if (map.getLayer(id)) map.removeLayer(id); } catch(e){} });
+        pathAnimation.lineLayers.forEach(id => { try { if (map.getLayer(id)) map.removeLayer(id); } catch(e){} });
+        pathAnimation.sources.forEach(id => { try { if (map.getSource(id)) map.removeSource(id); } catch(e){} });
     }
     pathAnimation.sources = [];
     pathAnimation.layers = [];
     pathAnimation.lineLayers = [];
+    pathAnimation.isActive = false;
+    pathAnimation.visible = false;
 }
 
 // Управление
 window.setPathSpeed = function(speed) { PATH_CONFIG.speed = speed; };
-window.setPathIndex = function(index) { PATH_CONFIG.pathIndex = index; };
 window.setStopDuration = function(seconds) { PATH_CONFIG.stopDuration = seconds; };
 window.setEndStopDuration = function(seconds) { PATH_CONFIG.endStopDuration = seconds; };
-window.updatePathStops = function(pathIndex, newStops) {
-    if (PATHS[pathIndex]) {
-        PATHS[pathIndex].stops = newStops;
-        console.log(`Path ${pathIndex} stops updated:`, newStops);
-    }
-};
 
 // Замените в toggle
 window.toggleHexagons = async function(checked) {
     popupSwitchState = checked;
     if (checked) {
         await addHexagonsToMap();
-        setTimeout(startPathAnimation, 1000);
+        startPathAnimation();
     } else {
         stopPathAnimation();
         removeHexagonsFromMap();
     }
 };
+
+// Слушаем события карты
+if (map) {
+    map.on('styledata', function() {
+        if (pathAnimation.isActive) {
+            pathAnimation.layers.forEach(layerId => {
+                if (map.getLayer(layerId)) {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                }
+            });
+            pathAnimation.lineLayers.forEach(layerId => {
+                if (map.getLayer(layerId)) {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                }
+            });
+        }
+    });
+}
 </script>
 
 
