@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -628,7 +629,7 @@ function setupHexagonClickHandler() {
         const feature = features[0];
         const props = feature.properties;
         const coords = getHexagonCoordinates(props);
-        const popupContent = `<div class="hexagon-popup-content"><div class="tooltip-row"><span class="tooltip-label">ID:</span><span class="tooltip-value">${props.id || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Resolution:</span><span class="tooltip-value">${props.resolution || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lat:</span><span class="tooltip-value">${coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lng:</span><span class="tooltip-value">${coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных'}</span></div><div class="popup-divider"></div><div class="tooltip-row"><span class="tooltip-label">Точность:</span><span class="tooltip-value">99%</span></div><a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a></div>`;
+        const popupContent = `<div class="hexagon-popup-content"><div class="tooltip-row"><span class="tooltip-label">ID:</span><span class="tooltip-value">${props.id || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Resolution:</span><span class="tooltip-value">${props.resolution || 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lat:</span><span class="tooltip-value">${coords.lat !== null ? (typeof coords.lat === 'number' ? coords.lat.toFixed(14) : coords.lat) : 'нет данных'}</span></div><div class="tooltip-row"><span class="tooltip-label">Lng:</span><span class="tooltip-value">${coords.lng !== null ? (typeof coords.lng === 'number' ? coords.lng.toFixed(14) : coords.lng) : 'нет данных'}</span></div><div class="popup-divider"></div><div class="tooltip-row"><span class="tooltip-label">Точность данных:</span><span class="tooltip-value">99%</span></div><a class="report-link" href="javascript:void(0)" onclick="handleReportClick(event)">Аналитический отчет ❯</a></div>`;
         new mapboxgl.Popup({ closeButton: true, closeOnClick: true, className: 'hexagon-popup' }).setLngLat(e.lngLat).setHTML(popupContent).addTo(map);
         e.preventDefault();
     });
@@ -1115,12 +1116,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+
 <script>
-// ================== ИСПРАВЛЕННЫЙ КОД 7 ГЕКСАГОНОВ ==================
+// ================== КОД 7 ГЕКСАГОНОВ (4 ОБЪЕКТА + ТЕСТ СКОРОСТИ) ==================
+
+// ГЛОБАЛЬНЫЙ МНОЖИТЕЛЬ СКОРОСТИ (для тестов)
+// 1 - нормальная скорость, 5 - быстро, 10 - очень быстро
+window.globalSpeedMultiplier = 1; 
 
 // КОНФИГУРАЦИЯ
 const PATHS_CONFIG = [
     {
+        // Первый путь
         coords: [
             [37.63586467,55.83838781], [37.63585017,55.83836861], [37.63594252,55.83834578],
             [37.63598143,55.8383977], [37.63563796,55.83848348], [37.63556925,55.83850933],
@@ -1129,17 +1138,60 @@ const PATHS_CONFIG = [
             [37.63586467,55.83838781]
         ],
         stops: [4, 8],
-        endStop: true
+        endStop: true,
+        speed: 0.01
     },
     {
+        // Второй путь
         coords: [
-            [37.63573089,55.83832215], [37.63543959,55.83839318],
-            [37.63551033,55.83847803], [37.63553685,55.83851043],
-            [37.63563796,55.83848348], [37.63553685,55.83851043],
-            [37.63543959,55.83839318], [37.63573089,55.83832215]
+            [37.63572500297244, 55.83831498900576],
+            [37.635578178687524, 55.83835120749653],
+            [37.63541990225246, 55.838392467703926],
+            [37.6354940579201, 55.83848225423139],
+            [37.63552096539869, 55.83851459707206],
+            [37.63563796, 55.83848348],
+            [37.63552038752187, 55.83851437327921],
+            [37.63542038124316, 55.838392655225334],
+            [37.635578151844044, 55.8383512859877],
+            [37.635726332117976, 55.83831496336034]
         ],
         stops: [2, 4],
-        endStop: true
+        endStop: true,
+        speed: 0.01
+    },
+    {
+        // Третий путь (Туда и обратно)
+        coords: [
+            [37.63585171, 55.83834213],
+            [37.63581719, 55.83829863],
+            [37.63578832, 55.83826694],
+            [37.63577152, 55.83827028],
+            [37.63578832, 55.83826694],
+            [37.63581719, 55.83829863],
+            [37.63585171, 55.83834213]
+        ],
+        stops: [1, 3, 5],
+        endStop: true,
+        speed: 0.01
+    },
+    {
+        // Четвертый путь (Туда и обратно)
+        coords: [
+            // Путь ТУДА
+            [37.63592594, 55.83823202],          // 0: Старт
+            [37.635900681724735, 55.83823855319756], // 1
+            [37.63594229946995, 55.83828850512516],  // 2: Остановка (туда)
+            [37.63597946834643, 55.83833538697101],  // 3
+            [37.63599646776974, 55.8383312839649],   // 4: Остановка (Разворот)
+            // Путь ОБРАТНО
+            [37.63597946834643, 55.83833538697101],  // 5
+            [37.63594229946995, 55.83828850512516],  // 6: Остановка (обратно)
+            [37.635900681724735, 55.83823855319756], // 7
+            [37.63592594, 55.83823202]           // 8: Финиш (возврат в начало)
+        ],
+        stops: [2, 4, 6], // Остановки на индексах 2, 4 (разворот) и 6
+        endStop: true,
+        speed: 0.03
     }
 ];
 
@@ -1150,7 +1202,6 @@ const PATH_CONFIG = {
     baseOpacity: 0.5,
     lineColor: '#3d85c6',
     lineWidth: 0.1,
-    speed: 0.01,
     stopDuration: 3,
     endStopDuration: 3
 };
@@ -1223,7 +1274,6 @@ function initPathLayers() {
                 v[1] - hex.center[1] + startPos[1] + offset[1]
             ]);
 
-            // Создаем источник, если нет
             if (!map.getSource(sourceId)) {
                 map.addSource(sourceId, {
                     type: 'geojson',
@@ -1236,7 +1286,6 @@ function initPathLayers() {
                 pathAnimation.sources.push(sourceId);
             }
 
-            // Создаем слой заливки, если нет
             if (!map.getLayer(layerId)) {
                 map.addLayer({
                     id: layerId,
@@ -1252,10 +1301,8 @@ function initPathLayers() {
                 pathAnimation.layers.push(layerId);
             }
             
-            // ВАЖНО: Принудительно делаем видимым (fix для повторного включения)
             map.setLayoutProperty(layerId, 'visibility', 'visible');
 
-            // Создаем линейный слой, если нет
             if (!map.getLayer(lineLayerId)) {
                 map.addLayer({
                     id: lineLayerId,
@@ -1270,7 +1317,6 @@ function initPathLayers() {
                 pathAnimation.lineLayers.push(lineLayerId);
             }
             
-            // ВАЖНО: Принудительно делаем видимым
             map.setLayoutProperty(lineLayerId, 'visibility', 'visible');
         });
     });
@@ -1314,8 +1360,11 @@ function animate(now) {
 
     PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
         const state = pathAnimation.pathStates[pathIdx];
+        
+        const baseSpeed = pathConfig.speed || 0.01;
+        const currentSpeed = baseSpeed * window.globalSpeedMultiplier;
 
-        let rawT = (elapsed * PATH_CONFIG.speed) % 1;
+        let rawT = (elapsed * currentSpeed) % 1;
         let targetT = rawT;
 
         // Логика остановок
@@ -1406,7 +1455,6 @@ function startPathAnimation() {
     pathAnimation.isActive = true;
     pathAnimation.visible = true;
     
-    // Создаем или обновляем слои (функция теперь сама включает видимость)
     initPathLayers();
     
     pathAnimation.startTime = performance.now();
@@ -1424,26 +1472,32 @@ function stopPathAnimation() {
 
 // 3. ПУБЛИЧНЫЙ ИНТЕРФЕЙС
 
-window.setPathSpeed = function(speed) { PATH_CONFIG.speed = speed; };
+window.setPathSpeed = function(index, speed) {
+    if (PATHS_CONFIG[index]) {
+        PATHS_CONFIG[index].speed = speed;
+        console.log(`Path ${index} speed set to ${speed}`);
+    }
+};
+
+window.setGlobalTestSpeed = function(multiplier) {
+    window.globalSpeedMultiplier = multiplier;
+    console.log(`Global test speed multiplier set to ${multiplier}`);
+};
+
 window.setStopDuration = function(seconds) { PATH_CONFIG.stopDuration = seconds; };
 window.setEndStopDuration = function(seconds) { PATH_CONFIG.endStopDuration = seconds; };
 
 window.toggleHexagons = async function(checked) {
     popupSwitchState = checked;
     if (checked) {
-        // Вызов внешней функции добавления (если есть)
         if (typeof addHexagonsToMap === 'function') await addHexagonsToMap();
-        
         startPathAnimation();
     } else {
         stopPathAnimation();
-        
-        // Вызов внешней функции удаления (если есть)
         if (typeof removeHexagonsFromMap === 'function') removeHexagonsFromMap();
     }
 };
 
-// Слушатели карты
 if (map) {
     map.on('styledata', function() {
         if (pathAnimation.isActive) {
@@ -1480,3 +1534,5 @@ function handlePwaClick(e) { if (e) { e.preventDefault(); e.stopPropagation(); }
 </div>
 
 </html>
+
+
