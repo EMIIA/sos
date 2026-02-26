@@ -1,3 +1,7 @@
+
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1086,23 +1090,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 
 
@@ -1116,18 +1103,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
 <script>
-// ================== КОД 7 ГЕКСАГОНОВ (6 ОБЪЕКТОВ + ТЕСТ СКОРОСТИ) ==================
+// ================== КОД 6 ПУТЕЙ С НАСТРАИВАЕМЫМИ ГЕКСАГОНАМИ ==================
 
-// ГЛОБАЛЬНЫЙ МНОЖИТЕЛЬ СКОРОСТИ (для тестов)
-// 1 - нормальная скорость, 5 - быстро, 10 - очень быстро
+// ГЛОБАЛЬНЫЙ МНОЖИТЕЛЬ СКОРОСТИ
 window.globalSpeedMultiplier = 1; 
 
 // КОНФИГУРАЦИЯ
 const PATHS_CONFIG = [
     {
-        // Первый путь
         coords: [
             [37.63586467,55.83838781], [37.63585017,55.83836861], [37.63594252,55.83834578],
             [37.63598143,55.8383977], [37.63563796,55.83848348], [37.63556925,55.83850933],
@@ -1140,7 +1124,6 @@ const PATHS_CONFIG = [
         speed: 0.01
     },
     {
-        // Второй путь
         coords: [
             [37.63572500297244, 55.83831498900576],
             [37.635578178687524, 55.83835120749653],
@@ -1158,7 +1141,6 @@ const PATHS_CONFIG = [
         speed: 0.01
     },
     {
-        // Третий путь (Туда и обратно)
         coords: [
             [37.63585171, 55.83834213],
             [37.63581719, 55.83829863],
@@ -1173,66 +1155,90 @@ const PATHS_CONFIG = [
         speed: 0.01
     },
     {
-        // Четвертый путь (Туда и обратно)
         coords: [
-            // Путь ТУДА
-            [37.63592594, 55.83823202],          // 0: Старт
-            [37.635900681724735, 55.83823855319756], // 1
-            [37.63594229946995, 55.83828850512516],  // 2: Остановка (туда)
-            [37.63597946834643, 55.83833538697101],  // 3
-            [37.63599646776974, 55.8383312839649],   // 4: Остановка (Разворот)
-            // Путь ОБРАТНО
-            [37.63597946834643, 55.83833538697101],  // 5
-            [37.63594229946995, 55.83828850512516],  // 6: Остановка (обратно)
-            [37.635900681724735, 55.83823855319756], // 7
-            [37.63592594, 55.83823202]           // 8: Финиш
+            [37.63592594, 55.83823202],
+            [37.635900681724735, 55.83823855319756],
+            [37.63594229946995, 55.83828850512516],
+            [37.63597946834643, 55.83833538697101],
+            [37.63599646776974, 55.8383312839649],
+            [37.63597946834643, 55.83833538697101],
+            [37.63594229946995, 55.83828850512516],
+            [37.635900681724735, 55.83823855319756],
+            [37.63592594, 55.83823202]
         ],
         stops: [2, 4, 6], 
         endStop: true,
         speed: 0.05
     },
     {
-        // Пятый путь (Туда и обратно)
         coords: [
-            [37.63599083, 55.83846266], // 0: Старт
-            [37.63584080, 55.83850598], // 1: Остановка (туда)
-            [37.63570364, 55.83853820], // 2: Остановка (Разворот)
-            [37.63584080, 55.83850598], // 3: Остановка (обратно)
-            [37.63599083, 55.83846266]  // 4: Финиш
+            [37.63599083, 55.83846266],
+            [37.63584080, 55.83850598],
+            [37.63570364, 55.83853820],
+            [37.63584080, 55.83850598],
+            [37.63599083, 55.83846266]
         ],
         stops: [1, 2, 3], 
         endStop: true,
         speed: 0.01
     },
     {
-        // Шестой путь (Туда и обратно)
         coords: [
-            // Путь ТУДА
-            [37.63569850, 55.83869821], // 0: Старт (Остановка)
-            [37.63564459, 55.83862115], // 1
-            [37.63556562, 55.83864504], // 2
-            [37.63562639, 55.83871716], // 3: Конец пути (Остановка, Разворот)
-            // Путь ОБРАТНО
-            [37.63556562, 55.83864504], // 4
-            [37.63564459, 55.83862115], // 5
-            [37.63569850, 55.83869821]  // 6: Финиш (Остановка)
+            [37.63569850, 55.83869821],
+            [37.63564459, 55.83862115],
+            [37.63556562, 55.83864504],
+            [37.63562639, 55.83871716],
+            [37.63556562, 55.83864504],
+            [37.63564459, 55.83862115],
+            [37.63569850, 55.83869821]
         ],
-        stops: [0, 3], // Остановка в начале (0) и в точке разворота (3)
-        endStop: true, // Остановка в конце цикла (индекс 6)
-        speed: 0.03
+        stops: [0, 3],
+        endStop: true,
+        speed: 0.01
     }
 ];
 
+// =============================================================================
+// ======================== НАСТРОЙКИ ГЕКСАГОНОВ ==============================
+// =============================================================================
+
 const PATH_CONFIG = {
-    color: '#3d85c6',
-    baseHeight: 2,
-    heightAmplitude: 4,
-    baseOpacity: 0.5,
-    lineColor: '#3d85c6',
-    lineWidth: 0.1,
-    stopDuration: 3,
-    endStopDuration: 3
+    // === БОЛЬШИЕ ГЕКСАГОНЫ (ZOOM >= pointMaxZoom) ===
+    bigHexColor: '#3d85c6',           
+    bigHexOpacity: 0.5,               
+    bigHexBaseHeight: 2,              
+    bigHexHeightAmplitude: 4,         
+    
+    bigHexGradientStart: 5,           
+    bigHexTopOpacity: 0.2,            
+    bigHexBottomOpacity: 0.6,         
+    
+    bigHexStrokeColor: '#f8f9fa',     
+    bigHexStrokeWidth: 0.5,           
+    bigHexStrokeOpacity: 0.9,         
+    
+    // === МАЛЫЕ ГЕКСАГОНЫ ===
+    smallHexSize: 0.000030,           
+    smallHexFillColor: '#3d85c6',     
+    smallHexStrokeColor: '#f8f9fa',   
+    smallHexStrokeWidth: 2,           
+    
+    smallHexBaseOpacity: 0.2,         
+    smallHexPulseAmplitude: 0.4,      
+    smallHexPulseSpeed: 1000,         
+    smallHexPulseSpeedVar: 300,       
+    smallHexPulsePhaseVar: 2,         
+    
+    // === ОБЩИЕ НАСТРОЙКИ ===
+    pointMinZoom: 16.5,               
+    pointMaxZoom: 18.2,               
+    stopDuration: 3,                  
+    endStopDuration: 3                
 };
+
+// =============================================================================
+// ======================== ГЕОМЕТРИЯ ГЕКСАГОНОВ ===============================
+// =============================================================================
 
 const HEX_GROUP = [
     { vertices: [[37.63590315636097,55.838361010095355], [37.63590315636097,55.83836412543678], [37.635898351689214,55.8383656831075], [37.63589354701746,55.83836412543678], [37.63589354701746,55.838361010095355], [37.635898351689214,55.83835945242464]], center: [37.635898351689214,55.83836256776607] },
@@ -1244,13 +1250,19 @@ const HEX_GROUP = [
     { vertices: [[37.635922375047976,55.838361010095355], [37.635922375047976,55.83836412543678], [37.63591757037622,55.8383656831075], [37.63591276570447,55.83836412543678], [37.63591276570447,55.838361010095355], [37.63591757037622,55.83835945242464]], center: [37.63591757037622,55.83836256776607] }
 ];
 
-// СОСТОЯНИЕ
+// =============================================================================
+// ======================== СОСТОЯНИЕ АНИМАЦИИ =================================
+// =============================================================================
+
 let pathAnimation = {
     id: null,
     startTime: null,
     sources: [],
     layers: [],
     lineLayers: [],
+    smallHexSources: [],
+    smallHexLayers: [],
+    smallHexLineLayers: [],
     isActive: false,
     visible: false,
     pathStates: PATHS_CONFIG.map(() => ({
@@ -1258,10 +1270,29 @@ let pathAnimation = {
         stopStartTime: 0,
         currentT: 0,
         targetT: 0
-    }))
+    })),
+    smallHexPulseParams: []
 };
 
-// 1. УПРАВЛЕНИЕ СЛОЯМИ
+// =============================================================================
+// ======================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ============================
+// =============================================================================
+
+function createSmallHexagon(center, size) {
+    const angles = [0, 60, 120, 180, 240, 300].map(a => a * Math.PI / 180);
+    return angles.map(angle => [
+        center[0] + size * Math.cos(angle),
+        center[1] + size * Math.sin(angle) * 0.6
+    ]);
+}
+
+function randomRange(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+// =============================================================================
+// ======================== ИНИЦИАЛИЗАЦИЯ СЛОЕВ ================================
+// =============================================================================
 
 function initPathLayers() {
     if (!map) return;
@@ -1281,6 +1312,16 @@ function initPathLayers() {
                 break;
             }
         }
+    }
+
+    if (pathAnimation.smallHexPulseParams.length === 0) {
+        PATHS_CONFIG.forEach((_, pathIdx) => {
+            const pathParams = {
+                speed: PATH_CONFIG.smallHexPulseSpeed + randomRange(-PATH_CONFIG.smallHexPulseSpeedVar, PATH_CONFIG.smallHexPulseSpeedVar),
+                phase: randomRange(0, PATH_CONFIG.smallHexPulsePhaseVar * Math.PI)
+            };
+            pathAnimation.smallHexPulseParams.push(pathParams);
+        });
     }
 
     PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
@@ -1307,28 +1348,29 @@ function initPathLayers() {
                     type: 'geojson',
                     data: {
                         type: 'Feature',
-                        properties: { offset, phase, animatedHeight: PATH_CONFIG.baseHeight },
+                        properties: { offset, phase },
                         geometry: { type: 'Polygon', coordinates: [[...shiftedVertices, shiftedVertices[0]]] }
                     }
                 });
                 pathAnimation.sources.push(sourceId);
             }
 
+            // Заливка с экструзией - статическая высота, будем обновлять через setPaintProperty
             if (!map.getLayer(layerId)) {
                 map.addLayer({
                     id: layerId,
                     type: 'fill-extrusion',
                     source: sourceId,
+                    minzoom: PATH_CONFIG.pointMaxZoom,
                     paint: {
-                        'fill-extrusion-color': PATH_CONFIG.color,
-                        'fill-extrusion-height': ['coalesce', ['get', 'animatedHeight'], PATH_CONFIG.baseHeight],
-                        'fill-extrusion-opacity': PATH_CONFIG.baseOpacity,
+                        'fill-extrusion-color': PATH_CONFIG.bigHexColor,
+                        'fill-extrusion-height': PATH_CONFIG.bigHexBaseHeight,
+                        'fill-extrusion-opacity': PATH_CONFIG.bigHexOpacity,
                         'fill-extrusion-base': 0
                     }
                 }, beforeLayerId);
                 pathAnimation.layers.push(layerId);
             }
-            
             map.setLayoutProperty(layerId, 'visibility', 'visible');
 
             if (!map.getLayer(lineLayerId)) {
@@ -1336,19 +1378,74 @@ function initPathLayers() {
                     id: lineLayerId,
                     type: 'line',
                     source: sourceId,
+                    minzoom: PATH_CONFIG.pointMaxZoom,
                     paint: {
-                        'line-color': PATH_CONFIG.lineColor,
-                        'line-width': PATH_CONFIG.lineWidth,
-                        'line-opacity': 0.9
+                        'line-color': PATH_CONFIG.bigHexStrokeColor,
+                        'line-width': PATH_CONFIG.bigHexStrokeWidth,
+                        'line-opacity': PATH_CONFIG.bigHexStrokeOpacity
                     }
                 }, beforeLayerId);
                 pathAnimation.lineLayers.push(lineLayerId);
             }
-            
             map.setLayoutProperty(lineLayerId, 'visibility', 'visible');
         });
+
+        // Малые гексагоны
+        const smallHexSourceId = `path-${pathIdx}-small-hex`;
+        const smallHexLayerId = `path-${pathIdx}-small-hex-fill`;
+        const smallHexLineLayerId = `path-${pathIdx}-small-hex-line`;
+        
+        const smallHexVertices = createSmallHexagon(startPos, PATH_CONFIG.smallHexSize);
+        
+        if (!map.getSource(smallHexSourceId)) {
+            map.addSource(smallHexSourceId, {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    properties: { pulseOpacity: PATH_CONFIG.smallHexBaseOpacity },
+                    geometry: { type: 'Polygon', coordinates: [[...smallHexVertices, smallHexVertices[0]]] }
+                }
+            });
+            pathAnimation.smallHexSources.push(smallHexSourceId);
+        }
+
+        if (!map.getLayer(smallHexLayerId)) {
+            map.addLayer({
+                id: smallHexLayerId,
+                type: 'fill',
+                source: smallHexSourceId,
+                minzoom: PATH_CONFIG.pointMinZoom,
+                maxzoom: PATH_CONFIG.pointMaxZoom,
+                paint: {
+                    'fill-color': PATH_CONFIG.smallHexFillColor,
+                    'fill-opacity': ['coalesce', ['get', 'pulseOpacity'], PATH_CONFIG.smallHexBaseOpacity]
+                }
+            }, beforeLayerId);
+            pathAnimation.smallHexLayers.push(smallHexLayerId);
+        }
+        map.setLayoutProperty(smallHexLayerId, 'visibility', 'visible');
+
+        if (!map.getLayer(smallHexLineLayerId)) {
+            map.addLayer({
+                id: smallHexLineLayerId,
+                type: 'line',
+                source: smallHexSourceId,
+                minzoom: PATH_CONFIG.pointMinZoom,
+                maxzoom: PATH_CONFIG.pointMaxZoom,
+                paint: {
+                    'line-color': PATH_CONFIG.smallHexStrokeColor,
+                    'line-width': PATH_CONFIG.smallHexStrokeWidth
+                }
+            }, beforeLayerId);
+            pathAnimation.smallHexLineLayers.push(smallHexLineLayerId);
+        }
+        map.setLayoutProperty(smallHexLineLayerId, 'visibility', 'visible');
     });
 }
+
+// =============================================================================
+// ======================== УПРАВЛЕНИЕ ВИДИМОСТЬЮ =============================
+// =============================================================================
 
 function setPathVisibility(visible) {
     pathAnimation.visible = visible;
@@ -1360,22 +1457,40 @@ function setPathVisibility(visible) {
     pathAnimation.lineLayers.forEach(layerId => {
         if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visibility);
     });
+    pathAnimation.smallHexLayers.forEach(layerId => {
+        if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visibility);
+    });
+    pathAnimation.smallHexLineLayers.forEach(layerId => {
+        if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visibility);
+    });
 }
 
 function removePathLayers() {
     if (!map) return;
+    
     pathAnimation.layers.forEach(id => { try { if (map.getLayer(id)) map.removeLayer(id); } catch (e) {} });
     pathAnimation.lineLayers.forEach(id => { try { if (map.getLayer(id)) map.removeLayer(id); } catch (e) {} });
+    pathAnimation.smallHexLayers.forEach(id => { try { if (map.getLayer(id)) map.removeLayer(id); } catch (e) {} });
+    pathAnimation.smallHexLineLayers.forEach(id => { try { if (map.getLayer(id)) map.removeLayer(id); } catch (e) {} });
+    
     pathAnimation.sources.forEach(id => { try { if (map.getSource(id)) map.removeSource(id); } catch (e) {} });
+    pathAnimation.smallHexSources.forEach(id => { try { if (map.getSource(id)) map.removeSource(id); } catch (e) {} });
 
     pathAnimation.sources = [];
     pathAnimation.layers = [];
     pathAnimation.lineLayers = [];
+    pathAnimation.smallHexSources = [];
+    pathAnimation.smallHexLayers = [];
+    pathAnimation.smallHexLineLayers = [];
+    pathAnimation.smallHexPulseParams = [];
+    
     pathAnimation.isActive = false;
     pathAnimation.visible = false;
 }
 
-// 2. ЛОГИКА АНИМАЦИИ
+// =============================================================================
+// ======================== АНИМАЦИЯ ==========================================
+// =============================================================================
 
 function animate(now) {
     if (!pathAnimation.isActive || !pathAnimation.visible) {
@@ -1395,7 +1510,6 @@ function animate(now) {
         let rawT = (elapsed * currentSpeed) % 1;
         let targetT = rawT;
 
-        // Логика остановок
         if (rawT > 0.98 && pathConfig.endStop && state.activeStop === -1) {
             state.activeStop = 'end';
             state.stopStartTime = now;
@@ -1423,7 +1537,6 @@ function animate(now) {
             }
         }
 
-        // Плавное движение
         let diff = targetT - state.currentT;
         if (diff > 0.5) diff -= 1;
         if (diff < -0.5) diff += 1;
@@ -1432,7 +1545,6 @@ function animate(now) {
         if (state.currentT >= 1) state.currentT -= 1;
         if (state.currentT < 0) state.currentT += 1;
 
-        // Координаты
         const totalPoints = pathConfig.coords.length;
         const floatIdx = state.currentT * (totalPoints - 1);
         const segIdx = Math.floor(floatIdx);
@@ -1442,9 +1554,10 @@ function animate(now) {
         const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
         const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
 
-        // Обновление гексагонов
+        // Обновление больших гексагонов
         HEX_GROUP.forEach((hex, i) => {
             const sourceId = `path-${pathIdx}-hex-${i}`;
+            const layerId = `path-${pathIdx}-layer-${i}`;
             const source = map.getSource(sourceId);
             if (!source) return;
 
@@ -1452,21 +1565,57 @@ function animate(now) {
             const offset = data.properties.offset;
             const phase = data.properties.phase;
 
+            // Обновляем позицию
             const newVertices = hex.vertices.map(v => [
                 v[0] - hex.center[0] + centerLng + offset[0],
                 v[1] - hex.center[1] + centerLat + offset[1]
             ]);
             data.geometry.coordinates = [[...newVertices, newVertices[0]]];
-
-            const heightOffset = Math.sin(globalPhase + phase) * PATH_CONFIG.heightAmplitude;
-            data.properties.animatedHeight = Math.max(0, PATH_CONFIG.baseHeight + heightOffset);
-
             source.setData(data);
+
+            // Вычисляем высоту и прозрачность
+            const heightOffset = Math.sin(globalPhase + phase) * PATH_CONFIG.bigHexHeightAmplitude;
+            const currentHeight = Math.max(0, PATH_CONFIG.bigHexBaseHeight + heightOffset);
+
+            // Градиент прозрачности
+            let opacity;
+            if (currentHeight <= PATH_CONFIG.bigHexGradientStart) {
+                const t = currentHeight / PATH_CONFIG.bigHexGradientStart;
+                opacity = PATH_CONFIG.bigHexBottomOpacity + (PATH_CONFIG.bigHexTopOpacity - PATH_CONFIG.bigHexBottomOpacity) * t;
+            } else {
+                opacity = PATH_CONFIG.bigHexTopOpacity;
+            }
+
+            // Обновляем высоту и прозрачность через setPaintProperty
+            if (map.getLayer(layerId)) {
+                map.setPaintProperty(layerId, 'fill-extrusion-height', currentHeight);
+                map.setPaintProperty(layerId, 'fill-extrusion-opacity', opacity);
+            }
         });
+
+        // Обновление малых гексагонов
+        const smallHexSourceId = `path-${pathIdx}-small-hex`;
+        const smallHexSource = map.getSource(smallHexSourceId);
+        if (smallHexSource) {
+            const pulseParams = pathAnimation.smallHexPulseParams[pathIdx];
+            const pulseCycle = ((now + pulseParams.phase * 1000) % pulseParams.speed) / pulseParams.speed;
+            const pulseValue = Math.sin(pulseCycle * Math.PI * 2);
+            const pulseOpacity = PATH_CONFIG.smallHexBaseOpacity + (pulseValue + 1) * (PATH_CONFIG.smallHexPulseAmplitude * 0.5);
+            const finalOpacity = Math.max(0, Math.min(1, pulseOpacity));
+
+            const smallHexVertices = createSmallHexagon([centerLng, centerLat], PATH_CONFIG.smallHexSize);
+            smallHexSource._data.geometry.coordinates = [[...smallHexVertices, smallHexVertices[0]]];
+            smallHexSource._data.properties.pulseOpacity = finalOpacity;
+            smallHexSource.setData(smallHexSource._data);
+        }
     });
 
     pathAnimation.id = requestAnimationFrame(animate);
 }
+
+// =============================================================================
+// ======================== ЗАПУСК И ОСТАНОВКА ===============================
+// =============================================================================
 
 function startPathAnimation() {
     if (!map) {
@@ -1498,7 +1647,9 @@ function stopPathAnimation() {
     setPathVisibility(false);
 }
 
-// 3. ПУБЛИЧНЫЙ ИНТЕРФЕЙС
+// =============================================================================
+// ======================== ПУБЛИЧНЫЙ ИНТЕРФЕЙС ================================
+// =============================================================================
 
 window.setPathSpeed = function(index, speed) {
     if (PATHS_CONFIG[index]) {
@@ -1514,6 +1665,31 @@ window.setGlobalTestSpeed = function(multiplier) {
 
 window.setStopDuration = function(seconds) { PATH_CONFIG.stopDuration = seconds; };
 window.setEndStopDuration = function(seconds) { PATH_CONFIG.endStopDuration = seconds; };
+
+window.setBigHexColor = function(color) {
+    PATH_CONFIG.bigHexColor = color;
+    pathAnimation.layers.forEach(layerId => {
+        if (map.getLayer(layerId)) {
+            map.setPaintProperty(layerId, 'fill-extrusion-color', color);
+        }
+    });
+};
+
+window.setBigHexStroke = function(color, width) {
+    PATH_CONFIG.bigHexStrokeColor = color;
+    PATH_CONFIG.bigHexStrokeWidth = width;
+    pathAnimation.lineLayers.forEach(layerId => {
+        if (map.getLayer(layerId)) {
+            map.setPaintProperty(layerId, 'line-color', color);
+            map.setPaintProperty(layerId, 'line-width', width);
+        }
+    });
+};
+
+window.setSmallHexSize = function(size) {
+    PATH_CONFIG.smallHexSize = size;
+    console.log(`Small hex size set to ${size}`);
+};
 
 window.toggleHexagons = async function(checked) {
     popupSwitchState = checked;
@@ -1535,6 +1711,8 @@ if (map) {
     });
 }
 </script>
+
+
 
 
 
