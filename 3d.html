@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1049,23 +1050,53 @@ function handleIoTNavigation() { const isPWA = window.navigator.standalone || wi
 function setupEventListeners() {
     document.getElementById('toggle-switch').addEventListener('change', toggleGrid);
     document.getElementById('menu-toggle').addEventListener('click', toggleMenu);
-    const switches = [{ id: 'toggle-switch', labelFor: 'grid-toggle' }, { id: 'map-switch', labelFor: 'map-toggle' }, { id: 'dbm-switch', labelFor: 'dbm-toggle' }, { id: 'vlm-switch', labelFor: 'vlm-toggle' }, { id: 'mrv-switch', labelFor: 'mrv-toggle' }, { id: 'iot-switch', labelFor: 'iot-toggle' }];
+
+
+
+const switches = [{ id: 'toggle-switch', labelFor: 'grid-toggle' }, { id: 'map-switch', labelFor: 'map-toggle' }, { id: 'dbm-switch', labelFor: 'dbm-toggle' }, { id: 'vlm-switch', labelFor: 'vlm-toggle' }, { id: 'mrv-switch', labelFor: 'mrv-toggle' }, { id: 'iot-switch', labelFor: 'iot-toggle' }];
     switches.forEach(switchConfig => {
         const switchElement = document.getElementById(switchConfig.id);
         const labelElement = document.querySelector(`.form-check-label[for="${switchConfig.labelFor}"]`);
         if (switchElement && labelElement) {
             labelElement.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('settings-icon')) {
-                    if (switchConfig.id === 'mrv-switch') { const mrvSwitch = document.getElementById('mrv-switch'); if (!mrvSwitch.checked) { mrvSwitch.checked = true; updateIcons(); setTimeout(() => { handleMrvNavigation(); }, 300); } return; }
-                    if (switchConfig.id === 'iot-switch') { const iotSwitch = document.getElementById('iot-switch'); if (!iotSwitch.checked) { iotSwitch.checked = true; updateIotIcon(true); setTimeout(() => { handleIoTNavigation(); }, 300); } return; }
+                    if (switchConfig.id === 'mrv-switch') { 
+                        const mrvSwitch = document.getElementById('mrv-switch');
+                        // Меняем визуальное состояние
+                        mrvSwitch.checked = !mrvSwitch.checked;
+                        updateIcons();
+                        // Переходим по ссылке
+                        setTimeout(() => { handleMrvNavigation(); }, 300); 
+                        return; 
+                    }
+                    if (switchConfig.id === 'iot-switch') { 
+                        const iotSwitch = document.getElementById('iot-switch');
+                        // Меняем визуальное состояние
+                        iotSwitch.checked = !iotSwitch.checked;
+                        updateIotIcon(iotSwitch.checked);
+                        // Переходим по ссылке
+                        setTimeout(() => { handleIoTNavigation(); }, 300); 
+                        return; 
+                    }
                     switchElement.checked = !switchElement.checked;
                     if (switchConfig.id !== 'toggle-switch') updateIcons();
                     switchElement.dispatchEvent(new Event('change'));
                 }
             });
-            switchElement.addEventListener('change', function() { if (switchConfig.id === 'mrv-switch' && this.checked) setTimeout(() => { handleMrvNavigation(); }, 300); if (switchConfig.id === 'iot-switch' && this.checked) setTimeout(() => { handleIoTNavigation(); }, 300); });
+            // Убираем старые change обработчики
+            switchElement.addEventListener('change', function() { 
+                if (switchConfig.id !== 'toggle-switch' && 
+                    switchConfig.id !== 'mrv-switch' && 
+                    switchConfig.id !== 'iot-switch') {
+                    updateIcons();
+                }
+            });
         }
     });
+
+
+
+
     document.querySelectorAll('.settings-icon').forEach(icon => { icon.addEventListener('click', function(e) { e.stopPropagation(); }); });
     const resolutionSelect = document.getElementById('resolution-select');
     if (resolutionSelect) resolutionSelect.addEventListener('change', () => { const newResolution = parseInt(resolutionSelect.value); if (gridActive && !isGenerating && newResolution !== currentResolution) switchResolution(newResolution); });
@@ -1080,8 +1111,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('map-switch').checked = false;
     document.getElementById('dbm-switch').checked = false;
     document.getElementById('vlm-switch').checked = true;
-    document.getElementById('mrv-switch').checked = false;
-    document.getElementById('iot-switch').checked = false;
+    document.getElementById('mrv-switch').checked = true;
+    document.getElementById('iot-switch').checked = true;
     setTimeout(() => { const controls = document.getElementById('controls'); const menuContent = document.getElementById('menu-content'); const toggleIcon = document.getElementById('toggle-icon'); controls.classList.add('collapsed'); menuContent.classList.add('collapsed'); toggleIcon.classList.add('collapsed'); menuContent.style.maxHeight = '0'; menuContent.style.overflow = 'hidden'; }, 100);
     setupEventListeners();
     initializeMap();
