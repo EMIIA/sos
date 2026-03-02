@@ -219,14 +219,14 @@
             <div style="text-align:center;margin-top:2rem">
                 <a class="text-primary1" href="https://www.emiia.ru/" style="color:#da4216;font-weight:600;text-decoration:none">
                     <span style="color:#b2b4b3;font-size:1rem;font-weight:500">ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</span>
-                    <span style="font-size:1rem;font-weight:600;color:#3c78d8;margin-left:2px"> • ❯</span>
+                    <span style="font-size:1rem;font-weight:600;color:#3c78d8;margin-left:2px"> ❯</span>
                 </a>
             </div>
         </div>
     </div>
 
     <script>
-        // Исправленный менеджер для iOS (множественные уведомления)
+        // Исправленный менеджер для iOS - without "from"
         class FixedIOSNotificationManager {
             constructor() {
                 this.badgeCount = 0;
@@ -303,7 +303,7 @@
             startMinuteNotifications() {
                 setTimeout(async () => {
                     await this.requestPermission();
-                    this.sendNotification('Добро пожаловать в EMIIA.AI!', 'Пространственный интеллект');
+                    this.sendNotification('Платформа EMIIA.AI', 'Пространственный интеллект активирован');
                 }, 5000);
 
                 this.notificationInterval = setInterval(() => {
@@ -337,7 +337,7 @@
                         }
                     };
 
-                    console.log(`Отправка уведомления #${this.notificationCounter}`, { tag: uniqueTag });
+                    console.log(`Отправка уведомления #${this.notificationCounter}`);
 
                     if ('serviceWorker' in navigator) {
                         const registration = await navigator.serviceWorker.ready;
@@ -375,17 +375,17 @@
                 if (Notification.permission !== 'granted') return;
 
                 const messages = [
-                    'Пространственный интеллект - анализ данных...',
+                    'Пространственный интеллект - анализ данных',
                     'Обнаружены новые паттерны в системе',
                     'Оптимизация алгоритмов завершена',
                     'Система в режиме реального времени',
-                    'Система работает в оптимальном режиме',
+                    'Платформа работает в оптимальном режиме',
                     'Доступны новые аналитические отчеты',
                     'Произведена калибровка сенсоров',
                     'Запущены фоновые вычисления',
                     'Выявлены новые корреляции',
                     'Синхронизация данных завершена',
-                    'Система готова к работе',
+                    'Платформа готова к работе',
                     'Аналитика в режиме реального времени'
                 ];
 
@@ -450,8 +450,8 @@
                     
                     if (notificationManager && Notification.permission === 'granted') {
                         await notificationManager.sendNotification(
-                            'Успешный вход!',
-                            `Добро пожаловать, ${login}! Система активирована.`
+                            'Аутентификация выполнена',
+                            `Пользователь ${login} авторизован. Платформа активирована.`
                         );
                     }
                     
