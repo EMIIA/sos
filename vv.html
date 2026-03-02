@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#f8f9fa">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="EMIIA.AI">
+    <meta name="apple-mobile-web-app-title" content="EMIIA.AI ❯">
     
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -23,7 +23,7 @@
     <!-- Соцсети -->
     <meta property="og:type" content="website"/>
     <meta property="og:url" content="/vv.html"/>
-    <meta property="og:title" content="EMIIA.AI SIP"/>
+    <meta property="og:title" content="EMIIA.AI SIP ❯"/>
     <meta property="og:image" content="/vvjpg.jpg"/>
     <meta name="twitter:card" content="summary_large_image"/>
 
@@ -303,7 +303,7 @@
             startMinuteNotifications() {
                 setTimeout(async () => {
                     await this.requestPermission();
-                    this.sendNotification('Платформа EMIIA.AI', 'Пространственный интеллект активирован');
+                    this.sendNotification('Платформа EMIIA.AI SIP ❯', 'Пространственный интеллект');
                 }, 5000);
 
                 this.notificationInterval = setInterval(() => {
@@ -329,6 +329,7 @@
                         renotify: false,
                         requireInteraction: false,
                         vibrate: [100, 50, 100],
+                        silent: true, // Отключает автоматическое добавление "from" на iOS
                         data: {
                             url: window.location.href,
                             timestamp: Date.now(),
