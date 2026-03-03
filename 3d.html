@@ -4,6 +4,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1160,6 +1161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
 <script>
 // ================== КОД 6 ПУТЕЙ С НАСТРАИВАЕМЫМИ ГЕКСАГОНАМИ ==================
 
@@ -1328,7 +1330,8 @@ let pathAnimation = {
         currentT: 0,
         targetT: 0
     })),
-    smallHexPulseParams: []
+    smallHexPulseParams: [],
+    pathPhases: []
 };
 
 // =============================================================================
@@ -1381,8 +1384,15 @@ function initPathLayers() {
         });
     }
 
+    if (pathAnimation.pathPhases.length === 0) {
+        PATHS_CONFIG.forEach(() => {
+            pathAnimation.pathPhases.push(randomRange(0, Math.PI * 2));
+        });
+    }
+
     PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
         const startPos = pathConfig.coords[0];
+        const pathPhase = pathAnimation.pathPhases[pathIdx];
 
         HEX_GROUP.forEach((hex, i) => {
             const sourceId = `path-${pathIdx}-hex-${i}`;
@@ -1393,7 +1403,7 @@ function initPathLayers() {
                 hex.center[0] - HEX_GROUP[0].center[0],
                 hex.center[1] - HEX_GROUP[0].center[1]
             ];
-            const phase = (pathIdx * 7 + i) * 0.9;
+            const phase = (i * 0.9) + pathPhase;
 
             const shiftedVertices = hex.vertices.map(v => [
                 v[0] - hex.center[0] + startPos[0] + offset[0],
@@ -1412,7 +1422,6 @@ function initPathLayers() {
                 pathAnimation.sources.push(sourceId);
             }
 
-            // Заливка с экструзией - статическая высота, будем обновлять через setPaintProperty
             if (!map.getLayer(layerId)) {
                 map.addLayer({
                     id: layerId,
@@ -1447,7 +1456,6 @@ function initPathLayers() {
             map.setLayoutProperty(lineLayerId, 'visibility', 'visible');
         });
 
-        // Малые гексагоны
         const smallHexSourceId = `path-${pathIdx}-small-hex`;
         const smallHexLayerId = `path-${pathIdx}-small-hex-fill`;
         const smallHexLineLayerId = `path-${pathIdx}-small-hex-line`;
@@ -1540,6 +1548,7 @@ function removePathLayers() {
     pathAnimation.smallHexLayers = [];
     pathAnimation.smallHexLineLayers = [];
     pathAnimation.smallHexPulseParams = [];
+    pathAnimation.pathPhases = [];
     
     pathAnimation.isActive = false;
     pathAnimation.visible = false;
@@ -1611,7 +1620,6 @@ function animate(now) {
         const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
         const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
 
-        // Обновление больших гексагонов
         HEX_GROUP.forEach((hex, i) => {
             const sourceId = `path-${pathIdx}-hex-${i}`;
             const layerId = `path-${pathIdx}-layer-${i}`;
@@ -1622,7 +1630,6 @@ function animate(now) {
             const offset = data.properties.offset;
             const phase = data.properties.phase;
 
-            // Обновляем позицию
             const newVertices = hex.vertices.map(v => [
                 v[0] - hex.center[0] + centerLng + offset[0],
                 v[1] - hex.center[1] + centerLat + offset[1]
@@ -1630,11 +1637,9 @@ function animate(now) {
             data.geometry.coordinates = [[...newVertices, newVertices[0]]];
             source.setData(data);
 
-            // Вычисляем высоту и прозрачность
             const heightOffset = Math.sin(globalPhase + phase) * PATH_CONFIG.bigHexHeightAmplitude;
             const currentHeight = Math.max(0, PATH_CONFIG.bigHexBaseHeight + heightOffset);
 
-            // Градиент прозрачности
             let opacity;
             if (currentHeight <= PATH_CONFIG.bigHexGradientStart) {
                 const t = currentHeight / PATH_CONFIG.bigHexGradientStart;
@@ -1643,14 +1648,12 @@ function animate(now) {
                 opacity = PATH_CONFIG.bigHexTopOpacity;
             }
 
-            // Обновляем высоту и прозрачность через setPaintProperty
             if (map.getLayer(layerId)) {
                 map.setPaintProperty(layerId, 'fill-extrusion-height', currentHeight);
                 map.setPaintProperty(layerId, 'fill-extrusion-opacity', opacity);
             }
         });
 
-        // Обновление малых гексагонов
         const smallHexSourceId = `path-${pathIdx}-small-hex`;
         const smallHexSource = map.getSource(smallHexSourceId);
         if (smallHexSource) {
@@ -1768,6 +1771,7 @@ if (map) {
     });
 }
 </script>
+
 
 
 
