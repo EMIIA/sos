@@ -1507,6 +1507,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // ГЛОБАЛЬНЫЙ МНОЖИТЕЛЬ СКОРОСТИ
 window.globalSpeedMultiplier = 1; 
 
+// ЦВЕТ ДЛЯ РОБОТА (жёлтый)
+const ROBOT_COLOR = '#FFD700'; // или '#FFFF00' для чисто желтого
+
 // КОНФИГУРАЦИЯ
 const PATHS_CONFIG = [
     {
@@ -1521,6 +1524,9 @@ const PATHS_CONFIG = [
         endStop: true,
         speed: 0.01
     },
+
+// ================== РОБОТ (index 1) ==================
+    
     {
         coords: [
             [37.63572500297244, 55.83831498900576],
@@ -1536,7 +1542,8 @@ const PATHS_CONFIG = [
         ],
         stops: [2, 4],
         endStop: true,
-        speed: 0.01
+        speed: 0.01,
+        isRobot: true // <-- метка для РОБОТА
     },
     {
         coords: [
@@ -1689,6 +1696,15 @@ function randomRange(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+// Функция определения цвета для пути
+function getPathColor(pathIdx) {
+    return PATHS_CONFIG[pathIdx].isRobot ? ROBOT_COLOR : PATH_CONFIG.bigHexColor;
+}
+
+function getSmallHexFillColor(pathIdx) {
+    return PATHS_CONFIG[pathIdx].isRobot ? ROBOT_COLOR : PATH_CONFIG.smallHexFillColor;
+}
+
 // =============================================================================
 // ======================== ИНИЦИАЛИЗАЦИЯ СЛОЕВ ================================
 // =============================================================================
@@ -1732,6 +1748,11 @@ function initPathLayers() {
     PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
         const startPos = pathConfig.coords[0];
         const pathPhase = pathAnimation.pathPhases[pathIdx];
+        
+        // Определяем цвета для этого пути
+        const isRobot = pathConfig.isRobot;
+        const bigHexColor = getPathColor(pathIdx);
+        const smallFillColor = getSmallHexFillColor(pathIdx);
 
         HEX_GROUP.forEach((hex, i) => {
             const sourceId = `path-${pathIdx}-hex-${i}`;
@@ -1754,7 +1775,7 @@ function initPathLayers() {
                     type: 'geojson',
                     data: {
                         type: 'Feature',
-                        properties: { offset, phase },
+                        properties: { offset, phase, isRobot: isRobot },
                         geometry: { type: 'Polygon', coordinates: [[...shiftedVertices, shiftedVertices[0]]] }
                     }
                 });
@@ -1768,13 +1789,16 @@ function initPathLayers() {
                     source: sourceId,
                     minzoom: PATH_CONFIG.pointMaxZoom,
                     paint: {
-                        'fill-extrusion-color': PATH_CONFIG.bigHexColor,
+                        'fill-extrusion-color': bigHexColor,
                         'fill-extrusion-height': PATH_CONFIG.bigHexBaseHeight,
                         'fill-extrusion-opacity': PATH_CONFIG.bigHexOpacity,
                         'fill-extrusion-base': 0
                     }
                 }, beforeLayerId);
                 pathAnimation.layers.push(layerId);
+            } else {
+                // Обновляем цвет если слой уже существует
+                map.setPaintProperty(layerId, 'fill-extrusion-color', bigHexColor);
             }
             map.setLayoutProperty(layerId, 'visibility', 'visible');
 
@@ -1806,7 +1830,10 @@ function initPathLayers() {
                 type: 'geojson',
                 data: {
                     type: 'Feature',
-                    properties: { pulseOpacity: PATH_CONFIG.smallHexBaseOpacity },
+                    properties: { 
+                        pulseOpacity: PATH_CONFIG.smallHexBaseOpacity,
+                        isRobot: isRobot
+                    },
                     geometry: { type: 'Polygon', coordinates: [[...smallHexVertices, smallHexVertices[0]]] }
                 }
             });
@@ -1821,11 +1848,14 @@ function initPathLayers() {
                 minzoom: PATH_CONFIG.pointMinZoom,
                 maxzoom: PATH_CONFIG.pointMaxZoom,
                 paint: {
-                    'fill-color': PATH_CONFIG.smallHexFillColor,
+                    'fill-color': smallFillColor,
                     'fill-opacity': ['coalesce', ['get', 'pulseOpacity'], PATH_CONFIG.smallHexBaseOpacity]
                 }
             }, beforeLayerId);
             pathAnimation.smallHexLayers.push(smallHexLayerId);
+        } else {
+            // Обновляем цвет если слой уже существует
+            map.setPaintProperty(smallHexLayerId, 'fill-color', smallFillColor);
         }
         map.setLayoutProperty(smallHexLayerId, 'visibility', 'visible');
 
@@ -1908,6 +1938,7 @@ function animate(now) {
 
     PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
         const state = pathAnimation.pathStates[pathIdx];
+        const isRobot = pathConfig.isRobot;
         
         const baseSpeed = pathConfig.speed || 0.01;
         const currentSpeed = baseSpeed * window.globalSpeedMultiplier;
@@ -1990,6 +2021,9 @@ function animate(now) {
             if (map.getLayer(layerId)) {
                 map.setPaintProperty(layerId, 'fill-extrusion-height', currentHeight);
                 map.setPaintProperty(layerId, 'fill-extrusion-opacity', opacity);
+                // Убеждаемся что цвет правильный (особенно для РОБОТА)
+                const expectedColor = getPathColor(pathIdx);
+                map.setPaintProperty(layerId, 'fill-extrusion-color', expectedColor);
             }
         });
 
