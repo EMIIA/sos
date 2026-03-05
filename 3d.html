@@ -1508,7 +1508,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.globalSpeedMultiplier = 1; 
 
 // ЦВЕТ ДЛЯ РОБОТА
-const ROBOT_COLOR = '#909497'; // или '#FFFF00' для чисто желтого
+const ROBOT_COLOR = '#707b7c'; 
 
 // КОНФИГУРАЦИЯ
 const PATHS_CONFIG = [
@@ -2046,6 +2046,23 @@ function animate(now) {
     pathAnimation.id = requestAnimationFrame(animate);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // =============================================================================
 // ======================== ЗАПУСК И ОСТАНОВКА ===============================
 // =============================================================================
@@ -2143,7 +2160,497 @@ if (map) {
         }
     });
 }
+
+
+
+
+
+
+
+
+
+
+// ================== ЗОНА ВЗАИМОДЕЙСТВИЯ С РОБОТОМ (3 ЗОНЫ, 2 ГРУППЫ) ==================
+
+const ROBOT_ZONE_CONFIG = {
+    // Группа 1: две верхние зоны (включаются вместе)
+    group1: {
+        zones: [
+            {
+                id: 'zone-1-7fac655e398e15ce4bece3',
+                vertices: [
+                    [37.63585099089536, 55.838312755162306],
+                    [37.63585099089536, 55.83835948528372],
+                    [37.63577892086812, 55.83838285034442],
+                    [37.63570685084088, 55.83835948528372],
+                    [37.63570685084088, 55.838312755162306],
+                    [37.63577892086812, 55.8382893901016]
+                ]
+            },
+            {
+                id: 'zone-2-d44feda1df6069bf2297fa',
+                vertices: [
+                    [37.635778920478344, 55.83824265998019],
+                    [37.635778920478344, 55.8382893901016],
+                    [37.63570685058103, 55.838312755162306],
+                    [37.635634780683716, 55.8382893901016],
+                    [37.635634780683716, 55.83824265998019],
+                    [37.63570685058103, 55.83821929491948]
+                ]
+            }
+        ],
+        // Точная граница двух верхних зон (объединённый полигон)
+        triggerZone: [
+            [37.63585099089536, 55.83821929491948],  // Северо-восток
+            [37.63585099089536, 55.83838285034442],  // Север
+            [37.63577892086812, 55.83838285034442],  // Северо-запад зоны 1
+            [37.63570685084088, 55.83835948528372],  // Юго-запад зоны 1
+            [37.63570685084088, 55.838312755162306], // Юг зоны 1 = север зоны 2
+            [37.635634780683716, 55.8382893901016],  // Юго-восток зоны 2
+            [37.635634780683716, 55.83824265998019], // Юг зоны 2
+            [37.63570685058103, 55.83821929491948],  // Юго-запад зоны 2
+            [37.635778920478344, 55.83824265998019], // Северо-запад зоны 2
+            [37.635778920478344, 55.8382893901016],  // Север зоны 2 = юг зоны 1
+            [37.63585099089536, 55.838312755162306], // Возврат
+            [37.63585099089536, 55.83821929491948]   // Замыкание
+        ]
+    },
+    
+    // Группа 2: нижняя зона (включается отдельно)
+    group2: {
+        zones: [
+            {
+                id: 'zone-3-965c22bae7a2a47b328950',
+                vertices: [
+                    [37.63570685058104, 55.83845294552655],
+                    [37.63570685058104, 55.83849967564796],
+                    [37.63563478029395, 55.838523040708665],
+                    [37.63556271000686, 55.83849967564796],
+                    [37.63556271000686, 55.83845294552655],
+                    [37.63563478029395, 55.83842958046584]
+                ]
+            }
+        ],
+        // Точная граница нижней зоны
+        triggerZone: [
+            [37.63570685058104, 55.83842958046584],  // Север
+            [37.63570685058104, 55.83849967564796],  // Северо-восток
+            [37.63563478029395, 55.838523040708665], // Восток
+            [37.63556271000686, 55.83849967564796],  // Юго-восток
+            [37.63556271000686, 55.83845294552655],  // Юг
+            [37.63563478029395, 55.83842958046584],  // Запад
+            [37.63570685058104, 55.83842958046584]   // Замыкание
+        ]
+    },
+    
+    // Параметры экструзии
+    zoneBaseHeight: 0,
+    zoneExtrusionHeight: 6.9,
+    zoneColor: '#3d85c6',
+    zoneOpacity: 0.3,
+    
+    // ID слоёв
+    sourceIdGroup1: 'robot-zone-group1-source',
+    layerIdGroup1: 'robot-zone-group1-layer',
+    lineLayerIdGroup1: 'robot-zone-group1-line',
+    
+    sourceIdGroup2: 'robot-zone-group2-source',
+    layerIdGroup2: 'robot-zone-group2-layer',
+    lineLayerIdGroup2: 'robot-zone-group2-line'
+};
+
+let robotZoneState = {
+    geoJSONGroup1: null,
+    geoJSONGroup2: null,
+    inGroup1: false,
+    inGroup2: false
+};
+
+// Проверка точки в полигоне
+function isPointInZone(lng, lat, zone) {
+    let inside = false;
+    for (let i = 0, j = zone.length - 1; i < zone.length; j = i++) {
+        const xi = zone[i][0], yi = zone[i][1];
+        const xj = zone[j][0], yj = zone[j][1];
+        const intersect = ((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+function createZoneGeoJSON(zones) {
+    const features = zones.map(zone => ({
+        type: 'Feature',
+        properties: {
+            id: zone.id,
+            baseHeight: ROBOT_ZONE_CONFIG.zoneBaseHeight,
+            extrusionHeight: ROBOT_ZONE_CONFIG.zoneExtrusionHeight
+        },
+        geometry: {
+            type: 'Polygon',
+            coordinates: [[...zone.vertices, zone.vertices[0]]]
+        }
+    }));
+    
+    return {
+        type: 'FeatureCollection',
+        features: features
+    };
+}
+
+function findInsertPosition() {
+    if (!map) return null;
+    const layers = map.getStyle().layers;
+    
+    let lastRobotLayer = null;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].id.startsWith('path-1-')) {
+            lastRobotLayer = layers[i].id;
+        }
+    }
+    
+    if (lastRobotLayer) {
+        for (let i = 0; i < layers.length - 1; i++) {
+            if (layers[i].id === lastRobotLayer) {
+                return layers[i + 1].id;
+            }
+        }
+    }
+    
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].id.includes('path-')) {
+            return layers[i].id;
+        }
+    }
+    
+    return null;
+}
+
+// Инициализация группы 1 (две верхние зоны)
+function initGroup1Layers() {
+    if (!map) return;
+    
+    removeGroup1Layers();
+    
+    if (!robotZoneState.geoJSONGroup1) {
+        robotZoneState.geoJSONGroup1 = createZoneGeoJSON(ROBOT_ZONE_CONFIG.group1.zones);
+    }
+    
+    const beforeLayerId = findInsertPosition();
+    
+    try {
+        map.addSource(ROBOT_ZONE_CONFIG.sourceIdGroup1, {
+            type: 'geojson',
+            data: robotZoneState.geoJSONGroup1
+        });
+        
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.layerIdGroup1,
+            type: 'fill-extrusion',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
+            paint: {
+                'fill-extrusion-color': ROBOT_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': ROBOT_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': ROBOT_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': ROBOT_ZONE_CONFIG.zoneOpacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        }, beforeLayerId);
+        
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.lineLayerIdGroup1,
+            type: 'line',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
+            paint: {
+                'line-color': '#5d9cec',
+                'line-width': 2,
+                'line-opacity': 0.7
+            }
+        }, beforeLayerId);
+        
+        console.log('Группа 1: 2 зоны включены');
+        
+    } catch (e) {
+        console.error('Ошибка группы 1:', e);
+    }
+}
+
+function removeGroup1Layers() {
+    if (!map) return;
+    try {
+        if (map.getLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup1)) map.removeLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup1);
+        if (map.getLayer(ROBOT_ZONE_CONFIG.layerIdGroup1)) map.removeLayer(ROBOT_ZONE_CONFIG.layerIdGroup1);
+        if (map.getSource(ROBOT_ZONE_CONFIG.sourceIdGroup1)) map.removeSource(ROBOT_ZONE_CONFIG.sourceIdGroup1);
+    } catch (e) {}
+}
+
+// Инициализация группы 2 (нижняя зона)
+function initGroup2Layers() {
+    if (!map) return;
+    
+    removeGroup2Layers();
+    
+    if (!robotZoneState.geoJSONGroup2) {
+        robotZoneState.geoJSONGroup2 = createZoneGeoJSON(ROBOT_ZONE_CONFIG.group2.zones);
+    }
+    
+    const beforeLayerId = findInsertPosition();
+    
+    try {
+        map.addSource(ROBOT_ZONE_CONFIG.sourceIdGroup2, {
+            type: 'geojson',
+            data: robotZoneState.geoJSONGroup2
+        });
+        
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.layerIdGroup2,
+            type: 'fill-extrusion',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
+            paint: {
+                'fill-extrusion-color': ROBOT_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': ROBOT_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': ROBOT_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': ROBOT_ZONE_CONFIG.zoneOpacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        }, beforeLayerId);
+        
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.lineLayerIdGroup2,
+            type: 'line',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
+            paint: {
+                'line-color': '#5d9cec',
+                'line-width': 2,
+                'line-opacity': 0.7
+            }
+        }, beforeLayerId);
+        
+        console.log('Группа 2: 1 зона включена');
+        
+    } catch (e) {
+        console.error('Ошибка группы 2:', e);
+    }
+}
+
+function removeGroup2Layers() {
+    if (!map) return;
+    try {
+        if (map.getLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup2)) map.removeLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup2);
+        if (map.getLayer(ROBOT_ZONE_CONFIG.layerIdGroup2)) map.removeLayer(ROBOT_ZONE_CONFIG.layerIdGroup2);
+        if (map.getSource(ROBOT_ZONE_CONFIG.sourceIdGroup2)) map.removeSource(ROBOT_ZONE_CONFIG.sourceIdGroup2);
+    } catch (e) {}
+}
+
+// Обновление зон — независимое управление группами
+function updateRobotZone(robotLng, robotLat) {
+    // Проверяем каждую группу отдельно
+    const inGroup1 = isPointInZone(robotLng, robotLat, ROBOT_ZONE_CONFIG.group1.triggerZone);
+    const inGroup2 = isPointInZone(robotLng, robotLat, ROBOT_ZONE_CONFIG.group2.triggerZone);
+    
+    // Группа 1 (две верхние зоны)
+    if (inGroup1 && !robotZoneState.inGroup1) {
+        console.log('>>> Робот ВОШЁЛ в группу 1 (2 зоны)');
+        initGroup1Layers();
+    }
+    if (!inGroup1 && robotZoneState.inGroup1) {
+        console.log('>>> Робот ВЫШЕЛ из группы 1');
+        removeGroup1Layers();
+    }
+    
+    // Группа 2 (нижняя зона)
+    if (inGroup2 && !robotZoneState.inGroup2) {
+        console.log('>>> Робот ВОШЁЛ в группу 2 (1 зона)');
+        initGroup2Layers();
+    }
+    if (!inGroup2 && robotZoneState.inGroup2) {
+        console.log('>>> Робот ВЫШЕЛ из группы 2');
+        removeGroup2Layers();
+    }
+    
+    robotZoneState.inGroup1 = inGroup1;
+    robotZoneState.inGroup2 = inGroup2;
+}
+
+// ================== ИНТЕГРАЦИЯ ==================
+
+const _originalAnimate = animate;
+
+animate = function(now) {
+    if (!pathAnimation.isActive || !pathAnimation.visible) {
+        pathAnimation.id = null;
+        return;
+    }
+
+    const elapsed = (now - pathAnimation.startTime) / 1000;
+    const globalPhase = elapsed * 2 * Math.PI;
+    let robotLng = null, robotLat = null;
+
+    PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
+        const state = pathAnimation.pathStates[pathIdx];
+        const baseSpeed = pathConfig.speed || 0.01;
+        const currentSpeed = baseSpeed * window.globalSpeedMultiplier;
+        
+        let rawT = (elapsed * currentSpeed) % 1;
+        let targetT = rawT;
+
+        if (rawT > 0.98 && pathConfig.endStop && state.activeStop === -1) {
+            state.activeStop = 'end';
+            state.stopStartTime = now;
+            state.targetT = 1.0;
+        }
+
+        if (state.activeStop === -1) {
+            for (let stopIdx of pathConfig.stops) {
+                const stopT = stopIdx / (pathConfig.coords.length - 1);
+                if (Math.abs(rawT - stopT) < 0.01) {
+                    state.activeStop = stopIdx;
+                    state.stopStartTime = now;
+                    state.targetT = stopT;
+                    break;
+                }
+            }
+        }
+
+        if (state.activeStop !== -1) {
+            const duration = state.activeStop === 'end' ? PATH_CONFIG.endStopDuration : PATH_CONFIG.stopDuration;
+            if ((now - state.stopStartTime) / 1000 < duration) {
+                targetT = state.targetT;
+            } else {
+                state.activeStop = -1;
+            }
+        }
+
+        let diff = targetT - state.currentT;
+        if (diff > 0.5) diff -= 1;
+        if (diff < -0.5) diff += 1;
+        state.currentT += diff * 0.05;
+        if (state.currentT >= 1) state.currentT -= 1;
+        if (state.currentT < 0) state.currentT += 1;
+
+        const totalPoints = pathConfig.coords.length;
+        const floatIdx = state.currentT * (totalPoints - 1);
+        const segIdx = Math.floor(floatIdx);
+        const segT = floatIdx - segIdx;
+        const p1 = pathConfig.coords[segIdx];
+        const p2 = pathConfig.coords[Math.min(totalPoints - 1, segIdx + 1)];
+        const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
+        const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
+
+        if (pathIdx === 1 && pathConfig.isRobot) {
+            robotLng = centerLng;
+            robotLat = centerLat;
+        }
+
+        HEX_GROUP.forEach((hex, i) => {
+            const sourceId = `path-${pathIdx}-hex-${i}`;
+            const layerId = `path-${pathIdx}-layer-${i}`;
+            const source = map.getSource(sourceId);
+            if (!source) return;
+
+            const data = source._data;
+            const offset = data.properties.offset;
+            const phase = data.properties.phase;
+
+            const newVertices = hex.vertices.map(v => [
+                v[0] - hex.center[0] + centerLng + offset[0],
+                v[1] - hex.center[1] + centerLat + offset[1]
+            ]);
+            data.geometry.coordinates = [[...newVertices, newVertices[0]]];
+            source.setData(data);
+
+            const heightOffset = Math.sin(globalPhase + phase) * PATH_CONFIG.bigHexHeightAmplitude;
+            const currentHeight = Math.max(0, PATH_CONFIG.bigHexBaseHeight + heightOffset);
+            
+            let opacity;
+            if (currentHeight <= PATH_CONFIG.bigHexGradientStart) {
+                const t = currentHeight / PATH_CONFIG.bigHexGradientStart;
+                opacity = PATH_CONFIG.bigHexBottomOpacity + (PATH_CONFIG.bigHexTopOpacity - PATH_CONFIG.bigHexBottomOpacity) * t;
+            } else {
+                opacity = PATH_CONFIG.bigHexTopOpacity;
+            }
+
+            if (map.getLayer(layerId)) {
+                map.setPaintProperty(layerId, 'fill-extrusion-height', currentHeight);
+                map.setPaintProperty(layerId, 'fill-extrusion-opacity', opacity);
+                map.setPaintProperty(layerId, 'fill-extrusion-color', getPathColor(pathIdx));
+            }
+        });
+
+        const smallHexSourceId = `path-${pathIdx}-small-hex`;
+        const smallHexSource = map.getSource(smallHexSourceId);
+        if (smallHexSource) {
+            const pulseParams = pathAnimation.smallHexPulseParams[pathIdx];
+            const pulseCycle = ((now + pulseParams.phase * 1000) % pulseParams.speed) / pulseParams.speed;
+            const pulseValue = Math.sin(pulseCycle * Math.PI * 2);
+            const pulseOpacity = PATH_CONFIG.smallHexBaseOpacity + (pulseValue + 1) * (PATH_CONFIG.smallHexPulseAmplitude * 0.5);
+            const finalOpacity = Math.max(0, Math.min(1, pulseOpacity));
+
+            const smallHexVertices = createSmallHexagon([centerLng, centerLat], PATH_CONFIG.smallHexSize);
+            smallHexSource._data.geometry.coordinates = [[...smallHexVertices, smallHexVertices[0]]];
+            smallHexSource._data.properties.pulseOpacity = finalOpacity;
+            smallHexSource.setData(smallHexSource._data);
+        }
+    });
+
+    if (robotLng !== null && robotLat !== null) {
+        updateRobotZone(robotLng, robotLat);
+    }
+
+    pathAnimation.id = requestAnimationFrame(animate);
+};
+
+if (pathAnimation.isActive) {
+    pathAnimation.id = requestAnimationFrame(animate);
+}
+
+if (map) {
+    map.on('styledata', function() {
+        if (pathAnimation.isActive) {
+            initPathLayers();
+            setPathVisibility(true);
+            if (robotZoneState.inGroup1) {
+                initGroup1Layers();
+            }
+            if (robotZoneState.inGroup2) {
+                initGroup2Layers();
+            }
+        }
+    });
+}
+
+console.log('Зона Робота: 2 группы (1-2 зоны вместе, 3 зона отдельно)');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
