@@ -2625,7 +2625,232 @@ console.log('Зона Робота: 2 группы (1-2 зоны вместе, 3
 
 
 
+// ================== ВИСЯЧИЕ ГЕКСАГОНЫ ДЛЯ ЗОН 1 И 2 ==================
 
+// === ГРУППА 1 (две зоны) + висячий гексагон ===
+function initGroup1Layers() {
+    if (!map) return;
+    
+    removeGroup1Layers();
+    
+    // === ВИСЯЧИЙ ГЕКСАГОН ДЛЯ ГРУППЫ 1 ===
+    const floatingSourceId1 = 'floating-hex-source-1';
+    const floatingLayerId1 = 'floating-hex-layer-1';
+    
+    const vertices1 = [
+        [37.635729279953146, 55.83829566437792],
+        [37.635729279953146, 55.838298779719345],
+        [37.63572447528947, 55.83830033739006],
+        [37.6357196706258, 55.838298779719345],
+        [37.6357196706258, 55.83829566437792],
+        [37.63572447528947, 55.8382941067072]
+    ];
+    
+    let beforeId = null;
+    const layers = map.getStyle().layers;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].id.includes('path-')) {
+            beforeId = layers[i].id;
+            break;
+        }
+    }
+    
+    map.addSource(floatingSourceId1, {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [[...vertices1, vertices1[0]]]
+                }
+            }]
+        }
+    });
+    
+    map.addLayer({
+        id: floatingLayerId1,
+        type: 'fill-extrusion',
+        source: floatingSourceId1,
+        paint: {
+            'fill-extrusion-color': '#3d85c6',
+            'fill-extrusion-base': 1.8,
+            'fill-extrusion-height': 2.0,
+            'fill-extrusion-opacity': 0.9
+        }
+    }, beforeId);
+    
+    console.log('>>> ВИСЯЧИЙ ГЕКСАГОН 1 СОЗДАН (1.8-2.0м)');
+    
+    // === ЗОНЫ ГРУППЫ 1 ===
+    if (!robotZoneState.geoJSONGroup1) {
+        robotZoneState.geoJSONGroup1 = createZoneGeoJSON(ROBOT_ZONE_CONFIG.group1.zones);
+    }
+    
+    map.addSource(ROBOT_ZONE_CONFIG.sourceIdGroup1, {
+        type: 'geojson',
+        data: robotZoneState.geoJSONGroup1
+    });
+    
+    map.addLayer({
+        id: ROBOT_ZONE_CONFIG.layerIdGroup1,
+        type: 'fill-extrusion',
+        source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
+        paint: {
+            'fill-extrusion-color': ROBOT_ZONE_CONFIG.zoneColor,
+            'fill-extrusion-base': ROBOT_ZONE_CONFIG.zoneBaseHeight,
+            'fill-extrusion-height': ROBOT_ZONE_CONFIG.zoneExtrusionHeight,
+            'fill-extrusion-opacity': ROBOT_ZONE_CONFIG.zoneOpacity
+        }
+    }, beforeId);
+    
+    map.addLayer({
+        id: ROBOT_ZONE_CONFIG.lineLayerIdGroup1,
+        type: 'line',
+        source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
+        paint: {
+            'line-color': '#5d9cec',
+            'line-width': 2,
+            'line-opacity': 0.7
+        }
+    }, beforeId);
+    
+    console.log('>>> ГРУППА 1 СОЗДАНА');
+}
+
+// === ГРУППА 2 (одна зона) + висячий гексагон ===
+function initGroup2Layers() {
+    if (!map) return;
+    
+    removeGroup2Layers();
+    
+    // === ВИСЯЧИЙ ГЕКСАГОН ДЛЯ ГРУППЫ 2 (3 метра вверх) ===
+    const floatingSourceId2 = 'floating-hex-source-2';
+    const floatingLayerId2 = 'floating-hex-layer-2';
+    
+    const vertices2 = [
+        [37.63566201463859, 55.83850127691214],
+        [37.63566201463859, 55.83850439225357],
+        [37.63565720994951, 55.83850594992428],
+        [37.63565240526042, 55.83850439225357],
+        [37.63565240526042, 55.83850127691214],
+        [37.63565720994951, 55.838499719241426]
+    ];
+    
+    let beforeId = null;
+    const layers = map.getStyle().layers;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].id.includes('path-')) {
+            beforeId = layers[i].id;
+            break;
+        }
+    }
+    
+    map.addSource(floatingSourceId2, {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [[...vertices2, vertices2[0]]]
+                }
+            }]
+        }
+    });
+    
+    // 3 метра вверх: base 3.0, height 3.2 (толщина 20см)
+    map.addLayer({
+        id: floatingLayerId2,
+        type: 'fill-extrusion',
+        source: floatingSourceId2,
+        paint: {
+            'fill-extrusion-color': '#3d85c6',
+            'fill-extrusion-base': 3.3,
+            'fill-extrusion-height': 3.5,
+            'fill-extrusion-opacity': 0.9
+        }
+    }, beforeId);
+    
+    console.log('>>> ВИСЯЧИЙ ГЕКСАГОН 2 СОЗДАН (3.0-3.2м)');
+    
+    // === ЗОНА ГРУППЫ 2 ===
+    if (!robotZoneState.geoJSONGroup2) {
+        robotZoneState.geoJSONGroup2 = createZoneGeoJSON(ROBOT_ZONE_CONFIG.group2.zones);
+    }
+    
+    map.addSource(ROBOT_ZONE_CONFIG.sourceIdGroup2, {
+        type: 'geojson',
+        data: robotZoneState.geoJSONGroup2
+    });
+    
+    map.addLayer({
+        id: ROBOT_ZONE_CONFIG.layerIdGroup2,
+        type: 'fill-extrusion',
+        source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
+        paint: {
+            'fill-extrusion-color': ROBOT_ZONE_CONFIG.zoneColor,
+            'fill-extrusion-base': ROBOT_ZONE_CONFIG.zoneBaseHeight,
+            'fill-extrusion-height': ROBOT_ZONE_CONFIG.zoneExtrusionHeight,
+            'fill-extrusion-opacity': ROBOT_ZONE_CONFIG.zoneOpacity
+        }
+    }, beforeId);
+    
+    map.addLayer({
+        id: ROBOT_ZONE_CONFIG.lineLayerIdGroup2,
+        type: 'line',
+        source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
+        paint: {
+            'line-color': '#5d9cec',
+            'line-width': 2,
+            'line-opacity': 0.7
+        }
+    }, beforeId);
+    
+    console.log('>>> ГРУППА 2 СОЗДАНА');
+}
+
+// === УДАЛЕНИЕ ГРУППЫ 1 ===
+function removeGroup1Layers() {
+    if (!map) return;
+    
+    // Удаляем висячий гексагон 1
+    try {
+        if (map.getLayer('floating-hex-layer-1')) map.removeLayer('floating-hex-layer-1');
+        if (map.getSource('floating-hex-source-1')) map.removeSource('floating-hex-source-1');
+    } catch(e) {}
+    
+    // Удаляем зоны
+    try {
+        if (map.getLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup1)) map.removeLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup1);
+        if (map.getLayer(ROBOT_ZONE_CONFIG.layerIdGroup1)) map.removeLayer(ROBOT_ZONE_CONFIG.layerIdGroup1);
+        if (map.getSource(ROBOT_ZONE_CONFIG.sourceIdGroup1)) map.removeSource(ROBOT_ZONE_CONFIG.sourceIdGroup1);
+    } catch (e) {}
+}
+
+// === УДАЛЕНИЕ ГРУППЫ 2 ===
+function removeGroup2Layers() {
+    if (!map) return;
+    
+    // Удаляем висячий гексагон 2
+    try {
+        if (map.getLayer('floating-hex-layer-2')) map.removeLayer('floating-hex-layer-2');
+        if (map.getSource('floating-hex-source-2')) map.removeSource('floating-hex-source-2');
+    } catch(e) {}
+    
+    // Удаляем зону
+    try {
+        if (map.getLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup2)) map.removeLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup2);
+        if (map.getLayer(ROBOT_ZONE_CONFIG.layerIdGroup2)) map.removeLayer(ROBOT_ZONE_CONFIG.layerIdGroup2);
+        if (map.getSource(ROBOT_ZONE_CONFIG.sourceIdGroup2)) map.removeSource(ROBOT_ZONE_CONFIG.sourceIdGroup2);
+    } catch (e) {}
+}
+
+console.log('Висячие гексагоны: группа 1 (1.8-2.0м), группа 2 (3.0-3.2м)');
 
 
 
