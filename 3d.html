@@ -5,6 +5,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1502,6 +1503,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
+
+
+
+
 // ================== КОД 6 ПУТЕЙ С НАСТРАИВАЕМЫМИ ГЕКСАГОНАМИ ==================
 
 // ГЛОБАЛЬНЫЙ МНОЖИТЕЛЬ СКОРОСТИ
@@ -1512,6 +1517,12 @@ const ROBOT_COLOR = '#707b7c';
 
 // КОНФИГУРАЦИЯ
 const PATHS_CONFIG = [
+
+
+
+// ================== ЧЕЛОВЕК  ==================
+
+
     {
         coords: [
             [37.63586467,55.83838781], [37.63585017,55.83836861], [37.63594252,55.83834578],
@@ -1935,6 +1946,9 @@ function animate(now) {
 
     const elapsed = (now - pathAnimation.startTime) / 1000;
     const globalPhase = elapsed * 2 * Math.PI;
+    
+    let robotLng = null, robotLat = null;
+    let humanLng = null, humanLat = null;
 
     PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
         const state = pathAnimation.pathStates[pathIdx];
@@ -1990,6 +2004,16 @@ function animate(now) {
         const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
         const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
 
+        // Сохраняем позиции для зон
+        if (pathIdx === 0) {
+            humanLng = centerLng;
+            humanLat = centerLat;
+        }
+        if (pathIdx === 1 && pathConfig.isRobot) {
+            robotLng = centerLng;
+            robotLat = centerLat;
+        }
+
         HEX_GROUP.forEach((hex, i) => {
             const sourceId = `path-${pathIdx}-hex-${i}`;
             const layerId = `path-${pathIdx}-layer-${i}`;
@@ -2021,7 +2045,6 @@ function animate(now) {
             if (map.getLayer(layerId)) {
                 map.setPaintProperty(layerId, 'fill-extrusion-height', currentHeight);
                 map.setPaintProperty(layerId, 'fill-extrusion-opacity', opacity);
-                // Убеждаемся что цвет правильный (особенно для РОБОТА)
                 const expectedColor = getPathColor(pathIdx);
                 map.setPaintProperty(layerId, 'fill-extrusion-color', expectedColor);
             }
@@ -2043,8 +2066,17 @@ function animate(now) {
         }
     });
 
+    // Обновляем зоны робота и человека
+    if (robotLng !== null && robotLat !== null) {
+        updateRobotZone(robotLng, robotLat);
+    }
+    if (humanLng !== null && humanLat !== null) {
+        updateHumanZone(humanLng, humanLat);
+    }
+
     pathAnimation.id = requestAnimationFrame(animate);
 }
+
 
 
 
@@ -2160,11 +2192,6 @@ if (map) {
         }
     });
 }
-
-
-
-
-
 
 
 
@@ -2472,159 +2499,6 @@ function updateRobotZone(robotLng, robotLat) {
     robotZoneState.inGroup2 = inGroup2;
 }
 
-// ================== ИНТЕГРАЦИЯ ==================
-
-const _originalAnimate = animate;
-
-animate = function(now) {
-    if (!pathAnimation.isActive || !pathAnimation.visible) {
-        pathAnimation.id = null;
-        return;
-    }
-
-    const elapsed = (now - pathAnimation.startTime) / 1000;
-    const globalPhase = elapsed * 2 * Math.PI;
-    let robotLng = null, robotLat = null;
-
-    PATHS_CONFIG.forEach((pathConfig, pathIdx) => {
-        const state = pathAnimation.pathStates[pathIdx];
-        const baseSpeed = pathConfig.speed || 0.01;
-        const currentSpeed = baseSpeed * window.globalSpeedMultiplier;
-        
-        let rawT = (elapsed * currentSpeed) % 1;
-        let targetT = rawT;
-
-        if (rawT > 0.98 && pathConfig.endStop && state.activeStop === -1) {
-            state.activeStop = 'end';
-            state.stopStartTime = now;
-            state.targetT = 1.0;
-        }
-
-        if (state.activeStop === -1) {
-            for (let stopIdx of pathConfig.stops) {
-                const stopT = stopIdx / (pathConfig.coords.length - 1);
-                if (Math.abs(rawT - stopT) < 0.01) {
-                    state.activeStop = stopIdx;
-                    state.stopStartTime = now;
-                    state.targetT = stopT;
-                    break;
-                }
-            }
-        }
-
-        if (state.activeStop !== -1) {
-            const duration = state.activeStop === 'end' ? PATH_CONFIG.endStopDuration : PATH_CONFIG.stopDuration;
-            if ((now - state.stopStartTime) / 1000 < duration) {
-                targetT = state.targetT;
-            } else {
-                state.activeStop = -1;
-            }
-        }
-
-        let diff = targetT - state.currentT;
-        if (diff > 0.5) diff -= 1;
-        if (diff < -0.5) diff += 1;
-        state.currentT += diff * 0.05;
-        if (state.currentT >= 1) state.currentT -= 1;
-        if (state.currentT < 0) state.currentT += 1;
-
-        const totalPoints = pathConfig.coords.length;
-        const floatIdx = state.currentT * (totalPoints - 1);
-        const segIdx = Math.floor(floatIdx);
-        const segT = floatIdx - segIdx;
-        const p1 = pathConfig.coords[segIdx];
-        const p2 = pathConfig.coords[Math.min(totalPoints - 1, segIdx + 1)];
-        const centerLng = p1[0] + (p2[0] - p1[0]) * segT;
-        const centerLat = p1[1] + (p2[1] - p1[1]) * segT;
-
-        if (pathIdx === 1 && pathConfig.isRobot) {
-            robotLng = centerLng;
-            robotLat = centerLat;
-        }
-
-        HEX_GROUP.forEach((hex, i) => {
-            const sourceId = `path-${pathIdx}-hex-${i}`;
-            const layerId = `path-${pathIdx}-layer-${i}`;
-            const source = map.getSource(sourceId);
-            if (!source) return;
-
-            const data = source._data;
-            const offset = data.properties.offset;
-            const phase = data.properties.phase;
-
-            const newVertices = hex.vertices.map(v => [
-                v[0] - hex.center[0] + centerLng + offset[0],
-                v[1] - hex.center[1] + centerLat + offset[1]
-            ]);
-            data.geometry.coordinates = [[...newVertices, newVertices[0]]];
-            source.setData(data);
-
-            const heightOffset = Math.sin(globalPhase + phase) * PATH_CONFIG.bigHexHeightAmplitude;
-            const currentHeight = Math.max(0, PATH_CONFIG.bigHexBaseHeight + heightOffset);
-            
-            let opacity;
-            if (currentHeight <= PATH_CONFIG.bigHexGradientStart) {
-                const t = currentHeight / PATH_CONFIG.bigHexGradientStart;
-                opacity = PATH_CONFIG.bigHexBottomOpacity + (PATH_CONFIG.bigHexTopOpacity - PATH_CONFIG.bigHexBottomOpacity) * t;
-            } else {
-                opacity = PATH_CONFIG.bigHexTopOpacity;
-            }
-
-            if (map.getLayer(layerId)) {
-                map.setPaintProperty(layerId, 'fill-extrusion-height', currentHeight);
-                map.setPaintProperty(layerId, 'fill-extrusion-opacity', opacity);
-                map.setPaintProperty(layerId, 'fill-extrusion-color', getPathColor(pathIdx));
-            }
-        });
-
-        const smallHexSourceId = `path-${pathIdx}-small-hex`;
-        const smallHexSource = map.getSource(smallHexSourceId);
-        if (smallHexSource) {
-            const pulseParams = pathAnimation.smallHexPulseParams[pathIdx];
-            const pulseCycle = ((now + pulseParams.phase * 1000) % pulseParams.speed) / pulseParams.speed;
-            const pulseValue = Math.sin(pulseCycle * Math.PI * 2);
-            const pulseOpacity = PATH_CONFIG.smallHexBaseOpacity + (pulseValue + 1) * (PATH_CONFIG.smallHexPulseAmplitude * 0.5);
-            const finalOpacity = Math.max(0, Math.min(1, pulseOpacity));
-
-            const smallHexVertices = createSmallHexagon([centerLng, centerLat], PATH_CONFIG.smallHexSize);
-            smallHexSource._data.geometry.coordinates = [[...smallHexVertices, smallHexVertices[0]]];
-            smallHexSource._data.properties.pulseOpacity = finalOpacity;
-            smallHexSource.setData(smallHexSource._data);
-        }
-    });
-
-    if (robotLng !== null && robotLat !== null) {
-        updateRobotZone(robotLng, robotLat);
-    }
-
-    pathAnimation.id = requestAnimationFrame(animate);
-};
-
-if (pathAnimation.isActive) {
-    pathAnimation.id = requestAnimationFrame(animate);
-}
-
-if (map) {
-    map.on('styledata', function() {
-        if (pathAnimation.isActive) {
-            initPathLayers();
-            setPathVisibility(true);
-            if (robotZoneState.inGroup1) {
-                initGroup1Layers();
-            }
-            if (robotZoneState.inGroup2) {
-                initGroup2Layers();
-            }
-        }
-    });
-}
-
-console.log('Зона Робота: 2 группы (1-2 зоны вместе, 3 зона отдельно)');
-
-
-
-
-
 // ================== ВИСЯЧИЕ ГЕКСАГОНЫ ДЛЯ ЗОН 1 И 2 ==================
 
 // === ГРУППА 1 (две зоны) + висячий гексагон ===
@@ -2853,10 +2727,468 @@ function removeGroup2Layers() {
 console.log('Висячие гексагоны: группа 1 (1.8-2.0м), группа 2 (3.0-3.2м)');
 
 
+// ================== ЗОНА ВЗАИМОДЕЙСТВИЯ С ЧЕЛОВЕКОМ ==================
 
+const HUMAN_ZONE_CONFIG = {
+    // Триггер-зоны ЗОНА 1 (3 гексагона)
+    triggerZones1: [
+        {
+            id: 'trigger-1',
+            vertices: [
+                [37.63587379261348, 55.83837844785227],
+                [37.63587379261348, 55.8383979187362],
+                [37.63584376339526, 55.838407654178155],
+                [37.635813734177034, 55.8383979187362],
+                [37.635813734177034, 55.83837844785227],
+                [37.63584376339526, 55.838368712410315]
+            ]
+        },
+        {
+            id: 'trigger-2',
+            vertices: [
+                [37.6359038217866, 55.83834924152639],
+                [37.6359038217866, 55.838368712410315],
+                [37.63587379259093, 55.83837844785227],
+                [37.63584376339526, 55.838368712410315],
+                [37.63584376339526, 55.83834924152639],
+                [37.63587379259093, 55.83833950608443]
+            ]
+        },
+        {
+            id: 'trigger-3',
+            vertices: [
+                [37.63593385100482, 55.83837844785227],
+                [37.63593385100482, 55.8383979187362],
+                [37.6359038217866, 55.838407654178155],
+                [37.635873792568376, 55.8383979187362],
+                [37.635873792568376, 55.83837844785227],
+                [37.6359038217866, 55.838368712410315]
+            ]
+        }
+    ],
+    
+    // Триггер-зона ЗОНА 2 (1 большой гексагон)
+    triggerZone2: {
+        id: 'trigger-zone-2',
+        vertices: [
+            [37.63570685058104, 55.83845294552655],
+            [37.63570685058104, 55.83849967564796],
+            [37.63563478029395, 55.838523040708665],
+            [37.63556271000686, 55.83849967564796],
+            [37.63556271000686, 55.83845294552655],
+            [37.63563478029395, 55.83842958046584]
+        ]
+    },
+    
+    // Зона №1 (большой гексагон)
+    zone1: {
+        id: '9aaa9718fe29f82ee7ff77',
+        vertices: [
+            [37.63592306131237, 55.83838285034443],
+            [37.63592306131237, 55.83842958046584],
+            [37.63585099115521, 55.83845294552655],
+            [37.63577892099805, 55.83842958046584],
+            [37.63577892099805, 55.83838285034443],
+            [37.63585099115521, 55.838359485283725]
+        ]
+    },
+    
+    // Зона №2 (большой гексагон)
+    zone2: {
+        id: '965c22bae7a2a47b328950',
+        vertices: [
+            [37.63570685058104, 55.83845294552655],
+            [37.63570685058104, 55.83849967564796],
+            [37.63563478029395, 55.838523040708665],
+            [37.63556271000686, 55.83849967564796],
+            [37.63556271000686, 55.83845294552655],
+            [37.63563478029395, 55.83842958046584]
+        ]
+    },
+    
+    // ВИСЯЧИЙ ГЕКСАГОН для зоны 1
+    floatingHex1: {
+        id: 'human-floating-hex-1',
+        vertices: [
+            [37.63585093681767, 55.8383881001248],
+            [37.63585093681767, 55.83839121546623],
+            [37.63584613214257, 55.838392773136945],
+            [37.63584132746747, 55.83839121546623],
+            [37.63584132746747, 55.8383881001248],
+            [37.63584613214257, 55.83838654245409]
+        ]
+    },
+    
+    // ВИСЯЧИЙ ГЕКСАГОН для зоны 2
+    floatingHex2: {
+        id: '81620b6c7e8480bab67114',
+        vertices: [
+            [37.63566835922169, 55.838500252416196],
+            [37.63566835922169, 55.838503367757625],
+            [37.635663554532734, 55.83850492542834],
+            [37.63565874984378, 55.838503367757625],
+            [37.63565874984378, 55.838500252416196],
+            [37.635663554532734, 55.83849869474548]
+        ]
+    },
+    
+    // ID слоёв зоны 1
+    sourceIdZone1: 'human-zone1-source',
+    layerIdZone1: 'human-zone1-layer',
+    lineLayerIdZone1: 'human-zone1-line',
+    sourceIdFloating1: 'human-floating-1-source',
+    layerIdFloating1: 'human-floating-1-layer',
+    
+    // ID слоёв зоны 2
+    sourceIdZone2: 'human-zone2-source',
+    layerIdZone2: 'human-zone2-layer',
+    lineLayerIdZone2: 'human-zone2-line',
+    sourceIdFloating2: 'human-floating-2-source',
+    layerIdFloating2: 'human-floating-2-layer',
+    
+    // Параметры визуализации
+    zoneColor: '#3d85c6',
+    zoneOpacity: 0.3,
+    zoneBaseHeight: 0,
+    zoneExtrusionHeight: 0.1
+};
 
+let humanZoneState = {
+    inZone1: false,
+    inZone2: false
+};
 
+// Проверка точки в полигоне (ray-casting algorithm)
+function isPointInPolygon(lng, lat, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i][0], yi = polygon[i][1];
+        const xj = polygon[j][0], yj = polygon[j][1];
+        const intersect = ((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
 
+// Проверка, находится ли человек в любой из триггер-зон 1
+function checkHumanInZone1(lng, lat) {
+    for (let zone of HUMAN_ZONE_CONFIG.triggerZones1) {
+        if (isPointInPolygon(lng, lat, zone.vertices)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Проверка, находится ли человек в триггер-зоне 2
+function checkHumanInZone2(lng, lat) {
+    return isPointInPolygon(lng, lat, HUMAN_ZONE_CONFIG.triggerZone2.vertices);
+}
+
+// Создание GeoJSON для зоны 1
+function createHumanZone1GeoJSON() {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: HUMAN_ZONE_CONFIG.zone1.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...HUMAN_ZONE_CONFIG.zone1.vertices, HUMAN_ZONE_CONFIG.zone1.vertices[0]]]
+            }
+        }]
+    };
+}
+
+// Создание GeoJSON для зоны 2
+function createHumanZone2GeoJSON() {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: HUMAN_ZONE_CONFIG.zone2.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...HUMAN_ZONE_CONFIG.zone2.vertices, HUMAN_ZONE_CONFIG.zone2.vertices[0]]]
+            }
+        }]
+    };
+}
+
+// Создание GeoJSON для висячего гексагона 1
+function createHumanFloatingHex1GeoJSON() {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: HUMAN_ZONE_CONFIG.floatingHex1.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...HUMAN_ZONE_CONFIG.floatingHex1.vertices, HUMAN_ZONE_CONFIG.floatingHex1.vertices[0]]]
+            }
+        }]
+    };
+}
+
+// Создание GeoJSON для висячего гексагона 2
+function createHumanFloatingHex2GeoJSON() {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: HUMAN_ZONE_CONFIG.floatingHex2.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...HUMAN_ZONE_CONFIG.floatingHex2.vertices, HUMAN_ZONE_CONFIG.floatingHex2.vertices[0]]]
+            }
+        }]
+    };
+}
+
+// Найти позицию для вставки слоя (перед path-слоями)
+function findHumanInsertPosition() {
+    if (!map) return null;
+    const layers = map.getStyle().layers;
+    
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].id.includes('path-')) {
+            return layers[i].id;
+        }
+    }
+    
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].type !== 'background') {
+            return layers[i].id;
+        }
+    }
+    
+    return null;
+}
+
+// Инициализация зоны 1 и висячего гексагона
+function initHumanZone1Layers() {
+    if (!map) return;
+    
+    removeHumanZone1Layers();
+    
+    const beforeLayerId = findHumanInsertPosition();
+    
+    try {
+        // === ВИСЯЧИЙ ГЕКСАГОН 1 (1.55-1.75м) ===
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdFloating1, {
+            type: 'geojson',
+            data: createHumanFloatingHex1GeoJSON()
+        });
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdFloating1,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdFloating1,
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': 1.55,
+                'fill-extrusion-height': 1.75,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeLayerId);
+        
+        // === ЗОНА №1 ===
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdZone1, {
+            type: 'geojson',
+            data: createHumanZone1GeoJSON()
+        });
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdZone1,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone1,
+            paint: {
+                'fill-extrusion-color': HUMAN_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': HUMAN_ZONE_CONFIG.zoneOpacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        }, beforeLayerId);
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.lineLayerIdZone1,
+            type: 'line',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone1,
+            paint: {
+                'line-color': '#5d9cec',
+                'line-width': 2,
+                'line-opacity': 0.7
+            }
+        }, beforeLayerId);
+        
+        console.log('>>> Человек ВОШЁЛ в ЗОНУ 1: зона + висячий гексагон включены');
+        
+    } catch (e) {
+        console.error('Ошибка создания зоны 1 для человека:', e);
+    }
+}
+
+// Удаление зоны 1 и висячего гексагона
+function removeHumanZone1Layers() {
+    if (!map) return;
+    
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdFloating1)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdFloating1);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdFloating1)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdFloating1);
+    } catch (e) {}
+    
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone1)) map.removeLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone1);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone1)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone1);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdZone1)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdZone1);
+    } catch (e) {}
+}
+
+// Инициализация зоны 2 и висячего гексагона
+function initHumanZone2Layers() {
+    if (!map) return;
+    
+    removeHumanZone2Layers();
+    
+    const beforeLayerId = findHumanInsertPosition();
+    
+    try {
+        // === ВИСЯЧИЙ ГЕКСАГОН 2 (1.55-1.75м) ===
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdFloating2, {
+            type: 'geojson',
+            data: createHumanFloatingHex2GeoJSON()
+        });
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdFloating2,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdFloating2,
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': 1.55,
+                'fill-extrusion-height': 1.75,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeLayerId);
+        
+        // === ЗОНА №2 ===
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdZone2, {
+            type: 'geojson',
+            data: createHumanZone2GeoJSON()
+        });
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdZone2,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone2,
+            paint: {
+                'fill-extrusion-color': HUMAN_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': HUMAN_ZONE_CONFIG.zoneOpacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        }, beforeLayerId);
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.lineLayerIdZone2,
+            type: 'line',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone2,
+            paint: {
+                'line-color': '#5d9cec',
+                'line-width': 2,
+                'line-opacity': 0.7
+            }
+        }, beforeLayerId);
+        
+        console.log('>>> Человек ВОШЁЛ в ЗОНУ 2: зона + висячий гексагон включены');
+        
+    } catch (e) {
+        console.error('Ошибка создания зоны 2 для человека:', e);
+    }
+}
+
+// Удаление зоны 2 и висячего гексагона
+function removeHumanZone2Layers() {
+    if (!map) return;
+    
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdFloating2)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdFloating2);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdFloating2)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdFloating2);
+    } catch (e) {}
+    
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone2)) map.removeLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone2);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone2)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone2);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdZone2)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdZone2);
+    } catch (e) {}
+}
+
+// Обновление зон человека
+function updateHumanZone(humanLng, humanLat) {
+    const inZone1 = checkHumanInZone1(humanLng, humanLat);
+    const inZone2 = checkHumanInZone2(humanLng, humanLat);
+    
+    // Зона 1
+    if (inZone1 && !humanZoneState.inZone1) {
+        initHumanZone1Layers();
+    }
+    if (!inZone1 && humanZoneState.inZone1) {
+        removeHumanZone1Layers();
+        console.log('>>> Человек ВЫШЕЛ из ЗОНЫ 1');
+    }
+    
+    // Зона 2
+    if (inZone2 && !humanZoneState.inZone2) {
+        initHumanZone2Layers();
+    }
+    if (!inZone2 && humanZoneState.inZone2) {
+        removeHumanZone2Layers();
+        console.log('>>> Человек ВЫШЕЛ из ЗОНЫ 2');
+    }
+    
+    humanZoneState.inZone1 = inZone1;
+    humanZoneState.inZone2 = inZone2;
+}
+
+// Очистка при остановке анимации
+const _originalStopPathAnimation = stopPathAnimation;
+stopPathAnimation = function() {
+    _originalStopPathAnimation();
+    removeGroup1Layers();
+    removeGroup2Layers();
+    removeHumanZone1Layers();
+    removeHumanZone2Layers();
+    robotZoneState.inGroup1 = false;
+    robotZoneState.inGroup2 = false;
+    humanZoneState.inZone1 = false;
+    humanZoneState.inZone2 = false;
+};
+
+if (map) {
+    map.on('styledata', function() {
+        if (pathAnimation.isActive) {
+            initPathLayers();
+            setPathVisibility(true);
+            if (robotZoneState.inGroup1) {
+                initGroup1Layers();
+            }
+            if (robotZoneState.inGroup2) {
+                initGroup2Layers();
+            }
+            if (humanZoneState.inZone1) {
+                initHumanZone1Layers();
+            }
+            if (humanZoneState.inZone2) {
+                initHumanZone2Layers();
+            }
+        }
+    });
+}
+
+console.log('Зона Человека: Зона 1 (3 триггера) + Зона 2 (1 триггер), висячие гексагоны 1.55-1.75м');
+console.log('Зона Робота: 2 группы (1-2 зоны вместе, 3 зона отдельно) + висячие гексагоны');
 
 
 </script>
@@ -2907,5 +3239,6 @@ function handlePwaClick(e) { if (e) { e.preventDefault(); e.stopPropagation(); }
 </div>
 
 </html>
+
 
 
