@@ -1506,7 +1506,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
 // ================== КОД 6 ПУТЕЙ С НАСТРАИВАЕМЫМИ ГЕКСАГОНАМИ ==================
 
 // ГЛОБАЛЬНЫЙ МНОЖИТЕЛЬ СКОРОСТИ
@@ -2780,6 +2779,19 @@ const HUMAN_ZONE_CONFIG = {
         ]
     },
     
+    // Триггер-зона ЗОНА 3 (1 большой гексагон)
+    triggerZone3: {
+        id: 'trigger-zone-3',
+        vertices: [
+            [37.63592306157222, 55.838523040708665],
+            [37.63592306157222, 55.83856977083008],
+            [37.63585099115521, 55.83859313589078],
+            [37.6357789207382, 55.83856977083008],
+            [37.6357789207382, 55.838523040708665],
+            [37.63585099115521, 55.83849967564796]
+        ]
+    },
+    
     // Зона №1 (большой гексагон)
     zone1: {
         id: '9aaa9718fe29f82ee7ff77',
@@ -2803,6 +2815,19 @@ const HUMAN_ZONE_CONFIG = {
             [37.63556271000686, 55.83849967564796],
             [37.63556271000686, 55.83845294552655],
             [37.63563478029395, 55.83842958046584]
+        ]
+    },
+    
+    // Зона №3 (большой гексагон)
+    zone3: {
+        id: '5f16f4e8c7d4a1407bc8bd',
+        vertices: [
+            [37.63592306157222, 55.838523040708665],
+            [37.63592306157222, 55.83856977083008],
+            [37.63585099115521, 55.83859313589078],
+            [37.6357789207382, 55.83856977083008],
+            [37.6357789207382, 55.838523040708665],
+            [37.63585099115521, 55.83849967564796]
         ]
     },
     
@@ -2832,6 +2857,19 @@ const HUMAN_ZONE_CONFIG = {
         ]
     },
     
+    // ВИСЯЧИЙ ГЕКСАГОН для зоны 3 (высота как у робота в группе 2: 3.3-3.5м)
+    floatingHex3: {
+        id: 'f45b4e9f2c2d5dfa1df5cd',
+        vertices: [
+            [37.63585093683499, 55.838528290489045],
+            [37.63585093683499, 55.83853140583047],
+            [37.63584613214257, 55.83853296350119],
+            [37.635841327450144, 55.83853140583047],
+            [37.635841327450144, 55.838528290489045],
+            [37.63584613214257, 55.83852673281833]
+        ]
+    },
+    
     // ID слоёв зоны 1
     sourceIdZone1: 'human-zone1-source',
     layerIdZone1: 'human-zone1-layer',
@@ -2846,6 +2884,13 @@ const HUMAN_ZONE_CONFIG = {
     sourceIdFloating2: 'human-floating-2-source',
     layerIdFloating2: 'human-floating-2-layer',
     
+    // ID слоёв зоны 3
+    sourceIdZone3: 'human-zone3-source',
+    layerIdZone3: 'human-zone3-layer',
+    lineLayerIdZone3: 'human-zone3-line',
+    sourceIdFloating3: 'human-floating-3-source',
+    layerIdFloating3: 'human-floating-3-layer',
+    
     // Параметры визуализации
     zoneColor: '#3d85c6',
     zoneOpacity: 0.3,
@@ -2855,7 +2900,8 @@ const HUMAN_ZONE_CONFIG = {
 
 let humanZoneState = {
     inZone1: false,
-    inZone2: false
+    inZone2: false,
+    inZone3: false
 };
 
 // Проверка точки в полигоне (ray-casting algorithm)
@@ -2883,6 +2929,11 @@ function checkHumanInZone1(lng, lat) {
 // Проверка, находится ли человек в триггер-зоне 2
 function checkHumanInZone2(lng, lat) {
     return isPointInPolygon(lng, lat, HUMAN_ZONE_CONFIG.triggerZone2.vertices);
+}
+
+// Проверка, находится ли человек в триггер-зоне 3
+function checkHumanInZone3(lng, lat) {
+    return isPointInPolygon(lng, lat, HUMAN_ZONE_CONFIG.triggerZone3.vertices);
 }
 
 // Создание GeoJSON для зоны 1
@@ -2915,6 +2966,21 @@ function createHumanZone2GeoJSON() {
     };
 }
 
+// Создание GeoJSON для зоны 3
+function createHumanZone3GeoJSON() {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: HUMAN_ZONE_CONFIG.zone3.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...HUMAN_ZONE_CONFIG.zone3.vertices, HUMAN_ZONE_CONFIG.zone3.vertices[0]]]
+            }
+        }]
+    };
+}
+
 // Создание GeoJSON для висячего гексагона 1
 function createHumanFloatingHex1GeoJSON() {
     return {
@@ -2940,6 +3006,21 @@ function createHumanFloatingHex2GeoJSON() {
             geometry: {
                 type: 'Polygon',
                 coordinates: [[...HUMAN_ZONE_CONFIG.floatingHex2.vertices, HUMAN_ZONE_CONFIG.floatingHex2.vertices[0]]]
+            }
+        }]
+    };
+}
+
+// Создание GeoJSON для висячего гексагона 3
+function createHumanFloatingHex3GeoJSON() {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: HUMAN_ZONE_CONFIG.floatingHex3.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...HUMAN_ZONE_CONFIG.floatingHex3.vertices, HUMAN_ZONE_CONFIG.floatingHex3.vertices[0]]]
             }
         }]
     };
@@ -3040,7 +3121,7 @@ function removeHumanZone1Layers() {
     
     try {
         if (map.getLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone1)) map.removeLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone1);
-        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone1)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone1);
+                if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone1)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone1);
         if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdZone1)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdZone1);
     } catch (e) {}
 }
@@ -3125,10 +3206,91 @@ function removeHumanZone2Layers() {
     } catch (e) {}
 }
 
+// Инициализация зоны 3 и висячего гексагона
+function initHumanZone3Layers() {
+    if (!map) return;
+    
+    removeHumanZone3Layers();
+    
+    const beforeLayerId = findHumanInsertPosition();
+    
+    try {
+        // === ВИСЯЧИЙ ГЕКСАГОН 3 (3.3-3.5м как у робота в группе 2) ===
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdFloating3, {
+            type: 'geojson',
+            data: createHumanFloatingHex3GeoJSON()
+        });
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdFloating3,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdFloating3,
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': 3.3,
+                'fill-extrusion-height': 3.5,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeLayerId);
+        
+        // === ЗОНА №3 ===
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdZone3, {
+            type: 'geojson',
+            data: createHumanZone3GeoJSON()
+        });
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdZone3,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone3,
+            paint: {
+                'fill-extrusion-color': HUMAN_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': HUMAN_ZONE_CONFIG.zoneOpacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        }, beforeLayerId);
+        
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.lineLayerIdZone3,
+            type: 'line',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone3,
+            paint: {
+                'line-color': '#5d9cec',
+                'line-width': 2,
+                'line-opacity': 0.7
+            }
+        }, beforeLayerId);
+        
+        console.log('>>> Человек ВОШЁЛ в ЗОНУ 3: зона + висячий гексагон включены');
+        
+    } catch (e) {
+        console.error('Ошибка создания зоны 3 для человека:', e);
+    }
+}
+
+// Удаление зоны 3 и висячего гексагона
+function removeHumanZone3Layers() {
+    if (!map) return;
+    
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdFloating3)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdFloating3);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdFloating3)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdFloating3);
+    } catch (e) {}
+    
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone3)) map.removeLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone3);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone3)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone3);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdZone3)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdZone3);
+    } catch (e) {}
+}
+
 // Обновление зон человека
 function updateHumanZone(humanLng, humanLat) {
     const inZone1 = checkHumanInZone1(humanLng, humanLat);
     const inZone2 = checkHumanInZone2(humanLng, humanLat);
+    const inZone3 = checkHumanInZone3(humanLng, humanLat);
     
     // Зона 1
     if (inZone1 && !humanZoneState.inZone1) {
@@ -3148,8 +3310,18 @@ function updateHumanZone(humanLng, humanLat) {
         console.log('>>> Человек ВЫШЕЛ из ЗОНЫ 2');
     }
     
+    // Зона 3
+    if (inZone3 && !humanZoneState.inZone3) {
+        initHumanZone3Layers();
+    }
+    if (!inZone3 && humanZoneState.inZone3) {
+        removeHumanZone3Layers();
+        console.log('>>> Человек ВЫШЕЛ из ЗОНЫ 3');
+    }
+    
     humanZoneState.inZone1 = inZone1;
     humanZoneState.inZone2 = inZone2;
+    humanZoneState.inZone3 = inZone3;
 }
 
 // Очистка при остановке анимации
@@ -3160,10 +3332,12 @@ stopPathAnimation = function() {
     removeGroup2Layers();
     removeHumanZone1Layers();
     removeHumanZone2Layers();
+    removeHumanZone3Layers();
     robotZoneState.inGroup1 = false;
     robotZoneState.inGroup2 = false;
     humanZoneState.inZone1 = false;
     humanZoneState.inZone2 = false;
+    humanZoneState.inZone3 = false;
 };
 
 if (map) {
@@ -3183,11 +3357,15 @@ if (map) {
             if (humanZoneState.inZone2) {
                 initHumanZone2Layers();
             }
+            if (humanZoneState.inZone3) {
+                initHumanZone3Layers();
+            }
         }
     });
 }
 
-console.log('Зона Человека: Зона 1 (3 триггера) + Зона 2 (1 триггер), висячие гексагоны 1.55-1.75м');
+console.log('Зона Человека: Зона 1 (3 триггера) + Зона 2 (1 триггер) + Зона 3 (1 триггер)');
+console.log('Висячие гексагоны: Зона 1-2 (1.55-1.75м), Зона 3 (3.3-3.5м как у робота)');
 console.log('Зона Робота: 2 группы (1-2 зоны вместе, 3 зона отдельно) + висячие гексагоны');
 
 
