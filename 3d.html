@@ -199,7 +199,12 @@ a.mapboxgl-ctrl-logo{ width: 0; height: 0; margin: 0 0 -4px-4px; display: block;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
 }
+
 </style>
+
+
+
+
 
 </head>
 <body>
@@ -974,49 +979,109 @@ window.handleReportClick = handleReportClick;
 
 
 
-
-
 // ================== КАСТОМНЫЙ КОМПАС ==================
 let isLocationActive = false;
 let compassHideTimer;
-let pulsingDotBlue;
+let userLocationMarker = null;
+let locationWatchId = null;
 
-function createPulsingDot() {
-    return {
-        width: 64,
-        height: 64,
-        data: new Uint8Array(64 * 64 * 4),
-        onAdd: function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = this.width;
-            canvas.height = this.height;
-            this.context = canvas.getContext('2d');
-        },
-        render: function() {
-            const duration = 1000;
-            const t = (performance.now() % duration) / duration;
-            const radius = (64 / 2) * 0.3;
-            const outerRadius = (64 / 2) * 0.7 * t + radius;
-            const context = this.context;
-            
-            context.clearRect(0, 0, this.width, this.height);
-            context.beginPath();
-            context.arc(32, 32, outerRadius, 0, Math.PI * 2);
-            context.fillStyle = `rgba(61, 133, 198, ${1 - t})`;
-            context.fill();
-            
-            context.beginPath();
-            context.arc(32, 32, radius, 0, Math.PI * 2);
-            context.fillStyle = '#3d85c6';
-            context.strokeStyle = 'white';
-            context.lineWidth = 2 + 4 * (1 - t);
-            context.fill();
-            context.stroke();
-            
-            this.data = context.getImageData(0, 0, this.width, this.height).data;
-            return true;
+function createPulseElement() {
+    const SIZE = 60;
+    const HEX_RADIUS = 9;
+    const BORDER_WIDTH = 4;
+    
+    const container = document.createElement('div');
+    container.style.width = SIZE + 'px';
+    container.style.height = SIZE + 'px';
+    container.style.position = 'relative';
+    container.className = 'pulse-marker-container'; // для поиска
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    canvas.style.width = SIZE + 'px';
+    canvas.style.height = SIZE + 'px';
+    canvas.style.position = 'absolute';
+    canvas.style.left = '0';
+    canvas.style.top = '0';
+    
+    container.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    
+    let animationId = null;
+    let isActive = false;
+    
+    function drawHexagon(cx, cy, r) {
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 6;
+            const x = cx + r * Math.cos(angle);
+            const y = cy + r * Math.sin(angle);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+    }
+    
+    function animate() {
+        if (!isActive) return;
+        
+        const now = performance.now();
+        const t = (now % 1800) / 1800;
+        const pulseT = (now % 700) / 700;
+        
+        const cx = SIZE / 2;
+        const cy = SIZE / 2;
+        
+        ctx.clearRect(0, 0, SIZE, SIZE);
+        
+        // Волна
+        const sweepAngle = Math.PI * 2 * 1.7 * t;
+        const opacity = 0.8 * Math.pow(1 - t, 2);
+        
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, SIZE/2, Math.PI/2, sweepAngle + Math.PI/2);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(61, 133, 198, ' + opacity + ')';
+        ctx.fill();
+        
+        // Гексагон
+        const pulseScale = 1 + 0.15 * Math.abs(Math.sin(Math.PI * pulseT));
+        const r = HEX_RADIUS * pulseScale;
+        
+        drawHexagon(cx, cy, r + BORDER_WIDTH);
+        ctx.fillStyle = '#f8f9fa';
+        ctx.fill();
+        
+        drawHexagon(cx, cy, r);
+        ctx.fillStyle = '#3d85c6';
+        ctx.fill();
+        
+        animationId = requestAnimationFrame(animate);
+    }
+    
+    container.startAnimation = function() {
+        console.log('startAnimation');
+        if (!isActive) {
+            isActive = true;
+            animate();
         }
     };
+    
+    container.stopAnimation = function() {
+        console.log('stopAnimation');
+        isActive = false;
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        // Очищаем canvas
+        ctx.clearRect(0, 0, SIZE, SIZE);
+    };
+    
+    return container;
 }
 
 function createCustomCompass() {
@@ -1049,7 +1114,6 @@ function createCustomCompass() {
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        transition: all 0.3s ease;
         opacity: 0;
         visibility: hidden;
         transform: translateY(-50%);
@@ -1064,6 +1128,7 @@ function createCustomCompass() {
 }
 
 function handleCompassClick() {
+    console.log('click, isLocationActive:', isLocationActive);
     if (isLocationActive) {
         removeUserLocation();
     } else {
@@ -1071,32 +1136,69 @@ function handleCompassClick() {
     }
 }
 
+// ГЛУБОКАЯ ОЧИСТКА - удаляем все маркеры
 function removeUserLocation() {
-    if (!map) return;
-    if (map.getSource('user-location')) {
-        map.removeLayer('user-location-layer');
-        map.removeSource('user-location');
+    console.log('=== removeUserLocation START ===');
+    
+    // 1. Останавливаем геолокацию
+    if (locationWatchId !== null) {
+        navigator.geolocation.clearWatch(locationWatchId);
+        locationWatchId = null;
+        console.log('watch stopped');
     }
+    
+    // 2. Останавливаем анимацию и удаляем маркер
+    if (userLocationMarker) {
+        const el = userLocationMarker.getElement();
+        console.log('marker element:', el);
+        
+        if (el && el.stopAnimation) {
+            el.stopAnimation();
+            console.log('animation stopped');
+        }
+        
+        // Удаляем через Mapbox API
+        userLocationMarker.remove();
+        console.log('marker.remove() called');
+        
+        // Принудительно удаляем из DOM если остался
+        if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+            console.log('forced DOM remove');
+        }
+        
+        userLocationMarker = null;
+    }
+    
+    // 3. Удаляем ВСЕ оставшиеся маркеры геолокации (на всякий случай)
+    document.querySelectorAll('.pulse-marker-container').forEach(el => {
+        const parent = el.closest('.mapboxgl-marker');
+        if (parent) {
+            parent.remove();
+            console.log('cleaned up extra marker');
+        }
+        el.remove();
+    });
+    
+    // 4. Сбрасываем флаг
     isLocationActive = false;
     updateCompassAppearance();
-    // После отключения геолокации запускаем таймер скрытия
+    
+    // 5. Таймер скрытия компаса
+    clearTimeout(compassHideTimer);
     compassHideTimer = setTimeout(() => {
         hideCompass();
     }, 7000);
+    
+    console.log('=== removeUserLocation END ===');
 }
 
 function updateCompassAppearance() {
     const compass = document.getElementById('custom-compass');
     const compassPath = document.getElementById('compass-path');
-    
     if (compass && compassPath) {
-        if (isLocationActive) {
-            compassPath.setAttribute('fill', '#3d85c6');
-            compass.title = 'Скрыть мое местоположение';
-        } else {
-            compassPath.setAttribute('fill', 'transparent');
-            compass.title = 'Показать мое местоположение';
-        }
+        compassPath.setAttribute('fill', isLocationActive ? '#3d85c6' : 'transparent');
+        compass.title = isLocationActive ? 'Скрыть мое местоположение' : 'Показать мое местоположение';
     }
 }
 
@@ -1120,130 +1222,141 @@ function hideCompass() {
 }
 
 function locateUser() {
+    console.log('=== locateUser START ===');
+    
     if (!navigator.geolocation) {
-        alert('Геолокация не поддерживается вашим браузером');
+        alert('Геолокация не поддерживается');
         return;
     }
+
+    // Гарантируем очистку
+    removeUserLocation();
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
             const { longitude, latitude } = position.coords;
+            console.log('coords:', longitude, latitude);
             
-            if (!map) return;
+            if (!map) {
+                console.error('no map!');
+                return;
+            }
             
             map.flyTo({
                 center: [longitude, latitude],
                 zoom: 17,
-                duration: 2000,
-                essential: true
+                duration: 1500
             });
 
-            removeUserLocation();
+            // Создаём новый маркер
+            const markerEl = createPulseElement();
+            console.log('new markerEl:', markerEl);
 
-            if (!pulsingDotBlue) pulsingDotBlue = createPulsingDot();
-            map.addImage('pulsing-dot-blue', pulsingDotBlue, { pixelRatio: 2 });
-            
-            map.addSource('user-location', {
-                type: 'geojson',
-                data: {
-                    type: 'FeatureCollection',
-                    features: [{
-                        type: 'Feature',
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [longitude, latitude]
-                        }
-                    }]
+            try {
+                userLocationMarker = new mapboxgl.Marker({
+                    element: markerEl,
+                    anchor: 'center'
+                })
+                .setLngLat([longitude, latitude])
+                .addTo(map);
+                
+                console.log('marker added to map');
+            } catch (e) {
+                console.error('marker error:', e);
+                return;
+            }
+
+            // Запускаем анимацию
+            setTimeout(() => {
+                if (markerEl.startAnimation) {
+                    markerEl.startAnimation();
+                    console.log('animation started');
                 }
-            });
+            }, 100);
 
-            map.addLayer({
-                id: 'user-location-layer',
-                type: 'symbol',
-                source: 'user-location',
-                layout: {
-                    'icon-image': 'pulsing-dot-blue',
-                    'icon-allow-overlap': true,
-                    'icon-ignore-placement': true
-                }
-            });
+            // z-index
+            const container = markerEl.closest('.mapboxgl-marker');
+            if (container) {
+                container.style.zIndex = '9999';
+            }
 
             isLocationActive = true;
             updateCompassAppearance();
             showCompass();
+
+            // Следим за позицией
+            locationWatchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    if (userLocationMarker) {
+                        userLocationMarker.setLngLat([pos.coords.longitude, pos.coords.latitude]);
+                    }
+                },
+                (err) => console.log('watch error:', err),
+                { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+            );
+            
+            console.log('=== locateUser END ===');
         },
         (error) => {
-            let errorMessage = 'Не удалось определить местоположение';
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMessage = 'Доступ к геолокации запрещен. Разрешите доступ в настройках браузера.';
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMessage = 'Информация о местоположении недоступна.';
-                    break;
-                case error.TIMEOUT:
-                    errorMessage = 'Время ожидания определения местоположения истекло.';
-                    break;
-            }
-            alert(errorMessage);
+            alert('Геолокация: ' + error.message);
+            isLocationActive = false;
+            updateCompassAppearance();
         },
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000
-        }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
 }
 
 function setupCompassEvents() {
     if (!map) return;
     
-    // Показываем компас при загрузке
     showCompass();
     
-    // Запускаем таймер скрытия через 7 секунд (если не активна геолокация)
     compassHideTimer = setTimeout(() => {
         hideCompass();
     }, 7000);
     
+    map.on('styledata', function() {
+        console.log('styledata');
+        if (isLocationActive && userLocationMarker) {
+            const pos = userLocationMarker.getLngLat();
+            const oldEl = userLocationMarker.getElement();
+            if (oldEl && oldEl.stopAnimation) oldEl.stopAnimation();
+            userLocationMarker.remove();
+            
+            setTimeout(() => {
+                if (!isLocationActive) return;
+                const newEl = createPulseElement();
+                userLocationMarker = new mapboxgl.Marker({ element: newEl, anchor: 'center' })
+                    .setLngLat(pos)
+                    .addTo(map);
+                setTimeout(() => newEl.startAnimation && newEl.startAnimation(), 100);
+            }, 100);
+        }
+    });
+    
     map.on('rotate', function() {
         const compass = document.getElementById('custom-compass');
         if (compass) {
-            const bearing = map.getBearing();
-            const compassIcon = compass.querySelector('.compass-icon');
-            if (compassIcon) {
-                compassIcon.style.transform = `rotate(${-bearing}deg)`;
-            }
+            const icon = compass.querySelector('.compass-icon');
+            if (icon) icon.style.transform = `rotate(${-map.getBearing()}deg)`;
         }
     });
 
     map.on('pitch', function() {
         const compass = document.getElementById('custom-compass');
         if (compass) {
-            const currentPitch = map.getPitch();
-            compass.style.transform = `translateY(-50%) perspective(500px) rotateX(${Math.min(currentPitch, 60)}deg)`;
+            compass.style.transform = `translateY(-50%) perspective(500px) rotateX(${Math.min(map.getPitch(), 60)}deg)`;
         }
     });
 
-    map.on('rotatestart', function() {
-        showCompass();
-    });
-
+    map.on('rotatestart', showCompass);
+    
     map.on('rotateend', function() {
         if (!isLocationActive) {
-            compassHideTimer = setTimeout(() => {
-                hideCompass();
-            }, 7000);
+            compassHideTimer = setTimeout(hideCompass, 7000);
         }
     });
 }
-
-
-
-
-
-
-
 
 
 
