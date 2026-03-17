@@ -6,10 +6,11 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EMIIA.AI SDK/H12</title>
+    <title>ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</title>
 
 <!-- PWA -->
 <meta charset="UTF-8">
@@ -795,7 +796,7 @@ function setupSAIClickHandler() {
 
 async function toggleSAI(checked) { console.log('SAI toggle:', checked); saiSwitchState = checked; if (checked) { const data = await loadSAIData(); addSAIToMap(data); } else { removeSAIFromMap(); } }
 
-function handleReportClick(e) { if (e) { e.preventDefault(); e.stopPropagation(); } const targetUrl = "https://sos.emiia.ai/vv1.html"; const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
+function handleReportClick(e) { if (e) { e.preventDefault(); e.stopPropagation(); } const targetUrl = "https://sos.emiia.ai/vv8.html"; const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
 
 // ================== ОСТАЛЬНЫЕ ФУНКЦИИ ==================
 
@@ -1410,9 +1411,9 @@ function initializeMap() {
     map.on('load', () => { mapLoaded = true; updateCenterDisplay(map.getCenter()); document.getElementById('map-zoom').textContent = map.getZoom().toFixed(1); updateMarkedCount(); updateIcons(); });
 }
 
-function handleMrvNavigation() { const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const targetUrl = 'https://sos.emiia.ai/3d.html'; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
+function handleMrvNavigation() { const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const targetUrl = 'https://sos.emiia.ai/vv1.html'; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
 
-function handleIoTNavigation() { const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const targetUrl = 'https://sos.emiia.ai/mrv.html'; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
+function handleIoTNavigation() { const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; const targetUrl = 'https://sos.emiia.ai/vv8.html'; if (isPWA) window.location.href = targetUrl; else window.location.assign(targetUrl); }
 
 function setupEventListeners() {
     document.getElementById('toggle-switch').addEventListener('change', toggleGrid);
