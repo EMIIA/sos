@@ -7391,6 +7391,70 @@ textarea::placeholder {
 
 
 
+
+
+
+<style>
+/* СКРЫВАЕМ ПУЛЬСИРУЮЩИЕ ИКОНКИ ПРИ ЗАГРУЗКЕ */
+#layer-1,
+#layer-2,
+#layer-3,
+#layer-4,
+#layer-5,
+#layer-6 {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    transition: none !important;
+}
+
+/* ПОКАЗЫВАЕМ ИХ ТОЛЬКО КОГДА SVG СЛОИ АКТИВНЫ */
+.svg-layers-visible #layer-1,
+.svg-layers-visible #layer-2,
+.svg-layers-visible #layer-3,
+.svg-layers-visible #layer-4,
+.svg-layers-visible #layer-5,
+.svg-layers-visible #layer-6 {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+</style>
+
+<script>
+// Добавляем класс к body при активации SVG слоев
+(function() {
+    // Сохраняем оригинальную функцию toggleAllSVGLayers
+    const originalToggle = window.toggleAllSVGLayers;
+    
+    if (originalToggle) {
+        window.toggleAllSVGLayers = function() {
+            // Вызываем оригинальную функцию
+            originalToggle();
+            
+            // Добавляем или удаляем класс в зависимости от состояния
+            if (!window.svgLayersHidden) {
+                document.body.classList.add('svg-layers-visible');
+            } else {
+                document.body.classList.remove('svg-layers-visible');
+            }
+        };
+    }
+    
+    // Принудительно скрываем при загрузке
+    setTimeout(function() {
+        document.body.classList.remove('svg-layers-visible');
+    }, 100);
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
 
