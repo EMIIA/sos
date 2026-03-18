@@ -979,12 +979,15 @@ window.handleReportClick = handleReportClick;
 
 
 
-// ================== КАСТОМНЫЙ КОМПАС ==================
+// ================== КАСТОМНЫЙ КОМПАС С ГЕКСАГОНАЛЬНЫМ МАРКЕРОМ ==================
+
 let isLocationActive = false;
 let compassHideTimer;
 let userLocationMarker = null;
 let locationWatchId = null;
 let styledataTimeout = null;
+
+// ================== СОЗДАНИЕ ГЕКСАГОНАЛЬНОГО МАРКЕРА ==================
 
 function createPulseElement() {
     const SIZE = 60;
@@ -1037,7 +1040,7 @@ function createPulseElement() {
         
         ctx.clearRect(0, 0, SIZE, SIZE);
         
-        // Волна
+        // === ВОЛНА РАДАРА (сектор 170°) ===
         const sweepAngle = Math.PI * 2 * 1.7 * t;
         const opacity = 0.8 * Math.pow(1 - t, 2);
         
@@ -1048,14 +1051,16 @@ function createPulseElement() {
         ctx.fillStyle = 'rgba(61, 133, 198, ' + opacity + ')';
         ctx.fill();
         
-        // Гексагон
+        // === ПУЛЬСИРУЮЩИЙ ГЕКСАГОН ===
         const pulseScale = 1 + 0.15 * Math.abs(Math.sin(Math.PI * pulseT));
         const r = HEX_RADIUS * pulseScale;
         
+        // Обводка (белая)
         drawHexagon(cx, cy, r + BORDER_WIDTH);
         ctx.fillStyle = '#f8f9fa';
         ctx.fill();
         
+        // Основной гексагон (синий)
         drawHexagon(cx, cy, r);
         ctx.fillStyle = '#3d85c6';
         ctx.fill();
@@ -1082,6 +1087,8 @@ function createPulseElement() {
     return container;
 }
 
+// ================== КОМПАС ==================
+
 function createCustomCompass() {
     const oldCompass = document.getElementById('custom-compass');
     if (oldCompass) oldCompass.remove();
@@ -1098,7 +1105,6 @@ function createCustomCompass() {
         </svg>
     `;
     
-    // === КНОПКА КОМПАСА: z-index МЕНЬШЕ ЧЕМ У МЕНЮ (20000) ===
     compass.style.cssText = `
         position: absolute;
         top: 40%;
@@ -1112,7 +1118,7 @@ function createCustomCompass() {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 10;  /* Было 1000, стало 100 — меньше чем у меню (20000) */
+        z-index: 10;
         opacity: 0;
         visibility: hidden;
         transform: translateY(-50%);
@@ -1196,6 +1202,8 @@ function hideCompass() {
     }
 }
 
+// ================== ГЕОЛОКАЦИЯ ==================
+
 function locateUser() {
     if (!navigator.geolocation) {
         alert('Геолокация не поддерживается');
@@ -1219,39 +1227,20 @@ function locateUser() {
             const markerEl = createPulseElement();
 
             try {
-                // === МАРКЕР: pitchAlignment='viewport' чтобы был под 3D ===
                 userLocationMarker = new mapboxgl.Marker({
                     element: markerEl,
                     anchor: 'center',
-                    pitchAlignment: 'viewport',  // Привязываем к экрану, не к земле
-                    rotationAlignment: 'viewport' // Не вращается с картой
+                    pitchAlignment: 'viewport',
+                    rotationAlignment: 'viewport'
                 })
                 .setLngLat([longitude, latitude])
                 .addTo(map);
                 
-                // === ПРИНУДИТЕЛЬНО ПОМЕЩАЕМ ПОД 3D СЛОИ ===
-                // Находим первый 3D слой и вставляем маркер ПЕРЕД ним
-                const layers = map.getStyle().layers;
-                let first3DLayer = null;
-                for (let i = 0; i < layers.length; i++) {
-                    if (layers[i].type === 'fill-extrusion' || 
-                        layers[i].type === 'custom' ||
-                        layers[i].id.includes('3d') ||
-                        layers[i].id.includes('building')) {
-                        first3DLayer = layers[i].id;
-                        break;
-                    }
-                }
-                
-                // Если нашли 3D слой — перемещаем маркер под него
-                if (first3DLayer && userLocationMarker.getElement()) {
-                    const markerContainer = userLocationMarker.getElement().closest('.mapboxgl-marker');
-                    if (markerContainer) {
-                        // z-index ниже чем у 3D слоёв
-                        markerContainer.style.zIndex = '1';
-                        // Прозрачность чтобы был "внутри"
-                        markerContainer.style.opacity = '0.9';
-                    }
+                // Ставим z-index низкий для позиции под 3D
+                const markerContainer = userLocationMarker.getElement().closest('.mapboxgl-marker');
+                if (markerContainer) {
+                    markerContainer.style.zIndex = '1';
+                    markerContainer.style.opacity = '0.9';
                 }
                 
             } catch (e) {
@@ -1286,9 +1275,12 @@ function locateUser() {
     );
 }
 
+// ================== СОБЫТИЯ ==================
+
 function setupCompassEvents() {
     if (!map) return;
     
+    createCustomCompass();
     showCompass();
     
     compassHideTimer = setTimeout(() => {
@@ -1319,13 +1311,12 @@ function setupCompassEvents() {
             userLocationMarker = new mapboxgl.Marker({ 
                 element: newEl, 
                 anchor: 'center',
-                pitchAlignment: 'viewport',  // Под 3D
+                pitchAlignment: 'viewport',
                 rotationAlignment: 'viewport'
             })
             .setLngLat(pos)
             .addTo(map);
             
-            // Снова ставим z-index низкий
             const markerContainer = newEl.closest('.mapboxgl-marker');
             if (markerContainer) {
                 markerContainer.style.zIndex = '1';
@@ -1360,6 +1351,13 @@ function setupCompassEvents() {
             compassHideTimer = setTimeout(hideCompass, 7000);
         }
     });
+}
+
+// Инициализация при загрузке карты
+if (map && map.loaded()) {
+    setupCompassEvents();
+} else if (map) {
+    map.on('load', setupCompassEvents);
 }
 
 
