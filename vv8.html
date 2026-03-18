@@ -30,6 +30,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -63,13 +64,6 @@
 <meta property="og:image" content="https://sos.emiia.ai/vvjpg.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 
-
-
-
-
-
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 
 
@@ -282,7 +276,6 @@ body { margin: 0; padding: 0; }
 
 
 
-
 #button778 {
     width: 41px;
     height: 43px;
@@ -300,6 +293,7 @@ body { margin: 0; padding: 0; }
     
    border-bottom:0px 0px 1px 2px rgba(0, 0, 0, 0.1) !important;
    box-shadow: 0 0 10px 0.1px rgba(0, 0, 0, 0.1) !important;
+
    
 
 .filter-blue {
@@ -558,7 +552,7 @@ font-size: 18px; /* Увеличьте значение по необходим�
 .mapboxgl-popup-content {
   text-align: left;
   font-family: 'Montserrat', montserrat !important; 
-  border-radius: 20px;
+  border-radius: 30px;
   background-color: var(--popup-bg-color);
   color: var(--popup-text-color);
   padding: 15px;
@@ -688,15 +682,15 @@ font-size: 18px; /* Увеличьте значение по необходим�
 .mapboxgl-popup {
     max-width: 250px !important;
     min-width: 250px !important;
-    border-radius: 15px;
+    border-radius: 30px;
     font-family: 'Montserrat', sans-serif !important;
     z-index: 10000 !important;
 }
 
 .mapboxgl-popup-content {
-    border-radius: 15px;
+    border-radius: 30px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    padding: 15px;
+    padding: 30px;
     max-width: 250px !important;
     min-width: 250px !important;
     font-family: 'Montserrat', sans-serif !important;
@@ -999,8 +993,14 @@ function resetNotifications() {
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             padding: 8px 0;
             z-index: 10000;
-            max-width: 280px;
+
             max-height: 70vh;
+
+    max-width: 90vw;
+    min-width: 300px;
+
+border-radius: 38px;
+
             overflow-y: auto;
             opacity: 0;
             transform: translateY(10px) scale(0.95);
@@ -6924,7 +6924,7 @@ textarea::placeholder {
         
         var btn = document.querySelector('[data-action="messages"]');
         if (!btn) {
-            setTimeout(init, 300);
+            setTimeout(init, 0);
             return;
         }
         
