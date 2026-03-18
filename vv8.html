@@ -2058,7 +2058,6 @@ max-width: 350px
 
 
 
-
 <style>
 /* ПОЛНЫЕ СТИЛИ - ВАШИ НАСТРОЙКИ + ЖИРНАЯ СТРЕЛКА + ИСПРАВЛЕННОЕ МЕНЮ */
 @media (max-width: 768px) {
@@ -2096,7 +2095,7 @@ max-width: 350px
         display: block !important;
     }
     
-    /* Текст - независимое позиционирование */
+    /* Текст - независимое позиционирование + УБРАНА ПОДСВЕТКА */
     .emiia-button {
         font-size: 16px !important;
         font-weight: 600 !important;
@@ -2107,6 +2106,10 @@ max-width: 350px
         padding: 0 !important;
         margin: 0 !important;
         
+        /* Убираем подсветку при клике */
+        outline: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        
         /* АБСОЛЮТНОЕ ПОЗИЦИОНИРОВАНИЕ */
         position: absolute !important;
         left: 50% !important;
@@ -2116,11 +2119,15 @@ max-width: 350px
         margin-left: 0px !important;
     }
     
-    /* Стрелка - ТОЛЬКО ДЛЯ ГЛАВНОЙ КНОПКИ */
+    /* Стрелка - ТОЛЬКО ДЛЯ ГЛАВНОЙ КНОПКИ + УБРАНА ПОДСВЕТКА */
     .emiia-button-wrapper .arrow-icon {
         width: 22px !important;
         height: 22px !important;
         padding: 0 !important;
+        
+        /* Убираем подсветку при клике */
+        outline: none !important;
+        -webkit-tap-highlight-color: transparent !important;
         
         /* АБСОЛЮТНОЕ ПОЗИЦИОНИРОВАНИЕ ТОЛЬКО ДЛЯ ГЛАВНОЙ КНОПКИ */
         position: absolute !important;
@@ -2139,10 +2146,29 @@ max-width: 350px
     /* ===== ТОЛЬКО ШИРИНА МЕНЮ НА МОБИЛЬНЫХ ===== */
     .emiia-menu,
     #dotsMenu {
-        width: 305px !important; /* Такая же ширина, как у кнопки */
+        width: 305px !important;
         min-width: 305px !important;
         max-width: 305px !important;
-        left: 23px !important; /* Выравнивание по левому краю */
+        left: 23px !important;
+    }
+    
+    /* РЕГУЛИРОВКА ОТСТУПОВ ДЛЯ МЕНЮ ПРИ КЛИКЕ НА СТРЕЛКУ/ТЕКСТ */
+    .emiia-menu {
+        /* РЕГУЛИРОВКА ПО ГОРИЗОНТАЛИ */
+        margin-left: -35px !important;  /* Положительное - вправо, отрицательное - влево */
+        
+       /* РЕГУЛИРОВКА ПО ВЕРТИКАЛИ (отступ от кнопки) */
+        bottom: calc(100% + -10px) !important; /* Уменьшите значение, чтобы меню было ниже */
+        /* Варианты:
+           bottom: calc(100% + 5px) !important;  - немного отступа
+           bottom: calc(100% + 0px) !important;   - без отступа
+           bottom: calc(100% - 5px) !important;   - меню будет ближе к кнопке
+        */
+    }
+    
+    /* МЕНЮ ТОЧЕК (ОСТАВЛЯЕМ КАК ЕСТЬ) */
+    #dotsMenu {
+        /* Не трогаем */
     }
 }
 
@@ -2197,6 +2223,35 @@ max-width: 350px
 #dotsMenu .arrow-icon path {
     stroke-width: 1px !important;
 }
+
+
+
+
+
+
+/* УМЕНЬШАЕМ ИКОНКУ ОБЛАКА В МЕНЮ И ДОБАВЛЯЕМ ОТСТУП */
+#dotsMenu .menu-item-with-icon[data-action="navi"] svg {
+    width: 16px !important;
+    height: 14px !important;
+    margin-right: 6px !important; /* Добавляет отступ справа от иконки */
+}
+
+/* Для всех иконок в меню, чтобы были одинаковые отступы */
+#dotsMenu .menu-item-with-icon svg {
+    flex-shrink: 0 !important;
+}
+
+/* На всякий случай для подменю тоже */
+#dotsMenu .submenu-item svg {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 4px !important;
+}
+
+
+
+
+
 </style>
 
 
