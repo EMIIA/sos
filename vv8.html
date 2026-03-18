@@ -2065,7 +2065,7 @@ max-width: 350px
     /* Контейнер - позиция на экране */
     .emiia-button-container {
         left: 25px !important;
-        bottom: 17px !important;
+        bottom: 15px !important;
         width: auto !important;
     }
     
@@ -2135,16 +2135,41 @@ max-width: 350px
         stroke-width: 2px !important;
         stroke: #3d85c6 !important;
     }
+    
+    /* ===== ТОЛЬКО ШИРИНА МЕНЮ НА МОБИЛЬНЫХ ===== */
+    .emiia-menu,
+    #dotsMenu {
+        width: 305px !important; /* Такая же ширина, как у кнопки */
+        min-width: 305px !important;
+        max-width: 305px !important;
+        left: 23px !important; /* Выравнивание по левому краю */
+    }
 }
 
 /* ИСПРАВЛЕНИЕ МЕНЮ (ВНЕ МЕДИА-ЗАПРОСА, ЧТОБЫ РАБОТАЛО НА ВСЕХ ЭКРАНАХ) */
 #dotsMenu {
-    max-width: 90vw !important;
     overflow-x: hidden !important;
     word-wrap: break-word !important;
 }
 
-#dotsMenu .menu-item-with-icon,
+#dotsMenu .menu-item-with-icon {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+#dotsMenu .menu-item-with-icon span {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    flex: 1 !important;
+}
+
 #dotsMenu .submenu-item {
     white-space: normal !important;
     word-wrap: break-word !important;
@@ -2153,24 +2178,19 @@ max-width: 350px
     box-sizing: border-box !important;
 }
 
-#dotsMenu .menu-item-with-icon span {
-    white-space: normal !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
-}
-
 #dotsMenu .submenu {
     max-width: 100% !important;
     overflow-x: hidden !important;
 }
 
-/* СТИЛИ ДЛЯ СТРЕЛОК В МЕНЮ - ВОССТАНАВЛИВАЕМ ВИДИМОСТЬ */
+/* СТИЛИ ДЛЯ СТРЕЛОК В МЕНЮ */
 #dotsMenu .arrow-icon {
-    position: static !important; /* Убираем absolute позиционирование */
+    position: relative !important;
     right: auto !important;
     width: 16px !important;
     height: 16px !important;
-    margin-left: 8px !important;
+    margin-left: 16px !important;
+    flex-shrink: 0 !important;
     stroke-width: 1px !important;
 }
 
@@ -2178,8 +2198,6 @@ max-width: 350px
     stroke-width: 1px !important;
 }
 </style>
-
-
 
 
 
