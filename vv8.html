@@ -1699,9 +1699,9 @@ function handleAction(action, url = null, target = '_self') {
         align-items: center;
         background: rgba(255, 255, 255, 0.98);
         
-        border-radius: 24px;
-        padding: 14px 24px;
-        gap: 18px;
+        border-radius: 28px;
+        padding: 24px 24px;
+        gap: 28px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         border: none;
         transition: all 0.3s ease;
@@ -1741,7 +1741,7 @@ function handleAction(action, url = null, target = '_self') {
 
     /* SVG логотип — УВЕЛИЧЕН */
     .dots-button svg {
-        height: 2.6em;
+        height: 3.6em;
         width: auto;
         vertical-align: middle;
         
@@ -1767,8 +1767,8 @@ function handleAction(action, url = null, target = '_self') {
 
     /* === СТРЕЛКА — УВЕЛИЧЕНА === */
     .arrow-icon {
-        width: 24px;
-        height: 24px;
+        width: 34px;
+        height: 34px;
         fill: #3d85c6;
         stroke: #3d85c6;
         stroke-width: 1.5;
@@ -1789,7 +1789,7 @@ function handleAction(action, url = null, target = '_self') {
         background: transparent;
         
         border-radius: 20px;
-        min-width: 320px;
+        min-width: 380px;
         padding: 20px;
         opacity: 0;
         visibility: hidden;
@@ -1814,8 +1814,8 @@ function handleAction(action, url = null, target = '_self') {
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-radius: 24px;
-        max-width: 300px;
-        min-width: 300px;
+        max-width: 350px;
+        min-width: 350px;
         padding: 12px 0;
         opacity: 0;
         visibility: hidden;
@@ -1892,7 +1892,7 @@ function handleAction(action, url = null, target = '_self') {
     .datasets-icon, 
     .terms-icon, 
     .privacy-icon {
-        width: 20px;
+        width: 29px;
         height: 20px;
         flex-shrink: 0;
         color: #3d85c6;
@@ -1947,6 +1947,7 @@ function handleAction(action, url = null, target = '_self') {
         .emiia-button-container {
             bottom: 20px;
             left: 16px;
+max-width: 350px
         }
         
         .emiia-button-wrapper {
@@ -2047,6 +2048,51 @@ function handleAction(action, url = null, target = '_self') {
     }
 </style>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+/* ПЕРЕОПРЕДЕЛЕНИЕ СТИЛЕЙ ДЛЯ МОБИЛЬНОЙ ВЕРСИИ - УВЕЛИЧЕНИЕ КНОПКИ */
+@media (max-width: 768px) {
+    /* Увеличиваем всю обертку */
+    .emiia-button-wrapper {
+        padding: 8px 16px !important;
+        gap: 22px !important;
+        border-radius: 36px !important;
+    }
+    
+    /* Увеличиваем текст кнопки */
+    .emiia-button {
+        font-size: 18px !important;
+        gap: 16px !important;
+        letter-spacing: 1px !important;
+    }
+    
+    /* Увеличиваем логотип-точки */
+    .dots-button svg {
+        height: 2.2em !important;
+        width: auto !important;
+    }
+    
+    /* Увеличиваем стрелку */
+    .arrow-icon {
+        width: 28px !important;
+        height: 28px !important;
+gap: 22px !important;
+    }
+}
+</style>
 
 
 
