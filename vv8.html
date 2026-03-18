@@ -2252,6 +2252,15 @@ max-width: 350px
 
 
 
+
+
+
+
+
+
+
+
+
 </style>
 
 
@@ -7217,7 +7226,7 @@ textarea::placeholder {
         // Обновляем визуал кнопки
         var btn = document.querySelector('[data-action="messages"]');
         if (btn) {
-            btn.style.background = window.svgLayersHidden ? '' : 'rgba(144, 238, 144, 0.3)';
+            btn.style.background = window.svgLayersHidden ? '' : 'rgba(61, 133, 198, 0.12)';
         }
         
         console.log('SVG:', window.svgLayersHidden ? 'СКРЫТЫ' : 'ПОКАЗАНЫ');
@@ -7287,7 +7296,21 @@ textarea::placeholder {
 </script>
 
 <style>
+/* Стили для кнопки Сообщения при hover и active */
 .menu-item-with-icon[data-action="messages"]:hover { background: #cccccc69; }
+
+.menu-item-with-icon[data-action="messages"].active {
+    background: rgba(61, 133, 198, 0.12) !important;
+    color: #3d85c6 !important;
+}
+
+.menu-item-with-icon[data-action="messages"].active svg,
+.menu-item-with-icon[data-action="messages"].active svg path {
+    fill: #3d85c6 !important;
+    stroke: #3d85c6 !important;
+}
+
+
 </style>
 
 
