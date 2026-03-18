@@ -2060,12 +2060,12 @@ max-width: 350px
 
 
 <style>
-/* ПРОСТОЕ РЕШЕНИЕ - ВСТАВИТЬ В КОНЕЦ ФАЙЛА */
+/* ПОЛНЫЕ СТИЛИ - ВАШИ НАСТРОЙКИ + ЖИРНАЯ СТРЕЛКА + ИСПРАВЛЕННОЕ МЕНЮ */
 @media (max-width: 768px) {
     /* Контейнер - позиция на экране */
     .emiia-button-container {
         left: 25px !important;
-        bottom: 15px !important;
+        bottom: 17px !important;
         width: auto !important;
     }
     
@@ -2079,7 +2079,7 @@ max-width: 350px
         border-radius: 36px !important;
         box-sizing: border-box !important;
         position: relative !important;
-        justify-content: flex-start !important; /* Элементы прижаты к левому краю */
+        justify-content: flex-start !important;
     }
     
     /* Логотип слева */
@@ -2098,8 +2098,8 @@ max-width: 350px
     
     /* Текст - независимое позиционирование */
     .emiia-button {
-        font-size: 16px !important; /* РЕГУЛИРОВКА РАЗМЕРА */
-        font-weight: 600 !important; /* РЕГУЛИРОВКА ЖИРНОСТИ */
+        font-size: 16px !important;
+        font-weight: 600 !important;
         letter-spacing: 1px !important;
         white-space: nowrap !important;
         background: transparent !important;
@@ -2109,31 +2109,73 @@ max-width: 350px
         
         /* АБСОЛЮТНОЕ ПОЗИЦИОНИРОВАНИЕ */
         position: absolute !important;
-        left: 50% !important; /* Относительно блока */
-        transform: translateX(-50%) !important; /* Центрирование */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
         
-        /* РУЧНАЯ РЕГУЛИРОВКА - двигает текст относительно центра */
-        margin-left: 0px !important; /* Положительное - вправо, отрицательное - влево */
-        /* Примеры:
-           margin-left: 15px; - сдвинет вправо на 15px
-           margin-left: -10px; - сдвинет влево на 10px
-        */
+        /* РУЧНАЯ РЕГУЛИРОВКА ТЕКСТА */
+        margin-left: 0px !important;
     }
     
-    /* Стрелка - независимое позиционирование */
-    .arrow-icon {
+    /* Стрелка - ТОЛЬКО ДЛЯ ГЛАВНОЙ КНОПКИ */
+    .emiia-button-wrapper .arrow-icon {
         width: 22px !important;
         height: 22px !important;
         padding: 0 !important;
         
-        /* АБСОЛЮТНОЕ ПОЗИЦИОНИРОВАНИЕ */
+        /* АБСОЛЮТНОЕ ПОЗИЦИОНИРОВАНИЕ ТОЛЬКО ДЛЯ ГЛАВНОЙ КНОПКИ */
         position: absolute !important;
-        right: -75px !important; /* Расстояние от правого края блока */
+        right: -78px !important;
         
-        /* РУЧНАЯ РЕГУЛИРОВКА СТРЕЛКИ */
-        /* right: 25px; - отодвинет стрелку левее от правого края */
-        /* right: 15px; - придвинет стрелку ближе к правому краю */
+        /* ЖИРНАЯ СТРЕЛКА */
+        stroke-width: 2px !important;
+        stroke: #3d85c6 !important;
     }
+    
+    .emiia-button-wrapper .arrow-icon path {
+        stroke-width: 2px !important;
+        stroke: #3d85c6 !important;
+    }
+}
+
+/* ИСПРАВЛЕНИЕ МЕНЮ (ВНЕ МЕДИА-ЗАПРОСА, ЧТОБЫ РАБОТАЛО НА ВСЕХ ЭКРАНАХ) */
+#dotsMenu {
+    max-width: 90vw !important;
+    overflow-x: hidden !important;
+    word-wrap: break-word !important;
+}
+
+#dotsMenu .menu-item-with-icon,
+#dotsMenu .submenu-item {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#dotsMenu .menu-item-with-icon span {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+#dotsMenu .submenu {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* СТИЛИ ДЛЯ СТРЕЛОК В МЕНЮ - ВОССТАНАВЛИВАЕМ ВИДИМОСТЬ */
+#dotsMenu .arrow-icon {
+    position: static !important; /* Убираем absolute позиционирование */
+    right: auto !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-left: 8px !important;
+    stroke-width: 1px !important;
+}
+
+#dotsMenu .arrow-icon path {
+    stroke-width: 1px !important;
 }
 </style>
 
