@@ -31,6 +31,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1659,11 +1660,25 @@ function handleAction(action, url = null, target = '_self') {
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 <style>
-    /* Добавляем шрифт Montserrat */
+    /* === ШРИФТЫ === */
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
 
+    /* === КОНТЕЙНЕР КНОПКИ === */
     .emiia-button-container {
         position: fixed;
         bottom: 70px;
@@ -1671,89 +1686,116 @@ function handleAction(action, url = null, target = '_self') {
         z-index: 1000;
     }
 
+
+
+
+
+
+
+
+ /* === ОСНОВНАЯ ОБЁРТКА КНОПКИ — УВЕЛИЧЕНАЯ === */
     .emiia-button-wrapper {
         display: flex;
         align-items: center;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 18px;
-        padding: 5.5px 12px;
-        gap: 11px;
-        box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(204, 204, 204, 0.1);
+        background: rgba(255, 255, 255, 0.98);
+        
+        border-radius: 24px;
+        padding: 14px 24px;
+        gap: 18px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        border: none;
         transition: all 0.3s ease;
         font-family: 'Orbitron', sans-serif;
     }
 
+   
+
     .emiia-button-wrapper:hover {
-        background: rgba(204, 204, 204, 0.3);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 1);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         transform: translateY(-2px);
+       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
 
     .emiia-button-wrapper:active {
         transform: translateY(0);
     }
 
+    /* === КНОПКА С ЛОГОТИПОМ (ТОЧКИ) === */
     .dots-button {
         background: transparent;
         border: none;
         cursor: pointer;
-        padding: 0;
+        padding: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: #3d85c6;
+        transition: all 0.2s ease;
     }
 
-    .dots-icon {
-        width: 16px;
-        height: 16px;
-        fill: white;
+    .dots-button:hover {
+        transform: scale(1.1);
     }
 
+    /* SVG логотип — УВЕЛИЧЕН */
+    .dots-button svg {
+        height: 2.6em;
+        width: auto;
+        vertical-align: middle;
+        
+    }
+
+    /* === ОСНОВНАЯ КНОПКА EMIIA.AI SIP === */
     .emiia-button {
         background: transparent;
         border: none;
         color: #383838;
         cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 20px;
+        font-weight: 700;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 14px;
         transition: all 0.3s ease;
         font-family: 'Orbitron', sans-serif;
-        padding: 0;
+        padding: 4px 8px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
     }
 
+    /* === СТРЕЛКА — УВЕЛИЧЕНА === */
     .arrow-icon {
-        width: 18px;
-        height: 18px;
-        fill: white;
-        stroke: white;
+        width: 24px;
+        height: 24px;
+        fill: #3d85c6;
+        stroke: #3d85c6;
         stroke-width: 1.5;
         transition: transform 0.3s ease;
+        
     }
 
     .emiia-button.active .arrow-icon {
         transform: rotate(180deg);
     }
 
+    /* === МЕНЮ EMIIA.AI SIP === */
     .emiia-menu {
         position: absolute;
         bottom: 100%;
         left: 0;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         background: transparent;
-        border-radius: 12px;
-        min-width: 250px;
+        
+        border-radius: 20px;
+        min-width: 320px;
+        padding: 20px;
         opacity: 0;
         visibility: hidden;
         transform: translateY(10px);
         transition: all 0.3s ease;
+       
     }
 
     .emiia-menu.active {
@@ -1762,30 +1804,30 @@ function handleAction(action, url = null, target = '_self') {
         transform: translateY(0);
     }
 
+    /* === МЕНЮ ТОЧЕК (DOTS MENU) — УВЕЛИЧЕНО === */
     .dots-menu {
         position: absolute;
         bottom: 100%;
         left: 0;
-        margin-bottom: 10px;
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 18px;
-        max-width: 235px;
-         min-width: 235px;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 24px;
+        max-width: 300px;
+        min-width: 300px;
+        padding: 12px 0;
         opacity: 0;
         visibility: hidden;
         transform: translateY(10px);
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         z-index: 1001;
-        padding: 8px 0;
         color: #383838;
-        /* Применяем Montserrat для меню точек */
         font-family: 'Montserrat', sans-serif;
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 500;
-        line-height: 1.4;
+        line-height: 1.5;
     }
 
     .dots-menu.active {
@@ -1794,145 +1836,224 @@ function handleAction(action, url = null, target = '_self') {
         transform: translateY(0);
     }
 
+    /* === ПУНКТЫ МЕНЮ — УВЕЛИЧЕНЫ === */
     .menu-item {
-        padding: 8px 16px;
+        padding: 12px 20px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: all 0.2s ease;
         border-bottom: none;
-        /* Применяем Montserrat для всех пунктов меню */
         font-family: 'Montserrat', sans-serif;
+        font-size: 15px;
     }
 
     .menu-item:hover {
-        background-color: rgba(245, 245, 245, 0.8);
-        color: #383838;
+        background-color: rgba(61, 133, 198, 0.08);
+        color: #3d85c6;
     }
 
-    .refresh-item, .settings-item, .install-item, .navigation-item, .datasets-item, .terms-item, .privacy-item {
+    /* === СПЕЦИАЛЬНЫЕ ПУНКТЫ МЕНЮ === */
+    .refresh-item, 
+    .settings-item, 
+    .install-item, 
+    .navigation-item, 
+    .datasets-item, 
+    .terms-item, 
+    .privacy-item {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 16px;
+        gap: 14px;
+        padding: 14px 20px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: all 0.2s ease;
         border-bottom: none;
         font-weight: 500;
-        /* Применяем Montserrat для всех пунктов меню точек */
         font-family: 'Montserrat', sans-serif;
+        font-size: 15px;
+        border-radius: 12px;
+        margin: 0 8px;
     }
 
-    .refresh-item:hover, .settings-item:hover, .install-item:hover, .navigation-item:hover, .datasets-item:hover, .terms-item:hover, .privacy-item:hover {
-        background-color: rgba(245, 245, 245, 0.8);
+    .refresh-item:hover, 
+    .settings-item:hover, 
+    .install-item:hover, 
+    .navigation-item:hover, 
+    .datasets-item:hover, 
+    .terms-item:hover, 
+    .privacy-item:hover {
+        background-color: rgba(61, 133, 198, 0.08);
+        color: #3d85c6;
     }
 
-    .refresh-icon, .settings-icon, .install-icon, .navigation-icon, .datasets-icon, .terms-icon, .privacy-icon {
-        width: 16px;
-        height: 16px;
+    /* === ИКОНКИ В МЕНЮ — УВЕЛИЧЕНЫ === */
+    .refresh-icon, 
+    .settings-icon, 
+    .install-icon, 
+    .navigation-icon, 
+    .datasets-icon, 
+    .terms-icon, 
+    .privacy-icon {
+        width: 20px;
+        height: 20px;
         flex-shrink: 0;
+        color: #3d85c6;
     }
 
+    /* === РАЗДЕЛИТЕЛИ — УЛУЧШЕНЫ === */
     .menu-divider {
         height: 1px;
-        background-color: #e0e0e0;
-        margin: 4px 0;
+        background: linear-gradient(90deg, transparent, rgba(61, 133, 198, 0.2), transparent);
+        margin: 8px 20px;
     }
 
+    /* === КОНТЕНТ МЕНЮ === */
     .menu-content {
-        padding: 0px 0px;
+        padding: 0;
     }
 
-    /* Адаптивность для мобильных устройств */
-    @media (max-width: 768px) {
-        .emiia-button-container {
-            bottom: 24px;
-            left: 18px;
-        }
-        
-        .emiia-button-wrapper {
-            padding: 6.5px 12px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        
-        .emiia-button {
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .emiia-menu {
-            min-width: 270px;
-        }
-
-        .dots-menu {
-            min-width: 235px;
-            font-weight: 500;
-            /* Сохраняем Montserrat на мобильных */
-            font-family: 'Montserrat', sans-serif;
-        }
-    }
-
+    /* === ИНФОРМАЦИОННЫЙ БЛОК === */
     #info {
         background: transparent;
-        padding: 0px;
-        margin: 0px;
+        padding: 0;
+        margin: 0;
         position: relative;
         top: -7px;
         color: #3d85c6;
-        /* Применяем Montserrat для информационного текста */
         font-family: 'Montserrat', sans-serif;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 500;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-y: auto;
+        line-height: 1.6;
     }
 
+    /* === Z-INDEX УПРАВЛЕНИЕ === */
+    #dotsMenu {
+        z-index: 10000 !important;
+        position: fixed;
+    }
 
- .menu-content {
-            padding: 0px 7px;
-        }
+    #dotsButton {
+        z-index: 10001 !important;
+        position: relative;
+    }
 
+    #dotsOverlay {
+        z-index: 9998 !important;
+    }
 
+    /* === МОБИЛЬНАЯ АДАПТАЦИЯ === */
     @media (max-width: 768px) {
+        .emiia-button-container {
+            bottom: 20px;
+            left: 16px;
+        }
+        
+        .emiia-button-wrapper {
+            padding: 12px 18px;
+            gap: 14px;
+            border-radius: 20px;
+        }
+        
+        .emiia-button {
+            font-size: 16px;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .dots-button svg {
+            height: 2.2em;
+        }
+        
+        .arrow-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
         .emiia-menu {
             min-width: 280px;
+            padding: 16px;
+        }
+
+        .dots-menu {
+            min-width: 260px;
+            max-width: 260px;
+            font-size: 14px;
+        }
+        
+        .menu-item,
+        .refresh-item, 
+        .settings-item, 
+        .install-item, 
+        .navigation-item, 
+        .datasets-item, 
+        .terms-item, 
+        .privacy-item {
+            padding: 12px 16px;
+            font-size: 14px;
         }
         
         .menu-content {
-            padding: 0px 7px;
+            padding: 0;
         }
+        
+        #info {
+            font-size: 12px;
+        }
+    }
 
+    /* === ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ === */
+    
+    /* Подсветка активного элемента */
+    .menu-item-with-icon.active,
+    .refresh-item.active,
+    .settings-item.active {
+        background: rgba(61, 133, 198, 0.12);
+        color: #3d85c6;
+    }
 
+    /* Анимация появления пунктов меню */
+    @keyframes menuItemFadeIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
 
+    .menu-item-with-icon {
+        animation: menuItemFadeIn 0.3s ease forwards;
+    }
 
+    /* Скроллбар для меню */
+    .dots-menu::-webkit-scrollbar {
+        width: 6px;
+    }
 
-#dotsMenu {
-    z-index: 10000 !important;
-    position: fixed;
-    /* Добавь свои стили позиционирования */
-}
+    .dots-menu::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-#dotsButton {
-    z-index: 10001 !important;
-    position: relative;
-}
+    .dots-menu::-webkit-scrollbar-thumb {
+        background: rgba(61, 133, 198, 0.3);
+        border-radius: 3px;
+    }
 
-#dotsOverlay {
-    z-index: 9998 !important;
-}
-
-
-
-
-
-
-
-
-
-
-
+    .dots-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(61, 133, 198, 0.5);
     }
 </style>
+
+
+
+
+
+
+
+
 
 
 
