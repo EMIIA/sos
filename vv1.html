@@ -71,11 +71,15 @@ body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI',
 #controls { position: absolute; bottom: 70px; left: 25px; z-index: 1000; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 38px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); max-width: 280px; min-width: 280px; max-height: 80vh; backdrop-filter: blur(10px); transition: all 0.3s ease; overflow: hidden; transform-origin: bottom left; padding-bottom: 0 !important; }
 @media (max-width: 768px) { #controls { position: fixed; bottom: 17px !important; left: 29px !important; padding-bottom: 20px; box-sizing: border-box; margin-bottom: 0 !important; overflow-y: auto; } }
 .custom-option { padding: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
 .header-text, .control-item-label { white-space: nowrap; }
 #controls { max-width: 90vw; min-width: 300px; width: max-content; }
 #controls div, #controls span { white-space: nowrap; }
 #controls.collapsed { padding-bottom: 10px; height: auto; }
+
+
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; cursor: pointer; }
+
 #controls:not(.collapsed):after { content: ""; position: absolute; top: 55px; left: 0; right: 0; height: 30px; background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 100%); pointer-events: none; z-index: 15; }
 #controls:not(.collapsed):before { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 100%); pointer-events: none; z-index: 15; border-radius: 0 0 38px 38px; }
 #controls.collapsed:after { display: none; }
@@ -88,7 +92,29 @@ body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI',
 
 
 
-.menu-content { transition: all 0.3s ease; overflow: hidden; max-height: 60vh; margin-right: -20px; padding-right: 20px; }
+
+
+.menu-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+    max-height: 60vh;           /* ← Увеличьте максимальную высоту */
+    margin-right: -20px;
+    padding-right: 20px;
+    /* Добавьте минимальную высоту */
+    min-height: -20px;          /* ← Если нужно фиксированная высота */
+
+}
+
+
+#controls.collapsed .header {
+    margin-bottom: 10px;
+    min-height: 40px;           /* высота только шапки */
+    align-items: center;        /* гарантируем центрирование */
+}
+
+#controls.collapsed .header-left {
+    align-items: center;        /* принудительное центрирование */
+}
 
 
 
