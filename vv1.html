@@ -85,12 +85,19 @@ body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI',
 .header-left { display: flex; align-items: center; gap: 43px; flex-grow: 1; }
 .toggle-icon { width: 20px; height: 20px; fill: #3d85c6; transition: transform 0.3s ease; flex-shrink: 0; transform: rotate(0deg); }
 .toggle-icon.collapsed { transform: rotate(180deg); }
+
+
+
 .menu-content { transition: all 0.3s ease; overflow: hidden; max-height: 60vh; margin-right: -20px; padding-right: 20px; }
+
+
+
 .menu-content.collapsed { max-height: 0; opacity: 0; margin: 0; padding: 0; }
 .menu-content::-webkit-scrollbar { width: 0px; background: transparent; }
 .menu-content::-webkit-scrollbar-track { background: transparent; }
 .menu-content::-webkit-scrollbar-thumb { background: transparent; }
 .menu-content { scrollbar-width: none; }
+
 .control-group { margin-bottom: 15px; position: relative; }
 .control-group label { display: block; font-size: 14px; color: #383838; margin-bottom: 5px; font-weight: 500; font-family: 'Montserrat', sans-serif; }
 .custom-select-wrapper { position: relative; width: 100%; }
@@ -167,7 +174,10 @@ a.mapboxgl-ctrl-logo{ width: 0; height: 0; margin: 0 0 -4px-4px; display: block;
   font-size: 16px !important;
         font-weight: 500 !important;
 
+
+
 font-family: 'Orbitron' !important;
+  padding-left: 10px; /* или нужное вам значение */
 }
 
 </style>
@@ -229,6 +239,10 @@ font-family: 'Orbitron' !important;
  /* === ШРИФТЫ === */
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+
+
+
 
 </style>
 
@@ -872,7 +886,13 @@ function toggleMenu() {
     menuContent.classList.toggle('collapsed');
     toggleIcon.classList.toggle('collapsed');
     if (menuContent.classList.contains('collapsed')) { menuContent.style.maxHeight = '0'; menuContent.style.overflow = 'hidden'; }
-    else { menuContent.style.maxHeight = '60vh'; menuContent.style.overflowY = 'scroll'; }
+
+
+
+else { menuContent.style.maxHeight = '60vh'; menuContent.style.overflowY = 'scroll'; }
+
+
+
 }
 
 function initCustomSelect() {
