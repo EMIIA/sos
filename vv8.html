@@ -5726,201 +5726,6 @@ map.addLayer({
 
 
 
-// Добавить источник GeoJSON с указанием модели зеленая модель
-map.addSource('model1', {
-    'type': 'geojson',
-    'data': {
-        'type': 'Feature',
-        'properties': {
-            'model-uri': 'https://sos.emiia.ai/VDNH_MINUS_GLB_TEST.glb'
-        },
-        'geometry': {
-            'coordinates': [37.63113790199057,
-          55.834227583210094],
-            'type': 'Point'
-        }
-    }
-});
-
-
-// Добавить слой модели с плавным появлением
-map.addLayer({
-    'id': 'tower1',
-    'type': 'model',
-    'slot': 'middle',
-    'source': 'model1',
-    'minzoom': 18.3,
-    'maxzoom': 24,
-    'layout': {
-        'model-id': ['get', 'model-uri']
-    },
-    'paint': {
-        'model-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-
-
-            18.3, 0,    // Полная прозрачность (0%) на зуме 17
-            18.5, 0.5, // Средняя прозрачность (50%) на зуме 17.75
-            18.6, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 0.8  // 90% прозрачности (90%) на зуме 18.5
-
-
-        ],
-
-
-        'model-rotation': [0.0, 0.0, -761.5],
-        'model-scale': [999.5, 1090.0, 1000],
-        'model-color-mix-intensity': 0,
-        'model-cast-shadows': true,
-        'model-translation': [0, 0, 0.3],
-        'model-emissive-strength': 0.99
-    }
-});
-
-
-
-
-
-
-
-
-
-
-// Добавить источник GeoJSON с указанием модели ЗНАКИ ПОЖАРНЫЕ
-map.addSource('model7', {
-    'type': 'geojson',
-    'data': {
-        'type': 'Feature',
-        'properties': {
-            'model-uri': 'https://sos.emiia.ai/VDNH_BASE_GLB.glb'
-        },
-        'geometry': {
-            'coordinates': [37.63113790199057,
-          55.834227583210094],
-            'type': 'Point'
-        }
-    }
-});
-
-
-// Добавить слой модели с плавным появлением
-map.addLayer({
-    'id': 'tower7',
-    'type': 'model',
-    'slot': 'middle',
-    'source': 'model7',
-    'minzoom': 18.3,
-    'maxzoom': 24,
-    'layout': {
-        'model-id': ['get', 'model-uri']
-    },
-    'paint': {
-        'model-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-
-
-            18.3, 0,    // Полная прозрачность (0%) на зуме 17
-            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
-            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-20, 0.8,  // 90% прозрачности (90%) на зуме 18.5
-21, 0.9,  // 90% прозрачности (90%) на зуме 18.5
-22, 0.9,  // 90% прозрачности (90%) на зуме 18.5
-24, 0.9  // 90% прозрачности (90%) на зуме 18.5
-
-
-        ],
-
-
-        'model-rotation': [0.0, 0.0, -761.5],
-        'model-scale': [999.5, 1090.0, 1000],
-        'model-color-mix-intensity': 0,
-        'model-cast-shadows': true,
-        'model-translation': [0, 0, 0.2],
-        'model-emissive-strength': 0.99
-    }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Добавить источник GeoJSON с указанием модели ЗНАКИ ПОЖАРНЫЕ СТАТУС (ПОЛОМКА, ЗАМЕНА...)
-map.addSource('model8', {
-    'type': 'geojson',
-    'data': {
-        'type': 'Feature',
-        'properties': {
-            'model-uri': 'https://sos.emiia.ai/VDNH_FARE_1_GLB.glb'
-        },
-        'geometry': {
-            'coordinates': [37.63113790199057,
-          55.834227583210094],
-            'type': 'Point'
-        }
-    }
-});
-
-
-// Добавить слой модели с плавным появлением
-map.addLayer({
-    'id': 'tower8',
-    'type': 'model',
-    'slot': 'middle',
-    'source': 'model8',
-    'minzoom': 18.3,
-    'maxzoom': 24,
-    'layout': {
-        'model-id': ['get', 'model-uri']
-    },
-    'paint': {
-        'model-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-
-
-            18.3, 0,    // Полная прозрачность (0%) на зуме 17
-            18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
-            18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-20, 0.8,  // 90% прозрачности (90%) на зуме 18.5
-21, 0.9,  // 90% прозрачности (90%) на зуме 18.5
-22, 0.9,  // 90% прозрачности (90%) на зуме 18.5
-24, 0.9  // 90% прозрачности (90%) на зуме 18.5
-
-
-        ],
-
-
-        'model-rotation': [0.0, 0.0, -761.5],
-        'model-scale': [999.5, 1090.0, 1000],
-        'model-color-mix-intensity': 0,
-        'model-cast-shadows': true,
-        'model-translation': [0, 0, 0.2],
-        'model-emissive-strength': 0.99
-    }
-});
-
-
-
-
-
-
-
-
 
 
 
@@ -5935,7 +5740,7 @@ map.addSource('model', {
     'data': {
         'type': 'Feature',
         'properties': {
-            'model-uri': 'https://sos.emiia.ai/VDNH-GLB.glb'
+            'model-uri': 'https://sos.emiia.ai/VDNH_G_GLB.glb'
         },
         'geometry': {
             'coordinates': [37.63113790199057,
@@ -5967,11 +5772,11 @@ map.addLayer({
             18.3, 0,    // Полная прозрачность (0%) на зуме 17
             18.5, 0.4, // Средняя прозрачность (50%) на зуме 17.75
             18.6, 0.5,  // 90% прозрачности (90%) на зуме 18.5
-19.5, 0.7,  // 90% прозрачности (90%) на зуме 18.5
-20, 0.8,  // 90% прозрачности (90%) на зуме 18.5
-21, 0.9,  // 90% прозрачности (90%) на зуме 18.5
-22, 0.9,  // 90% прозрачности (90%) на зуме 18.5
-24, 0.9  // 90% прозрачности (90%) на зуме 18.5
+19.5, 0.6,  // 90% прозрачности (90%) на зуме 18.5
+20, 0.6,  // 90% прозрачности (90%) на зуме 18.5
+21, 0.6,  // 90% прозрачности (90%) на зуме 18.5
+22, 0.6,  // 90% прозрачности (90%) на зуме 18.5
+24, 0.6  // 90% прозрачности (90%) на зуме 18.5
 
 
         ],
@@ -5979,16 +5784,12 @@ map.addLayer({
 
         'model-rotation': [0.0, 0.0, -761.5],
         'model-scale': [999.5, 1090.0, 1000],
-        'model-color-mix-intensity': 0,
+        'model-color-mix-intensity': 0.01,
         'model-cast-shadows': true,
         'model-translation': [0, 0, 0.2],
-        'model-emissive-strength': 0.99
+        'model-emissive-strength': 0.0
     }
 });
-
-
-
-
 
 
 
