@@ -7,6 +7,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,6 +48,8 @@ textarea::placeholder { color: #E2E8F0 !important; }
 </style>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js"></script>
 <script src="/mapbox-gl.js" type="text/javascript"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
@@ -142,12 +145,34 @@ a.mapboxgl-ctrl-logo{ width: 0; height: 0; margin: 0 0 -4px-4px; display: block;
 .grid-icon { width: 16px; height: 16px; margin-left: 8px; fill: currentColor; stroke: currentColor; }
 </style>
 
+
+
 <style>
 * { -webkit-tap-highlight-color: transparent; }
 .form-check-label, .switch, .switch-text, .custom-select-trigger, .custom-option, .header1, .header1 a, .mapboxgl-popup-close-button, button, [onclick] { -webkit-tap-highlight-color: transparent !important; -webkit-user-select: none; -webkit-touch-callout: none; }
 .form-check-label:active, .switch:active, .custom-select-trigger:active { opacity: 0.9; transform: scale(0.98); transition: all 0.1s ease; }
 .header1 a:active { transform: scale(0.95); background-color: rgba(61, 133, 198, 0.1); }
 </style>
+
+<style>
+
+
+ /* === ШРИФТЫ === */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+.header-text {
+    font-size: 20px;
+    color: #383838;
+  font-size: 16px !important;
+        font-weight: 500 !important;
+
+font-family: 'Orbitron' !important;
+}
+
+</style>
+
+
 
 <style>
 :root { --popup-bg-color: #f8f9fa; --popup-text-color: #3d85c6; --close-button-color: #3d85c6; --close-button-hover-color: #383838; --close-button-bg-hover: rgba(0, 0, 0, 0.1); }
@@ -200,9 +225,15 @@ a.mapboxgl-ctrl-logo{ width: 0; height: 0; margin: 0 0 -4px-4px; display: block;
     backface-visibility: hidden;
 }
 
+
+ /* === ШРИФТЫ === */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
 </style>
 
 
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 
 
@@ -226,7 +257,7 @@ a.mapboxgl-ctrl-logo{ width: 0; height: 0; margin: 0 0 -4px-4px; display: block;
                         <path fill="#3c78d8" d="m69.536 96.003l0 0c0-14.62 11.852-26.472 26.472-26.472 7.021 0 13.754 2.789 18.718 7.754 4.965 4.964 7.754 11.697 7.754 18.718l0 0c0 14.62-11.852 26.472-26.472 26.472-14.62 0-26.472-11.852-26.472-26.472z" fill-rule="evenodd"></path>
                     </g>
                 </svg>
-                <span class="header-text">EMIIA.AI SDK</span>
+                <span class="header-text">EMIIA.AI SIP</span>
             </div>
             <svg class="toggle-icon" id="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#3c78d8" viewBox="0 0 16 16" style="stroke: #3c78d8; stroke-width: 1.8px; display: inline-block; vertical-align: middle;">
                 <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
