@@ -541,10 +541,11 @@ font-size: 18px; /* Увеличьте значение по необходим�
 .marker1 {
   background-image: url('https://sos.emiia.ai/vv_svg.svg');
   background-size: cover;
-  width: 80px;
-  height: 80px;
+  width: 110px;
+  height: 110px;
   border-radius: 0%;
   cursor: pointer;
+margin-top: 30px; /* добавьте это */
 }
 
 .mapboxgl-popup {
@@ -1080,7 +1081,7 @@ border-radius: 38px;
                 </svg>
             </div>
             <div class="submenu">
-                <div class="submenu-item" data-action="open-url" data-url="https://sos.emiia.ai/3d.html" data-target="_self">
+                <div class="submenu-item" data-action="open-url" data-url="https://sos.emiia.ai/vv1.html" data-target="_self">
                     <span><span style="font-weight: bold;"> •</span> Технический ИИ-агент EMIIA.AI TAI</span>
                 </div>
                 <div class="submenu-item" data-action="open-url" data-url="https://emiia.ai " data-target="_self">
@@ -3393,7 +3394,7 @@ var geojson = {
       'type': 'Feature',
       'geometry': {
         'type': 'Point',
-        'coordinates': [37.63563151,55.83852133]
+        'coordinates': [37.63597735,55.83874712]
       },
       'properties': {
         'title': 'EMIIA.AI SIP <br>DARK STORE #33',
@@ -3431,7 +3432,7 @@ geojson.features.forEach(function (marker) {
     
     el.style.opacity = opacity;
     
-    if (zoom >= 17) {
+    if (zoom >= 24) {
       el.style.display = 'none';
     } else {
       el.style.display = 'block';
@@ -3555,15 +3556,6 @@ map.on('style.load', () => {
                 ]
             }
         });
-
-
-
-
-
-
-
-
-
 
 
 
@@ -3825,7 +3817,7 @@ const redLinesHTML1 = `
         <a href="https://www.emiia.ai/" 
            target="_blank" 
            style="color: #3d85c6; text-decoration: none;">
-            ОТЧЁТ ❯
+            Аналитический отчет ❯
         </a>
     </div>
 </div>
@@ -3841,7 +3833,7 @@ const redLinesHTML2 = `
         <a href="https://www.emiia.ai/" 
            target="_blank" 
            style="color:#3d85c6; text-decoration: none;">
-            ОТЧЁТ ❯
+            Аналитический отчет ❯
         </a>
     </div>
 </div>
@@ -4186,7 +4178,7 @@ const textForIcon4 = `
     </div>
     <div style="color: #3d85c6; font-size: 14px;">
         <a href="https://emiia.ai/" target="_blank" style="color: #3d85c6; text-decoration: none;">
-            ОТЧЁТ ❯
+            Аналитический отчет ❯
         </a>
     </div>
 </div>
@@ -4199,7 +4191,7 @@ const textForIcon5 = `
     </div>
     <div style="color: #3d85c6; font-size: 14px;">
         <a href="https://emiia.ai/" target="_blank" style="color: #3d85c6; text-decoration: none;">
-            ОТЧЁТ ❯
+            Аналитический отчет ❯
         </a>
     </div>
 </div>
@@ -4212,7 +4204,7 @@ const textForIcon6 = `
     </div>
     <div style="color: #3d85c6; font-size: 14px;">
         <a href="https://emiia.ai/" target="_blank" style="color: #3d85c6; text-decoration: none;">
-            ОТЧЁТ ❯
+            Аналитический отчет ❯
         </a>
     </div>
 </div>
