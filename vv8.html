@@ -34,6 +34,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -4377,11 +4378,6 @@ map.on('mouseleave', 'layer-6', function() {
 
 
 
-
-
-
-
-
 const size = 230;
 
 // Функция для рисования гексагона
@@ -4400,7 +4396,1038 @@ function drawHexagon(ctx, centerX, centerY, radius) {
     ctx.closePath();
 }
 
-// Первая точка (зеленая) - оригинальная
+// ================== ФУНКЦИИ ДЛЯ ЗОН ==================
+
+function isPointInPolygon(lng, lat, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i][0], yi = polygon[i][1];
+        const xj = polygon[j][0], yj = polygon[j][1];
+        const intersect = ((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+// ================== КОНФИГУРАЦИЯ ЗОН РОБОТА ==================
+
+const ROBOT_ZONE_CONFIG = {
+    group1: {
+        zones: [
+            {
+                id: 'zone-1-7fac655e398e15ce4bece3',
+                vertices: [
+                    [37.63585099089536, 55.838312755162306],
+                    [37.63585099089536, 55.83835948528372],
+                    [37.63577892086812, 55.83838285034442],
+                    [37.63570685084088, 55.83835948528372],
+                    [37.63570685084088, 55.838312755162306],
+                    [37.63577892086812, 55.8382893901016]
+                ]
+            },
+            {
+                id: 'zone-2-d44feda1df6069bf2297fa',
+                vertices: [
+                    [37.635778920478344, 55.83824265998019],
+                    [37.635778920478344, 55.8382893901016],
+                    [37.63570685058103, 55.838312755162306],
+                    [37.635634780683716, 55.8382893901016],
+                    [37.635634780683716, 55.83824265998019],
+                    [37.63570685058103, 55.83821929491948]
+                ]
+            }
+        ],
+        triggerZone: [
+            [37.63585099089536, 55.83821929491948],
+            [37.63585099089536, 55.83838285034442],
+            [37.63577892086812, 55.83838285034442],
+            [37.63570685084088, 55.83835948528372],
+            [37.63570685084088, 55.838312755162306],
+            [37.635634780683716, 55.8382893901016],
+            [37.635634780683716, 55.83824265998019],
+            [37.63570685058103, 55.83821929491948],
+            [37.635778920478344, 55.83824265998019],
+            [37.635778920478344, 55.8382893901016],
+            [37.63585099089536, 55.838312755162306],
+            [37.63585099089536, 55.83821929491948]
+        ],
+        floatingHex: {
+            vertices: [
+                [37.635729279953146, 55.83829566437792],
+                [37.635729279953146, 55.838298779719345],
+                [37.63572447528947, 55.83830033739006],
+                [37.6357196706258, 55.838298779719345],
+                [37.6357196706258, 55.83829566437792],
+                [37.63572447528947, 55.8382941067072]
+            ],
+            baseHeight: 1.8,
+            height: 2.0
+        }
+    },
+    group2: {
+        zones: [
+            {
+                id: 'zone-3-965c22bae7a2a47b328950',
+                vertices: [
+                    [37.63570685058104, 55.83845294552655],
+                    [37.63570685058104, 55.83849967564796],
+                    [37.63563478029395, 55.838523040708665],
+                    [37.63556271000686, 55.83849967564796],
+                    [37.63556271000686, 55.83845294552655],
+                    [37.63563478029395, 55.83842958046584]
+                ]
+            }
+        ],
+        triggerZone: [
+            [37.63570685058104, 55.83842958046584],
+            [37.63570685058104, 55.83849967564796],
+            [37.63563478029395, 55.838523040708665],
+            [37.63556271000686, 55.83849967564796],
+            [37.63556271000686, 55.83845294552655],
+            [37.63563478029395, 55.83842958046584],
+            [37.63570685058104, 55.83842958046584]
+        ],
+        floatingHex: {
+            vertices: [
+                [37.63566201463859, 55.83850127691214],
+                [37.63566201463859, 55.83850439225357],
+                [37.63565720994951, 55.83850594992428],
+                [37.63565240526042, 55.83850439225357],
+                [37.63565240526042, 55.83850127691214],
+                [37.63565720994951, 55.838499719241426]
+            ],
+            baseHeight: 3.3,
+            height: 3.5
+        }
+    },
+    zoneColor: '#3d85c6',
+    zoneOpacity: 0.3,
+    zoneBaseHeight: 0,
+    zoneExtrusionHeight: 0.1,
+    sourceIdGroup1: 'robot-zone-group1-source',
+    layerIdGroup1: 'robot-zone-group1-layer',
+    lineLayerIdGroup1: 'robot-zone-group1-line',
+    sourceIdGroup2: 'robot-zone-group2-source',
+    layerIdGroup2: 'robot-zone-group2-layer',
+    lineLayerIdGroup2: 'robot-zone-group2-line'
+};
+
+// ================== КОНФИГУРАЦИЯ ЗОН ЧЕЛОВЕКА ==================
+
+const HUMAN_ZONE_CONFIG = {
+    triggerZones1: [
+        {
+            vertices: [
+                [37.63587379261348, 55.83837844785227],
+                [37.63587379261348, 55.8383979187362],
+                [37.63584376339526, 55.838407654178155],
+                [37.635813734177034, 55.8383979187362],
+                [37.635813734177034, 55.83837844785227],
+                [37.63584376339526, 55.838368712410315]
+            ]
+        },
+        {
+            vertices: [
+                [37.6359038217866, 55.83834924152639],
+                [37.6359038217866, 55.838368712410315],
+                [37.63587379259093, 55.83837844785227],
+                [37.63584376339526, 55.838368712410315],
+                [37.63584376339526, 55.83834924152639],
+                [37.63587379259093, 55.83833950608443]
+            ]
+        },
+        {
+            vertices: [
+                [37.63593385100482, 55.83837844785227],
+                [37.63593385100482, 55.8383979187362],
+                [37.6359038217866, 55.838407654178155],
+                [37.635873792568376, 55.8383979187362],
+                [37.635873792568376, 55.83837844785227],
+                [37.6359038217866, 55.838368712410315]
+            ]
+        }
+    ],
+    triggerZone2: {
+        vertices: [
+            [37.63570685058104, 55.83845294552655],
+            [37.63570685058104, 55.83849967564796],
+            [37.63563478029395, 55.838523040708665],
+            [37.63556271000686, 55.83849967564796],
+            [37.63556271000686, 55.83845294552655],
+            [37.63563478029395, 55.83842958046584]
+        ]
+    },
+    triggerZone3: {
+        vertices: [
+            [37.63592306157222, 55.838523040708665],
+            [37.63592306157222, 55.83856977083008],
+            [37.63585099115521, 55.83859313589078],
+            [37.6357789207382, 55.83856977083008],
+            [37.6357789207382, 55.838523040708665],
+            [37.63585099115521, 55.83849967564796]
+        ]
+    },
+    zone1: {
+        id: '9aaa9718fe29f82ee7ff77',
+        vertices: [
+            [37.63592306131237, 55.83838285034443],
+            [37.63592306131237, 55.83842958046584],
+            [37.63585099115521, 55.83845294552655],
+            [37.63577892099805, 55.83842958046584],
+            [37.63577892099805, 55.83838285034443],
+            [37.63585099115521, 55.838359485283725]
+        ]
+    },
+    zone2: {
+        id: '965c22bae7a2a47b328950',
+        vertices: [
+            [37.63570685058104, 55.83845294552655],
+            [37.63570685058104, 55.83849967564796],
+            [37.63563478029395, 55.838523040708665],
+            [37.63556271000686, 55.83849967564796],
+            [37.63556271000686, 55.83845294552655],
+            [37.63563478029395, 55.83842958046584]
+        ]
+    },
+    zone3: {
+        id: '5f16f4e8c7d4a1407bc8bd',
+        vertices: [
+            [37.63592306157222, 55.838523040708665],
+            [37.63592306157222, 55.83856977083008],
+            [37.63585099115521, 55.83859313589078],
+            [37.6357789207382, 55.83856977083008],
+            [37.6357789207382, 55.838523040708665],
+            [37.63585099115521, 55.83849967564796]
+        ]
+    },
+    floatingHex1: {
+        vertices: [
+            [37.63585093681767, 55.8383881001248],
+            [37.63585093681767, 55.83839121546623],
+            [37.63584613214257, 55.838392773136945],
+            [37.63584132746747, 55.83839121546623],
+            [37.63584132746747, 55.8383881001248],
+            [37.63584613214257, 55.83838654245409]
+        ],
+        baseHeight: 1.55,
+        height: 1.75
+    },
+    floatingHex2: {
+        vertices: [
+            [37.63566835922169, 55.838500252416196],
+            [37.63566835922169, 55.838503367757625],
+            [37.635663554532734, 55.83850492542834],
+            [37.63565874984378, 55.838503367757625],
+            [37.63565874984378, 55.838500252416196],
+            [37.635663554532734, 55.83849869474548]
+        ],
+        baseHeight: 1.55,
+        height: 1.75
+    },
+    floatingHex3: {
+        vertices: [
+            [37.63585093683499, 55.838528290489045],
+            [37.63585093683499, 55.83853140583047],
+            [37.63584613214257, 55.83853296350119],
+            [37.635841327450144, 55.83853140583047],
+            [37.635841327450144, 55.838528290489045],
+            [37.63584613214257, 55.83852673281833]
+        ],
+        baseHeight: 3.3,
+        height: 3.5
+    },
+    zoneColor: '#3d85c6',
+    zoneOpacity: 0.3,
+    zoneBaseHeight: 0,
+    zoneExtrusionHeight: 0.1,
+    sourceIdZone1: 'human-zone1-source',
+    layerIdZone1: 'human-zone1-layer',
+    lineLayerIdZone1: 'human-zone1-line',
+    sourceIdZone2: 'human-zone2-source',
+    layerIdZone2: 'human-zone2-layer',
+    lineLayerIdZone2: 'human-zone2-line',
+    sourceIdZone3: 'human-zone3-source',
+    layerIdZone3: 'human-zone3-layer',
+    lineLayerIdZone3: 'human-zone3-line',
+    sourceIdFloating1: 'human-floating-1-source',
+    layerIdFloating1: 'human-floating-1-layer',
+    sourceIdFloating2: 'human-floating-2-source',
+    layerIdFloating2: 'human-floating-2-layer',
+    sourceIdFloating3: 'human-floating-3-source',
+    layerIdFloating3: 'human-floating-3-layer'
+};
+
+// ================== КОНФИГУРАЦИЯ ВЫСОКИХ ЭКСТРУЗИЙ (ПОВЕРХ ТОЧЕК) ==================
+
+const HIGH_EXTRUSION_CONFIG = {
+    height: 7,
+    color: '#3d85c6',
+    opacity: 0.4,
+    // Робот группа 1 - MultiPolygon с двумя зонами
+    robotGroup1: {
+        zones: ROBOT_ZONE_CONFIG.group1.zones, // ДВЕ зоны
+        sourceId: 'high-extrusion-robot-g1-src',
+        layerId: 'high-extrusion-robot-g1'
+    },
+    // Робот группа 2
+    robotGroup2: {
+        zones: ROBOT_ZONE_CONFIG.group2.zones,
+        sourceId: 'high-extrusion-robot-g2-src',
+        layerId: 'high-extrusion-robot-g2'
+    },
+    // Человек зона 1
+    humanZone1: {
+        zone: HUMAN_ZONE_CONFIG.zone1,
+        sourceId: 'high-extrusion-human-z1-src',
+        layerId: 'high-extrusion-human-z1'
+    },
+    // Человек зона 2
+    humanZone2: {
+        zone: HUMAN_ZONE_CONFIG.zone2,
+        sourceId: 'high-extrusion-human-z2-src',
+        layerId: 'high-extrusion-human-z2'
+    },
+    // Человек зона 3
+    humanZone3: {
+        zone: HUMAN_ZONE_CONFIG.zone3,
+        sourceId: 'high-extrusion-human-z3-src',
+        layerId: 'high-extrusion-human-z3'
+    }
+};
+
+// ================== СОСТОЯНИЯ ЗОН ==================
+
+let robotZoneState = {
+    geoJSONGroup1: null,
+    geoJSONGroup2: null,
+    inGroup1: false,
+    inGroup2: false
+};
+
+let humanZoneState = {
+    inZone1: false,
+    inZone2: false,
+    inZone3: false
+};
+
+// ================== ФУНКЦИИ СОЗДАНИЯ GEOJSON ==================
+
+function createZoneGeoJSON(zones) {
+    const features = zones.map(zone => ({
+        type: 'Feature',
+        properties: { id: zone.id },
+        geometry: {
+            type: 'Polygon',
+            coordinates: [[...zone.vertices, zone.vertices[0]]]
+        }
+    }));
+    return { type: 'FeatureCollection', features: features };
+}
+
+function createSingleZoneGeoJSON(zone) {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: zone.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...zone.vertices, zone.vertices[0]]]
+            }
+        }]
+    };
+}
+
+function createFloatingHexGeoJSON(vertices) {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...vertices, vertices[0]]]
+            }
+        }]
+    };
+}
+
+function createHumanZoneGeoJSON(zone) {
+    return {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            properties: { id: zone.id },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [[...zone.vertices, zone.vertices[0]]]
+            }
+        }]
+    };
+}
+
+// ================== ФУНКЦИИ ВЫСОКИХ ЭКСТРУЗИЙ (ДИНАМИЧЕСКИЕ) ==================
+
+// Создает MultiPolygon из массива зон
+function createMultiPolygonGeoJSON(zones) {
+    const coordinates = zones.map(zone => [[...zone.vertices, zone.vertices[0]]]);
+    return {
+        type: 'Feature',
+        geometry: {
+            type: 'MultiPolygon',
+            coordinates: coordinates
+        },
+        properties: { height: HIGH_EXTRUSION_CONFIG.height }
+    };
+}
+
+function initHighExtrusionRobotG1() {
+    if (!map) return;
+    removeHighExtrusionRobotG1();
+    
+    const config = HIGH_EXTRUSION_CONFIG.robotGroup1;
+    
+    try {
+        // MultiPolygon для двух зон
+        map.addSource(config.sourceId, {
+            'type': 'geojson',
+            'data': createMultiPolygonGeoJSON(config.zones)
+        });
+        
+        map.addLayer({
+            'id': config.layerId,
+            'type': 'fill-extrusion',
+            'source': config.sourceId,
+            'minzoom': 17,
+            'paint': {
+                'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
+                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': HIGH_EXTRUSION_CONFIG.opacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        });
+        
+        console.log('>>> Высокая экструзия робота Г1 создана (2 зоны, поверх точек)');
+    } catch (e) { console.error('Ошибка высокой экструзии робота Г1:', e); }
+}
+
+function removeHighExtrusionRobotG1() {
+    if (!map) return;
+    const config = HIGH_EXTRUSION_CONFIG.robotGroup1;
+    try {
+        if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
+        if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
+    } catch (e) {}
+}
+
+function initHighExtrusionRobotG2() {
+    if (!map) return;
+    removeHighExtrusionRobotG2();
+    
+    const config = HIGH_EXTRUSION_CONFIG.robotGroup2;
+    
+    try {
+        map.addSource(config.sourceId, {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [config.zones[0].vertices]
+                },
+                'properties': {'height': HIGH_EXTRUSION_CONFIG.height}
+            }
+        });
+        
+        map.addLayer({
+            'id': config.layerId,
+            'type': 'fill-extrusion',
+            'source': config.sourceId,
+            'minzoom': 17,
+            'paint': {
+                'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
+                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': HIGH_EXTRUSION_CONFIG.opacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        });
+        
+        console.log('>>> Высокая экструзия робота Г2 создана (поверх точек)');
+    } catch (e) { console.error('Ошибка высокой экструзии робота Г2:', e); }
+}
+
+function removeHighExtrusionRobotG2() {
+    if (!map) return;
+    const config = HIGH_EXTRUSION_CONFIG.robotGroup2;
+    try {
+        if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
+        if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
+    } catch (e) {}
+}
+
+function initHighExtrusionHumanZ1() {
+    if (!map) return;
+    removeHighExtrusionHumanZ1();
+    
+    const config = HIGH_EXTRUSION_CONFIG.humanZone1;
+    
+    try {
+        map.addSource(config.sourceId, {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [config.zone.vertices]
+                },
+                'properties': {'height': HIGH_EXTRUSION_CONFIG.height}
+            }
+        });
+        
+        map.addLayer({
+            'id': config.layerId,
+            'type': 'fill-extrusion',
+            'source': config.sourceId,
+            'minzoom': 17,
+            'paint': {
+                'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
+                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': HIGH_EXTRUSION_CONFIG.opacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        });
+        
+        console.log('>>> Высокая экструзия человека З1 создана (поверх точек)');
+    } catch (e) { console.error('Ошибка высокой экструзии человека З1:', e); }
+}
+
+function removeHighExtrusionHumanZ1() {
+    if (!map) return;
+    const config = HIGH_EXTRUSION_CONFIG.humanZone1;
+    try {
+        if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
+        if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
+    } catch (e) {}
+}
+
+function initHighExtrusionHumanZ2() {
+    if (!map) return;
+    removeHighExtrusionHumanZ2();
+    
+    const config = HIGH_EXTRUSION_CONFIG.humanZone2;
+    
+    try {
+        map.addSource(config.sourceId, {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [config.zone.vertices]
+                },
+                'properties': {'height': HIGH_EXTRUSION_CONFIG.height}
+            }
+        });
+        
+        map.addLayer({
+            'id': config.layerId,
+            'type': 'fill-extrusion',
+            'source': config.sourceId,
+            'minzoom': 17,
+            'paint': {
+                'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
+                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': HIGH_EXTRUSION_CONFIG.opacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        });
+        
+        console.log('>>> Высокая экструзия человека З2 создана (поверх точек)');
+    } catch (e) { console.error('Ошибка высокой экструзии человека З2:', e); }
+}
+
+function removeHighExtrusionHumanZ2() {
+    if (!map) return;
+    const config = HIGH_EXTRUSION_CONFIG.humanZone2;
+    try {
+        if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
+        if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
+    } catch (e) {}
+}
+
+function initHighExtrusionHumanZ3() {
+    if (!map) return;
+    removeHighExtrusionHumanZ3();
+    
+    const config = HIGH_EXTRUSION_CONFIG.humanZone3;
+    
+    try {
+        map.addSource(config.sourceId, {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [config.zone.vertices]
+                },
+                'properties': {'height': HIGH_EXTRUSION_CONFIG.height}
+            }
+        });
+        
+        map.addLayer({
+            'id': config.layerId,
+            'type': 'fill-extrusion',
+            'source': config.sourceId,
+            'minzoom': 17,
+            'paint': {
+                'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
+                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': HIGH_EXTRUSION_CONFIG.opacity,
+                'fill-extrusion-vertical-gradient': false
+            }
+        });
+        
+        console.log('>>> Высокая экструзия человека З3 создана (поверх точек)');
+    } catch (e) { console.error('Ошибка высокой экструзии человека З3:', e); }
+}
+
+function removeHighExtrusionHumanZ3() {
+    if (!map) return;
+    const config = HIGH_EXTRUSION_CONFIG.humanZone3;
+    try {
+        if (map.getLayer(config.layerId)) map.removeLayer(config.layerId);
+        if (map.getSource(config.sourceId)) map.removeSource(config.sourceId);
+    } catch (e) {}
+}
+
+// ================== ФУНКЦИИ ЗОН РОБОТА ==================
+
+function initRobotGroup1Layers() {
+    if (!map) return;
+    removeRobotGroup1Layers();
+    
+    if (!robotZoneState.geoJSONGroup1) {
+        robotZoneState.geoJSONGroup1 = createZoneGeoJSON(ROBOT_ZONE_CONFIG.group1.zones);
+    }
+    
+    const beforeId = 'layer-with-pulsing-dot-1';
+    
+    try {
+        // Висячий гексагон
+        map.addSource('robot-floating-source-1', {
+            type: 'geojson',
+            data: createFloatingHexGeoJSON(ROBOT_ZONE_CONFIG.group1.floatingHex.vertices)
+        });
+        map.addLayer({
+            id: 'robot-floating-layer-1',
+            type: 'fill-extrusion',
+            source: 'robot-floating-source-1',
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': ROBOT_ZONE_CONFIG.group1.floatingHex.baseHeight,
+                'fill-extrusion-height': ROBOT_ZONE_CONFIG.group1.floatingHex.height,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeId);
+        
+        // Зоны
+        map.addSource(ROBOT_ZONE_CONFIG.sourceIdGroup1, {
+            type: 'geojson',
+            data: robotZoneState.geoJSONGroup1
+        });
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.layerIdGroup1,
+            type: 'fill-extrusion',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
+            paint: {
+                'fill-extrusion-color': ROBOT_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': ROBOT_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': ROBOT_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': ROBOT_ZONE_CONFIG.zoneOpacity
+            }
+        }, beforeId);
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.lineLayerIdGroup1,
+            type: 'line',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
+            paint: {
+                'line-color': 'white',
+                'line-width': 2,
+                'line-opacity': 1
+            }
+        }, beforeId);
+        
+        // ВЫСОКАЯ ЭКСТРУЗИЯ ПОВЕРХ ТОЧЕК (MultiPolygon с двумя зонами)
+        initHighExtrusionRobotG1();
+        
+        console.log('>>> Робот ВОШЁЛ в группу 1 (2 зоны)');
+    } catch (e) { console.error('Ошибка группы 1:', e); }
+}
+
+function removeRobotGroup1Layers() {
+    if (!map) return;
+    try {
+        if (map.getLayer('robot-floating-layer-1')) map.removeLayer('robot-floating-layer-1');
+        if (map.getSource('robot-floating-source-1')) map.removeSource('robot-floating-source-1');
+        if (map.getLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup1)) map.removeLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup1);
+        if (map.getLayer(ROBOT_ZONE_CONFIG.layerIdGroup1)) map.removeLayer(ROBOT_ZONE_CONFIG.layerIdGroup1);
+        if (map.getSource(ROBOT_ZONE_CONFIG.sourceIdGroup1)) map.removeSource(ROBOT_ZONE_CONFIG.sourceIdGroup1);
+        removeHighExtrusionRobotG1();
+    } catch (e) {}
+}
+
+function initRobotGroup2Layers() {
+    if (!map) return;
+    removeRobotGroup2Layers();
+    
+    if (!robotZoneState.geoJSONGroup2) {
+        robotZoneState.geoJSONGroup2 = createZoneGeoJSON(ROBOT_ZONE_CONFIG.group2.zones);
+    }
+    
+    const beforeId = 'layer-with-pulsing-dot-1';
+    
+    try {
+        // Висячий гексагон
+        map.addSource('robot-floating-source-2', {
+            type: 'geojson',
+            data: createFloatingHexGeoJSON(ROBOT_ZONE_CONFIG.group2.floatingHex.vertices)
+        });
+        map.addLayer({
+            id: 'robot-floating-layer-2',
+            type: 'fill-extrusion',
+            source: 'robot-floating-source-2',
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': ROBOT_ZONE_CONFIG.group2.floatingHex.baseHeight,
+                'fill-extrusion-height': ROBOT_ZONE_CONFIG.group2.floatingHex.height,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeId);
+        
+        // Зона
+        map.addSource(ROBOT_ZONE_CONFIG.sourceIdGroup2, {
+            type: 'geojson',
+            data: robotZoneState.geoJSONGroup2
+        });
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.layerIdGroup2,
+            type: 'fill-extrusion',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
+            paint: {
+                'fill-extrusion-color': ROBOT_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': ROBOT_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': ROBOT_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': ROBOT_ZONE_CONFIG.zoneOpacity
+            }
+        }, beforeId);
+        map.addLayer({
+            id: ROBOT_ZONE_CONFIG.lineLayerIdGroup2,
+            type: 'line',
+            source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
+            paint: {
+                'line-color': 'white',
+                'line-width': 2,
+                'line-opacity': 1
+            }
+        }, beforeId);
+        
+        // ВЫСОКАЯ ЭКСТРУЗИЯ ПОВЕРХ ТОЧЕК
+        initHighExtrusionRobotG2();
+        
+        console.log('>>> Робот ВОШЁЛ в группу 2 (1 зона)');
+    } catch (e) { console.error('Ошибка группы 2:', e); }
+}
+
+function removeRobotGroup2Layers() {
+    if (!map) return;
+    try {
+        if (map.getLayer('robot-floating-layer-2')) map.removeLayer('robot-floating-layer-2');
+        if (map.getSource('robot-floating-source-2')) map.removeSource('robot-floating-source-2');
+        if (map.getLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup2)) map.removeLayer(ROBOT_ZONE_CONFIG.lineLayerIdGroup2);
+        if (map.getLayer(ROBOT_ZONE_CONFIG.layerIdGroup2)) map.removeLayer(ROBOT_ZONE_CONFIG.layerIdGroup2);
+        if (map.getSource(ROBOT_ZONE_CONFIG.sourceIdGroup2)) map.removeSource(ROBOT_ZONE_CONFIG.sourceIdGroup2);
+        removeHighExtrusionRobotG2();
+    } catch (e) {}
+}
+
+function updateRobotZones(lng, lat) {
+    const inGroup1 = isPointInPolygon(lng, lat, ROBOT_ZONE_CONFIG.group1.triggerZone);
+    const inGroup2 = isPointInPolygon(lng, lat, ROBOT_ZONE_CONFIG.group2.triggerZone);
+    
+    if (inGroup1 && !robotZoneState.inGroup1) {
+        initRobotGroup1Layers();
+    }
+    if (!inGroup1 && robotZoneState.inGroup1) {
+        removeRobotGroup1Layers();
+        console.log('>>> Робот ВЫШЕЛ из группы 1');
+    }
+    
+    if (inGroup2 && !robotZoneState.inGroup2) {
+        initRobotGroup2Layers();
+    }
+    if (!inGroup2 && robotZoneState.inGroup2) {
+        removeRobotGroup2Layers();
+        console.log('>>> Робот ВЫШЕЛ из группы 2');
+    }
+    
+    robotZoneState.inGroup1 = inGroup1;
+    robotZoneState.inGroup2 = inGroup2;
+}
+
+// ================== ФУНКЦИИ ЗОН ЧЕЛОВЕКА ==================
+
+function initHumanZone1Layers() {
+    if (!map) return;
+    removeHumanZone1Layers();
+    
+    const beforeId = 'layer-with-pulsing-dot-1';
+    
+    try {
+        // Висячий гексагон
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdFloating1, {
+            type: 'geojson',
+            data: createFloatingHexGeoJSON(HUMAN_ZONE_CONFIG.floatingHex1.vertices)
+        });
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdFloating1,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdFloating1,
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.floatingHex1.baseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.floatingHex1.height,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeId);
+        
+        // Зона
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdZone1, {
+            type: 'geojson',
+            data: createHumanZoneGeoJSON(HUMAN_ZONE_CONFIG.zone1)
+        });
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdZone1,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone1,
+            paint: {
+                'fill-extrusion-color': HUMAN_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': HUMAN_ZONE_CONFIG.zoneOpacity
+            }
+        }, beforeId);
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.lineLayerIdZone1,
+            type: 'line',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone1,
+            paint: {
+                'line-color': 'white',
+                'line-width': 2,
+                'line-opacity': 1
+            }
+        }, beforeId);
+        
+        // ВЫСОКАЯ ЭКСТРУЗИЯ ПОВЕРХ ТОЧЕК
+        initHighExtrusionHumanZ1();
+        
+        console.log('>>> Человек ВОШЁЛ в ЗОНУ 1');
+    } catch (e) { console.error('Ошибка зоны 1:', e); }
+}
+
+function removeHumanZone1Layers() {
+    if (!map) return;
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdFloating1)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdFloating1);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdFloating1)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdFloating1);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone1)) map.removeLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone1);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone1)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone1);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdZone1)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdZone1);
+        removeHighExtrusionHumanZ1();
+    } catch (e) {}
+}
+
+function initHumanZone2Layers() {
+    if (!map) return;
+    removeHumanZone2Layers();
+    
+    const beforeId = 'layer-with-pulsing-dot-1';
+    
+    try {
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdFloating2, {
+            type: 'geojson',
+            data: createFloatingHexGeoJSON(HUMAN_ZONE_CONFIG.floatingHex2.vertices)
+        });
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdFloating2,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdFloating2,
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.floatingHex2.baseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.floatingHex2.height,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeId);
+        
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdZone2, {
+            type: 'geojson',
+            data: createHumanZoneGeoJSON(HUMAN_ZONE_CONFIG.zone2)
+        });
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdZone2,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone2,
+            paint: {
+                'fill-extrusion-color': HUMAN_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': HUMAN_ZONE_CONFIG.zoneOpacity
+            }
+        }, beforeId);
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.lineLayerIdZone2,
+            type: 'line',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone2,
+            paint: {
+                'line-color': 'white',
+                'line-width': 2,
+                'line-opacity': 1
+            }
+        }, beforeId);
+        
+        // ВЫСОКАЯ ЭКСТРУЗИЯ ПОВЕРХ ТОЧЕК
+        initHighExtrusionHumanZ2();
+        
+        console.log('>>> Человек ВОШЁЛ в ЗОНУ 2');
+    } catch (e) { console.error('Ошибка зоны 2:', e); }
+}
+
+function removeHumanZone2Layers() {
+    if (!map) return;
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdFloating2)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdFloating2);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdFloating2)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdFloating2);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone2)) map.removeLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone2);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone2)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone2);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdZone2)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdZone2);
+        removeHighExtrusionHumanZ2();
+    } catch (e) {}
+}
+
+function initHumanZone3Layers() {
+    if (!map) return;
+    removeHumanZone3Layers();
+    
+    const beforeId = 'layer-with-pulsing-dot-1';
+    
+    try {
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdFloating3, {
+            type: 'geojson',
+            data: createFloatingHexGeoJSON(HUMAN_ZONE_CONFIG.floatingHex3.vertices)
+        });
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdFloating3,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdFloating3,
+            paint: {
+                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.floatingHex3.baseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.floatingHex3.height,
+                'fill-extrusion-opacity': 0.9
+            }
+        }, beforeId);
+        
+        map.addSource(HUMAN_ZONE_CONFIG.sourceIdZone3, {
+            type: 'geojson',
+            data: createHumanZoneGeoJSON(HUMAN_ZONE_CONFIG.zone3)
+        });
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.layerIdZone3,
+            type: 'fill-extrusion',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone3,
+            paint: {
+                'fill-extrusion-color': HUMAN_ZONE_CONFIG.zoneColor,
+                'fill-extrusion-base': HUMAN_ZONE_CONFIG.zoneBaseHeight,
+                'fill-extrusion-height': HUMAN_ZONE_CONFIG.zoneExtrusionHeight,
+                'fill-extrusion-opacity': HUMAN_ZONE_CONFIG.zoneOpacity
+            }
+        }, beforeId);
+        map.addLayer({
+            id: HUMAN_ZONE_CONFIG.lineLayerIdZone3,
+            type: 'line',
+            source: HUMAN_ZONE_CONFIG.sourceIdZone3,
+            paint: {
+                'line-color': 'white',
+                'line-width': 2,
+                'line-opacity': 0.7
+            }
+        }, beforeId);
+        
+        // ВЫСОКАЯ ЭКСТРУЗИЯ ПОВЕРХ ТОЧЕК
+        initHighExtrusionHumanZ3();
+        
+        console.log('>>> Человек ВОШЁЛ в ЗОНУ 3');
+    } catch (e) { console.error('Ошибка зоны 3:', e); }
+}
+
+function removeHumanZone3Layers() {
+    if (!map) return;
+    try {
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdFloating3)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdFloating3);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdFloating3)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdFloating3);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone3)) map.removeLayer(HUMAN_ZONE_CONFIG.lineLayerIdZone3);
+        if (map.getLayer(HUMAN_ZONE_CONFIG.layerIdZone3)) map.removeLayer(HUMAN_ZONE_CONFIG.layerIdZone3);
+        if (map.getSource(HUMAN_ZONE_CONFIG.sourceIdZone3)) map.removeSource(HUMAN_ZONE_CONFIG.sourceIdZone3);
+        removeHighExtrusionHumanZ3();
+    } catch (e) {}
+}
+
+function updateHumanZones(lng, lat) {
+    let inZone1 = false;
+    for (const trigger of HUMAN_ZONE_CONFIG.triggerZones1) {
+        if (isPointInPolygon(lng, lat, trigger.vertices)) {
+            inZone1 = true;
+            break;
+        }
+    }
+    const inZone2 = isPointInPolygon(lng, lat, HUMAN_ZONE_CONFIG.triggerZone2.vertices);
+    const inZone3 = isPointInPolygon(lng, lat, HUMAN_ZONE_CONFIG.triggerZone3.vertices);
+    
+    if (inZone1 && !humanZoneState.inZone1) {
+        initHumanZone1Layers();
+    }
+    if (!inZone1 && humanZoneState.inZone1) {
+        removeHumanZone1Layers();
+        console.log('>>> Человек ВЫШЕЛ из ЗОНЫ 1');
+    }
+    
+    if (inZone2 && !humanZoneState.inZone2) {
+        initHumanZone2Layers();
+    }
+    if (!inZone2 && humanZoneState.inZone2) {
+        removeHumanZone2Layers();
+        console.log('>>> Человек ВЫШЕЛ из ЗОНЫ 2');
+    }
+    
+    if (inZone3 && !humanZoneState.inZone3) {
+        initHumanZone3Layers();
+    }
+    if (!inZone3 && humanZoneState.inZone3) {
+        removeHumanZone3Layers();
+        console.log('>>> Человек ВЫШЕЛ из ЗОНЫ 3');
+    }
+    
+    humanZoneState.inZone1 = inZone1;
+    humanZoneState.inZone2 = inZone2;
+    humanZoneState.inZone3 = inZone3;
+}
+
+// Первая точка (синяя) - человек
 const pulsingDot = {
     width: size,
     height: size,
@@ -4451,7 +5478,7 @@ const pulsingDot = {
     }
 };
 
-// Вторая точка (оранжевая)
+// Вторая точка (серая) - робот
 const pulsingDotOrange = {
     width: size,
     height: size,
@@ -4502,7 +5529,7 @@ const pulsingDotOrange = {
     }
 };
 
-// Красная точка остановки - гексагон (ИСПРАВЛЕННАЯ)
+// Красная точка остановки - гексагон
 const redDot = {
     width: 40,
     height: 40,
@@ -4523,18 +5550,15 @@ const redDot = {
         const centerY = this.height / 2;
         const radius = 12;
 
-        // Градиент внутри гексагона, не выходящий за границы
         const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
         gradient.addColorStop(0, 'rgba(255, 0, 0, 0.9)');
         gradient.addColorStop(0.7, 'rgba(255, 0, 0, 0.6)');
         gradient.addColorStop(1, 'rgba(255, 0, 0, 0.3)');
 
-        // Рисуем гексагон с градиентом
         drawHexagon(context, centerX, centerY, radius);
         context.fillStyle = gradient;
         context.fill();
 
-        // Обводка толще и четко по контуру
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
         context.lineWidth = 4;
@@ -4546,7 +5570,7 @@ const redDot = {
     }
 };
 
-// Оранжевая точка остановки - гексагон (ИСПРАВЛЕННАЯ)
+// Оранжевая точка остановки - гексагон
 const orangeDot = {
     width: 40,
     height: 40,
@@ -4567,18 +5591,15 @@ const orangeDot = {
         const centerY = this.height / 2;
         const radius = 12;
 
-        // Градиент внутри гексагона
         const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
         gradient.addColorStop(0, 'rgba(255, 165, 0, 0.9)');
         gradient.addColorStop(0.7, 'rgba(255, 165, 0, 0.6)');
         gradient.addColorStop(1, 'rgba(255, 165, 0, 0.3)');
 
-        // Рисуем гексагон с градиентом
         drawHexagon(context, centerX, centerY, radius);
         context.fillStyle = gradient;
         context.fill();
 
-        // Обводка толще
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
         context.lineWidth = 4;
@@ -4590,7 +5611,7 @@ const orangeDot = {
     }
 };
 
-// Серая точка (пройденная остановка) - гексагон (ИСПРАВЛЕННАЯ - ЧИСТО ЗЕЛЕНАЯ)
+// Зеленая точка (пройденная остановка) - гексагон
 const grayDot = {
     width: 40,
     height: 40,
@@ -4611,12 +5632,10 @@ const grayDot = {
         const centerY = this.height / 2;
         const radius = 12;
 
-        // Сплошной чисто зеленый цвет внутри
         drawHexagon(context, centerX, centerY, radius);
-        context.fillStyle = '#00ff00'; // Чистый зеленый (lime)
+        context.fillStyle = '#00ff00';
         context.fill();
 
-        // Обводка толще
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
         context.lineWidth = 4;
@@ -4628,7 +5647,7 @@ const grayDot = {
     }
 };
 
-// Серая оранжевая точка (пройденная остановка оранжевой точки) - гексагон (ИСПРАВЛЕННАЯ)
+// Желто-зеленая точка 
 const grayOrangeDot = {
     width: 40,
     height: 40,
@@ -4649,12 +5668,10 @@ const grayOrangeDot = {
         const centerY = this.height / 2;
         const radius = 12;
 
-        // Сплошной желто-зеленый цвет
         drawHexagon(context, centerX, centerY, radius);
-        context.fillStyle = '#cccc00'; // Желто-зеленый
+        context.fillStyle = '#cccc00';
         context.fill();
 
-        // Обводка толще
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
         context.lineWidth = 4;
@@ -4666,7 +5683,7 @@ const grayOrangeDot = {
     }
 };
 
-// Координаты для первой точки (зеленая)
+// Координаты для первой точки (синяя - человек)
 const coordinates1 = [
     [37.63586467,55.83838781],
     [37.63585017,55.83836861],
@@ -4683,7 +5700,7 @@ const coordinates1 = [
     [37.63586467,55.83838781]
 ];
 
-// Координаты для второй точки (оранжевая)
+// Координаты для второй точки (серая - робот)
 const coordinates2 = [
     [37.63573089, 55.83832215],
     [37.63543959, 55.83839318],
@@ -4695,11 +5712,11 @@ const coordinates2 = [
     [37.63573089, 55.83832215]
 ];
 
-// Определяем точки остановок для первой точки
+// Определяем точки остановок для первой точки (человек)
 const stopPoints1 = [4, 8];
 const finalDestination1 = coordinates1.length - 1;
 
-// Определяем точки остановок для второй точки (две остановки)
+// Определяем точки остановок для второй точки (робот)
 const stopPoints2 = [2, 4];
 const finalDestination2 = coordinates2.length - 1;
 
@@ -4730,7 +5747,7 @@ function getNextTarget2() {
     return finalDestination2;
 }
 
-// Функция для сброса точек остановок для первой точки
+// Функция для сброса точек остановок для первой точки (человек)
 function resetStopPoints1() {
     completedStops1.clear();
     currentTargetIndex1 = getNextTarget1();
@@ -4753,7 +5770,7 @@ function resetStopPoints1() {
     });
 }
 
-// Функция для сброса точек остановок для второй точки
+// Функция для сброса точек остановок для второй точки (робот)
 function resetStopPoints2() {
     completedStops2.clear();
     currentTargetIndex2 = getNextTarget2();
@@ -4905,7 +5922,7 @@ async function updatePopupData2() {
         pointPopup2.setHTML(`
             <div class="popup-content">
                 <h3>EMIIA.AI SIP: API DATASET <br>Робот: ID D [#309945]</h3>
-                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#FFA500]</p>
+                <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#909497]</p>
                 ${formatISSData(issData)}
             </div>
         `);
@@ -4963,7 +5980,7 @@ map.on('load', () => {
         }
     });
 
-    // СНАЧАЛА добавляем слои пройденного пути (серый)
+    // СНАЧАЛА добавляем слои пройденного пути (серый) - скрытые по умолчанию
     map.addLayer({
         'id': 'passed-route-line-1',
         'type': 'line',
@@ -4971,12 +5988,13 @@ map.on('load', () => {
         'minzoom': 20,
         'layout': {
             'line-join': 'round',
-            'line-cap': 'round'
+            'line-cap': 'round',
+            'visibility': window.svgLayersHidden ? 'none' : 'visible'
         },
         'paint': {
             'line-color': '#3d85c6',
             'line-width': 8,
-            'line-opacity': 0.2,
+            'line-opacity': window.svgLayersHidden ? 0 : 0.2,
             'line-cap': 'round',
             'line-dasharray': [4, 8]
         }
@@ -4989,17 +6007,18 @@ map.on('load', () => {
         'minzoom': 20,
         'layout': {
             'line-join': 'round',
-            'line-cap': 'round'
+            'line-cap': 'round',
+            'visibility': window.svgLayersHidden ? 'none' : 'visible'
         },
         'paint': {
             'line-color': '#909497',
             'line-width': 8,
-            'line-opacity': 0.2,
+            'line-opacity': window.svgLayersHidden ? 0 : 0.2,
             'line-dasharray': [4, 8]
         }
     }, 'passed-route-line-1');
 
-    // Добавляем слои предстоящего пути (зеленый и оранжевый)
+    // Добавляем слои предстоящего пути (синий и серый) - скрытые по умолчанию
     map.addLayer({
         'id': 'future-route-line-1',
         'type': 'line',
@@ -5007,12 +6026,13 @@ map.on('load', () => {
         'minzoom': 20,
         'layout': {
             'line-join': 'round',
-            'line-cap': 'round'
+            'line-cap': 'round',
+            'visibility': window.svgLayersHidden ? 'none' : 'visible'
         },
         'paint': {
             'line-color': '#3d85c6',
             'line-width': 8,
-            'line-opacity': 1,
+            'line-opacity': window.svgLayersHidden ? 0 : 1,
             'line-dasharray': [4, 8]
         }
     }, 'passed-route-line-2');
@@ -5024,12 +6044,13 @@ map.on('load', () => {
         'minzoom': 20,
         'layout': {
             'line-join': 'round',
-            'line-cap': 'round'
+            'line-cap': 'round',
+            'visibility': window.svgLayersHidden ? 'none' : 'visible'
         },
         'paint': {
             'line-color': '#909497',
             'line-width': 8,
-            'line-opacity': 1,
+            'line-opacity': window.svgLayersHidden ? 0 : 1,
             'line-dasharray': [4, 8]
         }
     }, 'future-route-line-1');
@@ -5092,8 +6113,10 @@ map.on('load', () => {
                 }
             }))
         }
+
     });
 
+    // Источники для точек остановок
     map.addSource('stop-points-2', {
         'type': 'geojson',
         'data': {
@@ -5112,7 +6135,7 @@ map.on('load', () => {
         }
     });
 
-    // СНАЧАЛА добавляем слои точек остановок
+    // СНАЧАЛА добавляем слои точек остановок - скрытые по умолчанию
     map.addLayer({
         'id': 'stop-points-layer-1',
         'type': 'symbol',
@@ -5125,7 +6148,11 @@ map.on('load', () => {
             ],
             'icon-offset': [0, 0],
             'icon-allow-overlap': true,
-            'icon-ignore-placement': true
+            'icon-ignore-placement': true,
+            'visibility': window.svgLayersHidden ? 'none' : 'visible'
+        },
+        'paint': {
+            'icon-opacity': window.svgLayersHidden ? 0 : 1
         }
     }, '3d-buildings');
 
@@ -5141,7 +6168,11 @@ map.on('load', () => {
             ],
             'icon-offset': [0, 0],
             'icon-allow-overlap': true,
-            'icon-ignore-placement': true
+            'icon-ignore-placement': true,
+            'visibility': window.svgLayersHidden ? 'none' : 'visible'
+        },
+        'paint': {
+            'icon-opacity': window.svgLayersHidden ? 0 : 1
         }
     }, 'stop-points-layer-1');
 
@@ -5215,7 +6246,7 @@ map.on('load', () => {
             .setHTML(`
                 <div class="popup-content">
                     <h3>EMIIA.AI SIP: API DATASET <br> Робот:</h3>
-                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#FFA500]</p>
+                    <p>EMIIA.AI API: JSON DATASET OUTPUT ❯ EMIIA.AI SIP: ID R: [#909497]</p>
                     <div class="loading">Загрузка данных EMIIA.AI SIP: API...</div>
                 </div>
             `)
@@ -5273,6 +6304,9 @@ map.on('load', () => {
             const dotLng = startCoord[0] + (endCoord[0] - startCoord[0]) * dotProgress;
             const dotLat = startCoord[1] + (endCoord[1] - startCoord[1]) * dotProgress;
             const currentPoint = [dotLng, dotLat];
+            
+            // ========== ОБНОВЛЕНИЕ ЗОН ЧЕЛОВЕКА ==========
+            updateHumanZones(dotLng, dotLat);
             
             // Позиция линии (быстрее)
             const lineLng = startCoord[0] + (endCoord[0] - startCoord[0]) * lineProgress;
@@ -5400,6 +6434,9 @@ map.on('load', () => {
             const dotLat = startCoord[1] + (endCoord[1] - startCoord[1]) * dotProgress;
             const currentPoint = [dotLng, dotLat];
             
+            // ========== ОБНОВЛЕНИЕ ЗОН РОБОТА ==========
+            updateRobotZones(dotLng, dotLat);
+            
             // Позиция линии (быстрее)
             const lineLng = startCoord[0] + (endCoord[0] - startCoord[0]) * lineProgress;
             const lineLat = startCoord[1] + (endCoord[1] - startCoord[1]) * lineProgress;
@@ -5510,76 +6547,6 @@ map.on('load', () => {
         requestAnimationFrame(animatePoint2);
     }, 1000);
 });
-
-
-
-
-
-
-
-
-
-// Добавляем пятого источника для нового GLB-файла ласточка-тест
-        map.addSource('model5', {
-            'type': 'geojson',
-            'data': {
-                'type': 'Feature',
-                'properties': {
-                    'model-uri':
-                        ''
-                },
-                'geometry': {
-                    'coordinates': [37.631367826980494,
-            55.833906458903954],
-                    'type': 'Point'
-                }
-            }
-        });
-
-
-        // add the clip layer and configure it to also remove symbols and trees.
-        // clip-layer-scope layout property is used to specify that only models from the Mapbox Standard Style should be clipped.
-        // this will prevent the newly added model from getting clipped.
-        map.addLayer({
-            'id': 'eraser',
-            'type': 'clip',
-            'source': 'eraser',
-            'layout': {
-                // specify the layer types to be removed by this clip layer
-                'clip-layer-types': ['symbol', 'model'],
-                'clip-layer-scope': ['basemap']
-            }
-        });
-
-        // add the model layer and specify the appropriate slot to ensure the symbols are rendered correctly.
-        
-
-
-
-    map.addLayer({
-        'id': 'tower5',
-        'type': 'model',
-        'slot': 'middle',
-        'source': 'model5',
-        'minzoom': 15,
-        'maxzoom': 21,
-        'layout': {
-            'model-id': ['get', 'model-uri']
-        },
-        'paint': {
-            'model-opacity': ['interpolate', ['linear'], ['zoom'], 15, 1, 21, 0],
-            'model-rotation': [0.0, 0.0, 4.0],
-            'model-scale': [1.5, 1.5, 1.5],
-'model-translation': [0, 0, 4], // ЗДЕСЬ: поднятие на 10 единиц по Z
-            'model-color-mix-intensity': 0,
-            'model-cast-shadows': true,
-
-            'model-emissive-strength': 0.3
-        }
-    });
-
-
-
 
 
 
@@ -7059,144 +8026,6 @@ textarea::placeholder {
 
 
 
-
-<!-- СКРИПТ ЭКСТРУЗИИ (4 ЗОНЫ) -->
-<script>
-(function() {
-    'use strict';
-    
-    const EXTRUSION_HEIGHT = 4.5;
-    const EXTRUSION_OPACITY = 0.5;
-    
-    // Все 4 зоны
-    const zones = [
-        // Зона 1 точка остановки №1
-        [[37.63562028,55.83848023],
-         [37.63565139, 55.83852160],
-         [37.63569232, 55.83851084],
-         [37.63566214,55.83846955],
-         [37.63562028,55.83848023]],
-
-        // Зона 2 курьеры
-        [[37.63579566, 55.83836359],
-         [37.63582623, 55.83840300],
-         [37.63590614,55.83838327],
-         [37.63587510, 55.83834421],
-         [37.63579566, 55.83836359]],
-
-
-        // Зона 3 начальная точка движения робот
-        [[37.63564016, 55.83828259],
-         [37.63569513,55.83835382],
-         [37.63576039,55.83833700],
-         [37.63570430, 55.83826678],
-         [37.63564016, 55.83828259]],
-        
-       
-        // Зона 4
-        [[37.63586790,55.83850825],
-         [37.63582291, 55.83851879],
-         [37.63585426,55.83856156],
-         [37.63590079,55.83855028],
-         [37.63586790,55.83850825]],
-  
-
-
-
-
-// Зона 5
-        [[37.63556672,55.83847708],
-         [37.63554402,55.83844838],
-         [37.63546475,55.83846984],
-         [37.63548927,55.83849702],
-         [37.63556672,55.83847708]]
-    
-    ];
-    // Ждем загрузки карты
-    if (!map.loaded()) {
-        map.on('load', initZones);
-    } else {
-        initZones();
-    }
-    
-    function initZones() {
-        zones.forEach((polygon, index) => {
-            const zoneId = `extrusion-zone-${index + 1}`;
-            
-            // Создаем источник
-            map.addSource(zoneId + '-src', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Polygon',
-                        'coordinates': [polygon]
-                    },
-                    'properties': {'height': EXTRUSION_HEIGHT}
-                }
-            });
-            
-            // Создаем слой
-            map.addLayer({
-                'id': zoneId,
-                'type': 'fill-extrusion',
-                'source': zoneId + '-src',
-                'minzoom': 17,
-                'paint': {
-                    'fill-extrusion-color': '#90EE90',
-                    'fill-extrusion-height': ['get', 'height'],
-                    'fill-extrusion-base': 0,
-                    'fill-extrusion-opacity': 0,
-                    'fill-extrusion-vertical-gradient': false
-                }
-            });
-        });
-        
-        // Запускаем проверку
-        setInterval(checkZones, 50);
-    }
-    
-    function checkZones() {
-        zones.forEach((polygon, index) => {
-            const zoneId = `extrusion-zone-${index + 1}`;
-            let anyInside = false;
-            
-            // Проверяем точки
-            ['dot-point-1', 'dot-point-2'].forEach(pointId => {
-                try {
-                    const source = map.getSource(pointId);
-                    if (source && source._data && source._data.features && source._data.features[0]) {
-                        const coords = source._data.features[0].geometry.coordinates;
-                        if (pointInPolygon(coords, polygon)) {
-                            anyInside = true;
-                        }
-                    }
-                } catch(e) {}
-            });
-            
-            // Устанавливаем прозрачность
-            const opacity = anyInside ? EXTRUSION_OPACITY : 0;
-            try {
-                map.setPaintProperty(zoneId, 'fill-extrusion-opacity', opacity);
-            } catch(e) {}
-        });
-    }
-    
-    function pointInPolygon(point, vs) {
-        const x = point[0], y = point[1];
-        let inside = false;
-        for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-            const xi = vs[i][0], yi = vs[i][1];
-            const xj = vs[j][0], yj = vs[j][1];
-            const intersect = ((yi > y) !== (yj > y)) &&
-                (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-            if (intersect) inside = !inside;
-        }
-        return inside;
-    }
-    
-})();
-</script>
 
 
 
