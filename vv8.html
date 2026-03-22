@@ -4798,7 +4798,7 @@ function initHighExtrusionRobotG1() {
             'id': config.layerId,
             'type': 'fill-extrusion',
             'source': config.sourceId,
-            'minzoom': 17,
+            'minzoom': 19,
             'paint': {
                 'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
                 'fill-extrusion-height': ['get', 'height'],
@@ -4844,7 +4844,7 @@ function initHighExtrusionRobotG2() {
             'id': config.layerId,
             'type': 'fill-extrusion',
             'source': config.sourceId,
-            'minzoom': 17,
+            'minzoom': 19,
             'paint': {
                 'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
                 'fill-extrusion-height': ['get', 'height'],
@@ -4890,7 +4890,7 @@ function initHighExtrusionHumanZ1() {
             'id': config.layerId,
             'type': 'fill-extrusion',
             'source': config.sourceId,
-            'minzoom': 17,
+            'minzoom': 19,
             'paint': {
                 'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
                 'fill-extrusion-height': ['get', 'height'],
@@ -4936,7 +4936,7 @@ function initHighExtrusionHumanZ2() {
             'id': config.layerId,
             'type': 'fill-extrusion',
             'source': config.sourceId,
-            'minzoom': 17,
+            'minzoom': 19,
             'paint': {
                 'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
                 'fill-extrusion-height': ['get', 'height'],
@@ -4982,7 +4982,7 @@ function initHighExtrusionHumanZ3() {
             'id': config.layerId,
             'type': 'fill-extrusion',
             'source': config.sourceId,
-            'minzoom': 17,
+            'minzoom': 19,
             'paint': {
                 'fill-extrusion-color': HIGH_EXTRUSION_CONFIG.color,
                 'fill-extrusion-height': ['get', 'height'],
@@ -5980,6 +5980,16 @@ map.on('load', () => {
         }
     });
 
+
+
+
+
+
+
+
+
+
+
     // СНАЧАЛА добавляем слои пройденного пути (серый) - скрытые по умолчанию
     map.addLayer({
         'id': 'passed-route-line-1',
@@ -5994,11 +6004,13 @@ map.on('load', () => {
         'paint': {
             'line-color': '#3d85c6',
             'line-width': 8,
-            'line-opacity': window.svgLayersHidden ? 0 : 0.2,
+            'line-opacity': window.svgLayersHidden ? 0 : 0.5,
             'line-cap': 'round',
             'line-dasharray': [4, 8]
         }
     }, '3d-buildings');
+
+
 
     map.addLayer({
         'id': 'passed-route-line-2',
@@ -6013,10 +6025,22 @@ map.on('load', () => {
         'paint': {
             'line-color': '#909497',
             'line-width': 8,
-            'line-opacity': window.svgLayersHidden ? 0 : 0.2,
+            'line-opacity': window.svgLayersHidden ? 0 : 0.5,
             'line-dasharray': [4, 8]
         }
     }, 'passed-route-line-1');
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Добавляем слои предстоящего пути (синий и серый) - скрытые по умолчанию
     map.addLayer({
@@ -8145,7 +8169,14 @@ textarea::placeholder {
     setTimeout(init, 1000);
     
 })();
+
+
+
 </script>
+
+
+
+
 
 <style>
 /* Стили для кнопки Сообщения при hover и active */
