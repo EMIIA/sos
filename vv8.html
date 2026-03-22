@@ -33,6 +33,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -4501,7 +4502,7 @@ const pulsingDotOrange = {
     }
 };
 
-// Красная точка остановки - гексагон
+// Красная точка остановки - гексагон (ИСПРАВЛЕННАЯ)
 const redDot = {
     width: 40,
     height: 40,
@@ -4520,24 +4521,24 @@ const redDot = {
 
         const centerX = this.width / 2;
         const centerY = this.height / 2;
-        const radius = 15;
+        const radius = 12;
 
-        const gradient = context.createRadialGradient(centerX, centerY, radius, centerX, centerY, radius + 5);
-        gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)');
-        gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+        // Градиент внутри гексагона, не выходящий за границы
+        const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+        gradient.addColorStop(0, 'rgba(255, 0, 0, 0.9)');
+        gradient.addColorStop(0.7, 'rgba(255, 0, 0, 0.6)');
+        gradient.addColorStop(1, 'rgba(255, 0, 0, 0.3)');
 
-        context.beginPath();
-        context.arc(centerX, centerY, radius + 5, 0, Math.PI * 2);
+        // Рисуем гексагон с градиентом
+        drawHexagon(context, centerX, centerY, radius);
         context.fillStyle = gradient;
         context.fill();
 
-        drawHexagon(context, centerX, centerY, radius);
-        context.fillStyle = '#e06666';
-        context.fill();
-
+        // Обводка толще и четко по контуру
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
-        context.lineWidth = 3;
+        context.lineWidth = 4;
+        context.lineJoin = 'round';
         context.stroke();
 
         this.data = context.getImageData(0, 0, this.width, this.height).data;
@@ -4545,7 +4546,7 @@ const redDot = {
     }
 };
 
-// Оранжевая точка остановки - гексагон
+// Оранжевая точка остановки - гексагон (ИСПРАВЛЕННАЯ)
 const orangeDot = {
     width: 40,
     height: 40,
@@ -4564,24 +4565,24 @@ const orangeDot = {
 
         const centerX = this.width / 2;
         const centerY = this.height / 2;
-        const radius = 15;
+        const radius = 12;
 
-        const gradient = context.createRadialGradient(centerX, centerY, radius, centerX, centerY, radius + 5);
-        gradient.addColorStop(0, 'rgba(255, 165, 0, 0.8)');
-        gradient.addColorStop(1, 'rgba(255, 165, 0, 0)');
+        // Градиент внутри гексагона
+        const gradient = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+        gradient.addColorStop(0, 'rgba(255, 165, 0, 0.9)');
+        gradient.addColorStop(0.7, 'rgba(255, 165, 0, 0.6)');
+        gradient.addColorStop(1, 'rgba(255, 165, 0, 0.3)');
 
-        context.beginPath();
-        context.arc(centerX, centerY, radius + 5, 0, Math.PI * 2);
+        // Рисуем гексагон с градиентом
+        drawHexagon(context, centerX, centerY, radius);
         context.fillStyle = gradient;
         context.fill();
 
-        drawHexagon(context, centerX, centerY, radius);
-        context.fillStyle = '#ffa500';
-        context.fill();
-
+        // Обводка толще
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
-        context.lineWidth = 3;
+        context.lineWidth = 4;
+        context.lineJoin = 'round';
         context.stroke();
 
         this.data = context.getImageData(0, 0, this.width, this.height).data;
@@ -4589,7 +4590,7 @@ const orangeDot = {
     }
 };
 
-// Серая точка (пройденная остановка) - гексагон
+// Серая точка (пройденная остановка) - гексагон (ИСПРАВЛЕННАЯ - ЧИСТО ЗЕЛЕНАЯ)
 const grayDot = {
     width: 40,
     height: 40,
@@ -4610,13 +4611,16 @@ const grayDot = {
         const centerY = this.height / 2;
         const radius = 12;
 
+        // Сплошной чисто зеленый цвет внутри
         drawHexagon(context, centerX, centerY, radius);
-        context.fillStyle = '#b9ea21';
+        context.fillStyle = '#00ff00'; // Чистый зеленый (lime)
         context.fill();
 
+        // Обводка толще
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
-        context.lineWidth = 2;
+        context.lineWidth = 4;
+        context.lineJoin = 'round';
         context.stroke();
 
         this.data = context.getImageData(0, 0, this.width, this.height).data;
@@ -4624,7 +4628,7 @@ const grayDot = {
     }
 };
 
-// Серая оранжевая точка (пройденная остановка оранжевой точки) - гексагон
+// Серая оранжевая точка (пройденная остановка оранжевой точки) - гексагон (ИСПРАВЛЕННАЯ)
 const grayOrangeDot = {
     width: 40,
     height: 40,
@@ -4645,13 +4649,16 @@ const grayOrangeDot = {
         const centerY = this.height / 2;
         const radius = 12;
 
+        // Сплошной желто-зеленый цвет
         drawHexagon(context, centerX, centerY, radius);
-        context.fillStyle = '#cccc00';
+        context.fillStyle = '#cccc00'; // Желто-зеленый
         context.fill();
 
+        // Обводка толще
         drawHexagon(context, centerX, centerY, radius);
         context.strokeStyle = '#ffffff';
-        context.lineWidth = 2;
+        context.lineWidth = 4;
+        context.lineJoin = 'round';
         context.stroke();
 
         this.data = context.getImageData(0, 0, this.width, this.height).data;
@@ -5503,11 +5510,6 @@ map.on('load', () => {
         requestAnimationFrame(animatePoint2);
     }, 1000);
 });
-
-
-
-
-
 
 
 
