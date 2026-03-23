@@ -687,8 +687,6 @@
             }
         }
     },
-    "center": [37.17466698629812, 55.97669817501398],
-    "zoom": 16.88861978015393,
     "light": {"position": [90, -80, 110], "color": "#f8f9fa"},
     "terrain": {"source": "mapbox://mapbox.mapbox-terrain-dem-v1"},
     "sources": {
