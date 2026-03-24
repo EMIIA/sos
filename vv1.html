@@ -68,9 +68,36 @@ textarea::placeholder { color: #E2E8F0 !important; }
     cursor: pointer;
     transform: translate(-50%, -50%);
     z-index: 999;
+    
+    /* === АНТИ-МЕРЦАНИЕ === */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    -webkit-transition: none !important;
+    transition: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
 }
 
-/* Попап маркера #21 — полная стилистика как у #33 */
+/* Дополнительный фикс для iOS Safari */
+@supports (-webkit-touch-callout: none) {
+    .marker-store-21 {
+        filter: none !important;
+        -webkit-filter: none !important;
+        -webkit-transform: translate(-50%, -50%) translateZ(0);
+        transform: translate(-50%, -50%) translateZ(0);
+    }
+}
+
+/* Фикс для контейнера маркера Mapbox */
+.mapboxgl-marker {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Попап остаётся без изменений */
 .marker-store-21-popup.mapboxgl-popup {
     max-width: none !important;
     z-index: 2000;
@@ -2164,7 +2191,6 @@ function addStore21Marker() {
             
             <div style="height: 1px; background-color: #e9ecef; margin: 15px 0;"></div>
             
-            <!-- БЛОК ДОБАВИТЬ ФУНКЦИЮ -->
             <div class="add-function-block" onclick="handleAddFunctionClick()">
                 <div class="add-function-left">
                     <div class="add-function-logo">
@@ -2198,7 +2224,6 @@ function addStore21Marker() {
         popupContainer.style.display = 'block';
         updatePopupPosition(markerElement);
         
-        // Обработчик закрытия
         const closeBtn = document.getElementById('store21-close-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', function(e) {
@@ -2213,20 +2238,53 @@ function addStore21Marker() {
     var store21Data = {
         coordinates: [37.63147405, 55.83441285],
         title: 'EMIIA.AI SIP<br>AI IN-STORE DARK STORE: #21',
-        description: 'EMIIA.AI API: <span style="color: #3d85c6;">JSON DATASET OUTPUT ❯</span><br>EMIIA.AI DBM: ID R: [#3D4588] #21'
+        description: 'EMIIA.AI API: <span style="color: #3d85c6;">JSON DATASET OUTPUT ❯</span><br>EMIIA.AI DBM: ID R: [#3D4581] #21'
     };
 
-    // Создаём элемент маркера
+    // === СОЗДАЁМ МАРКЕР С ФИКСОМ МЕРЦАНИЯ ===
     var el = document.createElement('div');
     el.className = 'marker-store-21';
+    
+    // Принудительное отключение анимаций и фильтров
+    el.style.cssText = `
+        background-image: url('https://sos.emiia.ai/vv_g_m_STORE_21_90EE90.svg');
+        background-size: cover;
+        width: 110px;
+        height: 110px;
+        border-radius: 0%;
+        cursor: pointer;
+        transform: translate(-50%, -50%);
+        z-index: 999;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        will-change: transform;
+        filter: none !important;
+        -webkit-filter: none !important;
+        pointer-events: auto;
+    `;
 
-    // Создаём маркер
+    // Создаём маркер с оптимальными параметрами
     var markerObj = new mapboxgl.Marker({
         element: el,
-        anchor: 'center'
+        anchor: 'center',
+        pitchAlignment: 'viewport',  // Фикс для tilt
+        rotationAlignment: 'viewport', // Фикс для rotate
+        occludedOpacity: 1.0           // Не прозрачный при occlusion
     })
     .setLngLat(store21Data.coordinates)
     .addTo(map);
+
+    // === ДОПОЛНИТЕЛЬНЫЙ ФИКС: принудительный rerender ===
+    function forceRerender() {
+        const markerEl = markerObj.getElement();
+        if (markerEl) {
+            markerEl.style.display = 'none';
+            markerEl.offsetHeight; // force reflow
+            markerEl.style.display = 'block';
+        }
+    }
 
     // Клик по маркеру
     el.addEventListener('click', function(e) {
@@ -2234,15 +2292,22 @@ function addStore21Marker() {
         openStore21Popup(el, store21Data.title, store21Data.description);
     });
 
-    // Обновление позиции при движении карты
+    // Обновление позиции с throttle
+    let lastUpdate = 0;
     map.on('move', function() {
-        updatePopupPosition(el);
+        const now = Date.now();
+        if (now - lastUpdate > 16) { // ~60fps
+            updatePopupPosition(el);
+            lastUpdate = now;
+        }
     });
     
     map.on('zoom', function() {
         updatePopupPosition(el);
         
-        // Скрываем маркер при зуме > 24 (как у #33)
+        // Фикс мерцания при зуме
+        forceRerender();
+        
         var zoom = map.getZoom();
         if (zoom > 24) {
             el.style.opacity = '0';
@@ -2253,18 +2318,22 @@ function addStore21Marker() {
             el.style.opacity = '1';
             el.style.pointerEvents = 'auto';
             el.style.display = 'block';
+            forceRerender();
         }
     });
+
+    // Фикс при изменении pitch/bearing
+    map.on('pitch', forceRerender);
+    map.on('rotate', forceRerender);
 
     // Закрытие при клике на карту
     map.on('click', function() {
         popupContainer.style.display = 'none';
     });
 
-    console.log('Store #21 marker added');
+    console.log('Store #21 marker added (anti-flicker version)');
 }
 
-// Обработчик клика "Добавить функцию"
 function handleAddFunctionClick() {
     const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
     const targetUrl = 'https://sos.emiia.ai/vv8.html';
@@ -2275,12 +2344,7 @@ function handleAddFunctionClick() {
     }
 }
 
-// Запускаем добавление маркера
 addStore21Marker();
-
-
-
-
 
 </script>
 
