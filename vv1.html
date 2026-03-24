@@ -2223,7 +2223,6 @@ function addStore21Marker() {
         return;
     }
 
-    // Создаём контейнер для кастомного попапа
     const popupContainer = document.createElement('div');
     popupContainer.id = 'store21-popup';
     popupContainer.style.cssText = 'position: fixed; display: none; z-index: 999; font-family: Montserrat, sans-serif; pointer-events: auto; transform: translate(-50%, -100%); margin-top: 15px;';
@@ -2234,7 +2233,6 @@ function addStore21Marker() {
         <div class="custom-popup-content" style="background: #f8f9fa; border-radius: 30px; padding: 48px 25px 30px 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid #e1e5e9; min-width: 330px; max-width: 330px; position: relative; pointer-events: auto; animation: fadeIn 0.2s ease-in-out;">
             <div class="custom-popup-tail" style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #f8f9fa; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));"></div>
             
-            <!-- КРЕСТИК ЗАКРЫТИЯ С ПОЛЕМ -->
             <button class="custom-popup-close" id="store21-close-btn" title="Закрыть" style="
                 position: absolute;
                 top: 5px;
@@ -2258,6 +2256,18 @@ function addStore21Marker() {
             
             <h3 style="margin: 0 0 10px 0; color: #383838; font-size: 16px; font-weight: 600; padding-right: 25px; font-family: Montserrat, sans-serif; line-height: 1.4;">${title}</h3>
             <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.5; font-family: Montserrat, sans-serif;">${description}</p>
+            
+            <!-- EMIIA.AI WiKi БАЗА ЗНАНИЙ -->
+            <div style="margin: 12px 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-size: 14px; color: #808080; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 4px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#808080" viewBox="0 0 16 16" style="vertical-align: middle; flex-shrink: 0;">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                    </svg>
+                    EMIIA.AI WiKi:
+                </span>
+                <span style="font-size: 14px; color: #3d85c6; font-weight: 400; font-family: 'Montserrat', sans-serif; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleWikiClick()">БАЗА ЗНАНИЙ ❯</span>
+            </div>
             
             <div style="height: 1px; background-color: #e9ecef; margin: 15px 0;"></div>
             
@@ -2327,18 +2337,15 @@ function addStore21Marker() {
         }
     }
 
-    // Данные маркера
     var store21Data = {
         coordinates: [37.63147405, 55.83441285],
         title: 'EMIIA.AI SIP<br>AI IN-STORE DARK STORE #21',
-        description: 'EMIIA.AI API: <span style="color: #3d85c6;">JSON DATASET OUTPUT ❯</span><br>EMIIA.AI DBM: ID R: [#3D4588] #21'
+        description: 'EMIIA.AI API: <span style="color: #3d85c6;">JSON DATASET OUTPUT ❯</span><br>EMIIA.AI DBM: ID R: [#3D4588]'
     };
 
-    // === СОЗДАЁМ МАРКЕР С ФИКСОМ МЕРЦАНИЯ ===
     var el = document.createElement('div');
     el.className = 'marker-store-21';
     
-    // Принудительное отключение анимаций и фильтров
     el.style.cssText = `
         background-image: url('https://sos.emiia.ai/vv_g_m_STORE_21_90EE90.svg');
         background-size: cover;
@@ -2358,7 +2365,6 @@ function addStore21Marker() {
         pointer-events: auto;
     `;
 
-    // Создаём маркер с оптимальными параметрами
     var markerObj = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
@@ -2369,7 +2375,6 @@ function addStore21Marker() {
     .setLngLat(store21Data.coordinates)
     .addTo(map);
 
-    // === ДОПОЛНИТЕЛЬНЫЙ ФИКС: принудительный rerender ===
     function forceRerender() {
         const markerEl = markerObj.getElement();
         if (markerEl) {
@@ -2379,13 +2384,11 @@ function addStore21Marker() {
         }
     }
 
-    // Клик по маркеру
     el.addEventListener('click', function(e) {
         e.stopPropagation();
         openStore21Popup(el, store21Data.title, store21Data.description);
     });
 
-    // Обновление позиции с throttle
     let lastUpdate = 0;
     map.on('move', function() {
         const now = Date.now();
@@ -2413,11 +2416,9 @@ function addStore21Marker() {
         }
     });
 
-    // Фикс при изменении pitch/bearing
     map.on('pitch', forceRerender);
     map.on('rotate', forceRerender);
 
-    // Закрытие при клике на карту
     map.on('click', function() {
         popupContainer.style.display = 'none';
     });
@@ -2435,7 +2436,17 @@ function handleAddFunctionClick() {
     }
 }
 
-// Запускаем добавление маркера
+// Обработчик клика по WiKi
+function handleWikiClick() {
+    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    const targetUrl = 'https://sos.emiia.ai/wiki.html';
+    if (isPWA) {
+        window.location.href = targetUrl;
+    } else {
+        window.location.assign(targetUrl);
+    }
+}
+
 addStore21Marker();
 
 
