@@ -269,6 +269,55 @@ textarea::placeholder { color: #E2E8F0 !important; }
         height: 44px;
     }
 }
+
+
+
+<style>
+/* ... существующие стили ... */
+
+/* === КРЕСТИК ЗАКРЫТИЯ КАК У ОСНОВНОГО ПИНА === */
+.custom-popup-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    font-size: 28px;
+    color: #3d85c6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    z-index: 1;
+    padding: 0;
+    line-height: 1;
+}
+
+.custom-popup-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #383838;
+    transform: scale(1.1);
+}
+
+.custom-popup-close:active {
+    transform: scale(0.95);
+}
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+    .custom-popup-close {
+        font-size: 28px;
+        padding: 14px;
+        margin: 6px;
+        width: 44px;
+        height: 44px;
+    }
+}
+</style>
 </style>
 
 
@@ -2184,27 +2233,71 @@ function addStore21Marker() {
         return `
         <div class="custom-popup-content" style="background: #f8f9fa; border-radius: 30px; padding: 48px 25px 30px 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid #e1e5e9; min-width: 330px; max-width: 330px; position: relative; pointer-events: auto; animation: fadeIn 0.2s ease-in-out;">
             <div class="custom-popup-tail" style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #f8f9fa; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));"></div>
-            <button class="custom-popup-close" id="store21-close-btn" style="position: absolute; top: 5px; right: 5px; width: 40px; height: 40px; border: none; background: none; font-size: 28px; color: #3d85c6; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: all 0.2s ease; z-index: 1; padding: 0; line-height: 1;">×</button>
+            
+            <!-- КРЕСТИК ЗАКРЫТИЯ С ПОЛЕМ -->
+            <button class="custom-popup-close" id="store21-close-btn" title="Закрыть" style="
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                width: 40px;
+                height: 40px;
+                border: none;
+                background: none;
+                font-size: 28px;
+                color: #3d85c6;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                transition: all 0.2s ease;
+                z-index: 1;
+                padding: 0;
+                line-height: 1;
+            " onmouseover="this.style.background='rgba(0,0,0,0.1)'; this.style.color='#383838'; this.style.transform='scale(1.1)';" onmouseout="this.style.background='none'; this.style.color='#3d85c6'; this.style.transform='scale(1)';" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1.1)'">×</button>
             
             <h3 style="margin: 0 0 10px 0; color: #383838; font-size: 16px; font-weight: 600; padding-right: 25px; font-family: Montserrat, sans-serif; line-height: 1.4;">${title}</h3>
             <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.5; font-family: Montserrat, sans-serif;">${description}</p>
             
             <div style="height: 1px; background-color: #e9ecef; margin: 15px 0;"></div>
             
-            <div class="add-function-block" onclick="handleAddFunctionClick()">
-                <div class="add-function-left">
-                    <div class="add-function-logo">
+            <div class="add-function-block" onclick="handleAddFunctionClick()" style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 10px 15px;
+                min-width: 250px;
+                background: rgba(255,255,255,0.95);
+                border-radius: 26px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                margin-top: 12px;
+                border-top: 1px solid #e9ecef;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            " onmouseover="this.style.background='rgba(61,133,198,0.05)'; this.style.transform='scale(1.02)'" onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.transform='scale(1)'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1.02)'">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 36px;
+                        height: 36px;
+                        background: rgba(61,133,198,0.1);
+                        border-radius: 50%;
+                        flex-shrink: 0;
+                    ">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#3d85c6" viewBox="0 0 16 16">
                             <path d="M2 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5.5a.5.5 0 0 1 0 1H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v4a.5.5 0 0 1-1 0V4a1 1 0 0 0-1-1z"/>
                             <path d="M3.146 5.146a.5.5 0 0 1 .708 0L5.177 6.47a.75.75 0 0 1 0 1.06L3.854 8.854a.5.5 0 1 1-.708-.708L4.293 7 3.146 5.854a.5.5 0 0 1 0-.708M5.5 9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5"/>
                         </svg>
                     </div>
-                    <div class="add-function-texts">
-                        <span class="add-function-title">Добавить функцию</span>
-                        <span class="add-function-subtitle">EMIIA.AI CODE (LLM)</span>
+                    <div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start;">
+                        <span style="font-size: 14px; font-weight: 600; color: #3d85c6; font-family: 'Montserrat', sans-serif; line-height: 1.1;">Добавить функцию</span>
+                        <span style="font-size: 10px; font-weight: 500; color: #888; font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px; line-height: 1.1;">EMIIA.AI CODE (LLM)</span>
                     </div>
                 </div>
-                <svg class="add-function-plus" xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#3d85c6" viewBox="0 0 16 16">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#3d85c6" viewBox="0 0 16 16" style="flex-shrink: 0; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
                 </svg>
             </div>
@@ -2238,7 +2331,7 @@ function addStore21Marker() {
     var store21Data = {
         coordinates: [37.63147405, 55.83441285],
         title: 'EMIIA.AI SIP<br>AI IN-STORE DARK STORE: #21',
-        description: 'EMIIA.AI API: <span style="color: #3d85c6;">JSON DATASET OUTPUT ❯</span><br>EMIIA.AI DBM: ID R: [#3D4581] #21'
+        description: 'EMIIA.AI API: <span style="color: #3d85c6;">JSON DATASET OUTPUT ❯</span><br>EMIIA.AI DBM: ID R: [#3D4588] #21'
     };
 
     // === СОЗДАЁМ МАРКЕР С ФИКСОМ МЕРЦАНИЯ ===
@@ -2269,9 +2362,9 @@ function addStore21Marker() {
     var markerObj = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
-        pitchAlignment: 'viewport',  // Фикс для tilt
-        rotationAlignment: 'viewport', // Фикс для rotate
-        occludedOpacity: 1.0           // Не прозрачный при occlusion
+        pitchAlignment: 'viewport',
+        rotationAlignment: 'viewport',
+        occludedOpacity: 1.0
     })
     .setLngLat(store21Data.coordinates)
     .addTo(map);
@@ -2281,7 +2374,7 @@ function addStore21Marker() {
         const markerEl = markerObj.getElement();
         if (markerEl) {
             markerEl.style.display = 'none';
-            markerEl.offsetHeight; // force reflow
+            markerEl.offsetHeight;
             markerEl.style.display = 'block';
         }
     }
@@ -2296,7 +2389,7 @@ function addStore21Marker() {
     let lastUpdate = 0;
     map.on('move', function() {
         const now = Date.now();
-        if (now - lastUpdate > 16) { // ~60fps
+        if (now - lastUpdate > 16) {
             updatePopupPosition(el);
             lastUpdate = now;
         }
@@ -2304,8 +2397,6 @@ function addStore21Marker() {
     
     map.on('zoom', function() {
         updatePopupPosition(el);
-        
-        // Фикс мерцания при зуме
         forceRerender();
         
         var zoom = map.getZoom();
@@ -2344,7 +2435,11 @@ function handleAddFunctionClick() {
     }
 }
 
+// Запускаем добавление маркера
 addStore21Marker();
+
+
+
 
 </script>
 
