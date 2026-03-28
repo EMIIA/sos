@@ -37,6 +37,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -3025,7 +3026,7 @@ map.on('pitch', function() {
     const compass = document.getElementById('custom-compass');
     if (compass) {
         const currentPitch = map.getPitch();
-        const maxCompassPitch = 0;
+        const maxCompassPitch = 50;
         const limitedPitch = Math.min(currentPitch, maxCompassPitch);
         
         compass.style.transform = `translateY(-50%) perspective(500px) rotateX(${limitedPitch}deg)`;
@@ -7607,8 +7608,8 @@ map.on('mousemove', (e) => {
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px); padding: 20px; border-radius: 30px; margin-bottom: 25px; border: 1px solid #f8f9fa; ">
 
-            <p style="line-height: 2; color: #383838; font-family: 'Montserrat', sans-serif; font-size: 14px; margin: 0;  font-weight: 600;">
-                <strong style="color: #383838;  font-weight: 600;">МУЛЬТИАГЕНТНАЯ СИСТЕМА:</strong><br> <strong style="color: #3d85c6;  font-weight: 600;"> ❯ EMIIA.AI TAI</strong>  — технический агент<br>
+            <p style="line-height: 2; color: #383838; font-family: 'Montserrat', sans-serif; font-size: 14px; margin: 0;  font-weight: 400;">
+                <strong style="color: #383838;  font-weight: 400;">МУЛЬТИАГЕНТНАЯ СИСТЕМА:</strong><br> <strong style="color: #3d85c6;  font-weight: 600;"> ❯ EMIIA.AI TAI</strong>  — технический агент<br>
 
 <strong style="color: #3d85c6; font-weight: 600;"> 
 
@@ -7616,7 +7617,7 @@ map.on('mousemove', (e) => {
 
 <br>
 
-<strong style="color: #383838; font-weight: 600;">СУБАГЕНТЫ:</strong><br>
+<strong style="color: #383838; font-weight: 400;">СУБАГЕНТЫ:</strong><br>
 
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="19" viewBox="0 -1 16 16" style="vertical-align: -3px; display: inline-block;">
 <path fill-rule="evenodd" 
@@ -7776,8 +7777,6 @@ map.on('mousemove', (e) => {
         
     </div>
 </div>
-
-
 
 
 
