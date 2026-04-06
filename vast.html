@@ -15,48 +15,55 @@
     <h1>Цены на GPU для LLM</h1>
     <div id="grid" class="grid">Загрузка данных...</div>
 
-    <script>
-        async function load() {
-            try {
-                // Добавляем Date.now(), чтобы файл всегда был свежим
-                const res = await fetch('./prices.json?v=' + Date.now());
-                const data = await res.json();
-                const grid = document.getElementById('grid');
-                
-                // Расширенный список моделей (на всякий случай)
-                const models = ["RTX 4090", "A100 PCIe", "H100 PCIe", "H100 SXM5", "A100 SXM4", "A6000"];
-                
-                const offers = data.offers
-                    .filter(o => models.includes(o.gpu_name))
-                    .sort((a,b) => a.dph_total - b.dph_total)
-                    .slice(0, 15);
+<script>
+    async function load() {
+        const grid = document.getElementById('grid');
+        try {
+            // Добавляем метку времени, чтобы файл всегда был свежим
+            const res = await fetch('./prices.json?v=' + Date.now());
+            if (!res.ok) throw new Error('Файл не найден');
+            
+            const data = await res.json();
+            
+            // Список моделей, которые мы ищем (проверьте написание в JSON)
+            const models = ["RTX 4090", "A100 PCIe", "H100 PCIe", "A100 SXM4", "H100 SXM5", "RTX 6000 Ada", "A6000"];
+            
+            const offers = data.offers
+                .filter(o => models.includes(o.gpu_name))
+                .sort((a,b) => a.dph_total - b.dph_total)
+                .slice(0, 15);
 
-                if (offers.length === 0) {
-                    grid.innerHTML = 'Нет доступных предложений для выбранных моделей.';
-                    return;
-                }
-
-                grid.innerHTML = '';
-                offers.forEach(o => {
-                    const p = o.dph_total;
-                    grid.innerHTML += `
-                        <div class="card">
-                            <div style="font-weight:bold; color:#38bdf8">${o.gpu_name}</div>
-                            <div style="font-size: 0.9em; margin-bottom: 5px;">VRAM: ${(o.gpu_ram/1024).toFixed(0)}GB</div>
-                            <div class="price">$${p.toFixed(3)}<small style="font-size:12px">/час</small></div>
-                            <div class="fp-info">
-                                <div><b>FP16:</b> $${p.toFixed(2)}</div>
-                                <div><b>FP8:</b> $${(p*0.75).toFixed(2)} (est)</div>
-                                <div><b>FP4:</b> $${(p*0.45).toFixed(2)} (est)</div>
-                            </div>
-                        </div>`;
-                });
-            } catch (e) {
-                document.getElementById('grid').innerHTML = 'Ошибка: prices.json еще не создан роботом. Подождите 15 минут.';
+            if (offers.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">Данные загружены, но подходящих GPU сейчас нет в наличии.</div>';
+                return;
             }
+
+            grid.innerHTML = '';
+            offers.forEach(o => {
+                const p = o.dph_total;
+                grid.innerHTML += `
+                    <div class="card">
+                        <div style="font-weight:bold; color:#38bdf8; margin-bottom:10px">${o.gpu_name}</div>
+                        <div style="font-size: 0.9em; color: #94a3b8">VRAM: ${(o.gpu_ram/1024).toFixed(0)} GB</div>
+                        <div class="price">$${p.toFixed(3)}<small style="font-size:12px; color:#64748b"> /час</small></div>
+                        <div class="fp-info">
+                            <div><b>FP16:</b> $${p.toFixed(2)}</div>
+                            <div><b>FP8 (Quant):</b> $${(p*0.75).toFixed(2)}</div>
+                            <div><b>FP4 (Quant):</b> $${(p*0.45).toFixed(2)}</div>
+                        </div>
+                        <div style="margin-top:15px; font-size:0.8em; color:#4ade80">Надежность: ${(o.reliability * 100).toFixed(1)}%</div>
+                    </div>`;
+            });
+        } catch (e) {
+            console.error(e);
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #f87171;">Ошибка загрузки данных. Проверьте консоль (F12).</div>';
         }
-        load();
-    </script>
+    }
+    load();
+    // Обновлять каждые 5 минут
+    setInterval(load, 300000);
+</script>
+
 
 </body>
 </html>
