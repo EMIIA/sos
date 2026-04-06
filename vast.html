@@ -28,10 +28,19 @@
             // Список моделей, которые мы ищем (проверьте написание в JSON)
             const models = ["RTX 4090", "A100 PCIe", "H100 PCIe", "A100 SXM4", "H100 SXM5", "RTX 6000 Ada", "A6000"];
             
-            const offers = data.offers
-                .filter(o => models.includes(o.gpu_name))
-                .sort((a,b) => a.dph_total - b.dph_total)
-                .slice(0, 15);
+            // Замените старый блок фильтрации на этот:
+const offers = data.offers
+    .filter(o => {
+        const name = o.gpu_name.toLowerCase();
+        // Ищем вхождение ключевых слов в название
+        return name.includes("4090") || 
+               name.includes("h100") || 
+               name.includes("a100") || 
+               name.includes("a6000") ||
+               name.includes("l40");
+    })
+    .sort((a,b) => a.dph_total - b.dph_total)
+    .slice(0, 15);
 
             if (offers.length === 0) {
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">Данные загружены, но подходящих GPU сейчас нет в наличии.</div>';
