@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>GPU Market Monitor</title>
+    <style>
+        body { font-family: sans-serif; background: #0a0a0c; color: #e2e8f0; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; border: 1px solid #334155; padding: 20px; border-radius: 12px; }
+        .price { color: #10b981; font-size: 24px; font-weight: bold; }
+        .fp-info { font-size: 0.8em; margin-top: 10px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <h1>Цены на GPU для LLM</h1>
+    <div id="grid" class="grid">Загрузка данных...</div>
+
+    <script>
+        async function load() {
+            try {
+                // Добавляем Date.now(), чтобы файл всегда был свежим
+                const res = await fetch('./prices.json?v=' + Date.now());
+                const data = await res.json();
+                const grid = document.getElementById('grid');
+                
+                // Расширенный список моделей (на всякий случай)
+                const models = ["RTX 4090", "A100 PCIe", "H100 PCIe", "H100 SXM5", "A100 SXM4", "A6000"];
+                
+                const offers = data.offers
+                    .filter(o => models.includes(o.gpu_name))
+                    .sort((a,b) => a.dph_total - b.dph_total)
+                    .slice(0, 15);
+
+                if (offers.length === 0) {
+                    grid.innerHTML = 'Нет доступных предложений для выбранных моделей.';
+                    return;
+                }
+
+                grid.innerHTML = '';
+                offers.forEach(o => {
+                    const p = o.dph_total;
+                    grid.innerHTML += `
+                        <div class="card">
+                            <div style="font-weight:bold; color:#38bdf8">${o.gpu_name}</div>
+                            <div style="font-size: 0.9em; margin-bottom: 5px;">VRAM: ${(o.gpu_ram/1024).toFixed(0)}GB</div>
+                            <div class="price">$${p.toFixed(3)}<small style="font-size:12px">/час</small></div>
+                            <div class="fp-info">
+                                <div><b>FP16:</b> $${p.toFixed(2)}</div>
+                                <div><b>FP8:</b> $${(p*0.75).toFixed(2)} (est)</div>
+                                <div><b>FP4:</b> $${(p*0.45).toFixed(2)} (est)</div>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) {
+                document.getElementById('grid').innerHTML = 'Ошибка: prices.json еще не создан роботом. Подождите 15 минут.';
+            }
+        }
+        load();
+    </script>
+
+</body>
+</html>
