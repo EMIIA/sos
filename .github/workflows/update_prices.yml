@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Fetch API
         run: |
-          curl "https://vast.ai" > prices.json
+          # Добавляем User-Agent, чтобы сервер не блокировал запрос
+          curl -A "Mozilla/5.0" "https://vast.ai" > prices.json
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
