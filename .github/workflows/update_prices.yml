@@ -1,0 +1,24 @@
+name: Update GPU Prices
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Fetch API
+        run: |
+          curl "https://vast.ai" > prices.json
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git add prices.json
+          git commit -m "Update prices" || echo "No changes to commit"
+          git push
