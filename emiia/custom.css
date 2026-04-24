@@ -1,0 +1,175 @@
+/* === 1. Название в боковом меню === */
+#sidebar-webui-name {
+    font-size: 0 !important;
+    visibility: hidden !important;
+}
+#sidebar-webui-name::after {
+    content: "EMIIA.AI SIP";
+    font-size: 1rem !important; 
+    font-weight: 500 !important;
+    visibility: visible !important;
+    display: block;
+}
+
+/* === 2. Кнопка микрофона === */
+button[aria-label="Voice Input"],
+button[aria-label="Stop Recording"] {
+    background-color: #6d9eeb !important; 
+    border: none !important;
+}
+button[aria-label="Voice Input"] svg,
+button[aria-label="Stop Recording"] svg {
+    color: white !important;
+}
+button[aria-label="Stop Recording"] {
+    background-color: #ef4444 !important;
+}
+
+/* === 3. Кнопка "Режим голоса" === */
+button[aria-label="Режим голоса"] {
+    background-color: #6d9eeb !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* === 4. Логотип в меню === */
+img.sidebar-new-chat-icon {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+/* === 5. Иконка Integration Menu === */
+#integration-menu-button svg { display: none !important; }
+#integration-menu-button::after {
+    content: "";
+    display: block;
+    width: 18px; height: 18px;
+    background-color: #6d9eeb;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8.5.134a1 1 0 0 0-1 0l-6 3.577a1 1 0 0 0-.5.866v6.846a1 1 0 0 0 .5.866l6 3.577a1 1 0 0 0 1 0l6-3.577a1 1 0 0 0 .5-.866V4.577a1 1 0 0 0-.5-.866z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8.5.134a1 1 0 0 0-1 0l-6 3.577a1 1 0 0 0-.5.866v6.846a1 1 0 0 0 .5.866l6 3.577a1 1 0 0 0 1 0l6-3.577a1 1 0 0 0 .5-.866V4.577a1 1 0 0 0-.5-.866z'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain; mask-size: contain;
+    margin: auto;
+}
+
+/* === 6. Иконки === */
+svg:has(path[d^="M6 12H12"]) { color: #6d9eeb !important; }
+#input-menu-button, #input-menu-button svg, svg:has(path[d^="M10.75 4.75"]) { color: #6d9eeb !important; }
+svg:has(path[d^="M9.5 21V3"]) { color: #6d9eeb !important; }
+
+/* === 7. Оверлей === */
+.bg-black\/60 { background-color: color-mix(in oklab, var(--color-black) 5%, transparent) !important; }
+
+/* === 8. Подсказки === */
+.tippy-box, [role="tooltip"] { background-color: #6d9eeb !important; color: white !important; border: none !important; }
+.tippy-arrow { color: #6d9eeb !important; }
+
+/* === 9. Выравнивание моделей === */
+div.max-w-full.m-1:has(button[aria-label*="model-selector"]) { margin-top: 0 !important; margin-bottom: 0 !important; }
+div.relative.text-left.mt-\[1px\] { margin-top: 0px !important; }
+
+/* === 10. Точки активности === */
+.bg-green-500 { background-color: #6d9eeb !important; }
+
+/* === 11. Кнопки инструментов (Веб-поиск, Код) === */
+/* Светлая тема */
+button.group.p-\[7px\] {
+    border-radius: 50% !important;
+    background-color: #e0e0e099 !important;
+    color: #6d9eeb !important;
+    border: none !important;
+    margin: 0 !important;
+    align-items: center !important;
+    height: 30px !important;
+    flex-shrink: 0 !important;
+    vertical-align: middle !important;
+    justify-content: center !important;
+    flex-grow: 0 !important;
+    min-width: 30px !important;
+}
+button.group.p-\[7px\]:hover {
+    border-radius: 9999px !important;
+    background-color: #e0e0e099 !important;
+}
+/* Темная тема */
+.dark button.group.p-\[7px\] { background-color: #333331 !important; color: #6d9eeb !important; }
+.dark button.group.p-\[7px\]:hover { background-color: #333331 !important; }
+
+/* === 12. Убираем обводку фокуса === */
+button:focus, button:focus-visible, [role="switch"]:focus, [role="switch"]:focus-visible, input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* === 13. Слайдеры === */
+button[role="switch"][aria-checked="true"] { background-color: #3d85c6 !important; border-color: #3d85c6 !important; }
+button[role="switch"][aria-checked="false"] { background-color: #e5e5e5 !important; border: 1px solid #cecece !important; }
+.dark button[role="switch"][aria-checked="false"] { background-color: transparent !important; border: 1px solid #4b5563 !important; }
+
+/* === 14. Горизонтальные кнопки (Action Buttons) === */
+.emii-action-buttons-container {
+    width: 100%;
+    margin-bottom: 1rem;
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.emii-scroll-container {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #e7e7e7 #f1f5f9;
+    padding-bottom: 0.5rem;
+    
+    /* === FADE EDGES (Туман) === */
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Скроллбар - Светлая тема */
+.emii-scroll-container::-webkit-scrollbar { height: 4px; }
+.emii-scroll-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+.emii-scroll-container::-webkit-scrollbar-thumb { background: #e7e7e7; border-radius: 10px; }
+
+/* Скроллбар - Темная тема */
+.dark .emii-scroll-container { scrollbar-color: #333331 #1f1f1f; }
+.dark .emii-scroll-container::-webkit-scrollbar-track { background: #1f1f1f; }
+.dark .emii-scroll-container::-webkit-scrollbar-thumb { background: #333331; }
+
+.emii-buttons-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+/* Кнопки - Светлая тема */
+.emii-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #f9fafb;
+    border-radius: 0.75rem;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+.emii-action-btn:hover { background-color: #f3f4f6; }
+.emii-action-btn svg { width: 1rem; height: 1rem; color: #4b5563; transition: color 0.2s; }
+.emii-action-btn:hover svg { color: #1f2937; }
+
+/* Free Tier - Светлая тема */
+.emii-btn-free-tier svg, .emii-btn-free-tier span { color: #3c78d8 !important; }
+
+/* Кнопки - Темная тема */
+.dark .emii-action-btn { background-color: #333331; color: white; }
+.dark .emii-action-btn:hover { background-color: #444443; }
+.dark .emii-action-btn svg { color: white; }
+.dark .emii-action-btn:hover svg { color: #e5e7eb; }
+
+/* Free Tier - Темная тема (фон темный, текст синий) */
+.dark .emii-btn-free-tier { background-color: #333331; }
+.dark .emii-btn-free-tier svg, .dark .emii-btn-free-tier span { color: #3c78d8 !important; }
