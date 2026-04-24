@@ -138,17 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Скрытие блока
-function hideBottomBlock() {
-  document.querySelectorAll('div').forEach(div => {
-    const text = div.textContent.trim();
-    
-    // Только блоки, где текст начинается с EMIIA.AI — скрываем
-    if (text.startsWith('EMIIA.AI (Open WebUI) ‧ v0.9.1') && div.className.includes('svelte-')) {
-      div.style.display = 'none';
-    }
-  });
-}
-
 hideBottomBlock();
 const observer = new MutationObserver(hideBottomBlock);
-observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+observer.observe(document.body, { childList: true, subtree: true });
