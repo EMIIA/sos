@@ -173,3 +173,7 @@ button[role="switch"][aria-checked="false"] { background-color: #e5e5e5 !importa
 /* Free Tier - Темная тема (фон темный, текст синий) */
 .dark .emii-btn-free-tier { background-color: #333331; }
 .dark .emii-btn-free-tier svg, .dark .emii-btn-free-tier span { color: #3c78d8 !important; }
+
+.svelte-6tnq1o {
+  display: none !important;
+}
