@@ -149,14 +149,16 @@ button[role="switch"][aria-checked="false"] { background-color: #e5e5e5 !importa
     gap: 0.5rem;
     padding: 0.5rem 1rem;
     background-color: #f9fafb;
-    border-radius: 0.75rem;
+    border-radius: 1.4rem;
     color: #374151;
     font-size: 0.875rem;
     font-weight: 500;
+    min-height: 44px;       /* ← минимальная высота */
     white-space: nowrap;
     transition: all 0.2s;
     border: 1px solid transparent;
 }
+
 .emii-action-btn:hover { background-color: #f3f4f6; }
 .emii-action-btn svg { width: 1rem; height: 1rem; color: #4b5563; transition: color 0.2s; }
 .emii-action-btn:hover svg { color: #1f2937; }
