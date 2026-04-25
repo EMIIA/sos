@@ -137,7 +137,19 @@ document.addEventListener('DOMContentLoaded', function() {
     addActionButtons();
 });
 
-// Скрытие блока
+// Скрытие блока текста динамического
 hideBottomBlock();
 const observer = new MutationObserver(hideBottomBlock);
 observer.observe(document.body, { childList: true, subtree: true });
+
+// Скрытие блока логотипа
+function hideSvelteFlowAttribution() {
+  const attrBlock = document.querySelector('.svelte-flow__attribution');
+  if (attrBlock) {
+    attrBlock.style.display = 'none';
+  }
+}
+
+hideSvelteFlowAttribution();
+const attrObserver = new MutationObserver(hideSvelteFlowAttribution);
+attrObserver.observe(document.body, { childList: true, subtree: true });
