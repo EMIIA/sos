@@ -66,6 +66,30 @@
 
 
 
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+    (function () {
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        } else {
+            // fallback для обычного браузера
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.style.height = window.innerHeight + 'px';
+                setTimeout(function() {
+                    window.scrollTo(0, 0);
+                }, 100);
+            });
+        }
+    })();
+</script>
+
+
+
+
+
+
 <style>
 .header1 { padding: 0rem; position: fixed; bottom: 50px; z-index: 20000; right: 5%; }
 @media (max-width: 768px) { .header1 { bottom: 0px; right: 1%; } }
