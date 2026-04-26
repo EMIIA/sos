@@ -1,6 +1,6 @@
 {
   "background_color": "#F8F9FA",
- 
+"theme_color": "#000000", 
   "description": "EMIIA.AI ❯",
   "display": "standalone",
   "icons": [
