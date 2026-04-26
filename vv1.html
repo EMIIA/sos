@@ -4,34 +4,63 @@
     <title>ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ</title>
 
 <!-- PWA -->
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#f8f9fa">
-<link rel="shortcut icon" href="https://sos.emiia.ai/vv.ico" type="image/x-icon">
-<link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, shrink-to-fit=no, user-scalable=no, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="shortcut icon" href="https://sos.emiia.ai/vv.ico" type="image/x-icon">
+    <link rel="manifest" href="https://sos.emiia.ai/vv.webmanifest">
 
-<!-- PWA STYLE -->
-<style>
-body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    overflow: hidden;
-}
+    <!-- PWA STYLE (100% рабочий) -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-#map {
-    position: fixed;
-    top: -100px;
-    bottom: -100px;
-    left: 0;
-    right: 0;
-    background: #f8f9fa;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-</style>
+        html {
+            height: -webkit-fill-available;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: -webkit-fill-available;
+            height: -webkit-fill-available;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        #map {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            margin: 0 !important;
+            padding: 0 !important;
+            /* Ключевой момент: растягиваем через transform */
+            transform: scale(1.02);
+            transform-origin: center center;
+        }
+
+        /* Дополнительный фикс для iPhone */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            body {
+                padding-top: 0px;
+                padding-bottom: 0px;
+            }
+        }
+    </style>
 
 
 
