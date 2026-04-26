@@ -68,6 +68,7 @@
 
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <script>
     (function () {
         if (window.Telegram && window.Telegram.WebApp) {
@@ -1799,6 +1800,49 @@ if (map && map.loaded()) {
 function initializeMap() {
     mapboxgl.accessToken = MAPBOX_TOKEN;
     map = new mapboxgl.Map({ container: 'map', style: 'https://sos.emiia.ai/moscow_style_2.json', center: INITIAL_VIEW.center, zoom: INITIAL_VIEW.zoom, pitch: INITIAL_VIEW.pitch, bearing: INITIAL_VIEW.bearing, maxZoom: 24, attributionControl: false, minZoom: 0, antialias: true });
+
+
+
+
+
+
+
+   
+// Этот код должен быть ПОСЛЕ создания карты `map`
+map.on('load', function () {
+    // Находим canvas-элемент карты и заставляем его растянуться
+    var canvas = map.getCanvas();
+    var container = map.getContainer();
+
+    function stretchMap() {
+        // Принудительно устанавливаем стили, которые Mapbox не сможет проигнорировать
+        container.style.padding = '0';
+        container.style.margin = '0';
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        // Говорим карте пересчитать свои размеры
+        map.resize();
+    }
+
+    // Вызываем растягивание сразу после загрузки
+    stretchMap();
+
+    // И каждый раз, когда меняются стили карты (например, после загрузки слоев)
+    map.on('styledata', function () {
+        stretchMap();
+    });
+});
+
+
+
+
+
+
+
+
 
     map.on('style.load', function() {
         setTimeout(function() {
