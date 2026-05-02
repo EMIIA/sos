@@ -40,6 +40,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -4527,7 +4528,7 @@ const ROBOT_ZONE_CONFIG = {
             height: 3.5
         }
     },
-    zoneColor: '#3d85c6',
+    zoneColor: '#909497',
     zoneOpacity: 0.3,
     zoneBaseHeight: 0,
     zoneExtrusionHeight: 0.1,
@@ -4793,6 +4794,10 @@ function createHumanZoneGeoJSON(zone) {
     };
 }
 
+
+
+
+
 // ================== ФУНКЦИИ ВЫСОКИХ ЭКСТРУЗИЙ (ДИНАМИЧЕСКИЕ) ==================
 
 // Создает MultiPolygon из массива зон
@@ -5032,6 +5037,8 @@ function removeHighExtrusionHumanZ3() {
     } catch (e) {}
 }
 
+
+
 // ================== ФУНКЦИИ ЗОН РОБОТА ==================
 
 function initRobotGroup1Layers() {
@@ -5055,7 +5062,7 @@ function initRobotGroup1Layers() {
             type: 'fill-extrusion',
             source: 'robot-floating-source-1',
             paint: {
-                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-color': '#909497',
                 'fill-extrusion-base': ROBOT_ZONE_CONFIG.group1.floatingHex.baseHeight,
                 'fill-extrusion-height': ROBOT_ZONE_CONFIG.group1.floatingHex.height,
                 'fill-extrusion-opacity': 0.9
@@ -5129,7 +5136,7 @@ function initRobotGroup2Layers() {
             type: 'fill-extrusion',
             source: 'robot-floating-source-2',
             paint: {
-                'fill-extrusion-color': '#3d85c6',
+                'fill-extrusion-color': '#909497',
                 'fill-extrusion-base': ROBOT_ZONE_CONFIG.group2.floatingHex.baseHeight,
                 'fill-extrusion-height': ROBOT_ZONE_CONFIG.group2.floatingHex.height,
                 'fill-extrusion-opacity': 0.9
@@ -8403,6 +8410,8 @@ textarea::placeholder {
 
 </body>
 </html>
+
+
 
 
 
