@@ -2713,8 +2713,69 @@ body {
 
 
 
+<style>
+/* === ФИЛЬТР: перекрашиваем синие экструзии робота в серые === */
+/* Вставить в <head> или перед </body> */
 
+/* Целимся по canvas-слою Mapbox через цветовой фильтр */
+.mapboxgl-canvas-container canvas {
+    /* Не трогаем весь canvas, работаем через JS ниже */
+}
 
+/* Специфичный хак для слоёв робота */
+[data-layer-id="high-extrusion-robot-g1"],
+[data-layer-id="high-extrusion-robot-g2"] {
+    filter: hue-rotate(180deg) saturate(0%) brightness(150%) !important;
+}
+</style>
+
+<script>
+// === АЛЬТЕРНАТИВА: принудительная перекраска через style API ===
+(function() {
+    'use strict';
+    
+    const ROBOT_GRAY = '#909497';
+    
+    // Переопределяем map.addLayer для робота
+    function patchAddLayer() {
+        if (!map || !map.addLayer) return;
+        
+        const originalAddLayer = map.addLayer.bind(map);
+        
+        map.addLayer = function(layer, before) {
+            // Перехватываем только высокие экструзии робота
+            if (layer && layer.id && 
+                (layer.id === 'high-extrusion-robot-g1' || 
+                 layer.id === 'high-extrusion-robot-g2')) {
+                
+                // Принудительно меняем цвет в paint
+                if (layer.paint) {
+                    layer.paint['fill-extrusion-color'] = ROBOT_GRAY;
+                }
+                console.log('🔒 addLayer перехвачен:', layer.id, '→', ROBOT_GRAY);
+            }
+            
+            return originalAddLayer(layer, before);
+        };
+    }
+    
+    // Ждём Mapbox
+    function init() {
+        if (typeof map === 'undefined') {
+            setTimeout(init, 100);
+            return;
+        }
+        patchAddLayer();
+        console.log('🔒 addLayer патч активен');
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
 
 
 
