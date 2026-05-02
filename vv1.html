@@ -13,6 +13,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -3268,7 +3269,7 @@ const ROBOT_ZONE_CONFIG = {
     // Параметры экструзии
     zoneBaseHeight: 0,
     zoneExtrusionHeight: 0.0,
-    zoneColor: '#3d85c6',
+    zoneColor: '#909497',
     zoneOpacity: 0.3,
     
     // ID слоёв
@@ -3384,7 +3385,7 @@ function initGroup1Layers() {
             type: 'line',
             source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
             paint: {
-                'line-color': '#5d9cec',
+                'line-color': 'red',
                 'line-width': 2,
                 'line-opacity': 0.7
             }
@@ -3442,7 +3443,7 @@ function initGroup2Layers() {
             type: 'line',
             source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
             paint: {
-                'line-color': '#5d9cec',
+                'line-color': 'red',
                 'line-width': 2,
                 'line-opacity': 0.7
             }
@@ -3544,7 +3545,7 @@ function initGroup1Layers() {
         type: 'fill-extrusion',
         source: floatingSourceId1,
         paint: {
-            'fill-extrusion-color': '#3d85c6',
+            'fill-extrusion-color': '#909497',
             'fill-extrusion-base': 1.8,
             'fill-extrusion-height': 2.0,
             'fill-extrusion-opacity': 0.9
@@ -3580,7 +3581,7 @@ function initGroup1Layers() {
         type: 'line',
         source: ROBOT_ZONE_CONFIG.sourceIdGroup1,
         paint: {
-            'line-color': '#5d9cec',
+            'line-color': '#909497',
             'line-width': 2,
             'line-opacity': 0.7
         }
@@ -3589,11 +3590,17 @@ function initGroup1Layers() {
     console.log('>>> ГРУППА 1 СОЗДАНА');
 }
 
+
+
+
+
 // === ГРУППА 2 (одна зона) + висячий гексагон ===
 function initGroup2Layers() {
     if (!map) return;
     
     removeGroup2Layers();
+
+
     
     // === ВИСЯЧИЙ ГЕКСАГОН ДЛЯ ГРУППЫ 2 (3 метра вверх) ===
     const floatingSourceId2 = 'floating-hex-source-2';
@@ -3631,6 +3638,10 @@ function initGroup2Layers() {
             }]
         }
     });
+
+
+
+
     
     // 3 метра вверх: base 3.0, height 3.2 (толщина 20см)
     map.addLayer({
@@ -3638,7 +3649,7 @@ function initGroup2Layers() {
         type: 'fill-extrusion',
         source: floatingSourceId2,
         paint: {
-            'fill-extrusion-color': '#3d85c6',
+            'fill-extrusion-color': '#909497',
             'fill-extrusion-base': 3.3,
             'fill-extrusion-height': 3.5,
             'fill-extrusion-opacity': 0.9
@@ -3674,7 +3685,7 @@ function initGroup2Layers() {
         type: 'line',
         source: ROBOT_ZONE_CONFIG.sourceIdGroup2,
         paint: {
-            'line-color': '#5d9cec',
+            'line-color': '#909497',
             'line-width': 2,
             'line-opacity': 0.7
         }
@@ -4447,3 +4458,5 @@ document.querySelector('.logo-link').addEventListener('touchcancel', function(e)
 
 
 </html>
+
+
