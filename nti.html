@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Typing Animation</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js" integrity="sha512-BdHyGtczsUoFcEma+MfXc71KJLv/cd+sUsUaYYf2mXpfG/PtBjNXsPo78+rxWjscxUYN2Qr2+DbeGGiJx81ifg==" crossorigin="anonymous"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
@@ -41,7 +40,7 @@
         }
 
         .text {
-            color: #3d85c6;  /* Синий цвет для нижнего текста */
+            color: #3d85c6;
             font-size: 14.7px;
             font-weight: 500;
             white-space: nowrap;
@@ -52,19 +51,23 @@
             margin-left: 0.0px;
             -webkit-font-feature-settings: "kern" 1;
             font-feature-settings: "kern" 1;
+            opacity: 1;
         }
 
         .typed-cursor {
-            color: #3d85c6;  /* Курсор синий, соответствует нижнему тексту */
+            color: #3d85c6;
             font-size: 14px;
-            animation: blink 1s infinite;
             display: inline;
             font-family: Montserrat, monospace !important;
             font-weight: 600;
+            opacity: 1;
+            animation: blink 1s infinite;
+            margin-left: -2px;  /* Приближаем курсор к тексту */
+            letter-spacing: 0;  /* Убираем лишний отступ */
         }
 
         .iam {
-            color: #666666;  /* Серый цвет для верхнего логотипа */
+            color: #666666;
             font-size: 77.5px;
             font-weight: 400;
             font-family: Montserrat, monospace !important;
@@ -75,9 +78,20 @@
             font-feature-settings: "kern" 1;
         }
 
+        /* Анимация мигания курсора */
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
+        }
+
+        /* Анимация выцветания */
+        @keyframes fadeOutText {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .fading {
+            animation: fadeOutText 3s ease-out forwards;
         }
 
         @supports (-webkit-touch-callout: none) {
@@ -97,23 +111,61 @@
                     </g>
                 </svg>
             </div>
-            <span class="text"></span>
+            <span class="text"></span><span class="typed-cursor">_</span>
         </div>
     </div>
 
     <script>
-        var typing = new Typed(".text", {
-            strings: ["ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ"],
-            typeSpeed: 100,
-            backSpeed: 40,
-            loop: true,            // Зацикливание анимации
-            cursorChar: '_',
-            startDelay: 3000,      // Задержка 3 секунды перед началом набора
-            fadeOut: false,
-            shuffle: false,
-            backDelay: 1500,       // Пауза перед стиранием
-            smartBackspace: true,  // Умное стирание
-            showCursor: true,
+        document.addEventListener('DOMContentLoaded', function() {
+            var textElement = document.querySelector('.text');
+            var cursorElement = document.querySelector('.typed-cursor');
+            var fullText = "ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ";
+            var currentIndex = 0;
+            
+            function startCycle() {
+                // Сброс состояний
+                textElement.textContent = '';
+                textElement.style.opacity = '1';
+                textElement.classList.remove('fading');
+                cursorElement.style.opacity = '1';
+                cursorElement.classList.remove('fading');
+                cursorElement.style.animation = 'blink 1s infinite';
+                currentIndex = 0;
+                
+                // Курсор мигает 3.5 секунды перед набором
+                setTimeout(function() {
+                    typeChar();
+                }, 3500);
+            }
+            
+            function typeChar() {
+                if (currentIndex <= fullText.length) {
+                    textElement.textContent = fullText.substring(0, currentIndex);
+                    currentIndex++;
+                    setTimeout(typeChar, 30);
+                } else {
+                    // Текст набран, курсор продолжает мигать 3.5 секунды
+                    setTimeout(fadeOut, 3500);
+                }
+            }
+            
+            function fadeOut() {
+                // Запускаем анимацию выцветания текста
+                textElement.classList.add('fading');
+                
+                // Курсор тоже выцветает
+                cursorElement.style.animation = 'fadeOutText 3s ease-out forwards';
+                
+                // Ждем 3 секунды (время выцветания) + 2 секунды паузы
+                setTimeout(function() {
+                    // Восстанавливаем мигание курсора
+                    cursorElement.style.animation = 'blink 1s infinite';
+                    startCycle();
+                }, 5000);
+            }
+            
+            // Запуск первого цикла
+            startCycle();
         });
     </script>
 </body>
