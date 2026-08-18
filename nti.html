@@ -106,14 +106,14 @@
             strings: ["ПРОСТРАНСТВЕННЫЙ ИНТЕЛЛЕКТ"],
             typeSpeed: 100,
             backSpeed: 40,
-            loop: false,           // Текст набирается один раз
+            loop: true,            // Зацикливание анимации
             cursorChar: '_',
-            startDelay: 500,
+            startDelay: 3000,      // Задержка 3 секунды перед началом набора
             fadeOut: false,
             shuffle: false,
-            backDelay: 1500,
-            smartBackspace: false, // Не стирает текст
-            showCursor: true,      // Курсор остаётся видимым
+            backDelay: 1500,       // Пауза перед стиранием
+            smartBackspace: true,  // Умное стирание
+            showCursor: true,
         });
     </script>
 </body>
