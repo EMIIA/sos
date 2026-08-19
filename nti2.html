@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Typing Animation - Block 3 Fixed</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Orbitron', monospace;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+            margin-left: 100px; /* Добавлен отступ слева для смещения блока вправо */
+        }
+
+        .main-title-wrapper {
+            width: 580px;
+            margin-bottom: 30px;
+            min-height: 35px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .main-title {
+            color: #666666;
+            font-size: 24px;
+            font-weight: 700;
+            font-family: Montserrat, monospace !important;
+            letter-spacing: 1.5px;
+        }
+
+        .title-cursor {
+            color: #666666;
+            font-size: 24px;
+            font-family: Montserrat, monospace !important;
+            font-weight: 700;
+            animation: blink 1s infinite;
+        }
+
+        .line-wrapper {
+            width: 580px;
+            margin-bottom: 6px;
+            min-height: 22px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .line {
+            color: #3d85c6;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: Montserrat, monospace !important;
+            letter-spacing: 0.5px;
+        }
+
+        .typed-cursor {
+            color: #3d85c6;
+            font-size: 16px;
+            font-family: Montserrat, monospace !important;
+            font-weight: 600;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes fadeOutText {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .fading {
+            animation: fadeOutText 3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-title-wrapper">
+            <span class="main-title" id="mainTitle"></span><span class="title-cursor" id="titleCursor">_</span>
+        </div>
+        
+        <div class="line-wrapper" id="wrapper1">
+            <span class="line" id="line1"></span><span class="typed-cursor" id="cursor1" style="display:none;">_</span>
+        </div>
+        <div class="line-wrapper" id="wrapper2">
+            <span class="line" id="line2"></span><span class="typed-cursor" id="cursor2" style="display:none;">_</span>
+        </div>
+        <div class="line-wrapper" id="wrapper3">
+            <span class="line" id="line3"></span><span class="typed-cursor" id="cursor3" style="display:none;">_</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var mainTitle = document.getElementById('mainTitle');
+            var titleCursor = document.getElementById('titleCursor');
+            var line1 = document.getElementById('line1');
+            var line2 = document.getElementById('line2');
+            var line3 = document.getElementById('line3');
+            var cursor1 = document.getElementById('cursor1');
+            var cursor2 = document.getElementById('cursor2');
+            var cursor3 = document.getElementById('cursor3');
+            
+            var titleText = "ОПЕРАЦИОННЫЕ ТЕХНОЛОГИИ";
+            var text1 = "EMIIA.AI DBM — КОНВЕРГЕНТНАЯ БАЗА ДАННЫХ";
+            var text2 = "EMIIA.AI MCP — МУЛЬТИАГЕНТНАЯ СРЕДА";
+            var text3 = "EMIIA.AI RMS — РОБОТИЗИРОВАННЫЕ СИСТЕМЫ";
+            
+            var typeSpeed = 12;
+            var currentLine = 0;
+            var currentIndex = 0;
+            
+            function startCycle() {
+                mainTitle.textContent = '';
+                mainTitle.classList.remove('fading');
+                titleCursor.classList.remove('fading');
+                titleCursor.style.animation = 'blink 1s infinite';
+                
+                [line1, line2, line3].forEach(function(line) {
+                    line.textContent = '';
+                    line.classList.remove('fading');
+                });
+                
+                titleCursor.style.display = 'inline';
+                cursor1.style.display = 'none';
+                cursor2.style.display = 'none';
+                cursor3.style.display = 'none';
+                
+                [cursor1, cursor2, cursor3].forEach(function(cursor) {
+                    cursor.classList.remove('fading');
+                    cursor.style.animation = 'blink 1s infinite';
+                });
+                
+                currentLine = 0;
+                currentIndex = 0;
+                
+                setTimeout(function() {
+                    typeNextChar();
+                }, 1000);
+            }
+            
+            function typeNextChar() {
+                var targetElement;
+                var targetCursor;
+                var targetText;
+                
+                if (currentLine === 0) {
+                    targetElement = mainTitle;
+                    targetCursor = titleCursor;
+                    targetText = titleText;
+                } else if (currentLine === 1) {
+                    targetElement = line1;
+                    targetCursor = cursor1;
+                    targetText = text1;
+                } else if (currentLine === 2) {
+                    targetElement = line2;
+                    targetCursor = cursor2;
+                    targetText = text2;
+                } else if (currentLine === 3) {
+                    targetElement = line3;
+                    targetCursor = cursor3;
+                    targetText = text3;
+                }
+                
+                if (currentIndex <= targetText.length) {
+                    targetElement.textContent = targetText.substring(0, currentIndex);
+                    currentIndex++;
+                    setTimeout(typeNextChar, typeSpeed);
+                } else {
+                    if (currentLine < 3) {
+                        targetCursor.style.display = 'none';
+                        currentLine++;
+                        currentIndex = 0;
+                        
+                        if (currentLine === 1) {
+                            cursor1.style.display = 'inline';
+                        } else if (currentLine === 2) {
+                            cursor2.style.display = 'inline';
+                        } else if (currentLine === 3) {
+                            cursor3.style.display = 'inline';
+                        }
+                        
+                        setTimeout(typeNextChar, 300);
+                    } else {
+                        setTimeout(fadeOutAll, 2500);
+                    }
+                }
+            }
+            
+            function fadeOutAll() {
+                mainTitle.classList.add('fading');
+                line1.classList.add('fading');
+                line2.classList.add('fading');
+                line3.classList.add('fading');
+                titleCursor.style.animation = 'fadeOutText 3s ease-out forwards';
+                cursor1.style.animation = 'fadeOutText 3s ease-out forwards';
+                cursor2.style.animation = 'fadeOutText 3s ease-out forwards';
+                cursor3.style.animation = 'fadeOutText 3s ease-out forwards';
+                
+                setTimeout(function() {
+                    startCycle();
+                }, 4500);
+            }
+            
+            startCycle();
+        });
+    </script>
+</body>
+</html>
