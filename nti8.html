@@ -520,7 +520,7 @@
 
                 // === АНИМАЦИЯ КАМЕРЫ ПО КООРДИНАТАМ ===
                 const cameraLocations = [
-                    { center: [37.63089529, 55.83404627], zoom: 14, bearing: 30, pitch: 60 }, // Заменил 210 на 60 (макс. лимит Mapbox)
+                    { center: [37.63089529, 55.83404627], zoom: 15.5, bearing: 30, pitch: 60 }, // Заменил 210 на 60 (макс. лимит Mapbox)
                     { center: [37.6309919, 55.8339124], zoom: 15.8, bearing: 80.5, pitch: 40 },
                     { center: [37.63099873, 55.83394857], zoom: 18.3, bearing: 185, pitch: 20 }
                 ];
@@ -528,14 +528,14 @@
                 function playback(index) {
                     map.flyTo({
                         ...cameraLocations[index],
-                        duration: 2000
+                        duration: 1000
                     });
 
                     map.once('moveend', () => {
                         window.setTimeout(() => {
                             index = (index + 1) % cameraLocations.length;
                             playback(index);
-                        }, 2000);
+                        }, 1000);
                     });
                 }
 
