@@ -500,13 +500,13 @@
                 // Включаем гексагоны сразу
                 generateGrid();
 
-                // Добавляем 3D здания и модели
+                // Добавляем 3D здания (базовые из векторных тайлов)
                 const layers = map.getStyle().layers;
                 let labelLayerId;
                 for (let i = 0; i < layers.length; i++) { if (layers[i].type === 'symbol' && layers[i].layout['text-field']) { labelLayerId = layers[i].id; break; } }
                 
                 map.addSource('openmaptiles', { url: 'https://sos.emiia.ai/tiles.json', type: 'vector' });
-                map.setTerrain(null); // ОТКЛЮЧАЕМ РЕЛЬЕФ (как было в оригинале)
+                map.setTerrain(null); // ОТКЛЮЧАЕМ РЕЛЬЕФ
                 map.setLight({ 'anchor': 'viewport', 'color': '#ffffff', 'intensity': 0.2, 'position': [1.15, 90, 80] });
                 
                 if (labelLayerId) {
@@ -515,8 +515,13 @@
                     map.addLayer({ 'id': '3d-buildings', 'source': 'openmaptiles', 'source-layer': 'building', 'type': 'fill-extrusion', 'minzoom': 14, 'maxzoom': 19, 'paint': { 'fill-extrusion-color': '#d0e0f0', 'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.5, ['get', 'render_height']], 'fill-extrusion-base': 0, 'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0, 15.5, 0.4, 18, 0.0] } }, labelLayerId);
                 }
                 
-                add3DModelSafe();
                 setupCompassEvents();
+
+                // === ГАРАНТИРОВАННАЯ ЗАГРУЗКА 3D МОДЕЛЕЙ ===
+                // Ждем, пока карта полностью прогрузит тайлы (перейдет в idle)
+                map.once('idle', () => {
+                    add3DModelSafe();
+                });
             });
         }
 
@@ -525,19 +530,31 @@
             try {
                 if (map.setConfigProperty) map.setConfigProperty('basemap', 'lightPreset', 'dusk');
 
-                               // 1. Главная модель (Слон)
-                map.addSource('model', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': { 'model-uri': 'http://sos.emiia.ai/VDNH_NN_GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } } });
+                // 1. Главная модель (Слон) - ИСПРАВЛЕН ПРОТОКОЛ НА HTTPS
+                const model1Data = { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH_NN_GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } };
+                map.addSource('model', { 'type': 'geojson', 'data': model1Data });
                 map.addLayer({ 'id': 'tower', 'type': 'model', 'slot': 'middle', 'source': 'model', 'minzoom': 18.3, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 18.3, 0, 18.5, 0.4, 18.6, 0.5, 19.5, 0.6, 20, 0.6, 24, 0.6], 'model-rotation': [0.0, 0.0, -761.5], 'model-scale': [999.5, 1090.0, 1000], 'model-color-mix-intensity': 0.3, 'model-color': '#ffffff', 'model-cast-shadows': true, 'model-translation': [0, 0, 0.2], 'model-emissive-strength': 0.4 } });
 
                 // 2. Верхняя часть павильона
-                map.addSource('model2', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH-NN-VERH-GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } } });
+                const model2Data = { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH-NN-VERH-GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } };
+                map.addSource('model2', { 'type': 'geojson', 'data': model2Data });
                 map.addLayer({ 'id': 'tower2', 'type': 'model', 'slot': 'middle', 'source': 'model2', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1], 'model-rotation': [0.0, 0.0, -761.5], 'model-scale': [999.5, 1090.0, 100], 'model-color-mix-intensity': 1, 'model-cast-shadows': true, 'model-translation': [0, 0, 6.3], 'model-emissive-strength': 0.9 } });
 
                 // 3. Нижняя часть павильона
-                map.addSource('model4', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH-NN-VERH-GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } } });
+                const model4Data = { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH-NN-VERH-GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } };
+                map.addSource('model4', { 'type': 'geojson', 'data': model4Data });
                 map.addLayer({ 'id': 'tower4', 'type': 'model', 'slot': 'middle', 'source': 'model4', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1], 'model-rotation': [0.0, 0.0, -761.5], 'model-scale': [999.5, 1090.0, 1000], 'model-translation': [0, 0, 0.001], 'model-color-mix-intensity': 1, 'model-cast-shadows': true, 'model-emissive-strength': 0.9 } });
 
                 modelAdded = true;
+
+                // ФИКС: ПРИНУДИТЕЛЬНЫЙ ПЕРЕЗАПРОС ДАННЫХ ЧЕРЕЗ 1.5 СЕКУНДЫ
+                // Если Mapbox "проморгал" загрузку GLB-файла в первый раз, это заставит его перезапросить и отрисовать модель
+                setTimeout(() => {
+                    if (map.getSource('model')) map.getSource('model').setData(model1Data);
+                    if (map.getSource('model2')) map.getSource('model2').setData(model2Data);
+                    if (map.getSource('model4')) map.getSource('model4').setData(model4Data);
+                }, 1500);
+
             } catch (error) { console.error('Ошибка добавления 3D модели:', error); }
         }
 
