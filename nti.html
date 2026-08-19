@@ -31,39 +31,38 @@
             width: 100%;
             max-width: 800px;
             padding: 20px;
-            text-align: center;
+            display: flex;
+            justify-content: center;
         }
 
         .text-container {
-            display: inline-block;
             text-align: left;
+            width: 310px; /* Фиксированная ширина как у SVG */
+        }
+
+        .text-wrapper {
+            display: block;
+            min-height: 22px;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .text {
             color: #3d85c6;
             font-size: 14.7px;
             font-weight: 500;
-            white-space: nowrap;
-            display: inline;
-            text-align: left;
             font-family: Montserrat, monospace !important;
             letter-spacing: 1px;
-            margin-left: 0.0px;
-            -webkit-font-feature-settings: "kern" 1;
-            font-feature-settings: "kern" 1;
             opacity: 1;
         }
 
         .typed-cursor {
             color: #3d85c6;
             font-size: 14px;
-            display: inline;
             font-family: Montserrat, monospace !important;
             font-weight: 600;
-            opacity: 1;
             animation: blink 1s infinite;
-            margin-left: -2px;  /* Приближаем курсор к тексту */
-            letter-spacing: 0;  /* Убираем лишний отступ */
+            margin-left: -2px;
         }
 
         .iam {
@@ -72,19 +71,15 @@
             font-weight: 400;
             font-family: Montserrat, monospace !important;
             margin-bottom: -32px;
-            text-align: left;
             display: block;
-            -webkit-font-feature-settings: "kern" 1;
-            font-feature-settings: "kern" 1;
+            width: 310px;
         }
 
-        /* Анимация мигания курсора */
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
 
-        /* Анимация выцветания */
         @keyframes fadeOutText {
             0% { opacity: 1; }
             100% { opacity: 0; }
@@ -92,12 +87,6 @@
 
         .fading {
             animation: fadeOutText 3s ease-out forwards;
-        }
-
-        @supports (-webkit-touch-callout: none) {
-            .text, .iam {
-                -webkit-font-smoothing: subpixel-antialiased;
-            }
         }
     </style>
 </head>
@@ -111,7 +100,9 @@
                     </g>
                 </svg>
             </div>
-            <span class="text"></span><span class="typed-cursor">_</span>
+            <div class="text-wrapper">
+                <span class="text"></span><span class="typed-cursor">_</span>
+            </div>
         </div>
     </div>
 
@@ -123,7 +114,6 @@
             var currentIndex = 0;
             
             function startCycle() {
-                // Сброс состояний
                 textElement.textContent = '';
                 textElement.style.opacity = '1';
                 textElement.classList.remove('fading');
@@ -132,7 +122,6 @@
                 cursorElement.style.animation = 'blink 1s infinite';
                 currentIndex = 0;
                 
-                // Курсор мигает 3.5 секунды перед набором
                 setTimeout(function() {
                     typeChar();
                 }, 3500);
@@ -142,29 +131,22 @@
                 if (currentIndex <= fullText.length) {
                     textElement.textContent = fullText.substring(0, currentIndex);
                     currentIndex++;
-                    setTimeout(typeChar, 30);
+                    setTimeout(typeChar, 12);
                 } else {
-                    // Текст набран, курсор продолжает мигать 3.5 секунды
                     setTimeout(fadeOut, 3500);
                 }
             }
             
             function fadeOut() {
-                // Запускаем анимацию выцветания текста
                 textElement.classList.add('fading');
-                
-                // Курсор тоже выцветает
                 cursorElement.style.animation = 'fadeOutText 3s ease-out forwards';
                 
-                // Ждем 3 секунды (время выцветания) + 2 секунды паузы
                 setTimeout(function() {
-                    // Восстанавливаем мигание курсора
                     cursorElement.style.animation = 'blink 1s infinite';
                     startCycle();
                 }, 5000);
             }
             
-            // Запуск первого цикла
             startCycle();
         });
     </script>
