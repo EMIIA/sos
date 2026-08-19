@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Typing Animation - Video Standard</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic');
+        
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Orbitron', monospace;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .text-container {
+            display: inline-block;
+            text-align: left;
+        }
+
+        /* Большой заголовок */
+        .main-title-wrapper {
+            margin-bottom: 30px;
+            min-height: 35px;
+            display: block;
+        }
+
+        .main-title {
+            color: #666666;
+            font-size: 24px;  /* Стандартный размер для заголовка */
+            font-weight: 700;
+            text-align: left;
+            font-family: Montserrat, monospace !important;
+            letter-spacing: 1.5px;
+            display: inline;
+            -webkit-font-feature-settings: "kern" 1;
+            font-feature-settings: "kern" 1;
+            opacity: 1;
+        }
+
+        .title-cursor {
+            color: #666666;
+            font-size: 24px;
+            display: inline;
+            font-family: Montserrat, monospace !important;
+            font-weight: 700;
+            opacity: 1;
+            animation: blink 1s infinite;
+            margin-left: -2px;
+            letter-spacing: 0;
+        }
+
+        .line-wrapper {
+            display: block;
+            margin-bottom: 6px;
+            min-height: 22px;
+            position: relative;
+        }
+
+        .line {
+            color: #3d85c6;
+            font-size: 16px;  /* Стандартный читаемый размер */
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline;
+            text-align: left;
+            font-family: Montserrat, monospace !important;
+            letter-spacing: 0.5px;
+            opacity: 1;
+        }
+
+        .typed-cursor {
+            color: #3d85c6;
+            font-size: 16px;
+            display: inline;
+            font-family: Montserrat, monospace !important;
+            font-weight: 600;
+            opacity: 1;
+            animation: blink 1s infinite;
+            margin-left: -2px;
+            letter-spacing: 0;
+        }
+
+        /* Анимация мигания курсора */
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Анимация выцветания */
+        @keyframes fadeOutText {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .fading {
+            animation: fadeOutText 3s ease-out forwards;
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            .line, .main-title {
+                -webkit-font-smoothing: subpixel-antialiased;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-container">
+            <!-- Большой заголовок с курсором -->
+            <div class="main-title-wrapper">
+                <span class="main-title" id="mainTitle"></span><span class="title-cursor" id="titleCursor">_</span>
+            </div>
+            
+            <!-- Три строки -->
+            <div class="line-wrapper" id="wrapper1">
+                <span class="line" id="line1"></span><span class="typed-cursor" id="cursor1" style="display:none;">_</span>
+            </div>
+            <div class="line-wrapper" id="wrapper2">
+                <span class="line" id="line2"></span><span class="typed-cursor" id="cursor2" style="display:none;">_</span>
+            </div>
+            <div class="line-wrapper" id="wrapper3">
+                <span class="line" id="line3"></span><span class="typed-cursor" id="cursor3" style="display:none;">_</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var mainTitle = document.getElementById('mainTitle');
+            var titleCursor = document.getElementById('titleCursor');
+            var line1 = document.getElementById('line1');
+            var line2 = document.getElementById('line2');
+            var line3 = document.getElementById('line3');
+            var cursor1 = document.getElementById('cursor1');
+            var cursor2 = document.getElementById('cursor2');
+            var cursor3 = document.getElementById('cursor3');
+            
+            var titleText = "АДАПТИВНЫЕ ЦИФРОВЫЕ ДВОЙНИКИ";
+            var text1 = "EMIIA.AI MAP — ТЕХНОЛОГИЯ МАППИРОВАНИЯ ДАННЫХ";
+            var text2 = "EMIIA.AI GIS — ЦИФРОВЫЕ КАРТЫ";
+            var text3 = "EMIIA.AI HEX — ГЕКСАГОНАЛЬНОЕ ИНДЕКСИРОВАНИЕ В RTLS";
+            
+            var typeSpeed = 20;  // Оптимальная скорость
+            var currentLine = 0;
+            var currentIndex = 0;
+            
+            function startCycle() {
+                // Сброс состояний
+                mainTitle.textContent = '';
+                mainTitle.style.opacity = '1';
+                mainTitle.classList.remove('fading');
+                titleCursor.style.opacity = '1';
+                titleCursor.classList.remove('fading');
+                titleCursor.style.animation = 'blink 1s infinite';
+                
+                [line1, line2, line3].forEach(function(line) {
+                    line.textContent = '';
+                    line.style.opacity = '1';
+                    line.classList.remove('fading');
+                });
+                
+                // Показываем только курсор заголовка
+                titleCursor.style.display = 'inline';
+                cursor1.style.display = 'none';
+                cursor2.style.display = 'none';
+                cursor3.style.display = 'none';
+                
+                [cursor1, cursor2, cursor3].forEach(function(cursor) {
+                    cursor.style.opacity = '1';
+                    cursor.classList.remove('fading');
+                    cursor.style.animation = 'blink 1s infinite';
+                });
+                
+                currentLine = 0;
+                currentIndex = 0;
+                
+                // Задержка перед началом
+                setTimeout(function() {
+                    typeNextChar();
+                }, 1000);
+            }
+            
+            function typeNextChar() {
+                var targetElement;
+                var targetCursor;
+                var targetText;
+                
+                // Определяем текущий элемент
+                if (currentLine === 0) {
+                    targetElement = mainTitle;
+                    targetCursor = titleCursor;
+                    targetText = titleText;
+                } else if (currentLine === 1) {
+                    targetElement = line1;
+                    targetCursor = cursor1;
+                    targetText = text1;
+                } else if (currentLine === 2) {
+                    targetElement = line2;
+                    targetCursor = cursor2;
+                    targetText = text2;
+                } else if (currentLine === 3) {
+                    targetElement = line3;
+                    targetCursor = cursor3;
+                    targetText = text3;
+                }
+                
+                // Набираем символ
+                if (currentIndex <= targetText.length) {
+                    targetElement.textContent = targetText.substring(0, currentIndex);
+                    currentIndex++;
+                    setTimeout(typeNextChar, typeSpeed);
+                } else {
+                    // Элемент набран
+                    if (currentLine < 3) {
+                        // Скрываем текущий курсор
+                        targetCursor.style.display = 'none';
+                        
+                        currentLine++;
+                        currentIndex = 0;
+                        
+                        // Показываем следующий курсор
+                        if (currentLine === 1) {
+                            cursor1.style.display = 'inline';
+                        } else if (currentLine === 2) {
+                            cursor2.style.display = 'inline';
+                        } else if (currentLine === 3) {
+                            cursor3.style.display = 'inline';
+                        }
+                        
+                        setTimeout(typeNextChar, 300);  // Комфортная пауза
+                    } else {
+                        // Все набрано
+                        setTimeout(fadeOutAll, 2500);  // Пауза для чтения
+                    }
+                }
+            }
+            
+            function fadeOutAll() {
+                // Все элементы выцветают
+                mainTitle.classList.add('fading');
+                line1.classList.add('fading');
+                line2.classList.add('fading');
+                line3.classList.add('fading');
+                titleCursor.style.animation = 'fadeOutText 3s ease-out forwards';
+                cursor1.style.animation = 'fadeOutText 3s ease-out forwards';
+                cursor2.style.animation = 'fadeOutText 3s ease-out forwards';
+                cursor3.style.animation = 'fadeOutText 3s ease-out forwards';
+                
+                // Ждем 3 секунды (выцветание) + 1.5 секунды паузы
+                setTimeout(function() {
+                    startCycle();
+                }, 4500);
+            }
+            
+            // Запуск первого цикла
+            startCycle();
+        });
+    </script>
+</body>
+</html>
