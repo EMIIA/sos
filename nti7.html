@@ -530,20 +530,25 @@
             try {
                 if (map.setConfigProperty) map.setConfigProperty('basemap', 'lightPreset', 'dusk');
 
+
+ // 3. Нижняя часть павильона
+                const model4Data = { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH-NN-VERH-GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } };
+                map.addSource('model4', { 'type': 'geojson', 'data': model4Data });
+                map.addLayer({ 'id': 'tower4', 'type': 'model', 'slot': 'middle', 'source': 'model4', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1], 'model-rotation': [0.0, 0.0, -761.5], 'model-scale': [999.5, 1090.0, 1000], 'model-translation': [0, 0, 0.001], 'model-color-mix-intensity': 1, 'model-cast-shadows': true, 'model-emissive-strength': 0.9 } });
+
+
                 // 1. Главная модель (Слон) - ИСПРАВЛЕН ПРОТОКОЛ НА HTTPS
                 const model1Data = { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH_NN_GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } };
                 map.addSource('model', { 'type': 'geojson', 'data': model1Data });
                 map.addLayer({ 'id': 'tower', 'type': 'model', 'slot': 'middle', 'source': 'model', 'minzoom': 18.3, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 18.3, 0, 18.5, 0.4, 18.6, 0.5, 19.5, 0.6, 20, 0.6, 24, 0.6], 'model-rotation': [0.0, 0.0, -761.5], 'model-scale': [999.5, 1090.0, 1000], 'model-color-mix-intensity': 0.3, 'model-color': '#ffffff', 'model-cast-shadows': true, 'model-translation': [0, 0, 0.2], 'model-emissive-strength': 0.4 } });
+
 
                 // 2. Верхняя часть павильона
                 const model2Data = { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH-NN-VERH-GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } };
                 map.addSource('model2', { 'type': 'geojson', 'data': model2Data });
                 map.addLayer({ 'id': 'tower2', 'type': 'model', 'slot': 'middle', 'source': 'model2', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1], 'model-rotation': [0.0, 0.0, -761.5], 'model-scale': [999.5, 1090.0, 100], 'model-color-mix-intensity': 1, 'model-cast-shadows': true, 'model-translation': [0, 0, 6.3], 'model-emissive-strength': 0.9 } });
 
-                // 3. Нижняя часть павильона
-                const model4Data = { 'type': 'Feature', 'properties': { 'model-uri': 'https://sos.emiia.ai/VDNH-NN-VERH-GLB.glb' }, 'geometry': { 'coordinates': [37.63113790199057, 55.834227583210094], 'type': 'Point' } };
-                map.addSource('model4', { 'type': 'geojson', 'data': model4Data });
-                map.addLayer({ 'id': 'tower4', 'type': 'model', 'slot': 'middle', 'source': 'model4', 'minzoom': 15, 'maxzoom': 24, 'layout': { 'model-id': ['get', 'model-uri'] }, 'paint': { 'model-opacity': ['interpolate', ['linear'], ['zoom'], 17, 0, 18, 0.1, 18.5, 0.9, 19, 1, 19.5, 1], 'model-rotation': [0.0, 0.0, -761.5], 'model-scale': [999.5, 1090.0, 1000], 'model-translation': [0, 0, 0.001], 'model-color-mix-intensity': 1, 'model-cast-shadows': true, 'model-emissive-strength': 0.9 } });
+               
 
                 modelAdded = true;
 
