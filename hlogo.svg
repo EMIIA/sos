@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 192 192">
+  <defs>
+    <path id="hex" d="M96 31.259 A34 34 0 0 1 113 35.815 L139.622 51.185 A34 34 0 0 1 156.622 80.630 L156.622 111.370 A34 34 0 0 1 139.622 140.815 L113 156.185 A34 34 0 0 1 79 156.185 L52.378 140.815 A34 34 0 0 1 35.378 111.370 L35.378 80.630 A34 34 0 0 1 52.378 51.185 L79 35.815 A34 34 0 0 1 96 31.259 Z"/>
+  </defs>
+  <use href="#hex" fill="none" stroke="#d8d8d8" stroke-width="18" stroke-linejoin="round"/>
+  <use href="#hex" fill="none" stroke="#888888" stroke-width="18" stroke-linejoin="round" stroke-linecap="round"
+       stroke-dasharray="116.6 281.474" stroke-dashoffset="-8"/>
+</svg>
